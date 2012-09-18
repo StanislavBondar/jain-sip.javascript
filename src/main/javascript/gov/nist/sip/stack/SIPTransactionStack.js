@@ -1,24 +1,24 @@
-/* 
-    Copyright (C) 2012 France Telecom S.A.
-	 
-    This file is part of JAIN-SIP JavaScript API. 
-    JAIN-SIP JavaScript API has been developed by Orange based on a JAIN-SIP Java implementation.
-    Orange has implemented the transport of SIP over WebSocket based on current IETF work 
-    (http://datatracker.ietf.org/doc/draft-ietf-sipcore-sip-websocket/)
-	
-    JAIN-SIP JavaScript API is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    JavaScript SIP API is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with JAIN-SIP JavaScript API.  If not, see <http://www.gnu.org/licenses/>. 
-*/
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 
 /*
  *  Implementation of the JAIN-SIP SIPTransactionStack .
@@ -31,24 +31,11 @@
 function SIPTransactionStack() {
     if(logger!=undefined) logger.debug("SIPTransactionStack:SIPTransactionStack()");
     this.classname="SIPTransactionStack"; 
-    if(arguments.length!=0)
-    {
-        this.sipStack=arguments[0];
-        this.wsurl=this.sipStack.getUrlWs();
-        this.ipAddressLocal=this.sipStack.getIpAddress();
-        this.useragent=this.sipStack.getUserAgent();
-        if(arguments.length==2)
-        {
-            var messageFactory=arguments[1];
-            this.sipMessageFactory = messageFactory;
-        } 
-    }
+    
     this.messageProcessors=new Array();
     this.sipMessageFactory=null;
     this.activeClientTransactionCount = 0;
     this.mergeTable=new Array();
-    this.stackLogger=null;
-    this.serverLogger=null;
     this.defaultRouter=null;
     this.needsLogging=null;
     this.stackName=null;
@@ -90,6 +77,7 @@ function SIPTransactionStack() {
     this.maxListenerResponseTime=-1;
     this.non2XXAckPassedToListener=null;
     this.maxMessageSize=null;
+    this.addressResolver = new DefaultAddressResolver();
     
     this.dialogCreatingMethods.push("REFER");
     this.dialogCreatingMethods.push("INVITE");
@@ -115,7 +103,7 @@ SIPTransactionStack.prototype.reInit =function(){
     this.terminatedServerTransactionsPendingAck = new Array();
     this.forkedClientTransactionTable = new Array();
     this.timer = null;
-    this.activeClientTransactionCount = null;
+    this.activeClientTransactionCount=0;
 }
 
 SIPTransactionStack.prototype.addExtensionMethod =function(extensionMethod){
@@ -138,8 +126,6 @@ SIPTransactionStack.prototype.addExtensionMethod =function(extensionMethod){
 
 SIPTransactionStack.prototype.removeDialog =function(){
     if(logger!=undefined) logger.debug("SIPTransactionStack:removeDialog()");
-    //alert("early dialog"+"\n"+this.earlyDialogTable);
-    //alert("dialogTable"+"\n"+this.dialogTable);
     if(typeof arguments[0]=="objet")
     {
         var dialog=arguments[0];
@@ -732,14 +718,10 @@ SIPTransactionStack.prototype.getServerTransactionTableSize =function(){
 }
 
 SIPTransactionStack.prototype.getClientTransactionTableSize =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getStackLogger()");
+    if(logger!=undefined) logger.debug("SIPTransactionStack:getClientTransactionTableSize()");
     return this.clientTransactionTable.length;
 }
 
-SIPTransactionStack.prototype.getStackLogger =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getStackLogger()");
-    
-}
 SIPTransactionStack.prototype.findTransaction =function(sipMessage,isServer){
     if(logger!=undefined) logger.debug("SIPTransactionStack:findTransaction():sipMessage="+sipMessage+", isServer="+isServer);
     var retval = null;
@@ -1057,6 +1039,11 @@ SIPTransactionStack.prototype.setHostAddress =function(stackAddress){
         this.stackAddress = stackAddress;
     }
     this.stackInetAddress = stackAddress;   
+}
+
+SIPTransactionStack.prototype.getHostAddress =function(){
+    if(logger!=undefined) logger.debug("SIPTransactionStack:getHostAddress()"+stackAddress);
+    return this.stackAddress ;  
 }
 
 SIPTransactionStack.prototype.setRouter =function(router){

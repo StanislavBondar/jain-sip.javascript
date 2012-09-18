@@ -1,24 +1,24 @@
-/* 
-    Copyright (C) 2012 France Telecom S.A.
-	 
-    This file is part of JAIN-SIP JavaScript API. 
-    JAIN-SIP JavaScript API has been developed by Orange based on a JAIN-SIP Java implementation.
-    Orange has implemented the transport of SIP over WebSocket based on current IETF work 
-    (http://datatracker.ietf.org/doc/draft-ietf-sipcore-sip-websocket/)
-	
-    JAIN-SIP JavaScript API is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    JavaScript SIP API is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with JAIN-SIP JavaScript API.  If not, see <http://www.gnu.org/licenses/>. 
-*/
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 
 /*
  *  Implementation of the JAIN-SIP SipFactory .
@@ -30,25 +30,17 @@
 function SipFactory() {
     if(logger!=undefined) logger.debug("SipFactory:SipFactory()");
     this.classname="SipFactory"; 
-    this.sSipFactory=null;
+    this.sipFactory=null;
     this.mNameSipStackMap=new Array();
-    if(arguments.length!=0)
-    {
-        this.wsurl=arguments[0];
-        this.ipAddressLocal=arguments[1];
-        this.userAgent=arguments[2];
-        this.password=arguments[3];
-        this.sipuri="sip:"+arguments[4];
-    }
 }
 
 SipFactory.prototype.getInstance =function(){
     if(logger!=undefined) logger.debug("SipFactory:getInstance()");
-    if (this.sSipFactory == null) 
+    if (this.sipFactory == null) 
     {
-        this.sSipFactory = new SipFactory();
+        this.sipFactory = new SipFactory();
     }
-    return this.sSipFactory;
+    return this.sipFactory;
 }
 
 SipFactory.prototype.resetFactory =function(){
@@ -56,26 +48,27 @@ SipFactory.prototype.resetFactory =function(){
     this.mNameSipStackMap=new Array();
 }
 
-SipFactory.prototype.createSipStack =function(){
+SipFactory.prototype.createSipStack =function(wsUrl,sipUserAgentName){
     if(logger!=undefined) logger.debug("SipFactory:createSipStack()");
-    var name = this.wsurl;
+
     var sipStack = null;
     for(var i=0;i<this.mNameSipStackMap.length;i++)
     {
-        if(this.mNameSipStackMap[i][0]==name)
+        if(this.mNameSipStackMap[i][0]==wsUrl)
         {
             sipStack=this.mNameSipStackMap[i][1]
         }
     }
     if (sipStack == null) {
         var array=new Array();
-        sipStack=new SipStackImpl(this.wsurl,this.ipAddressLocal,this.userAgent,this.password,this.sipuri);
-        array[0]=name;
+        sipStack=new SipStackImpl(wsUrl,sipUserAgentName);
+        array[0]=wsUrl;
         array[1]=sipStack;
         this.mNameSipStackMap.push(array);
     }
     return sipStack;
 }
+
 
 SipFactory.prototype.createAddressFactory =function(){
     if(logger!=undefined) logger.debug("SipFactory:createAddressFactory()");

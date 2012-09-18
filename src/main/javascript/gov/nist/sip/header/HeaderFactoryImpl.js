@@ -1,24 +1,24 @@
-/* 
-    Copyright (C) 2012 France Telecom S.A.
-	 
-    This file is part of JAIN-SIP JavaScript API. 
-    JAIN-SIP JavaScript API has been developed by Orange based on a JAIN-SIP Java implementation.
-    Orange has implemented the transport of SIP over WebSocket based on current IETF work 
-    (http://datatracker.ietf.org/doc/draft-ietf-sipcore-sip-websocket/)
-	
-    JAIN-SIP JavaScript API is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    JavaScript SIP API is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with JAIN-SIP JavaScript API.  If not, see <http://www.gnu.org/licenses/>. 
-*/
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 
 /*
  *  Implementation of the JAIN-SIP HeaderFactoryImpl .
@@ -550,6 +550,7 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         var realm=response.getWWWAuthenticate().getRealm();
         var scheme=response.getWWWAuthenticate().getScheme();
         var nonce=response.getWWWAuthenticate().getNonce();
+        var qop=response.getWWWAuthenticate().getQop();
         var authorization=new Authorization();
     }
     else if(response.hasHeader("proxy-authenticate"))
@@ -558,17 +559,22 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         scheme=response.getProxyAuthenticate().getScheme();
         nonce=response.getProxyAuthenticate().getNonce(); 
         var proxyauthorization=new ProxyAuthorization();
+        qop=response.getWWWAuthenticate().getQop();
     }
     var mda=new MessageDigestAlgorithm();
     var method=response.getCSeq().getMethod();
-    var user=request.getFrom().getAddress().getURI().encodeWithoutScheme();
-    var resp=mda.calculateResponse(user,realm,password,nonce,null,null,method,sipuri,null,null);
+    var user=request.getFrom().getAddress().getURI().getUser();
+    var cnonce=Math.floor(Math.random()*16777215).toString(16);
+    var nc="00000001"; 
+    var resp=mda.calculateResponse(user,realm,password,nonce,nc,cnonce, method,sipuri,null,qop);
     
     if(response.hasHeader("www-authenticate"))
     {
         authorization.setUsername(user);
         authorization.setRealm(realm);
         authorization.setNonce(nonce);
+        authorization.setCNonce(cnonce);
+        authorization.setNonceCount(nc);
         authorization.setScheme(scheme);
         authorization.setResponse(resp);
         authorization.setURI(sipuri);
@@ -580,6 +586,8 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         proxyauthorization.setUsername(user);
         proxyauthorization.setRealm(realm);
         proxyauthorization.setNonce(nonce);
+        authorization.setCNonce(cnonce);
+        authorization.setNonceCount(nc);
         proxyauthorization.setScheme(scheme);
         proxyauthorization.setResponse(resp);
         proxyauthorization.setURI(sipuri);

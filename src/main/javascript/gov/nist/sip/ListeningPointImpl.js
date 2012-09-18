@@ -1,24 +1,24 @@
-/* 
-    Copyright (C) 2012 France Telecom S.A.
-	 
-    This file is part of JAIN-SIP JavaScript API. 
-    JAIN-SIP JavaScript API has been developed by Orange based on a JAIN-SIP Java implementation.
-    Orange has implemented the transport of SIP over WebSocket based on current IETF work 
-    (http://datatracker.ietf.org/doc/draft-ietf-sipcore-sip-websocket/)
-	
-    JAIN-SIP JavaScript API is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    JavaScript SIP API is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with JAIN-SIP JavaScript API.  If not, see <http://www.gnu.org/licenses/>. 
-*/
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 
 /*
  *  Implementation of the JAIN-SIP ListeningPointImpl .
@@ -37,7 +37,6 @@ function ListeningPointImpl() {
     {
         var sipStack=arguments[0];
         this.sipStack=sipStack;
-        this.useragent=this.sipStack.getUserAgent();
     }
 }
 
@@ -51,12 +50,12 @@ ListeningPointImpl.prototype.makeKey =function(host,transport){
 
 ListeningPointImpl.prototype.getKey =function(){
     if(logger!=undefined) logger.debug("ListeningPointImpl:getKey()");
-    return this.makeKey(this.getIPAddress(), this.transport);
+    return this.makeKey(this.sipStack.getHostAddress(), this.transport);
 }
 
 ListeningPointImpl.prototype.getUserAgent =function(){
     if(logger!=undefined) logger.debug("ListeningPointImpl:getUserAgent()");
-    return this.useragent;
+    return this.sipStack.getUserAgent();
 }
 
 ListeningPointImpl.prototype.setSipProvider =function(sipProviderImpl){
@@ -114,12 +113,13 @@ ListeningPointImpl.prototype.getHost =function(){
     return this.hostname;
 }
 
-ListeningPointImpl.prototype.createContactHeader =function(){
+ListeningPointImpl.prototype.createContactHeader =function(userName){
     if(logger!=undefined) logger.debug("ListeningPointImpl:createContactHeader()");
     try {
-        var hostname = this.getHost();
+        var hostname = this.sipStack.getHostAddress();
         var sipURI = new SipUri();
-        sipURI.setHost(hostname);
+        sipURI.setHost_String(hostname);
+        sipURI.setUser(userName);
         sipURI.setTransportParam(this.transport);
         var contact = new Contact();
         var address = new AddressImpl();
@@ -150,7 +150,7 @@ ListeningPointImpl.prototype.getPort =function(){
     return this.messageProcessor.getPort();
 }
 
-ListeningPointImpl.prototype.getIPAddress =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getIPAddress()");
-    return this.messageProcessor.getIpAddress();
+ListeningPointImpl.prototype.getHostAddress =function(){
+    if(logger!=undefined) logger.debug("ListeningPointImpl:getHostAddress()");
+    return this.sipStack.getHostAddress();
 }

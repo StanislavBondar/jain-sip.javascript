@@ -1,24 +1,24 @@
-/* 
-    Copyright (C) 2012 France Telecom S.A.
-	 
-    This file is part of JAIN-SIP JavaScript API. 
-    JAIN-SIP JavaScript API has been developed by Orange based on a JAIN-SIP Java implementation.
-    Orange has implemented the transport of SIP over WebSocket based on current IETF work 
-    (http://datatracker.ietf.org/doc/draft-ietf-sipcore-sip-websocket/)
-	
-    JAIN-SIP JavaScript API is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    JavaScript SIP API is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with JAIN-SIP JavaScript API.  If not, see <http://www.gnu.org/licenses/>. 
-*/
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 
 /*
  *  Implementation of the JAIN-SIP  SipUri.
@@ -818,18 +818,19 @@ SipUri.prototype.setTTLParam=function(ttl){
 }
 
 SipUri.prototype.setTransportParam=function(transport){
-    if(logger!=undefined) logger.debug("SipUri:setTransportParam():transport:"+transport);
+    if(logger!=undefined) logger.debug("SipUri:setTransportParam():transport="+transport);
     if (transport == null)
     {
         console.error("SipUri:setTransportParam():  null transport arg");
         throw "SipUri:setTransportParam(): null transport arg";
     }
     
-    if (transport.compareToIgnoreCase("UDP") == 0
-        || transport.compareToIgnoreCase("TLS") == 0
-        || transport.compareToIgnoreCase("TCP") == 0
-        || transport.compareToIgnoreCase("SCTP") == 0) {
-        var nv = new NameValue(TRANSPORT, transport.toLowerCase());
+    if (transport=="UDP" == 0
+        || transport=="TLS" == 0
+        || transport=="TCP" == 0
+        || transport=="SCTP" == 0
+        || transport=="WS" == 0) {
+        var nv = new NameValue(this.TRANSPORT, transport.toLowerCase());
         this.uriParms.set_nv(nv);
     } 
     else

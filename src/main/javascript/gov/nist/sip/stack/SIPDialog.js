@@ -1,24 +1,24 @@
-/* 
-    Copyright (C) 2012 France Telecom S.A.
-	 
-    This file is part of JAIN-SIP JavaScript API. 
-    JAIN-SIP JavaScript API has been developed by Orange based on a JAIN-SIP Java implementation.
-    Orange has implemented the transport of SIP over WebSocket based on current IETF work 
-    (http://datatracker.ietf.org/doc/draft-ietf-sipcore-sip-websocket/)
-	
-    JAIN-SIP JavaScript API is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    JavaScript SIP API is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with JAIN-SIP JavaScript API.  If not, see <http://www.gnu.org/licenses/>. 
-*/
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 
 /*
  *  Implementation of the JAIN-SIP SIPDialog .
@@ -103,7 +103,6 @@ function SIPDialog() {
         {
             sipResponse=arguments[1];
             this.sipStack = this.sipProvider.getSipStack();
-            this.useragent=this.sipStack.getUserAgent();
             this.setLastResponse(null, sipResponse);
             this.localSequenceNumber = sipResponse.getCSeq().getSeqNumber();
             this.originalLocalSequenceNumber = this.localSequenceNumber;
@@ -136,7 +135,6 @@ function SIPDialog() {
             throw "SIPDialog:SIPDialog(): null transcation argument";
         }
         this.sipStack = transaction.sipStack;
-        this.useragent=this.sipStack.getUserAgent();
         if (this.sipProvider == null) {
             console.error("SIPDialog:SIPDialog(): null sip provider argument");
             throw "SIPDialog:SIPDialog(): null sip provider argument";
@@ -1246,7 +1244,7 @@ SIPDialog.prototype.sendRequest =function(clientTransactionId){
             throw "SIPDialog:sendRequest(): no route found!"; 
         }
         messageChannel = this.sipStack.createRawMessageChannel(this.getSipProvider().
-            getListeningPoint(outboundProxy.getTransport()).getIPAddress(),this.firstTransactionPort, outboundProxy);
+            getListeningPoint(outboundProxy.getTransport()).getHostAddress(),this.firstTransactionPort, outboundProxy);
         if (messageChannel != null) {
             clientTransactionId.setEncapsulatedChannel(messageChannel);
         }
@@ -1324,10 +1322,6 @@ SIPDialog.prototype.createAck =function(cseqno){
     if (cseqno <= 0) {
         console.error("SIPDialog:createAck(): bad cseq <= 0");
         throw "SIPDialog:createAck(): bad cseq <= 0";
-    } 
-    else if (cseqno > (((1) << 32) - 1)) {
-        console.error("SIPDialog:createAck(): bad cseq > " + (((1) << 32) - 1));
-        throw "SIPDialog:createAck(): bad cseq > " + (((1) << 32) - 1);
     }
     if (this.remoteTarget == null) {
         console.error("SIPDialog:createAck(): cannot create ACK - no remote Target!");
@@ -1348,7 +1342,7 @@ SIPDialog.prototype.createAck =function(cseqno){
         }
         var transport = uri4transport.getTransportParam();
         if (transport == null) {
-            transport = "TCP";// use tcp for the test and it should be set ws in the end.
+            transport = "WS";
         }
         var lp = this.sipProvider.getListeningPoint(transport);
         if (lp == null) {

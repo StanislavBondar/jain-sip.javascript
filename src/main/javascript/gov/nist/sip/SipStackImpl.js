@@ -1,24 +1,24 @@
-/* 
-    Copyright (C) 2012 France Telecom S.A.
-	 
-    This file is part of JAIN-SIP JavaScript API. 
-    JAIN-SIP JavaScript API has been developed by Orange based on a JAIN-SIP Java implementation.
-    Orange has implemented the transport of SIP over WebSocket based on current IETF work 
-    (http://datatracker.ietf.org/doc/draft-ietf-sipcore-sip-websocket/)
-	
-    JAIN-SIP JavaScript API is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    JavaScript SIP API is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with JAIN-SIP JavaScript API.  If not, see <http://www.gnu.org/licenses/>. 
-*/
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 
 /*
  *  Implementation of the JAIN-SIP SipStackImpl .
@@ -30,85 +30,36 @@
 function SipStackImpl() {
     if(logger!=undefined) logger.debug("SipStackImpl:SipStackImpl()");
     this.classname="SipStackImpl"; 
-    this.messageProcessors=new Array();
-    this.sipMessageFactory=null;
-    this.activeClientTransactionCount = 0;
-    this.mergeTable=new Array();
-    this.stackLogger=null;
-    this.serverLogger=null;
-    this.defaultRouter=null;
-    this.needsLogging=null;
     this.stackName=null;
-    this.router=null;
-    this.useRouterForAll=null;
-    this.readTimeout= -1;
-    this.outboundProxy=null;
-    this.routerPath=null;
-    this.forkedEvents=new Array();
-    this.remoteTagReassignmentAllowed = true;
-    this.logStackTraceOnMessageSend = true;
-    this.stackDoesCongestionControl = true;
-    this.checkBranchId=false;
-    this.isDialogTerminatedEventDeliveredForNullDialog = false;
     this.serverTransactionTable=new Array();
     this.clientTransactionTable=new Array();
-    this.terminatedServerTransactionsPendingAck=new Array();
-    this.forkedClientTransactionTable=new Array();
     this.dialogCreatingMethods=new Array();
-    this.dialogTable=new Array();
     this.earlyDialogTable=new Array();
-    this.pendingTransactions=new Array();
-    this.unlimitedServerTransactionTableSize = true;
-    this.unlimitedClientTransactionTableSize = true;
-    this.serverTransactionTableHighwaterMark = 5000;
-    this.serverTransactionTableLowaterMark = 4000;
-    this.clientTransactionTableHiwaterMark = 1000;
-    this.clientTransactionTableLowaterMark = 800;
-    this.timer=0;
-    this.maxForkTime=0;
-    this.toExit=false;
     this.isBackToBackUserAgent = false;
-    this.maxListenerResponseTime=-1;
-    this.non2XXAckPassedToListener=null;
     this.eventScanner=new EventScanner(this);
     this.listeningPoints=new Array();
     this.sipProviders=new Array();
-    this.reEntrantListener=true;
     this.sipListener=null;
-    this.deliverTerminatedEventForAck = false;
-    this.deliverUnsolicitedNotify = false;
-    this.maxConnections = 1;
-    this.unlimitedServerTransactionTableSize = true;
-    this.unlimitedClientTransactionTableSize = true;
     this.setNon2XXAckPassedToListener(false);
-    this.generateTimeStampHeader = false;
-    this.rfc2543Supported = true;
-    this.cancelClientTransactionChecked = true;
-    this.deliverTerminatedEventForAck = false;
-    this.deliverUnsolicitedNotify = false;
-    this.useRouterForAll = false;
     this.isAutomaticDialogSupportEnabled = true;
     this.isAutomaticDialogErrorHandlingEnabled = true;
-    this.addressResolver = new DefaultAddressResolver();
-    this.messagechannel=null;
-    this.useragent=null;
+    this.messageChannel=null;
+    this.userAgentName=null;
     this.lastTransaction=null;
+    this.reEntrantListener=true;
     
     this.dialogCreatingMethods.push("REFER");
     this.dialogCreatingMethods.push("INVITE");
     this.dialogCreatingMethods.push("SUBSCRIBE");
-    //this.dialogCreatingMethods.push("REGISTER");
     
     if(arguments.length!=0)
     {
         this.wsurl=arguments[0];
-        var address = arguments[1];
-        this.ipAddressLocal=address;
-        this.setHostAddress(address);       
-        this.useragent=arguments[2];     
-        var msgFactory = new NistSipMessageFactoryImpl(this);
-        this.setMessageFactory(msgFactory);      
-        this.defaultRouter = new DefaultRouter(this, this.ipAddressLocal);
+        var utils=new Utils();
+        this.setHostAddress(utils.randomString(12)+".invalid");       
+        this.userAgentName=arguments[1];     
+        this.sipMessageFactory = new NistSipMessageFactoryImpl(this);      
+        this.defaultRouter = new DefaultRouter(this, this.stackAddress);
     }
 }
 
@@ -175,7 +126,8 @@ SipStackImpl.prototype.createListeningPoint =function(){
     }
     var transport="ws";
     var lp=new ListeningPointImpl(this);
-    var key = lp.makeKey(this.ipAddressLocal, transport);
+    lp.host=this.stackAddress;
+    var key = lp.makeKey(this.stackAddress, transport);
     var lip=null;
     for(var i=0;i<this.listeningPoints.length;i++)
     {
@@ -196,7 +148,7 @@ SipStackImpl.prototype.createListeningPoint =function(){
         array[0]=key;
         array[1]=lip;
         this.listeningPoints.push(array);
-        this.messagechannel=messageProcessor.createMessageChannel();
+        this.messageChannel=messageProcessor.createMessageChannel();
         return lip;
     }
 }
@@ -217,11 +169,6 @@ SipStackImpl.prototype.reInitialize =function(){
     this.sipListener = null;
 }
 
-SipStackImpl.prototype.getIpAddress =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:getIpAddress()");
-    return this.ipAddressLocal;
-}
-
 SipStackImpl.prototype.getUrlWs =function(){
     if(logger!=undefined) logger.debug("SipStackImpl:getUrlWs()");
     return this.wsurl;
@@ -229,7 +176,7 @@ SipStackImpl.prototype.getUrlWs =function(){
 
 SipStackImpl.prototype.getUserAgent =function(){
     if(logger!=undefined) logger.debug("SipStackImpl:getUserAgent()");
-    return this.useragent;
+    return this.userAgentName;
 }
 
 
@@ -374,16 +321,7 @@ SipStackImpl.prototype.isAutomaticDialogErrorHandlingEnabled =function(){
 
 SipStackImpl.prototype.getChannel =function(){
     if(logger!=undefined) logger.debug("SipStackImpl:getChannel()");
-    return this.messagechannel;
-}
-
-SipStackImpl.prototype.onOpen =function(clienttransaction){
-    if(logger!=undefined) logger.debug("SipStackImpl:onOpen()");
-    var websocket=this.getChannel().getWebSocket();
-    websocket.onopen=function()
-    {
-        clienttransaction.sendRequest();
-    }
+    return this.messageChannel;
 }
 
 SipStackImpl.prototype.newSIPServerRequest =function(requestReceived,requestMessageChannel){
@@ -541,9 +479,9 @@ SipStackImpl.prototype.removeTransaction =function(sipTransaction){
                 l=i;
             }
         }
-        removed = this.clientTransactionTable[l][1];
         if(l!=null)
         {
+            removed = this.clientTransactionTable[l][1];
             this.clientTransactionTable.splice(l,1);
         }
         if (removed != null && sipTransaction.testAndSetTransactionTerminatedEvent()) {

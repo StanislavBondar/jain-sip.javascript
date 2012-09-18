@@ -1,24 +1,24 @@
-/* 
-    Copyright (C) 2012 France Telecom S.A.
-	 
-    This file is part of JAIN-SIP JavaScript API. 
-    JAIN-SIP JavaScript API has been developed by Orange based on a JAIN-SIP Java implementation.
-    Orange has implemented the transport of SIP over WebSocket based on current IETF work 
-    (http://datatracker.ietf.org/doc/draft-ietf-sipcore-sip-websocket/)
-	
-    JAIN-SIP JavaScript API is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    JavaScript SIP API is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
-
-    You should have received a copy of the GNU Lesser General Public License
-    along with JAIN-SIP JavaScript API.  If not, see <http://www.gnu.org/licenses/>. 
-*/
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 
 /*
  *  Implementation of the JAIN-SIP SipListener .
@@ -32,42 +32,28 @@ function SipListener() {
 }
 
 SipListener.prototype.processDialogTerminated =function(dialogTerminatedEvent){
-    if(logger!=undefined) logger.debug("SipListener:processDialogTerminated():dialogTerminatedEvent="+dialogTerminatedEvent);  
 }
 
-SipListener.prototype.processIOException =function(exceptionEvent){
-    if(logger!=undefined) logger.debug("SipListener:processIOException():exceptionEvent="+exceptionEvent);   
+SipListener.prototype.processIOException =function(exceptionEvent){ 
 }
 
-SipListener.prototype.processRequest =function(requestEvent){
-    if(logger!=undefined) logger.debug("SipListener:processRequest():requestEvent="+requestEvent);  
+SipListener.prototype.processRequest =function(requestEvent){ 
 }
 
 SipListener.prototype.processResponse =function(responseEvent){
-    if(logger!=undefined) logger.debug("SipListener:processResponse():responseEvent="+responseEvent); 
 }
 
 SipListener.prototype.processTimeout =function(timeoutEvent){
-    if(logger!=undefined) logger.debug("SipListener:processTimeout():timeoutEvent="+timeoutEvent); 
 }
 
 SipListener.prototype.processTransactionTerminated =function(transactionTerminatedEvent){
-    if(logger!=undefined) logger.debug("SipListener:processTransactionTerminated():transactionTerminatedEvent="+transactionTerminatedEvent);  
 }
 
-SipListener.prototype.processIsConected =function(sipstack){
-    if(logger!=undefined) logger.debug("SipListener:processTransactionTerminated():sipstack="+sipstack);  
-    var num=sipstack.getChannel().getWebSocket().readyState;
-    if(num==0)
-    {
-        return "CONNECTING";
-    }
-    else if(num==1)
-    {
-        return "CONNECTED";
-    }
-    else
-    {
-        return "CLOSED";
-    }
+SipListener.prototype.processConnected =function(){   
+}
+
+SipListener.prototype.processDisconnected =function(){   
+}
+
+SipListener.prototype.processConnectionError =function(){   
 }
