@@ -79,7 +79,6 @@ function SIPTransactionStack() {
     this.maxMessageSize=null;
     this.addressResolver = new DefaultAddressResolver();
     this.stackAddress =null;
-	
     this.dialogCreatingMethods.push("REFER");
     this.dialogCreatingMethods.push("INVITE");
     this.dialogCreatingMethods.push("SUBSCRIBE");
@@ -1044,7 +1043,7 @@ SIPTransactionStack.prototype.setHostAddress =function(stackAddress){
 
 SIPTransactionStack.prototype.getHostAddress =function(){
     if(logger!=undefined) logger.debug("SIPTransactionStack:getHostAddress()");
-    return this.stackAddress ;  
+    return this.stackAddress;  
 }
 
 SIPTransactionStack.prototype.setRouter =function(router){
@@ -1251,9 +1250,3 @@ SIPTransactionStack.prototype.getAddressResolver =function(){
     if(logger!=undefined) logger.debug("SIPTransactionStack:getAddressResolver()");
     return this.addressResolver;      
 }
-
-/*SIPTransactionStack.prototype.obtainLocalAddress =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:obtainLocalAddress()");
-   
-}*/
-//pay attention to audit part
