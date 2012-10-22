@@ -30,7 +30,6 @@
  */
 
 function GenericObject() {
-    //if(logger!=undefined) logger.debug("GenericObject:GenericObject()");
     this.classname="GenericObject"; 
     this.indentation=0;
     this.stringRepresentation="";
@@ -66,17 +65,14 @@ GenericObject.prototype.HT = "\t";
 GenericObject.prototype.PERCENT = "%";
 
 GenericObject.prototype.setMatcher =function(matchExpression){
-    //if(logger!=undefined) logger.debug("GenericObject:setMatcher():matchExpression="+matchExpression);
     this.matchExpression = matchExpression;
 }
 
 GenericObject.prototype.getMatcher =function(){
-    //if(logger!=undefined) logger.debug("GenericObject:getMatcher()");
     return this.matchExpression;
 }
 
 GenericObject.prototype.getClassFromName =function(className){
-    //if(logger!=undefined) logger.debug("GenericObject:getClassFromName():className="+className);
     function class_for_name(name) {
         return new Function('return new ' + name)();
     }
@@ -85,7 +81,6 @@ GenericObject.prototype.getClassFromName =function(className){
 }
 
 GenericObject.prototype.isMySubclass=function(other){
-    //if(logger!=undefined) logger.debug("GenericObject:isMySubclass():other="+other);
     if((typeof other)!="object"||other instanceof Array)
     {
         return false;
@@ -126,28 +121,22 @@ GenericObject.prototype.isMySubclass=function(other){
 }
 
 GenericObject.prototype.encode=function(){
-    //if(logger!=undefined) logger.debug("GenericObject:encode()");
 }
 
 GenericObject.prototype.encode=function(buffer){
-    //if(logger!=undefined) logger.debug("GenericObject:encode():buffer="+buffer);
     return buffer+this.encode();
 }
 
 GenericObject.prototype.equals=function(that){
-    //if(logger!=undefined) logger.debug("GenericObject:equals():that="+that);
 }
 
 GenericObject.prototype.match=function(other){
-    //if(logger!=undefined) logger.debug("GenericObject:match():other="+other);
 }
 
 GenericObject.prototype.merge=function(mergeObject){
-    //if(logger!=undefined) logger.debug("GenericObject:merge():mergeObject="+mergeObject);  
 }
 
 GenericObject.prototype.clone=function(){
-    //if(logger!=undefined) logger.debug("GenericObject:clone()");
     var objClone;
     if (this.constructor == Object){
         objClone = new this.constructor(); 
@@ -198,12 +187,10 @@ GenericObject.prototype.clone=function(){
  *   
  */
 function GenericObjectList() {
-    //if(logger!=undefined) logger.debug("GenericObjectList:GenericObjectList()");
     this.classname="GenericObjectList"; 
 }
 
 GenericObjectList.prototype.isMySubclass=function(other){
-    //if(logger!=undefined) logger.debug("GenericObjectList:isMySubclass()");
     if((typeof other)!="object"||other instanceof Array)
     {
         return false;
@@ -273,7 +260,6 @@ GenericObjectList.prototype.isMySubclass=function(other){
  */
 
 function NameValue(n,v,isFlag) {
-    //if(logger!=undefined) logger.debug("NameValue:NameValue()");
     this.classname="NameValue"; 
     this.serialVersionUID = "-1857729012596437950L";
     this.isQuotedString = null;
@@ -302,48 +288,39 @@ NameValue.prototype.EQUALS="=";
 NameValue.prototype.DOUBLE_QUOTE="\"";
 
 NameValue.prototype.setSeparator=function(sep){
-    //if(logger!=undefined) logger.debug("NameValue:setSeparator():sep="+sep);
     this.separator=sep;
 }
 
 NameValue.prototype.setQuotedValue=function(){
-    //if(logger!=undefined) logger.debug("NameValue:setQuotedValue()");
     this.isQuotedString=true;
     this.quotes=this.DOUBLE_QUOTE;
 }
 
 NameValue.prototype.isValueQuoted=function(){
-    //if(logger!=undefined) logger.debug("NameValue:isValueQuoted()");
     return this.isQuotedString;
 }
 
 NameValue.prototype.getName=function(){
-    //if(logger!=undefined) logger.debug("NameValue:getName()");
     return this.name;
 }
 
 NameValue.prototype.getValueAsObject=function(){
-    //if(logger!=undefined) logger.debug("NameValue:getValueAsObject()");
     return this.isFlagParameter ? "" : this.value; 
 }
 
 NameValue.prototype.setName=function(n){
-    //if(logger!=undefined) logger.debug("NameValue:setName()");
     this.name=n;
 }
 
 NameValue.prototype.setValueAsObject=function(v){
-    //if(logger!=undefined) logger.debug("NameValue:setValueAsObject():v="+v);
     this.value=v;
 }
 
 NameValue.prototype.encode=function(){
-    //if(logger!=undefined) logger.debug("NameValue:encode()");
     return this.encodeBuffer("").toString();
 }
 
 NameValue.prototype.encodeBuffer=function(buffer){
-    //if(logger!=undefined) logger.debug("NameValue:encodeBuffer():buffer="+buffer);
     var go=new GenericObject();
     var gol=new GenericObjectList();
    
@@ -406,7 +383,6 @@ NameValue.prototype.encodeBuffer=function(buffer){
 }
 
 NameValue.prototype.equals=function(other){
-    //if(logger!=undefined) logger.debug("NameValue:equals():other="+other);
     if (other == null ) return false;
     if (other.classname!=this.classname)
     {
@@ -474,24 +450,20 @@ NameValue.prototype.equals=function(other){
 }
 
 NameValue.prototype.getKey=function(){
-    //if(logger!=undefined) logger.debug("NameValue:getKey()");
     return this.name;
 }
 
 NameValue.prototype.getValue=function(){
-    //if(logger!=undefined) logger.debug("NameValue:getValue()");
     return  this.value == null ? null : this.value.toString();
 }
 
 NameValue.prototype.setValue=function(value){
-    //if(logger!=undefined) logger.debug("NameValue:setValue():value="+value);
     var retval = this.value == null ? null : value;
     this.value = value;
     return retval;
 }
 
 NameValue.prototype.hashCode=function(){
-    //if(logger!=undefined) logger.debug("NameValue:hashCode()");
     var hash = 0;
     var x=this.encode().toLowerCase();
     if(!(x == null || x.value == ""))  
@@ -541,7 +513,6 @@ NameValue.prototype.hashCode=function(){
  */
 
 function NameValueList(sync) {
-    //if(logger!=undefined) logger.debug("NameValueList");
     this.classname="NameValueList"; 
     this.serialVersionUID = "-6998271876574260243L";
     this.hmap = new Array();
@@ -550,17 +521,14 @@ function NameValueList(sync) {
 }
 
 NameValueList.prototype.setSeparator =function(separator){
-    //if(logger!=undefined) logger.debug("NameValueList:setSeparator():separator="+separator);
     this.separator=separator;
 }
 
 NameValueList.prototype.encode =function(){
-    //if(logger!=undefined) logger.debug("NameValueList:encode()");
     return this.encodeBuffer("").toString();
 }
 
 NameValueList.prototype.encodeBuffer =function(buffer){
-    //if(logger!=undefined) logger.debug("NameValueList:encodeBuffer():buffer="+buffer);
     if (this.hmap.length!=0) 
     {
         for(var i=0;i<this.hmap.length;i++)
@@ -582,12 +550,10 @@ NameValueList.prototype.encodeBuffer =function(buffer){
 }
 
 NameValueList.prototype.toString =function(){
-    //if(logger!=undefined) logger.debug("NameValueList:toString()");
     return this.encode();
 }
 
 NameValueList.prototype.set_nv =function(nv){
-    //if(logger!=undefined) logger.debug("NameValueList:set_nv():nv="+nv);
     var n=0;
     for(var i=0;i<this.hmap.length;i++)// loop for method put() of hashtable
     {
@@ -612,7 +578,6 @@ NameValueList.prototype.set_nv =function(nv){
 
 
 NameValueList.prototype.set_name_value =function(name,value){
-    //if(logger!=undefined) logger.debug("NameValueList:set_name_value():name="+name+", value="+value);
     var nv=new NameValue(name,value);
     name=name.toLowerCase();
     value=nv;
@@ -640,7 +605,6 @@ NameValueList.prototype.set_name_value =function(name,value){
 
 
 NameValueList.prototype.equals =function(otherObject){
-    //if(logger!=undefined) logger.debug("NameValueList:equals():otherObject="+otherObject);
     if ( otherObject == null ) {
         return false;
     }
@@ -679,7 +643,6 @@ NameValueList.prototype.equals =function(otherObject){
 
 
 NameValueList.prototype.getValue =function(name){
-    //if(logger!=undefined) logger.debug("NameValueList:getValue():name="+name);
     var nv = new NameValue(); 
     nv=this.getNameValue(name.toLowerCase());
     if (nv != null)
@@ -694,7 +657,6 @@ NameValueList.prototype.getValue =function(name){
 
 
 NameValueList.prototype.getNameValue =function(name){
-    //if(logger!=undefined) logger.debug("NameValueList:getNameValue():name="+name);
     var nv=null;
     for (var i=0;i<this.hmap.length;i++)
     {
@@ -707,7 +669,6 @@ NameValueList.prototype.getNameValue =function(name){
 }
 
 NameValueList.prototype.hasNameValue =function(name){
-    //if(logger!=undefined) logger.debug("NameValueList:hasNameValue():name="+name);
     var c=0;
     for (var i=0;i<this.hmap.length;i++)
     {
@@ -727,7 +688,6 @@ NameValueList.prototype.hasNameValue =function(name){
 }
 
 NameValueList.prototype.delet=function(name){
-    //if(logger!=undefined) logger.debug("NameValueList:delet():name="+name);
     var c=0;
     var n=0;
     for (var i=0;i<this.hmap.length;i++)
@@ -750,12 +710,10 @@ NameValueList.prototype.delet=function(name){
 }
 
 NameValueList.prototype.size=function(){
-    //if(logger!=undefined) logger.debug("NameValueList:size()");
     return this.hmap.length;
 }
 
 NameValueList.prototype.isEmpty=function(){
-    //if(logger!=undefined) logger.debug("NameValueList:isEmpty()");
     if(this.hmap.length==0)
     {
         return true;
@@ -768,12 +726,10 @@ NameValueList.prototype.isEmpty=function(){
 
 
 NameValueList.prototype.iterator=function(){
-    //if(logger!=undefined) logger.debug("NameValueList:iterator()");
     return this.hmap;//here, i consider that we can use array to replace the itertor
 }
 
 NameValueList.prototype.getNames=function(){
-    //if(logger!=undefined) logger.debug("NameValueList:getNames()");
     var key=new Array();
     var c=0;
     for (i=0;i<this.hmap.length;i++)
@@ -792,7 +748,6 @@ NameValueList.prototype.getNames=function(){
 }
 
 NameValueList.prototype.getParameter=function(name){
-    //if(logger!=undefined) logger.debug("NameValueList:getParameter():name="+name);
     var val = this.getValue(name);
     if (val == null) {
         return null;
@@ -805,12 +760,10 @@ NameValueList.prototype.getParameter=function(name){
 }
 
 NameValueList.prototype.clear=function(){
-    //if(logger!=undefined) logger.debug("NameValueList:clear()");
     this.hmap=null;
 }
 
 NameValueList.prototype.containsKey=function(key){
-    //if(logger!=undefined) logger.debug("NameValueList:containsKey():key="+key);
     var c=0;
     for (var i=0;i<this.hmap.length;i++)
     {
@@ -830,7 +783,6 @@ NameValueList.prototype.containsKey=function(key){
 }
 
 NameValueList.prototype.containsValue=function(value){
-    //if(logger!=undefined) logger.debug("NameValueList:containsValue():value="+value);
     var c=0;
     for (var i=0;i<this.hmap.length;i++)
     {
@@ -850,12 +802,10 @@ NameValueList.prototype.containsValue=function(value){
 }
 
 NameValueList.prototype.entrySet=function(){
-    //if(logger!=undefined) logger.debug("NameValueList:entrySet()");
     return this.hmap;
 }
 
 NameValueList.prototype.get=function(key){
-    //if(logger!=undefined) logger.debug("NameValueList:get():key="+key);
     var nv = new NameValue(); 
     nv=this.getNameValue(key.toString().toLowerCase());
     if (nv != null)
@@ -869,7 +819,6 @@ NameValueList.prototype.get=function(key){
 }
 
 NameValueList.prototype.keySet=function(){
-    //if(logger!=undefined) logger.debug("NameValueList:keySet()");
     var key=new Array();
     var c=0;
     for (i=0;i<this.hmap.length;i++)
@@ -881,7 +830,6 @@ NameValueList.prototype.keySet=function(){
 }
 
 NameValueList.prototype.put=function(name,nameValue){
-    //if(logger!=undefined) logger.debug("NameValueList:put()name="+name+",nameValue="+nameValue);
     var nv=new NameValue();
     var n=0;
     for(var i=0;i<this.hmap.length;i++)// loop for method put() of hashtable
@@ -907,7 +855,6 @@ NameValueList.prototype.put=function(name,nameValue){
 }
 
 NameValueList.prototype.putAll=function(map){
-    //if(logger!=undefined) logger.debug("NameValueList:putAll():map="+map);
     for(var i=0;i<map.length;i++)// loop for method put() of hashtable
     {
         this.put(map[i][0], map[i][1]);
@@ -915,7 +862,6 @@ NameValueList.prototype.putAll=function(map){
 }
 
 NameValueList.prototype.remove=function(key){
-    //if(logger!=undefined) logger.debug("NameValueList:remove():key="+key);
     var c=0;
     var n=0;
     var nv=new NameValue();
@@ -940,7 +886,6 @@ NameValueList.prototype.remove=function(key){
 }
 
 NameValueList.prototype.values=function(){
-    //if(logger!=undefined) logger.debug("NameValueList:values()");
     var values=new Array();
     var c=0;
     for (i=0;i<this.hmap.length;i++)
@@ -952,7 +897,6 @@ NameValueList.prototype.values=function(){
 }
 
 NameValueList.prototype.hashCode=function(){
-    //if(logger!=undefined) logger.debug("NameValueList:hashCode()");
     var hash = 0;
     var x=this.keySet();
     if(!(x == null || x.value == ""))  
@@ -1003,7 +947,6 @@ NameValueList.prototype.hashCode=function(){
  *   
  */
 function DuplicateNameValueList() {
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:DuplicateNameValueList()");
     this.serialVersionUID = "-5611332957903796952L";
     this.classname="DuplicateNameValueList";
     this.nameValueMap = new Array();
@@ -1011,17 +954,14 @@ function DuplicateNameValueList() {
 }
 
 DuplicateNameValueList.prototype.setSeparator =function(separator){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:setSeparator():separator="+separator);
     this.separator=separator;
 }
 
 DuplicateNameValueList.prototype.encode =function(){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:encode()");
     return this.encodeBuffer("").toString();
 }
 
 DuplicateNameValueList.prototype.encodeBuffer =function(buffer){
-   // if(logger!=undefined) logger.debug("DuplicateNameValueList:encodeBuffer():buffer="+buffer);
     if (this.nameValueMap.length!=0) 
     {
         for(var i=0;i<this.nameValueMap.length;i++)
@@ -1047,12 +987,10 @@ DuplicateNameValueList.prototype.encodeBuffer =function(buffer){
 }
 
 DuplicateNameValueList.prototype.toString =function(){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:toString()");
     return this.encode();
 }
 
 DuplicateNameValueList.prototype.set_nv =function(nv){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:set_nv():nv="+nv);
     var keylist=null;
     var keyex=0;
     for(var i=0;i<this.nameValueMap.length;i++)// loop for method put() of hashmap
@@ -1090,7 +1028,6 @@ DuplicateNameValueList.prototype.set_nv =function(nv){
 }
 
 DuplicateNameValueList.prototype.set_name_value =function(name, value){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:set_name_value():name="+name+", value="+value);
     var nv=new NameValue(name,value);
     var keylist=null;
     var keyex=0;
@@ -1130,7 +1067,6 @@ DuplicateNameValueList.prototype.set_name_value =function(name, value){
 }
 
 DuplicateNameValueList.prototype.equals =function(otherObject){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:equals():otherObject="+otherObject);
     if ( otherObject == null ) 
     {
         return false;
@@ -1163,7 +1099,6 @@ DuplicateNameValueList.prototype.equals =function(otherObject){
 }
 
 DuplicateNameValueList.prototype.getValue =function(name){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:getValue():name="+name);
     var nv = this.getNameValue(name.toLowerCase());
     if (nv != null)
     {
@@ -1176,7 +1111,6 @@ DuplicateNameValueList.prototype.getValue =function(name){
 }
 
 DuplicateNameValueList.prototype.getNameValue =function(name){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:getNameValue():name="+name);
     var keylist=new Array();
     for(var i=0;i<this.nameValueMap.length;i++)// loop for method put() of hashmap
     {
@@ -1189,7 +1123,6 @@ DuplicateNameValueList.prototype.getNameValue =function(name){
 }
 
 DuplicateNameValueList.prototype.hasNameValue =function(name){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:hasNameValue():name="+name);
     var ex=0;
     for(var i=0;i<this.nameValueMap.length;i++)// loop for method put() of hashmap
     {
@@ -1209,7 +1142,6 @@ DuplicateNameValueList.prototype.hasNameValue =function(name){
 }
 
 DuplicateNameValueList.prototype.delet =function(name){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:delet():name="+name);
     var lcName = name.toLowerCase();
     var ex=0;
     var lo=0
@@ -1233,13 +1165,11 @@ DuplicateNameValueList.prototype.delet =function(name){
 }
 
 DuplicateNameValueList.prototype.iterator =function(){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:iterator()");
     return this.nameValueMap;
 }
 
 
 DuplicateNameValueList.prototype.getNames =function(){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:getNames()");
     var key=new Array();
     var c=0;
     for (var i=0;i<this.nameValueMap.length;i++)
@@ -1258,7 +1188,6 @@ DuplicateNameValueList.prototype.getNames =function(){
 }
 
 DuplicateNameValueList.prototype.getParameter =function(name){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:getParameter():name="+name);
     var val = this.getValue(name);
     
     if (val == null)
@@ -1286,12 +1215,10 @@ DuplicateNameValueList.prototype.getParameter =function(name){
 }
 
 DuplicateNameValueList.prototype.clear =function(){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:clear()");
     this.nameValueMap=new Array();
 }
 
 DuplicateNameValueList.prototype.isEmpty =function(){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:isEmpty()");
     if(this.nameValueMap.length!=0)
     {
         return true;
@@ -1303,7 +1230,6 @@ DuplicateNameValueList.prototype.isEmpty =function(){
 }
 
 DuplicateNameValueList.prototype.put =function(key, value){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:put():key="+key+",value="+value);
     var nv=new NameValue();
     var n=0;
     for(var i=0;i<this.nameValueMap.length;i++)// loop for method put() of hashtable
@@ -1329,7 +1255,6 @@ DuplicateNameValueList.prototype.put =function(key, value){
 }
 
 DuplicateNameValueList.prototype.remove =function(key){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:remove():key="+key);
     var c=0;
     var n=0;
     var nv=new NameValue();
@@ -1354,7 +1279,6 @@ DuplicateNameValueList.prototype.remove =function(key){
 }
 
 DuplicateNameValueList.prototype.size =function(){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:size()");
     var size=0;
     for(var i=0;i<this.nameValueMap.length;i++)
     {
@@ -1364,7 +1288,6 @@ DuplicateNameValueList.prototype.size =function(){
 }
 
 DuplicateNameValueList.prototype.values =function(){//return a series lists of values.
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:values()");
     var values=new Array();
     var c=0;
     for (var i=0;i<this.nameValueMap.length;i++)
@@ -1376,7 +1299,6 @@ DuplicateNameValueList.prototype.values =function(){//return a series lists of v
 }
 
 DuplicateNameValueList.prototype.hashCode =function(){
-    //if(logger!=undefined) logger.debug("DuplicateNameValueList:hashCode()");
     var hash = 0;
     var key=new Array();
     var c=0
@@ -1433,7 +1355,6 @@ DuplicateNameValueList.prototype.hashCode =function(){
  *   
  */
 function HostPort() {
-    //if(logger!=undefined) logger.debug("HostPort:HostPort()");
     this.classname="HostPort"; 
     this.serialVersionUID = "-7103412227431884523L";
     this.port = -1;
@@ -1445,11 +1366,9 @@ HostPort.prototype.constructor=HostPort;
 HostPort.prototype.COLON=":";
 
 HostPort.prototype.encode =function(){
-    //if(logger!=undefined) logger.debug("HostPort:encode()");
     return this.encodeBuffer("");
 }
 HostPort.prototype.encodeBuffer =function(buffer){
-    //if(logger!=undefined) logger.debug("HostPort:encode():buffer="+buffer);
     buffer=this.host.encodeBuffer(buffer);
     if (this.port != -1)
     {
@@ -1458,7 +1377,6 @@ HostPort.prototype.encodeBuffer =function(buffer){
     return buffer;
 }
 HostPort.prototype.equals =function(other){
-    //if(logger!=undefined) logger.debug("HostPort:equals():other="+other);
     if (other == null) {
         return false;
     }
@@ -1477,17 +1395,14 @@ HostPort.prototype.equals =function(other){
 }
 
 HostPort.prototype.getHost =function(){
-    //if(logger!=undefined) logger.debug("HostPort:getHost()");
     return this.host;
 }
 
 HostPort.prototype.getPort =function(){
-    //if(logger!=undefined) logger.debug("HostPort:getPort()");    
     return this.port;
 }
 
 HostPort.prototype.hasPort =function(){
-    if(logger!=undefined) logger.debug("HostPort:hasPort()");
     if(this.port!=-1)
     {
         return true;
@@ -1499,22 +1414,18 @@ HostPort.prototype.hasPort =function(){
 }
 
 HostPort.prototype.removePort =function(){
-    //if(logger!=undefined) logger.debug("HostPort:removePort()");
     this.port=-1;
 }
 
 HostPort.prototype.setHost =function(h){
-    //if(logger!=undefined) logger.debug("HostPort:setHost():h="+h);
     this.host=h;
 }
 
 HostPort.prototype.setPort =function(p){
-    //if(logger!=undefined) logger.debug("HostPort:setPort():p="+p);
     this.port=p;
 }
 
 HostPort.prototype.getInetAddress =function(){
-    //if(logger!=undefined) logger.debug("HostPort:getInetAddress()");
     if (this.host == null)
     {
         return null;
@@ -1526,7 +1437,6 @@ HostPort.prototype.getInetAddress =function(){
 }
 
 HostPort.prototype.merge =function(mergeObject){
-    //if(logger!=undefined) logger.debug("HostPort:merge(): mergeObject="+mergeObject);
     var go=new GenericObject();
     go.merge (mergeObject);
     if (this.port == -1)
@@ -1537,12 +1447,10 @@ HostPort.prototype.merge =function(mergeObject){
 
 
 HostPort.prototype.toString =function(){
-    //if(logger!=undefined) logger.debug("HostPort:toString()");
     return this.encode();
 }
 
 HostPort.prototype.hashCode =function(){
-    //if(logger!=undefined) logger.debug("HostPort:hashCode()"); 
     return this.host.hashCode()+this.port;
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -1576,7 +1484,6 @@ HostPort.prototype.hashCode =function(){
  */
 
 function Host(hn,addresstype) {
-    if(logger!=undefined) logger.debug("Host:Host(): hn="+hn+" addresstype="+addresstype);
     this.serialVersionUID = "-7233564517978323344L";
     this.stripAddressScopeZones = false;
     this.hostname = null;
@@ -1604,12 +1511,10 @@ Host.prototype.IPV4ADDRESS = 2;
 Host.prototype.IPV6ADDRESS = 3;
 
 Host.prototype.encode =function(){
-    //if(logger!=undefined) logger.debug("Host:encode()");
     return this.encodeBuffer("").toString();
 }
 
 Host.prototype.encodeBuffer =function(buffer){
-    //if(logger!=undefined) logger.debug("Host:encodeBuffer(): buffer="+buffer);
     var encode=null;
     if (this.addressType == this.IPV6ADDRESS && !this.isIPv6Reference(this.hostname)) {
         encode=buffer+"["+this.hostname+"]";
@@ -1627,7 +1532,6 @@ Host.prototype.encodeBuffer =function(buffer){
      * @return boolean
      */
 Host.prototype.equals =function(obj){
-    //if(logger!=undefined) logger.debug("Host:equals():obj="+obj);
     if ( obj == null ) 
     {
         return false;
@@ -1647,17 +1551,14 @@ Host.prototype.equals =function(obj){
 }
 
 Host.prototype.getHostname =function(){
-    //if(logger!=undefined) logger.debug("Host:getHostname()");
     return this.hostname;
 }
 
 Host.prototype.getAddress =function(){
-    //if(logger!=undefined) logger.debug("Host:getAddress()");
     return this.hostname;
 }
 
 Host.prototype.getIpAddress =function(){////////////////////////////////////////problem dans cette méthode
-    //if(logger!=undefined) logger.debug("Host:getIpAddress()");
     var rawIpAddress = null;
     if (this.hostname == null)
         return null;
@@ -1674,18 +1575,14 @@ Host.prototype.getIpAddress =function(){////////////////////////////////////////
 
 
 Host.prototype.setHostname =function(h){
-    //if(logger!=undefined) logger.debug("Host:setHostname():h="+h);
     this.setHost(h, this.HOSTNAME);
 }
 
 Host.prototype.setHostAddress =function(address){
-    //if(logger!=undefined) logger.debug("Host:setHostAddress():address="+address);
     this.setHost(address, this.IPV4ADDRESS);
 }
 
 Host.prototype.setHost =function(host,type){
-    //if(logger!=undefined) logger.debug("Host:setHost():host="+host);
-    //if(logger!=undefined) logger.debug("Host:setHost():type="+type);
     this.inetAddress = null;
     if(type==null)
     {
@@ -1716,12 +1613,10 @@ Host.prototype.setHost =function(host,type){
 }
 
 Host.prototype.setAddress =function(address){
-    i//f(logger!=undefined) logger.debug("Host:setAddress():address="+address);
     this.setHostAddress(address);
 }
 
 Host.prototype.isHostname =function(){
-    //if(logger!=undefined) logger.debug("Host:isHostname()");
     if (this.addressType == this.HOSTNAME) {
         return true;
     } else {
@@ -1731,7 +1626,6 @@ Host.prototype.isHostname =function(){
 
 
 Host.prototype.isIPAddress =function(){
-    //if(logger!=undefined) logger.debug("Host:isIPAddress()");
     if (this.addressType != this.HOSTNAME) {
         return true;
     } else {
@@ -1740,7 +1634,6 @@ Host.prototype.isIPAddress =function(){
 }
 
 Host.prototype.getInetAddress =function(){
-    //if(logger!=undefined) logger.debug("Host:getInetAddress()");
     if (this.hostname == null)
     {
         return null;
@@ -1756,7 +1649,6 @@ Host.prototype.getInetAddress =function(){
 
 //----- IPv6
 Host.prototype.isIPv6Address =function(address){
-    //if(logger!=undefined) logger.debug("Host:isIPv6Address():address="+address);
     if (address != null && address.indexOf(':') != -1) {
         return true;
     } else {
@@ -1765,7 +1657,6 @@ Host.prototype.isIPv6Address =function(address){
 }
 
 Host.prototype.isIPv6Reference =function(address){
-    //if(logger!=undefined) logger.debug("Host:isIPv6Reference():address="+address);
     if (address.charAt(0) == '['
         && address.charAt(address.length() - 1) == ']') {
         return true;
@@ -1775,7 +1666,6 @@ Host.prototype.isIPv6Reference =function(address){
 }
 
 Host.prototype.hashCode =function(){
-    if(logger!=undefined) logger.debug("Host:hashCode()");
     var hash = 0;
     var x=this.getHostname();
     if(!(x == null || x.value == ""))  
@@ -1823,24 +1713,20 @@ Host.prototype.hashCode =function(){
  *  @version 1.0 
  */
 function Token() {
-    //if(logger!=undefined) logger.debug("Token:Token()");
     this.classname="Token";
     this.tokenValue=null;
     this.tokenType=null;
 }
 
 Token.prototype.getTokenValue =function(){
-    //if(logger!=undefined) logger.debug("Token:getTokenValue()");
     return this.tokenValue;
 }
 
 Token.prototype.getTokenType =function(){
-    //if(logger!=undefined) logger.debug("Token:getTokenType()");
     return this.tokenType;
 }
 
 Token.prototype.toString =function(){
-    //if(logger!=undefined) logger.debug("Token:toString()");
     return "tokenValue = " + this.tokenValue + "/tokenType = " + this.tokenType;
 }
 
@@ -1874,7 +1760,6 @@ Token.prototype.toString =function(){
  *  @version 1.0 
  */
 function StringTokenizer(buffer) {
-    //if(logger!=undefined) logger.debug("StringTokenizer:StringTokenizer()");
     this.classname="StringTokenizer";
     this.buffer=null;
     this.bufferLen=null;
@@ -1889,7 +1774,6 @@ function StringTokenizer(buffer) {
 }
 
 StringTokenizer.prototype.nextToken =function(){
-    //if(logger!=undefined) logger.debug("StringTokenizer:nextToken()");
     var startIdx = this.ptr;
     while (this.ptr < this.bufferLen) {
         var c = this.buffer.charAt(this.ptr);
@@ -1902,7 +1786,6 @@ StringTokenizer.prototype.nextToken =function(){
 }
 
 StringTokenizer.prototype.hasMoreChars =function(){
-    //if(logger!=undefined) logger.debug("StringTokenizer:hasMoreChars()");
     if(this.ptr < this.bufferLen&&this.buffer.charAt(this.ptr)!='\r')
     {
         return true;
@@ -1914,7 +1797,6 @@ StringTokenizer.prototype.hasMoreChars =function(){
 }
 
 StringTokenizer.prototype.isHexDigit =function(ch){
-    //if(logger!=undefined) logger.debug("StringTokenizer:isHexDigit():ch="+ch);
     if((ch >= "A" && ch <= "F")
         || (ch >= "a" && ch <= "f")
         || this.isDigit(ch))
@@ -1928,7 +1810,6 @@ StringTokenizer.prototype.isHexDigit =function(ch){
 }
 
 StringTokenizer.prototype.isAlpha =function(ch){
-    //if(logger!=undefined) logger.debug("StringTokenizer:isAlpha():ch="+ch);
     if(ch.charCodeAt(0) <= 127)
     {
         if((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
@@ -1955,7 +1836,6 @@ StringTokenizer.prototype.isAlpha =function(ch){
 }
 
 StringTokenizer.prototype.isDigit =function(ch){
-    //if(logger!=undefined) logger.debug("StringTokenizer:isDigit():ch="+ch);
     if(ch.charCodeAt(0) <= 127)
     {
         if(ch <= '9' && ch >= '0')
@@ -1982,7 +1862,6 @@ StringTokenizer.prototype.isDigit =function(ch){
 }
 
 StringTokenizer.prototype.isAlphaDigit =function(ch){
-    //if(logger!=undefined) logger.debug("StringTokenizer:isAlphaDigit():ch="+ch);
     if(ch.charCodeAt(0) <= 127)
     {
         if((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')||(ch <= '9' && ch >= '0'))
@@ -2009,7 +1888,6 @@ StringTokenizer.prototype.isAlphaDigit =function(ch){
 }
 
 StringTokenizer.prototype.getLine =function(){
-    //if(logger!=undefined) logger.debug("StringTokenizer:getLine()");
     var startIdx = this.ptr;
     while (this.ptr < this.bufferLen && this.buffer.charAt(this.ptr) != '\n') {
         this.ptr++;
@@ -2021,7 +1899,6 @@ StringTokenizer.prototype.getLine =function(){
 }
 
 StringTokenizer.prototype.peekLine =function(){
-    //if(logger!=undefined) logger.debug("StringTokenizer:peekLine()");
     var curPos = this.ptr;
     var retval = this.getLine();
     this.ptr = curPos;
@@ -2029,7 +1906,6 @@ StringTokenizer.prototype.peekLine =function(){
 }
 
 StringTokenizer.prototype.lookAhead =function(k){
-    //if(logger!=undefined) logger.debug("StringTokenizer:lookAhead():k="+k);
     if(k==null)
     {
         k=0;
@@ -2038,7 +1914,6 @@ StringTokenizer.prototype.lookAhead =function(k){
 }
 
 StringTokenizer.prototype.getNextChar =function(){
-    //if(logger!=undefined) logger.debug("StringTokenizer:getNextChar()");
     if (this.ptr >= this.bufferLen) {
         console.error("StringTokenizer:getNextChar(): end of buffer:"+this.ptr);
         throw "StringTokenizer:getNextChar(): end of buffer";
@@ -2050,7 +1925,6 @@ StringTokenizer.prototype.getNextChar =function(){
 }
 
 StringTokenizer.prototype.consume =function(k){
-    //if(logger!=undefined) logger.debug("StringTokenizer:consume():k="+k);
     if(k==null)
     {
         this.ptr = this.savedPtr;
@@ -2062,7 +1936,6 @@ StringTokenizer.prototype.consume =function(k){
 }
 
 StringTokenizer.prototype.getLines =function(){
-    //if(logger!=undefined) logger.debug("StringTokenizer:getLines()");
     var result = new Array();
     while (this.hasMoreChars()) {
         var line = this.getLine();
@@ -2072,7 +1945,6 @@ StringTokenizer.prototype.getLines =function(){
 }
 
 StringTokenizer.prototype.getNextToken =function(delim){
-    //if(logger!=undefined) logger.debug("StringTokenizer:getNextToken():delim="+delim);
     var startIdx = this.ptr;
     while (true) {
         var la = this.lookAhead(0);
@@ -2091,7 +1963,6 @@ StringTokenizer.prototype.getNextToken =function(delim){
 }
 
 StringTokenizer.prototype.getSDPFieldName =function(line){
-    //if(logger!=undefined) logger.debug("StringTokenizer:getSDPFieldName():line="+line);
     if (line == null) {
         return null;
     }
@@ -2133,7 +2004,6 @@ StringTokenizer.prototype.getSDPFieldName =function(line){
  *  @todo catch exception 
  */
 function LexerCore() {
-    if(logger!=undefined) logger.debug("LexerCore:LexerCore()");
     this.classname="LexerCore";
     this.globalSymbolTable=new Array();
     this.lexerTables=new Array();
@@ -2205,7 +2075,6 @@ LexerCore.prototype.DIGIT_VALID_CHARS = String.fromCharCode(65534);
 LexerCore.prototype.ALPHADIGIT_VALID_CHARS = String.fromCharCode(65533);
 
 LexerCore.prototype.addKeyword =function(name, value){
-    //if(logger!=undefined) logger.debug("LexerCore:addKeyword():name="+name+", value="+value);
     var val = value;
     this.currentLexer=this.put(this.currentLexer, name, val);
     var j=null
@@ -2223,7 +2092,6 @@ LexerCore.prototype.addKeyword =function(name, value){
 }
 
 LexerCore.prototype.lookupToken =function(value){
-    //if(logger!=undefined) logger.debug("LexerCore:lookupToken():value="+value);
     var string=null;
     if (value > this.START) {
         for(var i=0;i<this.globalSymbolTable.length;i++)
@@ -2242,7 +2110,6 @@ LexerCore.prototype.lookupToken =function(value){
 }
 
 LexerCore.prototype.addLexer =function(lexerName){
-    //if(logger!=undefined) logger.debug("LexerCore:addLexer():lexerName="+lexerName);
     var v=null;
     for(var i=0;i<this.lexerTables.length;i++)
     {
@@ -2260,7 +2127,6 @@ LexerCore.prototype.addLexer =function(lexerName){
 }
 
 LexerCore.prototype.selectLexer =function(lexerName){
-    //if(logger!=undefined) logger.debug("LexerCore:selectLexer():lexerName="+lexerName);
     this.currentLexerName = lexerName;
 }
 
@@ -2268,7 +2134,6 @@ LexerCore.prototype.selectLexer =function(lexerName){
  * Peek the next id but dont move the buffer pointer forward.
  */
 LexerCore.prototype.peekNextId =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:peekNextId()");
     var oldPtr = this.ptr;
     var retval = this.ttoken();
     this.savedPtr = this.ptr;
@@ -2277,12 +2142,10 @@ LexerCore.prototype.peekNextId =function(){
 }
 
 LexerCore.prototype.getNextId =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:getNextId()");
     return this.ttoken();
 }
 
 LexerCore.prototype.getNextToken =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:getNextToken()");
     if(arguments.length!=0)
     {
         var delim=arguments[0];
@@ -2309,7 +2172,6 @@ LexerCore.prototype.getNextToken =function(){
 }
 
 LexerCore.prototype.peekNextToken =function(ntokens){
-    //if(logger!=undefined) logger.debug("LexerCore:peekNextToken():ntokens="+ntokens);
     if(ntokens==null)
     {
         ntokens=1;
@@ -2359,7 +2221,6 @@ LexerCore.prototype.peekNextToken =function(ntokens){
 }
 
 LexerCore.prototype.match =function(tok){
-    //if(logger!=undefined) logger.debug("LexerCore:match():tok="+tok);
 
     if (tok > this.START && tok < this.END) {
         if (tok == this.ID) {
@@ -2443,7 +2304,6 @@ LexerCore.prototype.match =function(tok){
 }
 
 LexerCore.prototype.SPorHT =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:SPorHT()");
     var c = this.lookAhead(0);
     while (c == ' ' || c == '\t') {
         this.consume(1);
@@ -2452,7 +2312,6 @@ LexerCore.prototype.SPorHT =function(){
 }
 
 LexerCore.prototype.isTokenChar =function(c){
-    //if(logger!=undefined) logger.debug("LexerCore:():c="+c);
     if (this.isAlphaDigit(c)) {
         return true;
     } else {
@@ -2475,13 +2334,11 @@ LexerCore.prototype.isTokenChar =function(c){
 }
 
 LexerCore.prototype.startsId =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:startsId()");
     var nextChar = this.lookAhead(0);
     return this.isTokenChar(nextChar);
 }
 
 LexerCore.prototype.startsSafeToken =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:startsSafeToken()");
     var nextChar = lookAhead(0);
     if (this.isAlphaDigit(nextChar)) {
         return true;
@@ -2519,7 +2376,6 @@ LexerCore.prototype.startsSafeToken =function(){
     }
 }
 LexerCore.prototype.ttoken =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:ttoken()");
     var startIdx = this.ptr;
     while (this.hasMoreChars()) {
         var nextChar = this.lookAhead(0);
@@ -2533,7 +2389,6 @@ LexerCore.prototype.ttoken =function(){
 }
 
 LexerCore.prototype.ttokenSafe =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:ttokenSafe()");
     var startIdx = this.ptr;
     while (this.hasMoreChars()) {
         var nextChar = this.lookAhead(0);
@@ -2579,7 +2434,6 @@ LexerCore.prototype.ttokenSafe =function(){
 }
 
 LexerCore.prototype.consumeValidChars =function(validChars){
-    //if(logger!=undefined) logger.debug("LexerCore:consumeValidChars():validChars="+validChars.toString());
     var validCharsLength = validChars.length;
     while (this.hasMoreChars()) {
         var nextChar = this.lookAhead(0);
@@ -2612,7 +2466,6 @@ LexerCore.prototype.consumeValidChars =function(validChars){
 }
 
 LexerCore.prototype.quotedString =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:quotedString()");
     var startIdx = this.ptr + 1;
     if (this.lookAhead(0) != '\"') {
         return null;
@@ -2633,7 +2486,6 @@ LexerCore.prototype.quotedString =function(){
 }
 
 LexerCore.prototype.comment =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:comment()");
     var retval = "";
     if (this.lookAhead(0) != '(') {
         return null;
@@ -2662,7 +2514,6 @@ LexerCore.prototype.comment =function(){
 }
 
 LexerCore.prototype.byteStringNoSemicolon =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:byteStringNoSemicolon()");
     var retval = "";
     while (true) {
         var next = this.lookAhead(0);
@@ -2677,7 +2528,6 @@ LexerCore.prototype.byteStringNoSemicolon =function(){
 }
 
 LexerCore.prototype.byteStringNoSlash =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:byteStringNoSlash()");
     var retval = "";
     while (true) {
         var next = this.lookAhead(0);
@@ -2692,7 +2542,6 @@ LexerCore.prototype.byteStringNoSlash =function(){
 }
 
 LexerCore.prototype.byteStringNoComma =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:byteStringNoComma()");
     var retval = "";
     while (true) {
         var next = this.lookAhead(0);
@@ -2707,7 +2556,6 @@ LexerCore.prototype.byteStringNoComma =function(){
 }
 
 LexerCore.prototype.charAsString =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:charAsString():arguments="+nchars);
     if(typeof arguments[0]=="string")
     {
         var ch=arguments[0];
@@ -2721,7 +2569,6 @@ LexerCore.prototype.charAsString =function(){
 }
 
 LexerCore.prototype.number =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:number()");
     var startIdx = this.ptr;
     if (!this.isDigit(this.lookAhead(0))) {
         console.error(this.buffer + "LexerCore:number(): Unexpected token at " + this.lookAhead(0),this.ptr);
@@ -2740,17 +2587,14 @@ LexerCore.prototype.number =function(){
 }
 
 LexerCore.prototype.markInputPosition =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:markInputPosition()");
     return this.ptr;
 }
 
 LexerCore.prototype.rewindInputPosition =function(position){
-    //if(logger!=undefined) logger.debug("LexerCore:rewindInputPosition():position="+position);
     this.ptr = position;
 }
 
 LexerCore.prototype.getRest =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:getRest()");
     if (this.ptr >= this.buffer.length) {
         return null;
     } else {
@@ -2759,7 +2603,6 @@ LexerCore.prototype.getRest =function(){
 }
 
 LexerCore.prototype.getString =function(c){
-    //if(logger!=undefined) logger.debug("LexerCore:getString():c:"+c);
     var retval = "";
     while (true) {
         var next = this.lookAhead(0);
@@ -2788,19 +2631,14 @@ LexerCore.prototype.getString =function(c){
 }
 
 LexerCore.prototype.getPtr =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:getPtr()");
     return this.ptr;
 }
 
 LexerCore.prototype.getBuffer =function(){
-    //if(logger!=undefined) logger.debug("LexerCore:getBuffer()");
     return this.buffer;
 }
 
 LexerCore.prototype.put =function(table,name, value){
-    //if(logger!=undefined) logger.debug("LexerCore:put(): table="+table.toString());
-    //if(logger!=undefined) logger.debug("LexerCore:put(): name="+name);
-    //if(logger!=undefined) logger.debug("LexerCore:put(): value="+value);
     var n=0;
     for(var i=0;i<table.length;i++)// loop for method put() of hashtable
     {
@@ -2852,14 +2690,12 @@ LexerCore.prototype.put =function(table,name, value){
  */
 
 function ParserCore() {
-    //if(logger!=undefined) logger.debug("ParserCore:ParserCore()");
     this.classname="ParserCore";
     this.nesting_level=null;
     this.lexer=new LexerCore();
 }
 
 ParserCore.prototype.nameValue =function(separator){
-    //if(logger!=undefined) logger.debug("ParserCore:nameValue():separator="+separator);
     if(separator==null)
     {
         var nv=this.nameValue("=")
@@ -2937,7 +2773,6 @@ ParserCore.prototype.nameValue =function(separator){
  *   
  */
 function HostNameParser() {
-    //if(logger!=undefined) logger.debug("HostNameParser:HostNameParser()");
     this.classname="HostNameParser"; 
     this.Lexer=null;
     this.stripAddressScopeZones = false;
@@ -2959,17 +2794,14 @@ HostNameParser.prototype.constructor=HostNameParser;
 HostNameParser.prototype.VALID_DOMAIN_LABEL_CHAR=[LexerCore.prototype.ALPHADIGIT_VALID_CHARS, '-', '.'];
 
 HostNameParser.prototype.consumeDomainLabel =function(){
-    //if(logger!=undefined) logger.debug("Parser:consumeDomainLabel()");
     this.lexer.consumeValidChars(this.VALID_DOMAIN_LABEL_CHAR);
 }
 
 //ipv6 is not used
 HostNameParser.prototype.ipv6Reference =function(){
-    //if(logger!=undefined) logger.debug("Parser:ipv6Reference()");   
 }
 
 HostNameParser.prototype.host =function(){
-    //if(logger!=undefined) logger.debug("Parser:host()");
     var hostname;
     //IPv6 referene
     if (this.lexer.lookAhead(0) == '[') {
@@ -3005,11 +2837,9 @@ HostNameParser.prototype.host =function(){
 
 
 HostNameParser.prototype.isIPv6Address =function(){
-    //if(logger!=undefined) logger.debug("Parser:isIPv6Address()");   
 }
 
 HostNameParser.prototype.hostPort =function(allowWS){
-    //if(logger!=undefined) logger.debug("Parser:hostPort():allowWS="+allowWS);
     var host = this.host();
     var hp = new HostPort();
     hp.setHost(host);
@@ -3087,7 +2917,6 @@ HostNameParser.prototype.hostPort =function(allowWS){
  */
 
 function MessageDigestAlgorithm() {
-    if(logger!=undefined) logger.debug("MessageDigestAlgorithm:MessageDigestAlgorithm()");
     this.classname="MessageDigestAlgorithm"; 
     this.toHex=['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
     this.hexcase=0;
@@ -3095,7 +2924,6 @@ function MessageDigestAlgorithm() {
 
 MessageDigestAlgorithm.prototype.calculateResponse =function(username_value,realm_value,
     passwd,nonce_value,nc_value,cnonce_value,method,digest_uri_value,entity_body,qop_value){
-    if(logger!=undefined) logger.debug("MessageDigestAlgorithm:calculateResponse()");
     var A1 = null;
     A1 = username_value + ":" + realm_value + ":" + passwd;
     var A2 = null;
@@ -3126,17 +2954,13 @@ MessageDigestAlgorithm.prototype.calculateResponse =function(username_value,real
 }
 
 MessageDigestAlgorithm.prototype.H =function(data){
-    if(logger!=undefined) logger.debug("MessageDigestAlgorithm:H():data="+data);
     return this.md5(data);
 }
 MessageDigestAlgorithm.prototype.KD =function(secret,data){
-    if(logger!=undefined) logger.debug("MessageDigestAlgorithm:KD(): secret"+secret);
-    if(logger!=undefined) logger.debug("MessageDigestAlgorithm:KD():data:"+data);
     return this.H(secret + ":" + data);
 }
 
 MessageDigestAlgorithm.prototype.toHexString =function(b){
-    if(logger!=undefined) logger.debug("MessageDigestAlgorithm:toHexString():b="+b);
     var pos = 0;
     var chaine="";
     var c = new Array();
@@ -3149,7 +2973,6 @@ MessageDigestAlgorithm.prototype.toHexString =function(b){
     return chaine;
 }
 MessageDigestAlgorithm.prototype.md5 =function(chaine){
-    if(logger!=undefined) logger.debug("MessageDigestAlgorithm:md5():chaine="+chaine);
     return this.hex_md5(chaine);    
 }
 
@@ -3387,7 +3210,6 @@ MessageDigestAlgorithm.prototype.bit_rol=function(num, cnt)
 
 
 function GenericURI(uriString) {
-    if(logger!=undefined) logger.debug("GenericURI:GenericURI()");
     this.classname="GenericURI"; 
     this.serialVersionUID = "3237685256878068790L";
     this.uriString=null;
@@ -3409,28 +3231,23 @@ GenericURI.prototype.PROVIDER_TAG = "provider-tag";
 GenericURI.prototype.TEL="tel";
 
 GenericURI.prototype.encode=function(){
-    if(logger!=undefined) logger.debug("GenericURI:encode()");
     return this.uriString;
 }
 
 GenericURI.prototype.encodeBuffer=function(buffer){
-    if(logger!=undefined) logger.debug("GenericURI:encodeBuffer():buffer="+buffer);
     buffer=buffer+this.uriString;
     return buffer;
 }
 
 GenericURI.prototype.toString=function(){
-    if(logger!=undefined) logger.debug("GenericURI:tostring()");
     return this.encode();
 }
 
 GenericURI.prototype.getScheme=function(){
-    if(logger!=undefined) logger.debug("GenericURI:getScheme()");
     return this.scheme;
 }
 
 GenericURI.prototype.isSipURI=function(){
-    if(logger!=undefined) logger.debug("GenericURI:isSipURI()");
     if(this instanceof SipUri)
     {
         return true;
@@ -3442,7 +3259,6 @@ GenericURI.prototype.isSipURI=function(){
 }
 
 GenericURI.prototype.equals=function(that){
-    if(logger!=undefined) logger.debug("GenericURI:equals():that="+that);
     if (this==that) {
         return true;
     }
@@ -3463,7 +3279,6 @@ GenericURI.prototype.equals=function(that){
 }
 
 GenericURI.prototype.hashCode=function(){
-    if(logger!=undefined) logger.debug("GenericURI:hashCode()");
     var hash = 0;
     var x=this.toString();
     if(!(x == null || x.value == ""))  
@@ -3513,7 +3328,6 @@ GenericURI.prototype.hashCode=function(){
  *  @see  gov/nist/javax/sip/address/UserInfo.java  
  */
 function UserInfo() {
-    if(logger!=undefined) logger.debug("UserInfo:UserInfo()");
     this.serialVersionUID = "7268593273924256144L";
     this.user =null;
     this.password=null;
@@ -3528,7 +3342,6 @@ UserInfo.prototype.POUND="#";
 UserInfo.prototype.SEMICOLON=";"
 
 UserInfo.prototype.equals =function(obj){
-    if(logger!=undefined) logger.debug("UserInfo:equals():obj:"+obj);
     if (obj.classname!="UserInfo") {
         return false;
     }
@@ -3550,12 +3363,10 @@ UserInfo.prototype.equals =function(obj){
 }
 
 UserInfo.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("UserInfo:encode()");
     return this.encodeBuffer("").toString();
 }
 
 UserInfo.prototype.encodeBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("UserInfo:encodeBuffer():buffer="+buffer);
     var encode=null;
     if(this.password!=null)
     {
@@ -3570,22 +3381,18 @@ UserInfo.prototype.encodeBuffer =function(buffer){
 }
 
 UserInfo.prototype.clearPassword =function(){
-    if(logger!=undefined) logger.debug("UserInfo:clearPassword()");
     this.password=null;
 }
 
 UserInfo.prototype.getUserType =function(){
-    if(logger!=undefined) logger.debug("UserInfo:getUserType()");
     return this.userType;
 }
 
 UserInfo.prototype.getUser =function(){
-    if(logger!=undefined) logger.debug("UserInfo:getUser()");
     return this.user;
 }
 
 UserInfo.prototype.setUser =function(user){
-    if(logger!=undefined) logger.debug("UserInfo:setUser()");
     this.user=user;
     if (user != null
         && (user.indexOf(this.POUND) >= 0 || user.indexOf(this.SEMICOLON) >= 0)) {
@@ -3596,17 +3403,14 @@ UserInfo.prototype.setUser =function(user){
 }
 
 UserInfo.prototype.getPassword =function(){
-    if(logger!=undefined) logger.debug("UserInfo:getPassword()");
     return this.password;
 }
 
 UserInfo.prototype.setPassword =function(p){
-    if(logger!=undefined) logger.debug("UserInfo:setPassword():p="+p);
     this.password=p;
 }
 
 UserInfo.prototype.setUserType =function(type){
-    if(logger!=undefined) logger.debug("UserInfo:setUserType():type="+type);
     if (type != this.USER && type != this.TELEPHONE_SUBSCRIBER) {
         console.error("UserInfo:setUserType(): parameter not in range");
         throw "UserInfo:setUserType(): parameter not in range";
@@ -3644,7 +3448,6 @@ UserInfo.prototype.setUserType =function(type){
  */
 
 function Authority() {
-    if(logger!=undefined) logger.debug("Authority:Authority()");
     this.classname="Authority"; 
     this.serialVersionUID = "-3570349777347017894L";
     this.userInfo =null;
@@ -3654,12 +3457,10 @@ function Authority() {
 Authority.prototype.AT="@";
 
 Authority.prototype.encode=function(){
-    if(logger!=undefined) logger.debug("Authority:encode()");
     return this.encodeBuffer("");
 }
 
 Authority.prototype.encodeBuffer=function(buffer){
-    if(logger!=undefined) logger.debug("Authority:encodeBuffer():buffer="+buffer);
     if (this.userInfo != null) {
         buffer=this.userInfo.encodeBuffer(buffer);
         buffer=buffer+this.AT;
@@ -3671,7 +3472,6 @@ Authority.prototype.encodeBuffer=function(buffer){
 }
 
 Authority.prototype.equals=function(other){
-    if(logger!=undefined) logger.debug("Authority:equals():other="+other);
     if (other == null) {
         return false;
     }
@@ -3691,17 +3491,14 @@ Authority.prototype.equals=function(other){
 }
 
 Authority.prototype.getHostPort=function(){
-    if(logger!=undefined) logger.debug("Authority:getHostPort()");
     return this.hostPort;
 }
 
 Authority.prototype.getUserInfo=function(){
-    if(logger!=undefined) logger.debug("Authority:getUserInfo()");
     return this.userInfo;
 }
 
 Authority.prototype.getPassword=function(){
-    if(logger!=undefined) logger.debug("Authority:getPassword()");
     if (this.userInfo == null)
     {
         return null;
@@ -3713,12 +3510,10 @@ Authority.prototype.getPassword=function(){
 }
 
 Authority.prototype.getUser=function(){
-    if(logger!=undefined) logger.debug("Authority:getUser()");
     return this.userInfo != null ? this.userInfo.user : null;
 }
 
 Authority.prototype.getHost=function(){
-    if(logger!=undefined) logger.debug("Authority:getHost()");
     if (this.hostPort == null)
     {
         return null;
@@ -3730,7 +3525,6 @@ Authority.prototype.getHost=function(){
 }
 
 Authority.prototype.getPort=function(){
-    if(logger!=undefined) logger.debug("Authority:getPort()");
     if (this.hostPort == null)
     {
         return -1;
@@ -3742,7 +3536,6 @@ Authority.prototype.getPort=function(){
 }
 
 Authority.prototype.removePort=function(){
-    if(logger!=undefined) logger.debug("Authority:removePort()");
     if (this.hostPort != null)
     {
         this.hostPort.removePort();
@@ -3750,7 +3543,6 @@ Authority.prototype.removePort=function(){
 }
 
 Authority.prototype.setPassword=function(passwd){
-    if(logger!=undefined) logger.debug("Authority:setPassword():passwd="+passwd);
     if (this.userInfo == null)
     {
         this.userInfo = new UserInfo();
@@ -3759,7 +3551,6 @@ Authority.prototype.setPassword=function(passwd){
 }
 
 Authority.prototype.setUser=function(user){
-    if(logger!=undefined) logger.debug("Authority:setUser():user="+user);
     if (this.userInfo == null)
     {
         this.userInfo = new UserInfo();
@@ -3768,7 +3559,6 @@ Authority.prototype.setUser=function(user){
 }
 
 Authority.prototype.setHost=function(host){
-    if(logger!=undefined) logger.debug("Authority:setHost():host:"+host);
     if (this.hostPort == null)
     {
         this.hostPort = new HostPort();
@@ -3777,7 +3567,6 @@ Authority.prototype.setHost=function(host){
 }
 
 Authority.prototype.setPort=function(port){
-    if(logger!=undefined) logger.debug("Authority:setPort():port:"+port);
     if (this.hostPort == null)
     {
         this.hostPort = new HostPort();
@@ -3786,22 +3575,18 @@ Authority.prototype.setPort=function(port){
 }
 
 Authority.prototype.setHostPort=function(h){
-    if(logger!=undefined) logger.debug("Authority:setHostPort():h:"+h);
     this.hostPort=h;
 }
 
 Authority.prototype.setUserInfo=function(u){
-    if(logger!=undefined) logger.debug("Authority:setUserInfo()");
     this.userInfo=u;
 }
 
 Authority.prototype.removeUserInfo=function(){
-    if(logger!=undefined) logger.debug("Authority:removeUserInfo()");
     this.userInfo=null;
 }
 
 Authority.prototype.hashCode=function(){
-    if(logger!=undefined) logger.debug("Authority:hashCode()");
     if ( this.hostPort == null ) 
     {
         console.error("Authority:hashCode(): null hostPort cannot compute hashcode");
@@ -3840,7 +3625,6 @@ Authority.prototype.hashCode=function(){
  */
 
 function TelephoneNumber() {
-    if(logger!=undefined) logger.debug("TelephoneNumber:TelephoneNumber()");
     this.classname="TelephoneNumber"; 
     this.isglobal=null;
     this.phoneNumber=null;
@@ -3854,27 +3638,22 @@ TelephoneNumber.prototype.PROVIDER_TAG = "provider-tag";
 TelephoneNumber.prototype.SEMICOLON=";";
 
 TelephoneNumber.prototype.deleteParm=function(name){
-    if(logger!=undefined) logger.debug("TelephoneNumber:deleteParm()");
     this.parameters.delet(name);
 }
 
 TelephoneNumber.prototype.getPhoneNumber=function(){
-    if(logger!=undefined) logger.debug("TelephoneNumber:getPhoneNumber()");
     return this.phoneNumber;
 }
 
 TelephoneNumber.prototype.getPostDial=function(){
-    if(logger!=undefined) logger.debug("TelephoneNumber:getPostDial()");
     return this.parameters.getValue(this.POSTDIAL);
 }
 
 TelephoneNumber.prototype.getIsdnSubaddress=function(){
-    if(logger!=undefined) logger.debug("TelephoneNumber:getIsdnSubaddress()");
     return this.parameters.getValue(this.ISUB);
 }
 
 TelephoneNumber.prototype.hasPostDial=function(){
-    if(logger!=undefined) logger.debug("TelephoneNumber:hasPostDial()");
     if(this.parameters.getValue(this.POSTDIAL) != null)
     {
         return true;
@@ -3886,7 +3665,6 @@ TelephoneNumber.prototype.hasPostDial=function(){
 }
 
 TelephoneNumber.prototype.hasParm=function(pname){
-    if(logger!=undefined) logger.debug("TelephoneNumber:hasParm()");
     if(this.parameters.hasNameValue(pname))
     {
         return true;
@@ -3898,7 +3676,6 @@ TelephoneNumber.prototype.hasParm=function(pname){
 }
 
 TelephoneNumber.prototype.hasIsdnSubaddress=function(){
-    if(logger!=undefined) logger.debug("TelephoneNumber:hasIsdnSubaddress()");
     if(this.hasParm(this.ISUB))
     {
         return true;
@@ -3910,59 +3687,48 @@ TelephoneNumber.prototype.hasIsdnSubaddress=function(){
 }
 
 TelephoneNumber.prototype.isGlobal=function(){
-    if(logger!=undefined) logger.debug("TelephoneNumber:isGlobal()");
     return this.isglobal;
 }
 
 TelephoneNumber.prototype.removePostDial=function(){
-    if(logger!=undefined) logger.debug("TelephoneNumber:removePostDial()");
     this.parameters.delet(this.POSTDIAL);
 }
 
 TelephoneNumber.prototype.removeIsdnSubaddress=function(){
-    if(logger!=undefined) logger.debug("TelephoneNumber:removeIsdnSubaddress()");
     this.deleteParm(this.ISUB);
 }
 
 TelephoneNumber.prototype.setParameters=function(p){
-    if(logger!=undefined) logger.debug("TelephoneNumber:setParameters():p:"+p);
     this.parameters=p;
 }
 
 TelephoneNumber.prototype.setGlobal=function(g){
-    if(logger!=undefined) logger.debug("TelephoneNumber:setGlobal():g:"+g);
     this.isglobal=g;
 }
 
 TelephoneNumber.prototype.setPostDial=function(p){
-    if(logger!=undefined) logger.debug("TelephoneNumber:setPostDial():p:"+p);
     var nv=new NameValue(this.POSTDIAL,p);
     this.parameters.set_nv(nv);
 }
 
 TelephoneNumber.prototype.setParm=function(name, value){
-    if(logger!=undefined) logger.debug("TelephoneNumber:setParm():name="+name+" value="+value);
     var nv = new NameValue(name, value);
     this.parameters.set_nv(nv);
 }
 
 TelephoneNumber.prototype.setIsdnSubaddress=function(isub){
-    if(logger!=undefined) logger.debug("TelephoneNumber:setIsdnSubaddress():isub="+isub);
     this.setParm(this.ISUB, isub);
 }
 
 TelephoneNumber.prototype.setPhoneNumber=function(num){
-    if(logger!=undefined) logger.debug("TelephoneNumber:setPhoneNumber():num="+num);
     this.phoneNumber=num;
 }
 
 TelephoneNumber.prototype.encode=function(){
-    if(logger!=undefined) logger.debug("TelephoneNumber:encode()");
     return this.encodeBuffer("").toString();
 }
 
 TelephoneNumber.prototype.encodeBuffer=function(buffer){
-    if(logger!=undefined) logger.debug("TelephoneNumber:encodeBuffer():buffer="+buffer);
     if (this.isglobal)
     {
         buffer=buffer+"+";
@@ -3976,7 +3742,6 @@ TelephoneNumber.prototype.encodeBuffer=function(buffer){
 }
 
 TelephoneNumber.prototype.getParameter=function(name){
-    if(logger!=undefined) logger.debug("TelephoneNumber:getParameter():name="+name);
     var val = this.parameters.getValue(name);
     if (val == null)
     {
@@ -3993,23 +3758,19 @@ TelephoneNumber.prototype.getParameter=function(name){
 }
 
 TelephoneNumber.prototype.getParameterNames=function(){
-    if(logger!=undefined) logger.debug("TelephoneNumber:getParameterNames()");
     return this.parameters.getNames();
 }
 
 TelephoneNumber.prototype.removeParameter=function(parameter){
-    if(logger!=undefined) logger.debug("TelephoneNumber:removeParameter():parameter:"+parameter);
     this.parameters.delet(parameter);
 }
 
 TelephoneNumber.prototype.setParameter=function(name, value){
-    if(logger!=undefined) logger.debug("TelephoneNumber:setParameter():name="+name+" value="+value);
     var nv = new NameValue(name, value);
     this.parameters.set_nv(nv);
 }
 
 TelephoneNumber.prototype.getParameters=function(){
-    if(logger!=undefined) logger.debug("TelephoneNumber:getParameters()");
     return this.parameters;
 }
 
@@ -4044,7 +3805,6 @@ TelephoneNumber.prototype.getParameters=function(){
  */
 
 function SipUri() {
-    if(logger!=undefined) logger.debug("SipUri");
     this.serialVersionUID = "7749781076218987044L";
     this.classname="SipUri";
     this.authority=new Authority();
@@ -4076,7 +3836,6 @@ SipUri.prototype.GRUU="gr";
  * The scheme must be either Sip or Sips
  */
 SipUri.prototype.setScheme =function(scheme){
-    if(logger!=undefined) logger.debug("SipUri:setScheme():scheme="+scheme);
     if (scheme.toLowerCase()!= this.SIP
         &&scheme.toLowerCase()!=  this.SIPS)
         {
@@ -4087,17 +3846,14 @@ SipUri.prototype.setScheme =function(scheme){
 }
 
 SipUri.prototype.getScheme =function(){
-    if(logger!=undefined) logger.debug("SipUri:getScheme()");
     return this.scheme;
 }
 
 SipUri.prototype.clearUriParms =function(){
-    if(logger!=undefined) logger.debug("SipUri:clearUriParms()");
     this.uriParms = new NameValueList();
 }
 
 SipUri.prototype.clearPassword =function(){
-    if(logger!=undefined) logger.debug("SipUri:clearPassword()");
     if (this.authority != null) {
         var userInfo = this.authority.getUserInfo();
         if (userInfo != null)
@@ -4107,17 +3863,14 @@ SipUri.prototype.clearPassword =function(){
     }
 }
 SipUri.prototype.getAuthority =function(){
-    if(logger!=undefined) logger.debug("SipUri:getAuthority()");
     return this.authority;
 }
 
 SipUri.prototype.clearQheaders =function(){
-    if(logger!=undefined) logger.debug("SipUri:clearQheaders()");
     this.qheaders = new NameValueList();
 }
 
 SipUri.prototype.equals =function(that){
-    if(logger!=undefined) logger.debug("SipUri:equals():that="+that);
     
     // Shortcut for same object
     if (that==this) {
@@ -4238,12 +3991,10 @@ SipUri.prototype.equals =function(that){
 }
 
 SipUri.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("SipUri:encode()");
     return this.encodeBuffer("");
 }
 
 SipUri.prototype.encodeBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("SipUri:encodeBuffer():buffer="+buffer);
     buffer=buffer+this.scheme+this.COLON;
     if (this.authority != null)
     {
@@ -4263,7 +4014,6 @@ SipUri.prototype.encodeBuffer =function(buffer){
 }
 
 SipUri.prototype.encodeWithoutScheme =function(){
-    if(logger!=undefined) logger.debug("SipUri:encodeWithoutScheme()");
     var buffer="";
     if (this.authority != null)
     {
@@ -4283,12 +4033,10 @@ SipUri.prototype.encodeWithoutScheme =function(){
 }
 
 SipUri.prototype.toString =function(){
-    if(logger!=undefined) logger.debug("SipUri:toString()");
     return this.encode();
 }
 
 SipUri.prototype.getUserAtHost =function(){
-    if(logger!=undefined) logger.debug("SipUri:getUserAtHost()");
     var user = "";
     if (this.authority.getUserInfo() != null)
     {
@@ -4306,7 +4054,6 @@ SipUri.prototype.getUserAtHost =function(){
 }
 
 SipUri.prototype.getUserAtHostPort =function(){
-    if(logger!=undefined) logger.debug("SipUri:getUserAtHostPort()");
     var user = "";
     if (this.authority.getUserInfo() != null)
     {
@@ -4341,38 +4088,31 @@ SipUri.prototype.getUserAtHostPort =function(){
 }
 
 SipUri.prototype.getParm =function(parmname){
-    if(logger!=undefined) logger.debug("SipUri:getParm():parmname="+parmname);
     var obj = this.uriParms.getValue(parmname);
     return obj;
 }
 
 SipUri.prototype.getMethod =function(){
-    if(logger!=undefined) logger.debug("SipUri:getMethod()");
     return this.getParm(this.METHOD);
 }
 
 SipUri.prototype.getParameters =function(){
-    if(logger!=undefined) logger.debug("SipUri:getParameters()");
     return this.uriParms;
 }
 
 SipUri.prototype.removeParameters=function(){
-    if(logger!=undefined) logger.debug("SipUri:removeParameters()");
     this.uriParms = new NameValueList();
 }
 
 SipUri.prototype.getQheaders =function(){
-    if(logger!=undefined) logger.debug("SipUri:getQheaders()");
     return this.qheaders;
 }
 
 SipUri.prototype.getUserType =function(){
-    if(logger!=undefined) logger.debug("SipUri:getUserType()");
     return this.uriParms.getValue(this.USER);
 }
 
 SipUri.prototype.getUserPassword =function(){
-    if(logger!=undefined) logger.debug("SipUri:getUserPassword()");
     if (this.authority == null)
     {
         return null;
@@ -4381,7 +4121,6 @@ SipUri.prototype.getUserPassword =function(){
 }
 
 SipUri.prototype.setUserPassword =function(password){
-    if(logger!=undefined) logger.debug("SipUri:setUserPassword():password="+password);
     if (this.authority == null)
     {
         this.authority = new Authority();
@@ -4390,7 +4129,6 @@ SipUri.prototype.setUserPassword =function(password){
 }
 
 SipUri.prototype.getTelephoneSubscriber =function(){
-    if(logger!=undefined) logger.debug("SipUri:getTelephoneSubscriber()");
     if (this.telephoneSubscriber == null) {
         
         this.telephoneSubscriber = new TelephoneNumber();
@@ -4399,7 +4137,6 @@ SipUri.prototype.getTelephoneSubscriber =function(){
 }
 
 SipUri.prototype.getHostPort =function(){
-    if(logger!=undefined) logger.debug("SipUri:getHostPort()");
     if (this.authority == null ||  this.authority.getHost() == null )
     {
         return null;
@@ -4411,7 +4148,6 @@ SipUri.prototype.getHostPort =function(){
 }
 
 SipUri.prototype.getPort =function(){
-    if(logger!=undefined) logger.debug("SipUri:getPort()");
     var hp = this.getHostPort();
     if (hp == null)
     {
@@ -4421,7 +4157,6 @@ SipUri.prototype.getPort =function(){
 }
 
 SipUri.prototype.getHost =function(){
-    if(logger!=undefined) logger.debug("SipUri:getHost()");
     if ( this.authority == null) {
         return null;
     }
@@ -4434,7 +4169,6 @@ SipUri.prototype.getHost =function(){
 }
 
 SipUri.prototype.isUserTelephoneSubscriber =function(){
-    if(logger!=undefined) logger.debug("SipUri:isUserTelephoneSubscriber()");
     var usrtype = this.uriParms.getValue(this.USER);
     if (usrtype == null)
     {
@@ -4451,7 +4185,6 @@ SipUri.prototype.isUserTelephoneSubscriber =function(){
 }
 
 SipUri.prototype.removeTTL =function(){
-    if(logger!=undefined) logger.debug("SipUri:removeTTL()");
     if (this.uriParms != null)
     {
         this.uriParms.delet(this.TTL);
@@ -4459,7 +4192,6 @@ SipUri.prototype.removeTTL =function(){
 }
 
 SipUri.prototype.removeMAddr =function(){
-    if(logger!=undefined) logger.debug("SipUri:removeMAddr()");
     if (this.uriParms != null)
     {
         this.uriParms.delet(this.MADDR);
@@ -4467,7 +4199,6 @@ SipUri.prototype.removeMAddr =function(){
 }
 
 SipUri.prototype.removeTransport =function(){
-    if(logger!=undefined) logger.debug("SipUri:removeTransport()");
     if (this.uriParms != null)
     {
         this.uriParms.delet(this.TRANSPORT);
@@ -4475,7 +4206,6 @@ SipUri.prototype.removeTransport =function(){
 }
 
 SipUri.prototype.removeHeader =function(name){
-    if(logger!=undefined) logger.debug("SipUri:removeHeader():name="+name);
     if (this.uriParms != null)
     {
         this.uriParms.delet(name);
@@ -4483,12 +4213,10 @@ SipUri.prototype.removeHeader =function(name){
 }
 
 SipUri.prototype.removeHeaders =function(){
-    if(logger!=undefined) logger.debug("SipUri:removeHeaders()");
     this.qheaders = new NameValueList();
 }
 
 SipUri.prototype.removeUserType =function(){
-    if(logger!=undefined) logger.debug("SipUri:removeUserType()");
     if (this.uriParms != null)
     {
         this.uriParms.delet(this.USER);
@@ -4496,12 +4224,10 @@ SipUri.prototype.removeUserType =function(){
 }
 
 SipUri.prototype.removePort =function(){
-    if(logger!=undefined) logger.debug("SipUri:removePort()");
     this.authority.removePort();
 }
 
 SipUri.prototype.removeMethod =function(){
-    if(logger!=undefined) logger.debug("SipUri:removeMethod()");
     if (this.uriParms != null)
     {
         this.uriParms.delet(this.METHOD);
@@ -4509,7 +4235,6 @@ SipUri.prototype.removeMethod =function(){
 }
 
 SipUri.prototype.setUser =function(uname){
-    if(logger!=undefined) logger.debug("SipUri:setUser():uname:"+uname);
     if (this.authority == null) 
     {
         this.authority = new Authority();
@@ -4518,12 +4243,10 @@ SipUri.prototype.setUser =function(uname){
 }
 
 SipUri.prototype.removeUser =function(){
-    if(logger!=undefined) logger.debug("SipUri:removeUser()");
     this.authority.removeUserInfo();
 }
 
 SipUri.prototype.setDefaultParm=function(name, value){
-    if(logger!=undefined) logger.debug("SipUri:setDefaultParm():name, value:"+name+","+value);
     if (this.uriParms.getValue(name) == null) 
     {
         var nv = new NameValue(name, value);
@@ -4532,12 +4255,10 @@ SipUri.prototype.setDefaultParm=function(name, value){
 }
 
 SipUri.prototype.setAuthority =function(authority){
-    if(logger!=undefined) logger.debug("SipUri:setAuthority():authority:"+authority);
     this.authority = authority;
 }
 
 SipUri.prototype.setHost_Host =function(h){
-    if(logger!=undefined) logger.debug("SipUri:setHost_Host():h="+h);
     if (this.authority == null)
     {
         this.authority = new Authority();
@@ -4546,23 +4267,19 @@ SipUri.prototype.setHost_Host =function(h){
 }
 
 SipUri.prototype.setUriParms =function(parms){
-    if(logger!=undefined) logger.debug("SipUri:setUriParms():parms="+parms);
     this.uriParms = parms;
 }
 
 SipUri.prototype.setUriParm =function(name, value){
-    if(logger!=undefined) logger.debug("SipUri:setUriParm():name="+name+" value="+value);
     var nv = new NameValue(name, value);
     this.uriParms.set_nv(nv);
 }
 
 SipUri.prototype.setQheaders =function(parms){
-    if(logger!=undefined) logger.debug("SipUri:setQheaders():parms="+parms);
     this.qheaders = parms;
 }
 
 SipUri.prototype.setMAddr =function(mAddr){
-    if(logger!=undefined) logger.debug("SipUri:setMAddr():mAddr="+mAddr);
     var nameValue = this.uriParms.getNameValue(this.MADDR);
     var host = new Host();
     host.setAddress(mAddr);
@@ -4577,17 +4294,14 @@ SipUri.prototype.setMAddr =function(mAddr){
 }
 
 SipUri.prototype.setUserParam =function(usertype){
-    if(logger!=undefined) logger.debug("SipUri:setUserParam():usertype="+usertype);
     this.uriParms.set_name_value(this.USER, usertype);
 }
 
 SipUri.prototype.setMethod =function(method){
-    if(logger!=undefined) logger.debug("SipUri:setMethod():method="+method);
     this.uriParms.set_name_value(this.METHOD, method);
 }
 
 SipUri.prototype.setIsdnSubAddress =function(isdnSubAddress){
-    if(logger!=undefined) logger.debug("SipUri:setIsdnSubAddress():isdnSubAddress="+isdnSubAddress);
     if (this.telephoneSubscriber == null)
     {
         this.telephoneSubscriber = new TelephoneNumber();
@@ -4596,12 +4310,10 @@ SipUri.prototype.setIsdnSubAddress =function(isdnSubAddress){
 }
 
 SipUri.prototype.setTelephoneSubscriber =function(tel){
-    if(logger!=undefined) logger.debug("SipUri:setTelephoneSubscriber():tel="+tel);
     this.telephoneSubscriber = tel;
 }
 
 SipUri.prototype.setPort =function(p){
-    if(logger!=undefined) logger.debug("SipUri:setPort():p="+p);
     if (this.authority == null)
     {
         this.authority = new Authority();
@@ -4610,7 +4322,6 @@ SipUri.prototype.setPort =function(p){
 }
 
 SipUri.prototype.hasParameter =function(name){
-    if(logger!=undefined) logger.debug("SipUri:hasParameter():name="+name);
     if(this.uriParms.getValue(name) != null)
     {
         return true;
@@ -4622,16 +4333,13 @@ SipUri.prototype.hasParameter =function(name){
 }
 
 SipUri.prototype.setQHeader =function(nameValue){
-    if(logger!=undefined) logger.debug("SipUri:setQHeader():nameValue="+nameValue);
     this.qheaders.set_nv(nameValue);
 }
 SipUri.prototype.setUriParameter =function(nameValue){
-    if(logger!=undefined) logger.debug("SipUri:setUriParameter():nameValue="+nameValue);
     this.uriParms.set_nv(nameValue);
 }
 
 SipUri.prototype.hasTransport =function(){
-    if(logger!=undefined) logger.debug("SipUri:hasTransport()");
     if(this.hasParameter(this.TRANSPORT))
     {
         return true;
@@ -4644,12 +4352,10 @@ SipUri.prototype.hasTransport =function(){
 }
 
 SipUri.prototype.removeParameter =function(name){
-    if(logger!=undefined) logger.debug("SipUri:removeParameter():name="+name);
     this.uriParms.delet(name);
 }
 
 SipUri.prototype.setHostPort =function(hostPort){
-    if(logger!=undefined) logger.debug("SipUri:setHostPort():hostPort="+hostPort);
     if (this.authority == null) {
         this.authority = new Authority();
     }
@@ -4657,25 +4363,21 @@ SipUri.prototype.setHostPort =function(hostPort){
 }
 
 SipUri.prototype.getHeader =function(name){
-    if(logger!=undefined) logger.debug("SipUri:getHeader():name="+name);
     return this.qheaders.getValue(name) != null
     ? this.qheaders.getValue(name)
     : null;
 }
 
 SipUri.prototype.getHeaderNames=function(){
-    if(logger!=undefined) logger.debug("SipUri:getHeaderNames()");
     return this.qheaders.getNames();
 }
 
 SipUri.prototype.getLrParam=function(){
-    if(logger!=undefined) logger.debug("SipUri:getLrParam()");
     var haslr = this.hasParameter(this.LR);
     return haslr ? "true" : null;
 }
 
 SipUri.prototype.getMAddrParam=function(){
-    if(logger!=undefined) logger.debug("SipUri:getMAddrParam()");
     var maddr = this.uriParms.getNameValue(this.MADDR);
     if (maddr == null)
     {
@@ -4691,12 +4393,10 @@ SipUri.prototype.getMAddrParam=function(){
 }
 
 SipUri.prototype.getMethodParam=function(){
-    if(logger!=undefined) logger.debug("SipUri:getMethodParam()");
     return this.getParameter(this.METHOD);
 }
 
 SipUri.prototype.getParameter=function(name){
-    if(logger!=undefined) logger.debug("SipUri:getParameter():name="+name);
     var val = this.uriParms.getValue(name);
     if (val == null)
     {
@@ -4713,12 +4413,10 @@ SipUri.prototype.getParameter=function(name){
 }
 
 SipUri.prototype.getParameterNames=function(){
-    if(logger!=undefined) logger.debug("SipUri:getParameterNames()");
     return this.uriParms.getNames();
 }
 
 SipUri.prototype.getTTLParam=function(){
-    if(logger!=undefined) logger.debug("SipUri:getTTLParam()");
     var ttl = this.uriParms.getValue("ttl");
     if (ttl != null)
     {
@@ -4732,7 +4430,6 @@ SipUri.prototype.getTTLParam=function(){
 }
 
 SipUri.prototype.getTransportParam=function(){
-    if(logger!=undefined) logger.debug("SipUri:getTransportParam()");
     if (this.uriParms != null) 
     {
         return this.uriParms.getValue(this.TRANSPORT);
@@ -4744,12 +4441,10 @@ SipUri.prototype.getTransportParam=function(){
 }
 
 SipUri.prototype.getUser=function(){
-    if(logger!=undefined) logger.debug("SipUri:getUser()");
     return this.authority.getUser();
 }
 
 SipUri.prototype.isSecure=function(){
-    if(logger!=undefined) logger.debug("SipUri:isSecure()"); 
     if(this.getScheme().toLowerCase()==this.SIPS)
     {
         return true;
@@ -4761,30 +4456,25 @@ SipUri.prototype.isSecure=function(){
 }
 
 SipUri.prototype.isSipURI=function(){
-    if(logger!=undefined) logger.debug("SipUri:isSipURI()");
     return true;
 }
 
 SipUri.prototype.setHeader=function(name, value){
-    if(logger!=undefined) logger.debug("SipUri:setHeader():name="+name+" value="+value);
     var nv = new NameValue(name, value);
     this.qheaders.set_nv(nv);
 }
 
 //in order to make difference between two setHost(), i have named them setHost_String et setHost_Host
 SipUri.prototype.setHost_String=function(host){
-    if(logger!=undefined) logger.debug("SipUri:setHost_String():host="+host);
     var h = new Host(host);
     this.setHost_Host(h);
 }
 
 SipUri.prototype.setLrParam=function(){
-    if(logger!=undefined) logger.debug("SipUri:setLrParam()");
     this.uriParms.set_name_value("lr",null);
 }
 
 SipUri.prototype.setMAddrParam=function(maddr){
-    if(logger!=undefined) logger.debug("SipUri:setMAddrParam():maddr="+maddr);
     if (maddr == null)
     {
         console.error("SipUri:setMAddrParam(): bad maddr");
@@ -4794,12 +4484,10 @@ SipUri.prototype.setMAddrParam=function(maddr){
 }
 
 SipUri.prototype.setMethodParam=function(method){
-    if(logger!=undefined) logger.debug("SipUri:setMethodParam():method="+method);
     this.setParameter("method", method);
 }
 
 SipUri.prototype.setParameter=function(name, value){
-    if(logger!=undefined) logger.debug("SipUri:setParameter():name="+name+" value="+value);
     if (name.toLowerCase()=="ttl") {
         value=value-0;
     }
@@ -4807,7 +4495,6 @@ SipUri.prototype.setParameter=function(name, value){
 }
 
 SipUri.prototype.setSecure=function(secure){
-    if(logger!=undefined) logger.debug("SipUri:setSecure():secure="+secure);
     if (secure)
     {
         this.scheme = this.SIPS;
@@ -4819,7 +4506,6 @@ SipUri.prototype.setSecure=function(secure){
 }
 
 SipUri.prototype.setTTLParam=function(ttl){
-    if(logger!=undefined) logger.debug("SipUri:setTTLParam():ttl="+ttl);
     if (ttl <= 0)
     {
         console.error("SipUri:setTTLParam(): Bad ttl value");
@@ -4833,7 +4519,6 @@ SipUri.prototype.setTTLParam=function(ttl){
 }
 
 SipUri.prototype.setTransportParam=function(transport){
-    if(logger!=undefined) logger.debug("SipUri:setTransportParam():transport="+transport);
     if (transport == null)
     {
         console.error("SipUri:setTransportParam():  null transport arg");
@@ -4856,12 +4541,10 @@ SipUri.prototype.setTransportParam=function(transport){
 }
 
 SipUri.prototype.getUserParam=function(){
-    if(logger!=undefined) logger.debug("SipUri:getUserParam()");
     return this.getParameter("user");
 }
 
 SipUri.prototype.hasLrParam=function(){
-    if(logger!=undefined) logger.debug("SipUri:hasLrParam()");
     if(this.uriParms.getNameValue("lr") != null)
     {
         return true;
@@ -4873,7 +4556,6 @@ SipUri.prototype.hasLrParam=function(){
 }
 
 SipUri.prototype.hasGrParam=function(){
-    if(logger!=undefined) logger.debug("SipUri:hasGrParam()");
     if(this.uriParms.getNameValue(this.GRUU) != null)
     {
         return true;
@@ -4885,12 +4567,10 @@ SipUri.prototype.hasGrParam=function(){
 }
 
 SipUri.prototype.setGrParam=function(value){
-    if(logger!=undefined) logger.debug("SipUri:setGrParam():value="+value);
     this.uriParms.set_name_value(this.GRUU, value);
 }
 
 SipUri.prototype.getGrParam=function(){
-    if(logger!=undefined) logger.debug("SipUri:getGrParam()");
     return this.uriParms.getValue(this.GRUU);
 }
 
@@ -4925,7 +4605,6 @@ SipUri.prototype.getGrParam=function(){
  *   
  */
 function AddressImpl() {
-    if(logger!=undefined) logger.debug("AddressImpl:AddressImpl()");
     this.serialVersionUID = "429592779568617259L";
     this.classname="AddressImpl";
     this.addressType =1;
@@ -4942,7 +4621,6 @@ AddressImpl.prototype.LESS_THAN="<";
 AddressImpl.prototype.GREATER_THAN=">";
 
 AddressImpl.prototype.match =function(other){
-    if(logger!=undefined) logger.debug("AddressImpl:match():other="+other);
     if (other == null)
     {
         return true;
@@ -4995,7 +4673,6 @@ AddressImpl.prototype.match =function(other){
 }
 
 AddressImpl.prototype.getHostPort =function(){
-    if(logger!=undefined) logger.debug("AddressImpl:getHostPort()");
     if (!(this.address instanceof SipUri))
     {
         console.error("AddressImpl:getHostPort(): address is not a SipUri");
@@ -5006,7 +4683,6 @@ AddressImpl.prototype.getHostPort =function(){
 }
 
 AddressImpl.prototype.getPort =function(){
-    if(logger!=undefined) logger.debug("AddressImpl:getPort()");
     if (!(this.address instanceof SipUri))
     {
         console.error("AddressImpl:getPort(): address is not a SipUri");
@@ -5017,7 +4693,6 @@ AddressImpl.prototype.getPort =function(){
 }
 
 AddressImpl.prototype.getUserAtHostPort =function(){
-    if(logger!=undefined) logger.debug("AddressImpl:getUserAtHostPort()");
     if (this.address instanceof SipUri) {
         var uri = this.address;
         return uri.getUserAtHostPort();
@@ -5029,7 +4704,6 @@ AddressImpl.prototype.getUserAtHostPort =function(){
 }
 
 AddressImpl.prototype.getHost =function(){
-    if(logger!=undefined) logger.debug("AddressImpl:getHost()");
     if (!(this.address instanceof SipUri))
     {
         console.error("AddressImpl:getHost(): address is not a SipUri");
@@ -5040,7 +4714,6 @@ AddressImpl.prototype.getHost =function(){
 }
 
 AddressImpl.prototype.removeParameter =function(parameterName){
-    if(logger!=undefined) logger.debug("AddressImpl:removeParameter():parameterName="+parameterName);
     if (!(this.address instanceof SipUri))
     {
         console.error("AddressImpl:removeParameter(): address is not a SipUri");
@@ -5051,12 +4724,10 @@ AddressImpl.prototype.removeParameter =function(parameterName){
 }
 
 AddressImpl.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("AddressImpl:encode()");
     return this.encodeBuffer("");
 }
 
 AddressImpl.prototype.encodeBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("AddressImpl:encodeBuffer():buffer="+buffer);
     if (this.addressType == this.WILD_CARD) {
         buffer=buffer+"*";
     }
@@ -5080,33 +4751,27 @@ AddressImpl.prototype.encodeBuffer =function(buffer){
 }
 
 AddressImpl.prototype.getAddressType =function(){
-    if(logger!=undefined) logger.debug("AddressImpl:getAddressType()");
     return this.addressType;
 }
 
 AddressImpl.prototype.setAddressType =function(atype){
-    if(logger!=undefined) logger.debug("AddressImpl:setAddressType():atype="+atype);
     this.addressType = atype;
 }
 
 AddressImpl.prototype.getDisplayName =function(){
-    if(logger!=undefined) logger.debug("AddressImpl:getDisplayName()");
     return this.displayName;
 }
 
 AddressImpl.prototype.setDisplayName =function(displayName){
-    if(logger!=undefined) logger.debug("AddressImpl:setDisplayName():displayName="+displayName);
     this.displayName = displayName;
     this.addressType = this.NAME_ADDR;
 }
 
 AddressImpl.prototype.setAddress =function(address){
-    if(logger!=undefined) logger.debug("AddressImpl:setAddress():address="+address);
     this.address = address;
 }
 
 AddressImpl.prototype.hashCode =function(){
-    if(logger!=undefined) logger.debug("AddressImpl:hashCode()");
     var hash = 0;
     var x=this.address;
     if(!(x == null || x.value == ""))  
@@ -5126,7 +4791,6 @@ AddressImpl.prototype.hashCode =function(){
 }
 
 AddressImpl.prototype.equals =function(other){
-    if(logger!=undefined) logger.debug("AddressImpl:equals():other="+other);
     if (this==other) {
         return true;
     }
@@ -5147,7 +4811,6 @@ AddressImpl.prototype.equals =function(other){
 }
 
 AddressImpl.prototype.hasDisplayName =function(){
-    if(logger!=undefined) logger.debug("AddressImpl:hasDisplayName()");
     if(this.displayName != null)
     {
         return true;
@@ -5159,12 +4822,10 @@ AddressImpl.prototype.hasDisplayName =function(){
 }
 
 AddressImpl.prototype.removeDisplayName =function(){
-    if(logger!=undefined) logger.debug("AddressImpl:removeDisplayName()");
     this.displayName = null;
 }
 
 AddressImpl.prototype.isSIPAddress =function(){
-    if(logger!=undefined) logger.debug("AddressImpl:isSIPAddress()");
     if(address instanceof SipUri)
     {
         return true;
@@ -5176,12 +4837,10 @@ AddressImpl.prototype.isSIPAddress =function(){
 }
 
 AddressImpl.prototype.getURI =function(){
-    if(logger!=undefined) logger.debug("AddressImpl:getURI()");
  
     return this.address;
 }
 AddressImpl.prototype.isWildcard =function(){
-    if(logger!=undefined) logger.debug("AddressImpl:isWildcard()");
     if(this.addressType == this.WILD_CARD)
     {
         return true;
@@ -5193,13 +4852,11 @@ AddressImpl.prototype.isWildcard =function(){
 }
 
 AddressImpl.prototype.setURI=function(address){
-    if(logger!=undefined) logger.debug("AddressImpl:setURI():address="+address);
     this.address = address;
     
 }
 
 AddressImpl.prototype.setUser=function(user){
-    if(logger!=undefined) logger.debug("AddressImpl:setUser():user="+user);
     if(this.address instanceof SipUri)
     {
         this.address.setUser(user);
@@ -5212,7 +4869,6 @@ AddressImpl.prototype.setUser=function(user){
 }
 
 AddressImpl.prototype.setWildCardFlag=function(){
-    if(logger!=undefined) logger.debug("AddressImpl:setWildCardFlag()");
     this.addressType = this.WILD_CARD;
     this.address = new SipUri();
     this.address.setUser("*");
@@ -5250,12 +4906,10 @@ AddressImpl.prototype.setWildCardFlag=function(){
  */
  
 function AddressFactoryImpl() {
-    if(logger!=undefined) logger.debug("AddressFactoryImpl:AddressFactoryImpl()");
     this.classname="AddressFactoryImpl";
 }
 
 AddressFactoryImpl.prototype.createAddress =function(){
-    if(logger!=undefined) logger.debug("AddressFactoryImpl:createAddress()");
     if(arguments.length==0)
     {
         var addressImpl=new AddressImpl();
@@ -5291,7 +4945,6 @@ AddressFactoryImpl.prototype.createAddress =function(){
 }
 
 AddressFactoryImpl.prototype.createAddress_name_uri =function(displayName,uri){
-    if(logger!=undefined) logger.debug("AddressFactoryImpl:createAddress():displayName="+displayName +" uri="+uri);
     if (uri == null)
     {
         console.error("AddressFactoryImpl:createAddress_name_uri():  null uri arg");
@@ -5307,7 +4960,6 @@ AddressFactoryImpl.prototype.createAddress_name_uri =function(displayName,uri){
 }
 
 AddressFactoryImpl.prototype.createSipURI =function(){
-    if(logger!=undefined) logger.debug("AddressFactoryImpl:createSipURI():arguments="+arguments.toString());
     if(arguments.length==0)
     {
         console.error("AddressFactoryImpl:createSipURI(): missing uri arg");
@@ -5334,7 +4986,6 @@ AddressFactoryImpl.prototype.createSipURI =function(){
 }
 
 AddressFactoryImpl.prototype.createSipURI_user_host =function(user, host){
-    if(logger!=undefined) logger.debug("AddressFactoryImpl:createSipURI(): user="+user+" host:"+host);
     if (host == null) {
         console.error("AddressFactoryImpl:createSipURI_user_host(): null host arg");
         throw "AddressFactoryImpl:createSipURI_user_host():  null host arg";
@@ -5355,7 +5006,6 @@ AddressFactoryImpl.prototype.createSipURI_user_host =function(user, host){
 }
 
 AddressFactoryImpl.prototype.createTelURL =function(uri){
-    if(logger!=undefined) logger.debug("AddressFactoryImpl:createTelURL(): uri="+uri);
     if (uri == null) {
         console.error("AddressFactoryImpl:createTelURL(): null uri arg");
         throw "AddressFactoryImpl:createTelURL():  null uri arg";
@@ -5368,7 +5018,6 @@ AddressFactoryImpl.prototype.createTelURL =function(uri){
 }
 
 AddressFactoryImpl.prototype.createAddress_uri =function(uri){
-    if(logger!=undefined) logger.debug("AddressFactoryImpl:createAddress_uri(): uri="+uri);
     if (uri == null) {
         console.error("AddressFactoryImpl:createAddress_uri(): null uri arg");
         throw "AddressFactoryImpl:createAddress_uri():  null uri arg";
@@ -5379,7 +5028,6 @@ AddressFactoryImpl.prototype.createAddress_uri =function(uri){
 }
 
 AddressFactoryImpl.prototype.createAddress_address =function(address){
-    if(logger!=undefined) logger.debug("AddressFactoryImpl:createAddress_address(): address="+address);
     if (address == null) {
         console.error("AddressFactoryImpl:createAddress_address(): null address arg");
         throw "AddressFactoryImpl:createAddress_address():  null address arg";
@@ -5399,7 +5047,6 @@ AddressFactoryImpl.prototype.createAddress_address =function(address){
 }
 
 AddressFactoryImpl.prototype.createURI =function(uri){
-    if(logger!=undefined) logger.debug("AddressFactoryImpl:createURI(): uri="+uri);
     if (uri == null) {
         console.error("AddressFactoryImpl:createURI(): null uri arg");
         throw "AddressFactoryImpl:createURI():  null uri arg";
@@ -5452,7 +5099,6 @@ AddressFactoryImpl.prototype.createURI =function(uri){
  *  @version 1.0 
  */
 function SIPObject() {
-    if(logger!=undefined) logger.debug("SIPObject:SIPObject()");
     this.classname="SIPObject"; 
     //GenericObject.call(this);
 }
@@ -5489,7 +5135,6 @@ SIPObject.prototype.constructor=SIPObject;
  *  @version 1.0 
  */
 function SIPHeader(headername) {
-    if(logger!=undefined) logger.debug("SIPHeader:SIPHeader()");
     this.serialVersionUID = "7749781076218987044L";
     this.classname="SIPHeader";
     this.headerName=null;
@@ -5504,22 +5149,18 @@ SIPHeader.prototype.SP=" ";
 SIPHeader.prototype.NEWLINE="\r\n";
 
 SIPHeader.prototype.getHeaderName =function(){
-    if(logger!=undefined) logger.debug("SIPHeader:getHeaderName()");
     return this.headerName;
 }
 
 SIPHeader.prototype.getName =function(){
-    if(logger!=undefined) logger.debug("SIPHeader:getName()");
     return this.headerName;
 }
 
 SIPHeader.prototype.setHeaderName =function(hdrname){
-    if(logger!=undefined) logger.debug("SIPHeader:setHeaderName():hdrname="+hdrname);
     this.headerName=hdrname;
 }
 
 SIPHeader.prototype.getHeaderValue =function(){
-    if(logger!=undefined) logger.debug("SIPHeader:getHeaderValue()");
     var encodedHdr = null;
     encodedHdr = this.encode();
     var buffer = encodedHdr;
@@ -5534,17 +5175,14 @@ SIPHeader.prototype.getHeaderValue =function(){
 }
 
 SIPHeader.prototype.isHeaderList =function(){
-    if(logger!=undefined) logger.debug("SIPHeader:isHeaderList()");
     return false;
 }
 
 SIPHeader.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("SIPHeader:encode()");
     return this.encodeBuffer("").toString();
 }
 
 SIPHeader.prototype.encodeBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("SIPHeader:encodeBuffer():buffer="+buffer);
     buffer=buffer+this.headerName+this.COLON+this.SP;
     buffer=this.encodeBodyBuffer(buffer);
     buffer=buffer+this.NEWLINE;
@@ -5552,22 +5190,18 @@ SIPHeader.prototype.encodeBuffer =function(buffer){
 }
 
 SIPHeader.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("SIPHeader:encodeBody()");
 }
 
 SIPHeader.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("SIPHeader:encodeBodyBuffer():buffer="+buffer);
     buffer=buffer+this.encodeBody();
     return buffer;
 }
 
 SIPHeader.prototype.getValue =function(){
-    if(logger!=undefined) logger.debug("SIPHeader:getValue()");
     return this.getHeaderValue();
 }
 
 SIPHeader.prototype.hashCode =function(){
-    if(logger!=undefined) logger.debug("SIPHeader:hashCode()");
     var hash = 0;
     var x=this.headerName;
     if(!(x == null || x.value == ""))  
@@ -5587,7 +5221,6 @@ SIPHeader.prototype.hashCode =function(){
 }
 
 SIPHeader.prototype.toString =function(){
-    if(logger!=undefined) logger.debug("SIPHeader:toString()");
     return this.encode();
 }
 
@@ -5622,7 +5255,6 @@ SIPHeader.prototype.toString =function(){
  */
 
 function SIPHeaderList() {
-    if(logger!=undefined) logger.debug("SIPHeaderList:SIPHeaderList()");
     this.classname="SIPHeaderList";
     this.prettyEncode = false;
     this.hlist=new Array();
@@ -5652,12 +5284,10 @@ SIPHeaderList.prototype.COMMA=",";
 SIPHeaderList.prototype.SEMICOLON=";";
 
 SIPHeaderList.prototype.getName =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:getName()");
     return this.headerName;
 }
 
 SIPHeaderList.prototype.add =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:add()");
     if(arguments.length==1)
     {
         var objectToAdd=arguments[0];
@@ -5709,12 +5339,10 @@ SIPHeaderList.prototype.add =function(){
 }
 
 SIPHeaderList.prototype.addFirst =function(obj){
-    if(logger!=undefined) logger.debug("SIPHeaderList:addFirst():obj="+obj);
     this.hlist.unshift(obj); 
 }
 
 SIPHeaderList.prototype.concatenate =function(other, topFlag){
-    if(logger!=undefined) logger.debug("SIPHeaderList:concatenate():other="+other+",topFlag="+topFlag);
     if (!topFlag) 
     {
         this.addAll(other);
@@ -5726,12 +5354,10 @@ SIPHeaderList.prototype.concatenate =function(other, topFlag){
 }
 
 SIPHeaderList.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:encode()");
     return this.encodeBuffer("").toString();
 }
 
 SIPHeaderList.prototype.encodeBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("SIPHeaderList:encodeBuffer():buffer="+buffer);
     if (this.hlist.length==0) 
     {
         buffer=buffer+this.headerName+":"+this.NEWLINE;
@@ -5762,7 +5388,6 @@ SIPHeaderList.prototype.encodeBuffer =function(buffer){
 }
 
 SIPHeaderList.prototype.getHeadersAsEncodedStrings =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:getHeadersAsEncodedStrings()");
     var retval = new Array();
     for(var i=0;i<this.hlist.length;i++)
     {
@@ -5773,7 +5398,6 @@ SIPHeaderList.prototype.getHeadersAsEncodedStrings =function(){
 }
 
 SIPHeaderList.prototype.getFirst =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:getFirst()");
     if (this.hlist == null || this.hlist.length==0)
     {
         return null;
@@ -5785,7 +5409,6 @@ SIPHeaderList.prototype.getFirst =function(){
 }
 
 SIPHeaderList.prototype.getLast =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:getLast()");
     if (this.hlist == null || this.hlist.length==0)
     {
         return null;
@@ -5795,7 +5418,6 @@ SIPHeaderList.prototype.getLast =function(){
 }
 
 SIPHeaderList.prototype.getMyClass =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:getMyClass()");
     return  this.myClass;
 /*here it return the name of the class not an object. the reason
      *i have explained on the top
@@ -5803,7 +5425,6 @@ SIPHeaderList.prototype.getMyClass =function(){
 }
 
 SIPHeaderList.prototype.isEmpty =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:isEmpty()");
     if(this.hlist==0)
     {
         return true;
@@ -5815,7 +5436,6 @@ SIPHeaderList.prototype.isEmpty =function(){
 }
 
 SIPHeaderList.prototype.listIterator =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:listIterator()");
     if(arguments.length==0)
     {
         return this.hlist;
@@ -5829,12 +5449,10 @@ SIPHeaderList.prototype.listIterator =function(){
 }
 
 SIPHeaderList.prototype.getHeaderList =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:getHeaderList()");
     return this.hlist;
 }
 
 SIPHeaderList.prototype.removeFirst =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:removeFirst()");
     if (this.hlist.length != 0)
     {
         this.hlist.splice(0,1);
@@ -5842,7 +5460,6 @@ SIPHeaderList.prototype.removeFirst =function(){
 }
 
 SIPHeaderList.prototype.removeLast =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:removeLast()");
     if (this.hlist.length != 0)
     {
         var length=this.hlist.length-1;
@@ -5851,7 +5468,6 @@ SIPHeaderList.prototype.removeLast =function(){
 }
 
 SIPHeaderList.prototype.remove =function(obj){
-    if(logger!=undefined) logger.debug("SIPHeaderList:remove():obj="+obj);
     if(typeof obj=="number")
     {
         var x=this.hlist[obj]
@@ -5889,16 +5505,13 @@ SIPHeaderList.prototype.remove =function(obj){
 }
     
 SIPHeaderList.prototype.setMyClass =function(cl){//here cl is the name of the class not an object.
-    if(logger!=undefined) logger.debug("SIPHeaderList:setMyClass():cl="+cl);
     this.myClass = cl;
 }
 
 SIPHeaderList.prototype.toArray =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:toArray()");
     return this.hlist;
 }
 SIPHeaderList.prototype.indexOf =function(gobj){
-    if(logger!=undefined) logger.debug("SIPHeaderList:indexOf():gobj="+gobj);
     var l=null;
     for(var i=0;i<this.hlist.length;i++)
     {
@@ -5918,22 +5531,18 @@ SIPHeaderList.prototype.indexOf =function(gobj){
 }
 
 SIPHeaderList.prototype.size =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:size()");
     return this.hlist.length;
 }
 
 SIPHeaderList.prototype.isHeaderList =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:isHeaderList()");
     return true;
 }
 
 SIPHeaderList.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:encodeBody()");
     return this.encodeBodyBuffer("").toString();
 }
 
 SIPHeaderList.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("SIPHeaderList:encodeBodyBuffer():buffer="+buffer);
     for(var i=0;i<this.hlist.length;i++)
     {
         var sipHeader = this.hlist[i];
@@ -5959,7 +5568,6 @@ SIPHeaderList.prototype.encodeBodyBuffer =function(buffer){
 }
 
 SIPHeaderList.prototype.addAll =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:addAll():arguments="+arguments.toString());
     if(arguments.length==1)
     {
         
@@ -6030,7 +5638,6 @@ SIPHeaderList.prototype.addAll =function(){
 }
 
 SIPHeaderList.prototype.containsAll =function(collection){
-    if(logger!=undefined) logger.debug("SIPHeaderList:containsAll():collection="+collection);
     var c=0;
     for(var i=0;i<collection.length;i++)
     {
@@ -6053,12 +5660,10 @@ SIPHeaderList.prototype.containsAll =function(collection){
 }
 
 SIPHeaderList.prototype.clear =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:clear()");
     this.hlist=new Array();
 }
 
 SIPHeaderList.prototype.contains =function(header){
-    if(logger!=undefined) logger.debug("SIPHeaderList:contains():header="+header);
     var c=0;
     for(var n=0;n<this.hlist.length;n++)
     {
@@ -6078,17 +5683,14 @@ SIPHeaderList.prototype.contains =function(header){
 }
 
 SIPHeaderList.prototype.get =function(index){
-    if(logger!=undefined) logger.debug("SIPHeaderList:get():index="+index);
     return this.hlist[index];
 }
 
 SIPHeaderList.prototype.iterator =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:iterator()");
     return this.hlist;
 }
 
 SIPHeaderList.prototype.lastIndexOf =function(obj){
-    if(logger!=undefined) logger.debug("SIPHeaderList:lastIndexOf():obj="+obj);
     var c=null;
     for(var n=0;n<this.hlist.length;n++)
     {
@@ -6108,7 +5710,6 @@ SIPHeaderList.prototype.lastIndexOf =function(obj){
 }
 
 SIPHeaderList.prototype.removeAll =function(collection){
-    if(logger!=undefined) logger.debug("SIPHeaderList:removeAll():collection="+collection);
     var na=new Array();
     var c=0;
     var l=0;
@@ -6140,7 +5741,6 @@ SIPHeaderList.prototype.removeAll =function(collection){
 }
 
 SIPHeaderList.prototype.retainAll =function(collection){
-    if(logger!=undefined) logger.debug("SIPHeaderList:retainAll():collection="+collection);
     var na=new Array();
     var c=0;
     for(var i=0;i<this.hlist.length;i++)
@@ -6166,12 +5766,10 @@ SIPHeaderList.prototype.retainAll =function(collection){
 }
 
 SIPHeaderList.prototype.subList =function(index1, index2){
-    if(logger!=undefined) logger.debug("SIPHeaderList:subList():index1="+index1+", index2:"+index2);
     return this.hlist.slice(index1,index2);
 }
 
 SIPHeaderList.prototype.hashCode =function(){
-    if(logger!=undefined) logger.debug("SIPHeaderList:hashCode()");
     var hash = 0;
     var set=this.headerName;
     if(!(set == null || set.value == ""))  
@@ -6191,13 +5789,11 @@ SIPHeaderList.prototype.hashCode =function(){
 }
 
 SIPHeaderList.prototype.set =function(position, sipHeader){
-    if(logger!=undefined) logger.debug("SIPHeaderList:set():position="+position+", sipHeader:"+sipHeader);
     var x=this.hlist[position];
     this.hlist[position]=sipHeader;
     return x;
 }
 SIPHeaderList.prototype.setPrettyEncode =function(flag){
-    if(logger!=undefined) logger.debug("SIPHeaderList:setPrettyEncode():flag="+flag);
     this.prettyEncode=flag;
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -6229,7 +5825,6 @@ SIPHeaderList.prototype.setPrettyEncode =function(flag){
  *  @version 1.0 
  */
 function ParametersHeader(hdrName, sync) {
-    if(logger!=undefined) logger.debug("ParametersHeader:ParametersHeader()");
     this.classname="ParametersHeader";
     this.parameters=null;
     this.duplicates=null;
@@ -6257,22 +5852,18 @@ ParametersHeader.prototype = new SIPHeader();
 ParametersHeader.prototype.constructor=ParametersHeader;
 
 ParametersHeader.prototype.getParameter =function(name){
-    if(logger!=undefined) logger.debug("ParametersHeader:getParameter():name="+name);
     return this.parameters.getParameter(name);
 }
 
 ParametersHeader.prototype.getParameterValue =function(name){
-    if(logger!=undefined) logger.debug("ParametersHeader:getParameterValue():name="+name);
     return this.parameters.getValue(name);
 }
 
 ParametersHeader.prototype.getParameterNames =function(){
-    if(logger!=undefined) logger.debug("ParametersHeader:getParameterNames()");
     return this.parameters.getNames();
 }
 
 ParametersHeader.prototype.hasParameters =function(){
-    if(logger!=undefined) logger.debug("ParametersHeader:hasParameters()");
     if(this.parameters != null && this.parameters.hmap.length!=0)
     {
         return true;
@@ -6284,11 +5875,9 @@ ParametersHeader.prototype.hasParameters =function(){
 }
 
 ParametersHeader.prototype.removeParameter =function(name){
-    if(logger!=undefined) logger.debug("ParametersHeader:removeParameter():name="+name);
     this.parameters.delet(name);
 }
 ParametersHeader.prototype.setQuotedParameter =function(name, value){
-    if(logger!=undefined) logger.debug("ParametersHeader:setQuotedParameter():name="+name+",value:"+value);
     var nv = this.parameters.getNameValue(name);
     if (nv != null) 
     {
@@ -6304,7 +5893,6 @@ ParametersHeader.prototype.setQuotedParameter =function(name, value){
 
 // four fonctions set() with different auguments is integred into one fonction
 ParametersHeader.prototype.setParameter =function(name, value){
-    if(logger!=undefined) logger.debug("ParametersHeader:setParameter():name="+name+",value:"+value);
     if(typeof value=="object")
     {
         this.parameters.set_name_value(name,val);
@@ -6347,31 +5935,25 @@ ParametersHeader.prototype.setParameter =function(name, value){
 }
 
 ParametersHeader.prototype.hasParameter =function(parameterName){
-    if(logger!=undefined) logger.debug("ParametersHeader:hasParameter():parameterName="+parameterName);
     return this.parameters.hasNameValue(parameterName);
 }
 
 ParametersHeader.prototype.removeParameters =function(){
-    if(logger!=undefined) logger.debug("ParametersHeader:removeParameters()");
     this.parameters = new NameValueList();
 }
 
 ParametersHeader.prototype.getParameters =function(){
-    if(logger!=undefined) logger.debug("ParametersHeader:getParameters()");
     return this.parameters;
 }
 ParametersHeader.prototype.setParameter_nv =function(nameValue){
-    if(logger!=undefined) logger.debug("ParametersHeader:setParameter_nv():nameValue="+nameValue);
     this.parameters.set_nv(nameValue);
 }
 
 ParametersHeader.prototype.setParameters =function(parameters){
-    if(logger!=undefined) logger.debug("ParametersHeader:setParameters():parameters="+parameters);
     this.parameters = parameters;
 }
 
 ParametersHeader.prototype.getParameterAsNumber =function(parameterName){//i delete the other type of number. they are useless in javascript
-    if(logger!=undefined) logger.debug("ParametersHeader:getParameterAsNumber():parameterName="+parameterName);
     if (this.getParameterValue(parameterName) != null) 
     {
         return this.getParameterValue(parameterName)-0;
@@ -6382,7 +5964,6 @@ ParametersHeader.prototype.getParameterAsNumber =function(parameterName){//i del
     }
 }
 ParametersHeader.prototype.getParameterAsURI =function(parameterName){
-    if(logger!=undefined) logger.debug("ParametersHeader:getParameterAsURI():parameterName="+parameterName);
     var val = this.getParameterValue(parameterName);
     if (val instanceof GenericURI)
     {
@@ -6395,7 +5976,6 @@ ParametersHeader.prototype.getParameterAsURI =function(parameterName){
 }
 
 ParametersHeader.prototype.getParameterAsBoolean =function(parameterName){
-    if(logger!=undefined) logger.debug("ParametersHeader:getParameterAsBoolean():parameterName="+parameterName);
     var val = this.getParameterValue(parameterName);
     if (val == null) 
     {
@@ -6417,12 +5997,10 @@ ParametersHeader.prototype.getParameterAsBoolean =function(parameterName){
 }
 
 ParametersHeader.prototype.getNameValue =function(parameterName){
-    if(logger!=undefined) logger.debug("ParametersHeader:getNameValue():parameterName="+parameterName);
     return this.parameters.getNameValue(parameterName);
 }
 
 ParametersHeader.prototype.setMultiParameter_name_value =function(name, value){
-    if(logger!=undefined) logger.debug("ParametersHeader:setMultiParameter_name_value():name="+name+",value="+value);
     var nv = new NameValue();
     nv.setName(name);
     nv.setValue(value);
@@ -6430,32 +6008,26 @@ ParametersHeader.prototype.setMultiParameter_name_value =function(name, value){
 }
 
 ParametersHeader.prototype.setMultiParameter_nv =function(nameValue){
-    if(logger!=undefined) logger.debug("ParametersHeader:setMultiParameter_nv():nameValue="+nameValue);
     this.duplicates.set_nv(nameValue);
 }
 
 ParametersHeader.prototype.getMultiParameter =function(name){
-    if(logger!=undefined) logger.debug("ParametersHeader:getMultiParameter():name="+name);
     return this.duplicates.getParameter(name);
 }
 
 ParametersHeader.prototype.getMultiParameters =function(){
-    if(logger!=undefined) logger.debug("ParametersHeader:getMultiParameters()");
     return this.duplicates;
 }
 
 ParametersHeader.prototype.getMultiParameterValue =function(name){
-    if(logger!=undefined) logger.debug("ParametersHeader:getMultiParameterValue(): name="+name);
     return this.duplicates.getValue(name);
 }
 
 ParametersHeader.prototype.getMultiParameterNames =function(){
-    if(logger!=undefined) logger.debug("ParametersHeader:getMultiParameterNames()");
     return this.duplicates.getNames();
 }
 
 ParametersHeader.prototype.hasMultiParameters =function(){
-    if(logger!=undefined) logger.debug("ParametersHeader:hasMultiParameters()");
     if(this.duplicates != null && this.duplicates.length!=o)
     {
         return true;
@@ -6467,22 +6039,18 @@ ParametersHeader.prototype.hasMultiParameters =function(){
 }
 
 ParametersHeader.prototype.removeMultiParameter =function(name){
-    if(logger!=undefined) logger.debug("ParametersHeader:removeMultiParameter(): name="+name);
     this.duplicates.delet(name);
 }
 
 ParametersHeader.prototype.hasMultiParameter =function(parameterName){
-    if(logger!=undefined) logger.debug("ParametersHeader:hasMultiParameter()");
     return this.duplicates.hasNameValue(parameterName);
 }
 
 ParametersHeader.prototype.removeMultiParameters =function(){
-    if(logger!=undefined) logger.debug("ParametersHeader:removeMultiParameters()");
     this.duplicates = new DuplicateNameValueList();
 }
 
 ParametersHeader.prototype.equalParameters =function(other){
-    if(logger!=undefined) logger.debug("ParametersHeader:equalParameters()");
     if (this==other) {
         return true;
     }
@@ -6514,7 +6082,6 @@ ParametersHeader.prototype.equalParameters =function(other){
 }
 
 ParametersHeader.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("ParametersHeader:encodeBody()");
     
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -6546,7 +6113,6 @@ ParametersHeader.prototype.encodeBody =function(){
  *  @version 1.0 
  */
 function RequestLine(requestURI, method) {
-    if(logger!=undefined) logger.debug("RequestLine:RequestLine()");
     this.serialVersionUID = "-3286426172326043129L";
     this.classname="RequestLine";
     this.uri=new GenericURI();
@@ -6565,12 +6131,10 @@ RequestLine.prototype.SP=" ";
 RequestLine.prototype.NEWLINE="\r\n";
 
 RequestLine.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("RequestLine:encode()");
     return this.encodeBuffer("").toString();
 }
 
 RequestLine.prototype.encodeBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("RequestLine:encodeBuffer();buffer="+buffer);
     if (this.method != null) {
         buffer=buffer+this.method+this.SP;
     }
@@ -6583,37 +6147,30 @@ RequestLine.prototype.encodeBuffer =function(buffer){
 }
 
 RequestLine.prototype.getUri =function(){
-    if(logger!=undefined) logger.debug("RequestLine:getUri()");
     return this.uri;
 }
 
 RequestLine.prototype.getMethod =function(){
-    if(logger!=undefined) logger.debug("RequestLine:getMethod()");
     return this.method;
 }
 
 RequestLine.prototype.getSipVersion =function(){
-    if(logger!=undefined) logger.debug("RequestLine:getSipVersion()");
     return this.sipVersion;
 }
 
 RequestLine.prototype.setUri =function(uri){
-    if(logger!=undefined) logger.debug("RequestLine:setUri(): uri="+uri);
     return this.uri=uri;
 }
 
 RequestLine.prototype.setMethod =function(method){
-    if(logger!=undefined) logger.debug("RequestLine:setMethod():method="+method);
     this.method=method
 }
 
 RequestLine.prototype.setSipVersion =function(version){
-    if(logger!=undefined) logger.debug("RequestLine:setSipVersion():version="+version);
     this.sipVersion=version
 }
 
 RequestLine.prototype.getVersionMajor =function(){
-    if(logger!=undefined) logger.debug("RequestLine:getVersionMajor()");
     if (this.sipVersion == null)
         return null;
     var major = null;
@@ -6643,7 +6200,6 @@ RequestLine.prototype.getVersionMajor =function(){
 }
 
 RequestLine.prototype.getVersionMinor =function(){
-    if(logger!=undefined) logger.debug("RequestLine:getVersionMinor()");
     if (this.sipVersion == null)
         return null;
     var minor = null;
@@ -6700,7 +6256,6 @@ RequestLine.prototype.getVersionMinor =function(){
  *  @version 1.0 
  */
 function UserAgent() {
-    if(logger!=undefined) logger.debug("UserAgent:UserAgent()");
     this.serialVersionUID = "4561239179796364295L";
     this.classname="UserAgent";
     this.productTokens=new Array();
@@ -6712,7 +6267,6 @@ UserAgent.prototype.constructor=UserAgent;
 UserAgent.prototype.NAME="User-Agent";
 
 UserAgent.prototype.encodeProduct =function(){
-    if(logger!=undefined) logger.debug("UserAgent_encodeProduct");
     var tokens = "";
     for(var i=0;i<this.productTokens.length;i++)
     {
@@ -6722,18 +6276,15 @@ UserAgent.prototype.encodeProduct =function(){
 }
 
 UserAgent.prototype.addProductToken =function(pt){
-    if(logger!=undefined) logger.debug("UserAgent_addProductToken");
     var x=this.productTokens.length;
     this.productTokens[x]=pt;
 }
 
 UserAgent.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("UserAgent_encodeBody");
     return this.encodeProduct();
 }
 
 UserAgent.prototype.getProduct =function(){
-    if(logger!=undefined) logger.debug("UserAgent_getProduct");
     if (this.productTokens == null || this.productTokens.length==0)
     {
         return null;
@@ -6745,7 +6296,6 @@ UserAgent.prototype.getProduct =function(){
 }
 
 UserAgent.prototype.setProduct =function(product){
-    if(logger!=undefined) logger.debug("UserAgent_setProduct");
     if (product == null)
     {
         console.error("UserAgent:setProduct(): the product parameter is null");
@@ -6783,7 +6333,6 @@ UserAgent.prototype.setProduct =function(product){
  *  @version 1.0 
  */
 function ContentLength(length) {
-    if(logger!=undefined) logger.debug("ContentLength:ContentLength(): length="+length);
     this.serialVersionUID = "1187190542411037027L";
     this.classname="ContentLength";
     this.headerName=this.NAME;
@@ -6804,13 +6353,11 @@ ContentLength.prototype.constructor=ContentLength;
 ContentLength.prototype.NAME="Content-Length";
 
 ContentLength.prototype.getContentLength =function(){
-    if(logger!=undefined) logger.debug("ContentLength:getContentLength()");
     var x=this.contentLength-0;
     return x;
 }
 
 ContentLength.prototype.setContentLength =function(contentLength){
-    if(logger!=undefined) logger.debug("ContentLength:setContentLength():contentLength="+contentLength);
     if (contentLength < 0)
     {
         console.error("ContentLength:setContentLength(): the contentLength parameter is < 0");
@@ -6820,12 +6367,10 @@ ContentLength.prototype.setContentLength =function(contentLength){
 }
 
 ContentLength.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("ContentLength:encodeBody()");
     return this.encodeBodyBuffer("").toString();
 }
 
 ContentLength.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("ContentLength:encodeBodyBuffer():buffer="+buffer);
     if (this.contentLength == null)
     {
         buffer=buffer+"0";
@@ -6838,7 +6383,6 @@ ContentLength.prototype.encodeBodyBuffer =function(buffer){
 }
 
 ContentLength.prototype.match =function(other){
-    if(logger!=undefined) logger.debug("ContentLength:match():other="+other);
     if (other instanceof ContentLength)
     {
         return true;
@@ -6878,7 +6422,6 @@ ContentLength.prototype.match =function(other){
  */
 
 function ExtensionHeaderImpl(headerName) {
-    if(logger!=undefined) logger.debug("ExtensionHeaderImpl:ExtensionHeaderImpl(): headerName="+headerName);
     this.classname="ExtensionHeaderImpl"; 
     this.serialVersionUID = "-8693922839612081849L";
     this.value=null;
@@ -6895,17 +6438,14 @@ ExtensionHeaderImpl.prototype.SP=" ";
 ExtensionHeaderImpl.prototype.NEWLINE="\r\n";
 
 ExtensionHeaderImpl.prototype.setName =function(headerName){
-    if(logger!=undefined) logger.debug("ExtensionHeaderImpl:setName():headerName="+headerName);
     this.headerName = headerName;
 }
 
 ExtensionHeaderImpl.prototype.setValue =function(value){
-    if(logger!=undefined) logger.debug("ExtensionHeaderImpl:setValue():value="+value);
     this.value = value;
 }
 
 ExtensionHeaderImpl.prototype.getHeaderValue =function(){
-    if(logger!=undefined) logger.debug("ExtensionHeaderImpl:getHeaderValue()");
     if (this.value != null) {
         return this.value;
     } 
@@ -6932,14 +6472,12 @@ ExtensionHeaderImpl.prototype.getHeaderValue =function(){
 }
 
 ExtensionHeaderImpl.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("ExtensionHeaderImpl:encode()");
     var encode="";
     encode=encode+this.headerName+this.COLON+this.SP+this.value+this.NEWLINE;
     return encode;
 }
 
 ExtensionHeaderImpl.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("ExtensionHeaderImpl:encodeBody()");
     return this.getHeaderValue();
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -6971,7 +6509,6 @@ ExtensionHeaderImpl.prototype.encodeBody =function(){
  *  @version 1.0 
  */
 function Server(to) {
-    if(logger!=undefined) logger.debug("Server:Server(): to="+to);
     this.serialVersionUID = "-3587764149383342973L";
     this.classname="Server";
     this.productTokens = new Array();
@@ -6983,7 +6520,6 @@ Server.prototype.constructor=Server;
 Server.prototype.NAME="Server";
 
 Server.prototype.encodeProduct =function(){
-    if(logger!=undefined) logger.debug("Server:encodeProduct()");
     var tokens = "";
     for(var i=0;i<this.productTokens.length;i++)
     {
@@ -7001,17 +6537,14 @@ Server.prototype.encodeProduct =function(){
 }
 
 Server.prototype.addProductToken =function(pt){
-    if(logger!=undefined) logger.debug("Server:addProductToken():pt="+pt);
     this.productTokens.push(pt);
 }
 
 Server.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("Server:encodeBody()");
     return this.encodeProduct();
 }
 
 Server.prototype.getProduct =function(){
-    if(logger!=undefined) logger.debug("Server:getProduct()");
     if (this.productTokens == null || this.productTokens.length==0)
     {
         return null;
@@ -7023,7 +6556,6 @@ Server.prototype.getProduct =function(){
 }
 
 Server.prototype.setProduct =function(product){
-    if(logger!=undefined) logger.debug("Server:setProduct():product="+product.toString());
     if (product == null)
     {
         console.error("Server:setProduct(): the product parameter is null");
@@ -7062,7 +6594,6 @@ Server.prototype.setProduct =function(product){
  */
 
 function AddressParametersHeader(name, sync) {
-    if(logger!=undefined) logger.debug("AddressParametersHeader:AddressParametersHeader(): name="+name+",sync="+sync);
     this.classname="AddressParametersHeader";
     this.address=new AddressImpl();
     this.headerName=null;
@@ -7084,17 +6615,14 @@ AddressParametersHeader.prototype = new ParametersHeader();
 AddressParametersHeader.prototype.constructor=AddressParametersHeader;
 
 AddressParametersHeader.prototype.getAddress =function(){
-    if(logger!=undefined) logger.debug("AddressParametersHeader:getAddress()");
     return this.address;
 }
 
 AddressParametersHeader.prototype.setAddress =function(address){
-    if(logger!=undefined) logger.debug("AddressParametersHeader:setAddress():address"+address);
     this.address=address;
 }
 
 AddressParametersHeader.prototype.equals =function(other){
-    if(logger!=undefined) logger.debug("AddressParametersHeader:equals():other"+other);
     if (this==other) {
         return true;
     }
@@ -7141,7 +6669,6 @@ AddressParametersHeader.prototype.equals =function(other){
  */
 
 function From(to) {
-    if(logger!=undefined) logger.debug("From:From(): to="+to);
     this.serialVersionUID = "-6312727234330643892L";
     this.classname="From";
     this.parameters=null;
@@ -7171,12 +6698,10 @@ From.prototype.SEMICOLON=";";
 From.prototype.TAG="tag";
 
 From.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("From:encodeBody()");
     return this.encodeBodyBuffer("").toString();
 }
 
 From.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("From:encodeBodyBuffer():buffer="+buffer);
     if (this.address.getAddressType() == this.ADDRESS_SPEC) {
         buffer=buffer+this.LESS_THAN;
     }
@@ -7192,17 +6717,14 @@ From.prototype.encodeBodyBuffer =function(buffer){
 }
 
 From.prototype.getHostPort =function(){
-    if(logger!=undefined) logger.debug("From:getHostPort()");
     return this.address.getHostPort();
 }
 
 From.prototype.getDisplayName =function(){
-    if(logger!=undefined) logger.debug("From:getDisplayName()");
     return this.address.getDisplayName();
 }
 
 From.prototype.getTag =function(){
-    if(logger!=undefined) logger.debug("From:getTag()");
     if (this.parameters == null)
     {
         return null;
@@ -7211,34 +6733,28 @@ From.prototype.getTag =function(){
 }
 
 From.prototype.hasTag =function(){
-    if(logger!=undefined) logger.debug("From:hasTag()");
     return this.hasParameter(this.TAG);
 }
 
 From.prototype.removeTag =function(){
-    if(logger!=undefined) logger.debug("From:removeTag()");
     this.parameters.delet(this.TAG);
 }
 
 From.prototype.setAddress =function(address){
-    if(logger!=undefined) logger.debug("From:setAddress():address="+address);
     this.address=address;
 }
 
 From.prototype.setTag =function(t){
-    if(logger!=undefined) logger.debug("From:setTag():t="+t);
     var parser=new Parser();
     parser.checkToken(t);
     this.setParameter(this.TAG, t);
 }
 
 From.prototype.getUserAtHostPort =function(){
-    if(logger!=undefined) logger.debug("From:getUserAtHostPort()");
     return this.address.getUserAtHostPort();
 }
 
 From.prototype.equals =function(other){
-    if(logger!=undefined) logger.debug("From:equals():other="+other);
     if((other instanceof From) && Object.getPrototypeOf(this).equals(other))
     {
         return true;
@@ -7250,7 +6766,6 @@ From.prototype.equals =function(other){
 }
 
 From.prototype.getAddress=function(){
-    if(logger!=undefined) logger.debug("From:getAddress()");
     return this.address;
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -7282,7 +6797,6 @@ From.prototype.getAddress=function(){
  *  @version 1.0 
  */
 function To(from) {
-    if(logger!=undefined) logger.debug("To:To()");
     this.serialVersionUID = "-4057413800584586316L";
     this.classname="To";
     if(from==null)
@@ -7314,17 +6828,14 @@ To.prototype.SP=" ";
 To.prototype.NEWLINE="\r\n";
 
 To.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("To:encode()");
     return this.headerName + this.COLON + this.SP + this.encodeBody() + this.NEWLINE;
 }
 
 To.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("To:encodeBody()");
     return this.encodeBodyBuffer("").toString();
 }
 
 To.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("To:encodeBodyBuffer():buffer="+buffer);
     if (this.address != null) {
         if (this.address.getAddressType() == this.ADDRESS_SPEC) {
             buffer=buffer+this.LESS_THAN;
@@ -7342,7 +6853,6 @@ To.prototype.encodeBodyBuffer =function(buffer){
 }
 
 To.prototype.getHostPort =function(){
-    if(logger!=undefined) logger.debug("To:getHostPort()");
     if (this.address == null)
     {
         return null;
@@ -7351,7 +6861,6 @@ To.prototype.getHostPort =function(){
 }
 
 To.prototype.getDisplayName =function(){
-    if(logger!=undefined) logger.debug("To:getDisplayName()");
     if (this.address == null)
     {
         return null;
@@ -7360,7 +6869,6 @@ To.prototype.getDisplayName =function(){
 }
 
 To.prototype.getTag =function(){
-    if(logger!=undefined) logger.debug("To:getTag()");
     if (this.parameters == null)
     {
         return null;
@@ -7369,7 +6877,6 @@ To.prototype.getTag =function(){
 }
 
 To.prototype.hasTag =function(){
-    if(logger!=undefined) logger.debug("To:hasTag()");
     if (this.parameters == null)
     {
         return false;
@@ -7378,7 +6885,6 @@ To.prototype.hasTag =function(){
 }
 
 To.prototype.removeTag =function(){
-    if(logger!=undefined) logger.debug("To:removeTag()");
     if (this.parameters != null)
     {
         this.parameters.delet(this.TAG);
@@ -7386,14 +6892,12 @@ To.prototype.removeTag =function(){
 }
 
 To.prototype.setTag =function(t){
-    if(logger!=undefined) logger.debug("To:setTag():t="+t);
     var parser=new Parser();
     parser.checkToken(t);
     this.setParameter(this.TAG, t);
 }
 
 To.prototype.getUserAtHostPort =function(){
-    if(logger!=undefined) logger.debug("To:getUserAtHostPort()");
     if (this.address == null)
     {
         return null;
@@ -7429,7 +6933,6 @@ To.prototype.getUserAtHostPort =function(){
  *  @version 1.0 
  */
 function Reason() {
-    if(logger!=undefined) logger.debug("Reason:Reason()");
     this.serialVersionUID = "-8903376965568297388L";
     this.classname="Reason";
     this.headerName=this.NAME;
@@ -7446,27 +6949,22 @@ Reason.prototype.CAUSE = "cause";
 Reason.prototype.SEMICOLON = ";";
 
 Reason.prototype.getCause =function(){
-    if(logger!=undefined) logger.debug("Reason:getCause()");
     return this.getParameterAsNumber(this.CAUSE);
 }
 
 Reason.prototype.setCause =function(cause){
-    if(logger!=undefined) logger.debug("Reason:setCause():cause="+cause);
     this.parameters.set_name_value("cause", cause);
 }
 
 Reason.prototype.setProtocol =function(protocol){
-    if(logger!=undefined) logger.debug("Reason:setProtocol():protocol="+protocol);
     this.protocol = protocol;
 }
 
 Reason.prototype.getProtocol =function(){
-    if(logger!=undefined) logger.debug("Reason:getProtocol()");
     return this.protocol;
 }
 
 Reason.prototype.setText =function(text){
-    if(logger!=undefined) logger.debug("Reason:setText():text="+text);
     if ( text.charAt(0) != '"' ) {
         var utils=new Utils();
         text = utils.getQuotedString(text);
@@ -7475,17 +6973,14 @@ Reason.prototype.setText =function(text){
 }
 
 Reason.prototype.getText =function(){
-    if(logger!=undefined) logger.debug("Reason:getText()");
     return this.parameters.getParameter("text");
 }
 
 Reason.prototype.getName =function(){
-    if(logger!=undefined) logger.debug("Reason:getName()");
     return this.NAME;
 }
 
 Reason.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("Reason:encodeBody()");
     var s = "";
     s=s+this.protocol;
     if (this.parameters != null && this.parameters.hmap.length!=0)
@@ -7523,7 +7018,6 @@ Reason.prototype.encodeBody =function(){
  *  @version 1.0 
  */
 function ReasonList() {
-    if(logger!=undefined) logger.debug("ReasonList:ReasonList()");
     this.serialVersionUID = "7459989997463160670L";
     this.classname="ReasonList";
     this.headerName = this.NAME;
@@ -7535,7 +7029,6 @@ ReasonList.prototype.constructor=ReasonList;
 ReasonList.prototype.NAME="Reason";
 
 ReasonList.prototype.clone =function(){
-    if(logger!=undefined) logger.debug("ReasonList:clone()");   
 }
 
 /*
@@ -7568,7 +7061,6 @@ ReasonList.prototype.clone =function(){
  *  @version 1.0 
  */
 function Protocol() {
-    if(logger!=undefined) logger.debug("Protocol:Protocol()");
     this.serialVersionUID = "2216758055974073280L";
     this.classname="Protocol";
     this.protocolName="SIP";
@@ -7581,33 +7073,27 @@ Protocol.prototype.constructor=Protocol;
 Protocol.prototype.SLASH="/";
 
 Protocol.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("Protocol:encode()");
     return this.encodeBuffer("").toString();
 }
 
 Protocol.prototype.encodeBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("Protocol:encodeBuffer():buffer="+buffer);
     buffer=buffer+this.protocolName.toUpperCase()+this.SLASH+this.protocolVersion+this.SLASH+this.transport.toUpperCase();
     return buffer;
 }
 
 Protocol.prototype.getProtocolName =function(){
-    if(logger!=undefined) logger.debug("Protocol:getProtocolName()");
     return this.protocolName;
 }
 
 Protocol.prototype.getProtocolVersion =function(){
-    if(logger!=undefined) logger.debug("Protocol:getProtocolVersion()");
     return this.protocolVersion;
 }
 
 Protocol.prototype.getProtocol =function(){
-    if(logger!=undefined) logger.debug("Protocol:getProtocol()");
     return this.protocolName + "/" + this.protocolVersion;
 }
 
 Protocol.prototype.setProtocol =function(name_and_version){
-    if(logger!=undefined) logger.debug("Protocol:setProtocol():name_and_version="+name_and_version);
     var slash = name_and_version.indexOf('/');
     if (slash>0) {
         this.protocolName = name_and_version.substring(0,slash);
@@ -7621,22 +7107,18 @@ Protocol.prototype.setProtocol =function(name_and_version){
 }
 
 Protocol.prototype.getTransport =function(){
-    if(logger!=undefined) logger.debug("Protocol:getTransport()");
     return this.transport;
 }
 
 Protocol.prototype.setProtocolName =function(pn){
-    if(logger!=undefined) logger.debug("Protocol:setProtocolName():pn="+pn);
     this.protocolName=pn;
 }
 
 Protocol.prototype.setProtocolVersion =function(p){
-    if(logger!=undefined) logger.debug("Protocol:setProtocolVersion():p="+p);
     this.protocolVersion=p
 }
 
 Protocol.prototype.setTransport =function(t){
-    if(logger!=undefined) logger.debug("Protocol:setTransport(): t="+t);
     this.transport=t;
 }
 /*
@@ -7669,7 +7151,6 @@ Protocol.prototype.setTransport =function(t){
  *  @version 1.0 
  */
 function Via() {
-    if(logger!=undefined) logger.debug("Via:Via()");
     this.serialVersionUID = "5281728373401351378L";
     this.classname="Via";
     this.sentProtocol=new Protocol();
@@ -7696,7 +7177,6 @@ Via.prototype.RPAREN=")";
 
 
 Via.prototype.getProtocolVersion =function(){
-    if(logger!=undefined) logger.debug("Via:getProtocolVersion()");
     if (this.sentProtocol == null)
     {
         return null;
@@ -7708,32 +7188,26 @@ Via.prototype.getProtocolVersion =function(){
 }
 
 Via.prototype.getSentProtocol =function(){
-    if(logger!=undefined) logger.debug("Via:getSentProtocol()");
     return this.sentProtocol;
 }
 
 Via.prototype.getSentBy =function(){
-    if(logger!=undefined) logger.debug("Via:getSentBy()");
     return this.sentBy;
 }
 
 Via.prototype.getHop =function(){
-    if(logger!=undefined) logger.debug("Via:getHop()");
     var hop = new HopImpl(this.sentBy.getHost().getHostname());
     return hop;
 }
 
 Via.prototype.getViaParms =function(){
-    if(logger!=undefined) logger.debug("Via:getViaParms()");
     return this.parameters;
 }
 Via.prototype.hasPort =function(){
-    if(logger!=undefined) logger.debug("Via:hasPort()");
     return this.getSentBy().hasPort();
 }
 
 Via.prototype.hasComment =function(){
-    if(logger!=undefined) logger.debug("Via:hasComment()");
     if(this.comment != null)
     {
         return true;
@@ -7745,17 +7219,14 @@ Via.prototype.hasComment =function(){
 }
 
 Via.prototype.removePort =function(){
-    if(logger!=undefined) logger.debug("Via:removePort()");
     this.sentBy.removePort();
 }
 
 Via.prototype.removeComment =function(){
-    if(logger!=undefined) logger.debug("Via:removeComment()");
     this.comment = null;
 }
 
 Via.prototype.setProtocolVersion =function(){
-    if(logger!=undefined) logger.debug("Via:setProtocolVersion()");
     if (this.sentProtocol == null)
     {
         this.sentProtocol = new Protocol();
@@ -7764,7 +7235,6 @@ Via.prototype.setProtocolVersion =function(){
 }
 
 Via.prototype.setHost =function(host){
-    if(logger!=undefined) logger.debug("Via:setHost():host="+host);
     if(typeof host=="object")
     {
         if (this.sentBy == null) {
@@ -7786,22 +7256,18 @@ Via.prototype.setHost =function(host){
 }
 
 Via.prototype.setSentProtocol =function(s){
-    if(logger!=undefined) logger.debug("Via:setSentProtocol():s="+s);
     this.sentProtocol = s;
 }
 
 Via.prototype.setSentBy =function(s){
-    if(logger!=undefined) logger.debug("Via:setSentBy():s="+s);
     this.sentBy = s;
 }
 
 Via.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("Via:encodeBody()");
     return this.encodeBodyBuffer("").toString();
 }
 
 Via.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("Via:encodeBodyBuffer():buffer="+buffer);
     buffer=this.sentProtocol.encodeBuffer(buffer);
     buffer=buffer+this.SP;   
     buffer=this.sentBy.encodeBuffer(buffer);
@@ -7820,7 +7286,6 @@ Via.prototype.encodeBodyBuffer =function(buffer){
 }
 
 Via.prototype.getHost =function(){
-    if(logger!=undefined) logger.debug("Via:getHost()");
     if (this.sentBy == null)
         return null;
     else {
@@ -7837,7 +7302,6 @@ Via.prototype.getHost =function(){
 }
 
 Via.prototype.setPort =function(port){
-    if(logger!=undefined) logger.debug("Via:setPort():port="+port);
     if ( port!=-1 && (port<1 || port>65535)) {
         console.error("Via:setPort(): port value out of range -1, [1..65535]");
         throw "Via:setPort(): port value out of range -1, [1..65535]"; 
@@ -7850,12 +7314,10 @@ Via.prototype.setPort =function(port){
 }
 
 Via.prototype.setRPort =function(){
-    if(logger!=undefined) logger.debug("Via:setRPort()");
     this.rPortFlag = true;
 }
 
 Via.prototype.getPort =function(){
-    if(logger!=undefined) logger.debug("Via:getPort()");
     if (this.sentBy == null)
     {
         return -1;
@@ -7864,7 +7326,6 @@ Via.prototype.getPort =function(){
 }
 
 Via.prototype.getRPort =function(){
-    if(logger!=undefined) logger.debug("Via:getRPort()");
     var strRport = this.getParameter(this.RPORT);
     if (strRport != null && ! strRport.equals(""))
     {
@@ -7878,7 +7339,6 @@ Via.prototype.getRPort =function(){
 }
 
 Via.prototype.getTransport =function(){
-    if(logger!=undefined) logger.debug("Via:getTransport()");
     if (this.sentProtocol == null)
     {
         return null;
@@ -7887,7 +7347,6 @@ Via.prototype.getTransport =function(){
 }
 
 Via.prototype.setTransport =function(transport){
-    if(logger!=undefined) logger.debug("Via:setTransport():transport="+transport);
     if (transport == null)
     {
         console.error("Via:setTransport(): the transport parameter is null");
@@ -7901,7 +7360,6 @@ Via.prototype.setTransport =function(transport){
 }
 
 Via.prototype.getProtocol =function(){
-    if(logger!=undefined) logger.debug("Via:getProtocol()");
     if (this.sentProtocol == null)
     {
         return null;
@@ -7910,7 +7368,6 @@ Via.prototype.getProtocol =function(){
 }
 
 Via.prototype.setProtocol =function(protocol){
-    if(logger!=undefined) logger.debug("Via:setProtocol():protocol="+protocol);
     if (protocol == null)
     {
         console.error("Via:setProtocol(): the transport parameter is null");
@@ -7924,13 +7381,11 @@ Via.prototype.setProtocol =function(protocol){
 }
 
 Via.prototype.getTTL =function(){
-    if(logger!=undefined) logger.debug("Via:getTTL()");
     var ttl = this.getParameterAsNumber(this.TTL);
     return ttl;
 }
 
 Via.prototype.setTTL =function(ttl){
-    if(logger!=undefined) logger.debug("Via:setTTL():ttl="+ttl);
     if (ttl < 0 && ttl != -1)
     {
         console.error("Via:setTTL():  the ttl parameter is < 0");
@@ -7941,12 +7396,10 @@ Via.prototype.setTTL =function(ttl){
 }
 
 Via.prototype.getMAddr =function(){
-    if(logger!=undefined) logger.debug("Via:getMAddr()");
     return this.getParameter(this.MADDR);
 }
 
 Via.prototype.setMAddr =function(mAddr){
-    if(logger!=undefined) logger.debug("Via:setMAddr():mAddr="+mAddr);
     if (mAddr == null)
     {
         console.error("Via:setMAddr():  the mAddr parameter is < 0");
@@ -7959,12 +7412,10 @@ Via.prototype.setMAddr =function(mAddr){
 }
 
 Via.prototype.getReceived =function(){
-    if(logger!=undefined) logger.debug("Via:getReceived()");
     return this.getParameter(this.RECEIVED);
 }
 
 Via.prototype.setReceived =function(received){
-    if(logger!=undefined) logger.debug("Via:setReceived():received="+received);
     if (received == null)
     {
        console.error("Via:setReceived():  the received parameter is < 0");
@@ -7974,12 +7425,10 @@ Via.prototype.setReceived =function(received){
 }
 
 Via.prototype.getBranch =function(){
-    if(logger!=undefined) logger.debug("Via:getBranch()");
     return this.getParameter(this.BRANCH);
 }
 
 Via.prototype.setBranch =function(branch){
-    if(logger!=undefined) logger.debug("Via:setBranch():branch:"+branch);
     if (branch == null || branch.length==0)
     {
        console.error("Via:setBranch():  branch parameter is null or length 0");
@@ -7989,7 +7438,6 @@ Via.prototype.setBranch =function(branch){
 }
 
 Via.prototype.getSentByField =function(){
-    if(logger!=undefined) logger.debug("Via:getSentByField()");
     if(this.sentBy != null)
     {
         return this.sentBy.encode();
@@ -7997,7 +7445,6 @@ Via.prototype.getSentByField =function(){
     return null;
 }
 Via.prototype.getSentProtocolField =function(){
-    if(logger!=undefined) logger.debug("Via:getSentProtocolField()");
     if(this.sentProtocol != null)
     {
         return this.sentProtocol.encode();
@@ -8033,7 +7480,6 @@ Via.prototype.getSentProtocolField =function(){
  *  @version 1.0 
  */
 function Contact() {
-    if(logger!=undefined) logger.debug("Contact:Contact()");
     this.serialVersionUID = "1677294871695706288L";
     this.classname="Contact";
     this.headerName=this.NAME;
@@ -8060,7 +7506,6 @@ Contact.prototype.PUB_GRUU="pub-gruu";
 Contact.prototype.TEMP_GRUU="temp-gruu";
 
 Contact.prototype.setParameter =function(name,value){
-    if(logger!=undefined) logger.debug("Contact:setParameter():name="+name+",value"+value);
     var nv = this.parameters.getNameValue(name);
     if (nv != null) 
     {
@@ -8078,12 +7523,10 @@ Contact.prototype.setParameter =function(name,value){
 }
 
 Contact.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("Contact:encodeBody()");
     return this.encodeBodyBuffer("");
 }
 
 Contact.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("Contact:encodeBodyBuffer():buffer="+buffer);
     if (this.wildCardFlag) {
         buffer=buffer+"*";
     }
@@ -8108,55 +7551,45 @@ Contact.prototype.encodeBodyBuffer =function(buffer){
 }
 
 Contact.prototype.getContactList =function(){
-    if(logger!=undefined) logger.debug("Contact:getContactList()");
     return this.contactList;
 }
 
 Contact.prototype.getWildCardFlag =function(){
-    if(logger!=undefined) logger.debug("Contact:getWildCardFlag()");
     return this.wildCardFlag;
 }
 
 Contact.prototype.getAddress =function(){
-    if(logger!=undefined) logger.debug("Contact:getAddress()");
     return this.address;
 }
 
 Contact.prototype.getContactParms =function(){
-    if(logger!=undefined) logger.debug("Contact:getContactParms()");
     return this.parameters;
 }
 
 Contact.prototype.getExpires =function(){
-    if(logger!=undefined) logger.debug("Contact:getExpires()");
     return this.getParameterAsNumber(this.EXPIRES);
 }
 
 Contact.prototype.setExpires =function(expiryDeltaSeconds){
-    if(logger!=undefined) logger.debug("Contact:setExpires():expiryDeltaSeconds="+expiryDeltaSeconds);
     var deltaSeconds = expiryDeltaSeconds-0;
     this.parameters.set_name_value(this.EXPIRES, deltaSeconds);
 }
 
 Contact.prototype.getQValue =function(){
-    if(logger!=undefined) logger.debug("Contact:getQValue()");
     return this.getParameterAsNumber(Q);
 }
 
 Contact.prototype.setContactList =function(cl){
-    if(logger!=undefined) logger.debug("Contact:setContactList():cl"+cl);
     this.contactList=cl;
 }
 
 Contact.prototype.setWildCardFlag =function(w){
-    if(logger!=undefined) logger.debug("Contact:setWildCardFlag():w="+w);
     this.wildCardFlag = true;
     this.address = new AddressImpl();
     this.address.setWildCardFlag();
 }
 
 Contact.prototype.setAddress =function(address){
-    if(logger!=undefined) logger.debug("Contact:setAddress():address="+address);
     if (address == null)
     {
         console.error("CSeq:setAddress(): the address parameter is null");
@@ -8167,7 +7600,6 @@ Contact.prototype.setAddress =function(address){
 }
 
 Contact.prototype.setQValue =function(qValue){
-    if(logger!=undefined) logger.debug("Contact:setQValue():qValue="+qValue);
     if (qValue != -1 && (qValue < 0 || qValue > 1))
     {
         console.error("CSeq:setQValue(): the qValue is not between 0 and 1");
@@ -8178,16 +7610,13 @@ Contact.prototype.setQValue =function(qValue){
 }
 
 Contact.prototype.setWildCard =function(){
-    if(logger!=undefined) logger.debug("Contact:setWildCard()");
     this.setWildCardFlag(true);
 }
 Contact.prototype.isWildCard =function(){
-    if(logger!=undefined) logger.debug("Contact:isWildCard()");
     return this.address.isWildcard();
 }
 
 Contact.prototype.removeSipInstanceParam =function(){
-    if(logger!=undefined) logger.debug("Contact:removeSipInstanceParam()");
     if (this.parameters != null)
     {
         this.parameters.delet(this.SIP_INSTANCE);
@@ -8195,17 +7624,14 @@ Contact.prototype.removeSipInstanceParam =function(){
 }
 
 Contact.prototype.getSipInstanceParam =function(){
-    if(logger!=undefined) logger.debug("Contact:getSipInstanceParam()");
     return this.parameters.getValue(this.SIP_INSTANCE);
 }
 
 Contact.prototype.setSipInstanceParam =function(value){
-    if(logger!=undefined) logger.debug("Contact:setSipInstanceParam():value="+value);
     this.parameters.set_name_value(this.SIP_INSTANCE, value);
 }
 
 Contact.prototype.removePubGruuParam =function(){
-    if(logger!=undefined) logger.debug("Contact:removePubGruuParam()");
     if (this.parameters != null)
     {
         this.parameters.delet(this.PUB_GRUU);
@@ -8213,17 +7639,14 @@ Contact.prototype.removePubGruuParam =function(){
 }
 
 Contact.prototype.getPubGruuParam =function(){
-    if(logger!=undefined) logger.debug("Contact:getPubGruuParam()");
     return this.parameters.getValue(this.PUB_GRUU);
 }
 
 Contact.prototype.setPubGruuParam =function(value){
-    if(logger!=undefined) logger.debug("Contact:setPubGruuParam():value="+value);
     this.parameters.set_name_value(this.PUB_GRUU, value);
 }
 
 Contact.prototype.removeTempGruuParam =function(){
-    if(logger!=undefined) logger.debug("Contact:removeTempGruuParam()");
     if (this.parameters != null)
     {
         this.parameters.delet(this.TEMP_GRUU);
@@ -8231,12 +7654,10 @@ Contact.prototype.removeTempGruuParam =function(){
 }
 
 Contact.prototype.getTempGruuParam =function(){
-    if(logger!=undefined) logger.debug("Contact:getTempGruuParam()");
     return this.parameters.getValue(this.TEMP_GRUU);
 }
 
 Contact.prototype.setTempGruuParam =function(value){
-    if(logger!=undefined) logger.debug("Contact:setTempGruuParam():value="+value);
     this.parameters.set_name_value(this.TEMP_GRUU, value);
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -8268,7 +7689,6 @@ Contact.prototype.setTempGruuParam =function(value){
  *  @version 1.0 
  */
 function MediaRange() {
-    if(logger!=undefined) logger.debug("MediaRange:MediaRange()");
     this.serialVersionUID = "-6297125815438079210L";
     this.classname="MediaRange";
     this.type=null;
@@ -8280,32 +7700,26 @@ MediaRange.prototype.constructor=MediaRange;
 MediaRange.prototype.SLASH="/"
 
 MediaRange.prototype.getType =function(){
-    if(logger!=undefined) logger.debug("MediaRange:getType()");
     return this.type;
 }
 
 MediaRange.prototype.getSubtype =function(){
-    if(logger!=undefined) logger.debug("MediaRange:getSubtype()");
     return this.subtype;
 }
 
 MediaRange.prototype.setType =function(t){
-    if(logger!=undefined) logger.debug("MediaRange:setType():t="+t);
     this.type=t;
 }
 
 MediaRange.prototype.setSubtype =function(s){
-    if(logger!=undefined) logger.debug("MediaRange:setSubtype():s="+s);
     this.subtype=s;
 }
 
 MediaRange.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("MediaRange:encode()");
     return this.encodeBuffer("").toString();
 }
 
 MediaRange.prototype.encodeBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("MediaRange:encodeBuffer():buffer="+buffer);
     buffer=buffer+this.type+this.SLASH+this.subtype;
     return buffer;
 }/*
@@ -8339,7 +7753,6 @@ MediaRange.prototype.encodeBuffer =function(buffer){
  */
 
 function AuthenticationHeader(name) {
-    if(logger!=undefined) logger.debug("AuthenticationHeader:AuthenticationHeader()");
     this.classname="AuthenticationHeader";
     this.headerName=null;
     this.scheme=null;
@@ -8385,7 +7798,6 @@ AuthenticationHeader.prototype.SP = " ";
 //AuthenticationHeader.prototype.CK = "ck";
 
 AuthenticationHeader.prototype.setParameter =function(name,value){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setParameter():name="+name+",value="+value);
     var nv = this.parameters.getNameValue(name.toLowerCase());
     if (nv == null) 
     {
@@ -8433,29 +7845,24 @@ AuthenticationHeader.prototype.setParameter =function(name,value){
 }
 
 AuthenticationHeader.prototype.setChallenge =function(challenge){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setChallenge():challenge="+challenge);
     this.scheme = challenge.scheme;
     this.parameters = challenge.authParams;
 }
 
 AuthenticationHeader.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:encodeBody()");
     this.parameters.setSeparator(this.COMMA);
     return this.scheme + this.SP + this.parameters.encode();
 }
 
 AuthenticationHeader.prototype.setScheme =function(scheme){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setScheme():scheme="+scheme);
     this.scheme=scheme;
 }
 
 AuthenticationHeader.prototype.getScheme =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getScheme()");
     return this.scheme;
 }
 
 AuthenticationHeader.prototype.setRealm =function(realm){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setRealm():realm="+realm);
     if (realm == null)
     {
         console.error("AuthenticationHeader:setRealm(): the realm parameter is null");
@@ -8465,12 +7872,10 @@ AuthenticationHeader.prototype.setRealm =function(realm){
 }
 
 AuthenticationHeader.prototype.getRealm =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getRealm()");
     return this.getParameter(this.REALM);
 }
 
 AuthenticationHeader.prototype.setNonce =function(nonce){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setNonce():nonce="+nonce);
     if (nonce == null)
     {
         console.error("AuthenticationHeader:setNonce(): the nonce parameter is null");
@@ -8480,12 +7885,10 @@ AuthenticationHeader.prototype.setNonce =function(nonce){
 }
 
 AuthenticationHeader.prototype.getNonce =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getNonce()");
     return this.getParameter(this.NONCE);
 }
 
 AuthenticationHeader.prototype.setURI =function(uri){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setURI():uri="+uri);
     if (uri != null) 
     {
         var nv = new NameValue(this.URI, uri);
@@ -8500,12 +7903,10 @@ AuthenticationHeader.prototype.setURI =function(uri){
 }
 
 AuthenticationHeader.prototype.getURI =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getURI()");
     return this.getParameterAsURI(this.URI);
 }
 
 AuthenticationHeader.prototype.setAlgorithm =function(algorithm){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setAlgorithm():algorithm="+algorithm);
     if (algorithm == null)
     {
         console.error("AuthenticationHeader:setAlgorithm(): the algorithm parameter is null");
@@ -8515,12 +7916,10 @@ AuthenticationHeader.prototype.setAlgorithm =function(algorithm){
 }
 
 AuthenticationHeader.prototype.getAlgorithm =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getAlgorithm()");
     return this.getParameter(this.ALGORITHM);
 }
 
 AuthenticationHeader.prototype.setQop =function(qop){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setQop():qop="+qop);
     if (qop == null)
     {
         console.error("AuthenticationHeader:setQop(): the qop parameter is null");
@@ -8530,12 +7929,10 @@ AuthenticationHeader.prototype.setQop =function(qop){
 }
 
 AuthenticationHeader.prototype.getQop =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getQop()");
     return this.getParameter(this.QOP);
 }
 
 AuthenticationHeader.prototype.setOpaque =function(opaque){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setOpaque():opaque="+opaque);
     if (opaque == null)
     {
         console.error("AuthenticationHeader:setOpaque(): the opaque parameter is null");
@@ -8545,12 +7942,10 @@ AuthenticationHeader.prototype.setOpaque =function(opaque){
 }
 
 AuthenticationHeader.prototype.getOpaque =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getOpaque()");
     return this.getParameter(this.OPAQUE);
 }
 
 AuthenticationHeader.prototype.setDomain =function(domain){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setDomain():domain:"+domain);
     if (domain == null)
     {
         console.error("AuthenticationHeader:setDomain(): the domain parameter is null");
@@ -8560,37 +7955,30 @@ AuthenticationHeader.prototype.setDomain =function(domain){
 }
 
 AuthenticationHeader.prototype.getDomain =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getDomain()");
     return this.getParameter(this.DOMAIN);
 }
 
 AuthenticationHeader.prototype.setStale =function(stale){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setStale():stale="+stale);
     this.parameters.set_nv(new NameValue(this.STALE, new Boolean(stale)));
 }
 
 AuthenticationHeader.prototype.isStale =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:isStale()");
     return this.getParameterAsBoolean(this.STALE);
 }
 
 AuthenticationHeader.prototype.setCNonce =function(cnonce){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setCNonce():cnonce:"+cnonce);
     this.setParameter(this.CNONCE, cnonce);
 }
 
 AuthenticationHeader.prototype.getCNonce =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getCNonce()");
     return this.getParameter(this.CNONCE);
 }
 
 AuthenticationHeader.prototype.getNonceCount =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getNonceCount()");
     return this.getParameterAsNumber(this.NC);
 }
 
 AuthenticationHeader.prototype.setNonceCount =function(param){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setNonceCount():param:"+param);
     if (param < 0)
     {
         console.error("AuthenticationHeader:setNonceCount(): bad parameter");
@@ -8603,12 +7991,10 @@ AuthenticationHeader.prototype.setNonceCount =function(param){
 }
 
 AuthenticationHeader.prototype.getResponse =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getResponse()");
     return this.getParameter(this.RESPONSE);
 }
 
 AuthenticationHeader.prototype.setResponse =function(response){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setResponse():response:"+response);
     if (response == null)
     {
         console.error("AuthenticationHeader:setResponse(): the domain parameter is null");
@@ -8618,17 +8004,14 @@ AuthenticationHeader.prototype.setResponse =function(response){
 }
 
 AuthenticationHeader.prototype.getUsername =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getUsername()");
     return this.getParameter(this.USERNAME);
 }
 
 AuthenticationHeader.prototype.setUsername =function(username){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setUsername():username:"+username);
     this.setParameter(this.USERNAME, username);
 }
 
 AuthenticationHeader.prototype.setIK =function(ik){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setIK():ik="+ik);
     if (ik == null)
     {
         console.error("AuthenticationHeader:setIK(): the auth-param IK parameter is null");
@@ -8638,12 +8021,10 @@ AuthenticationHeader.prototype.setIK =function(ik){
 }
 
 AuthenticationHeader.prototype.getIK =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getIK()");
     return this.getParameter(this.IK);
 }
 
 AuthenticationHeader.prototype.setCK =function(ck){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setCK():ck="+ck);
     if (ck == null)
     {
         console.error("AuthenticationHeader:setCK() the auth-param CK parameter is null");
@@ -8653,12 +8034,10 @@ AuthenticationHeader.prototype.setCK =function(ck){
 }
 
 AuthenticationHeader.prototype.getCK =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getCK()");
     return this.getParameter(this.CK);
 }
 
 AuthenticationHeader.prototype.setIntegrityProtected =function(integrityProtected){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:setIntegrityProtected():integrityProtected="+integrityProtected);
     if (integrityProtected == null)
     {
         console.error("AuthenticationHeader:setIntegrityProtected(): the integrity-protected parameter is null");
@@ -8668,7 +8047,6 @@ AuthenticationHeader.prototype.setIntegrityProtected =function(integrityProtecte
 }
 
 AuthenticationHeader.prototype.getIntegrityProtected =function(){
-    if(logger!=undefined) logger.debug("AuthenticationHeader:getIntegrityProtected()");
     return this.getParameter(this.INTEGRITY_PROTECTED);
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -8700,7 +8078,6 @@ AuthenticationHeader.prototype.getIntegrityProtected =function(){
  *  @version 1.0 
  */
 function WWWAuthenticate() {
-    if(logger!=undefined) logger.debug("WWWAuthenticate:WWWAuthenticate()");
     this.serialVersionUID = "115378648697363486L";
     this.classname="WWWAuthenticate";
     this.headerName=this.NAME;
@@ -8717,12 +8094,10 @@ WWWAuthenticate.prototype.COMMA = ",";
 WWWAuthenticate.prototype.DIGEST = "Digest";
 
 WWWAuthenticate.prototype.getURI =function(){
-    if(logger!=undefined) logger.debug("WWWAuthenticate:getURI()");
     return null
 }
 
 WWWAuthenticate.prototype.setURI =function(uri){
-    if(logger!=undefined) logger.debug("WWWAuthenticate:setURI():uri="+uri); 
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
  * and individual contributors
@@ -8753,7 +8128,6 @@ WWWAuthenticate.prototype.setURI =function(uri){
  *  @version 1.0 
  */
 function Route(address) {
-    if(logger!=undefined) logger.debug("Route:Route()");
     this.serialVersionUID = "5683577362998368846L";
     this.classname="Route";
     if(address==null)
@@ -8777,7 +8151,6 @@ Route.prototype.NAME_ADDR=1;
 Route.prototype.SEMICOLON=";";
 
 Route.prototype.hashCode =function(){
-    if(logger!=undefined) logger.debug("Route:hashCode()");
     var hash = 0;
     var x=this.address.getHostPort().encode().toLowerCase();
     if(!(x == null || x.value == ""))  
@@ -8797,12 +8170,10 @@ Route.prototype.hashCode =function(){
 }
 
 Route.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("Route:encodeBody()");
     return this.encodeBodyBuffer("").toString();
 }
 
 Route.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("Route:encodeBodyBuffer():buffer="+buffer);
     var addrFlag = this.address.getAddressType() == this.NAME_ADDR;
     if (!addrFlag) {
         buffer=buffer+"<";
@@ -8846,7 +8217,6 @@ Route.prototype.encodeBodyBuffer =function(buffer){
  *  @version 1.0 
  */
 function ProxyAuthenticate() {
-    if(logger!=undefined) logger.debug("ProxyAuthenticate:ProxyAuthenticate()");
     this.serialVersionUID = "-3826145955463251116L";
     this.classname="ProxyAuthenticate";
     this.headerName=this.PROXY_AUTHENTICATE;
@@ -8863,12 +8233,10 @@ ProxyAuthenticate.prototype.COMMA = ",";
 ProxyAuthenticate.prototype.DIGEST = "Digest";
 
 ProxyAuthenticate.prototype.getURI =function(){
-    if(logger!=undefined) logger.debug("ProxyAuthenticate:getURI()");
     return null
 }
 
 ProxyAuthenticate.prototype.setURI =function(uri){
-    if(logger!=undefined) logger.debug("ProxyAuthenticate:setURI():uri="+uri);
     
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -8900,7 +8268,6 @@ ProxyAuthenticate.prototype.setURI =function(uri){
  *  @version 1.0 
  */
 function ProxyAuthorization() {
-    if(logger!=undefined) logger.debug("ProxyAuthorization:ProxyAuthorization()");
     this.serialVersionUID = "-6374966905199799098L";
     this.classname="ProxyAuthorization";
     this.scheme=null;
@@ -8946,7 +8313,6 @@ ProxyAuthorization.prototype.DIGEST = "Digest";
  *  @version 1.0 
  */
 function StatusLine() {
-    if(logger!=undefined) logger.debug("StatusLine:StatusLine()");
     this.serialVersionUID = "-4738092215519950414L";
     this.classname="StatusLine";
     this.matchStatusClass=null;
@@ -8962,16 +8328,13 @@ StatusLine.prototype.SP=" ";
 StatusLine.prototype.NEWLINE="\r\n";
 
 StatusLine.prototype.match =function(){
-    if(logger!=undefined) logger.debug("StatusLine:match()");
     
 }
 StatusLine.prototype.setMatchStatusClass =function(flag){
-    if(logger!=undefined) logger.debug("StatusLine:setMatchStatusClass():flag="+flag);
     this.matchStatusClass=flag;
 }
 
 StatusLine.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("StatusLine:encode()");
     var encoding = this.SIP_VERSION_STRING + this.SP + this.statusCode;
     if (this.reasonPhrase != null)
     {
@@ -8982,37 +8345,30 @@ StatusLine.prototype.encode =function(){
 }
 
 StatusLine.prototype.getSipVersion =function(){
-    if(logger!=undefined) logger.debug("StatusLine:getSipVersion()");
     return this.sipVersion;
 }
 
 StatusLine.prototype.getStatusCode =function(){
-    if(logger!=undefined) logger.debug("StatusLine:getStatusCode()");
     return this.statusCode;
 }
 
 StatusLine.prototype.getReasonPhrase =function(){
-    if(logger!=undefined) logger.debug("StatusLine:getReasonPhrase()");
     return this.reasonPhrase;
 }
 
 StatusLine.prototype.setSipVersion =function(s){
-    if(logger!=undefined) logger.debug("StatusLine:setSipVersion():s="+s);
     this.sipVersion=s;
 }
 
 StatusLine.prototype.setStatusCode =function(statusCode){
-    if(logger!=undefined) logger.debug("StatusLine:setStatusCode():statusCode="+statusCode);
     this.statusCode=statusCode;
 }
 
 StatusLine.prototype.setReasonPhrase =function(reasonPhrase){
-    if(logger!=undefined) logger.debug("StatusLine:setReasonPhrase():reasonPhrase="+reasonPhrase);
     this.reasonPhrase=reasonPhrase;
 }
 
 StatusLine.prototype.getVersionMajor =function(){
-    if(logger!=undefined) logger.debug("StatusLine:getVersionMajor()");
     if (this.sipVersion == null)
     {
         return null;
@@ -9040,7 +8396,6 @@ StatusLine.prototype.getVersionMajor =function(){
 }
 
 StatusLine.prototype.getVersionMinor =function(){
-    if(logger!=undefined) logger.debug("StatusLine:getVersionMinor()");
     if (this.sipVersion == null)
         return null;
     var minor = null;
@@ -9093,7 +8448,6 @@ StatusLine.prototype.getVersionMinor =function(){
  *  @version 1.0 
  */
 function Authorization() {
-    if(logger!=undefined) logger.debug("Authorization:Authorization()");
     this.serialVersionUID = "-8897770321892281348L";
     this.classname="Authorization";
     this.headerName=this.NAME;
@@ -9139,7 +8493,6 @@ Authorization.prototype.DIGEST = "Digest";
  */
 
 function Allow (m) {
-    if(logger!=undefined) logger.debug("Allow:Allow(): m="+m);
     this.serialVersionUID = "-3105079479020693930L";
     this.classname="Allow"; 
     this.method=null;
@@ -9159,12 +8512,10 @@ Allow.prototype.constructor=Allow;
 Allow.prototype.ALLOW="Allow";
 
 Allow.prototype.getMethod =function(){
-    if(logger!=undefined) logger.debug("Allow:getMethod()");
     return this.method;
 }
 
 Allow.prototype.setMethod =function(method){
-    if(logger!=undefined) logger.debug("Allow:setMethod():method="+method);
     if (method == null)
     {
         console.error("Allow:setMethod(): JAIN-SIP Exception, the method parameter is null.");
@@ -9174,7 +8525,6 @@ Allow.prototype.setMethod =function(method){
 }
 
 Allow.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("Allow:encodeBody()");
     return this.method;
 }
 /*
@@ -9207,7 +8557,6 @@ Allow.prototype.encodeBody =function(){
  *  @version 1.0 
  */
 function RecordRoute(address) {
-    if(logger!=undefined) logger.debug("RecordRoute:RecordRoute()");
     this.serialVersionUID = "2388023364181727205L";
     this.classname="RecordRoute";
     if(address==null)
@@ -9236,12 +8585,10 @@ RecordRoute.prototype.GREATER_THAN=">";
 RecordRoute.prototype.SEMICOLON=";";
 
 RecordRoute.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("RecordRoute:encodeBody()");
     return this.encodeBodyBuffer("").toString();
 }
 
 RecordRoute.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("RecordRoute:encodeBodyBuffer():buffer="+buffer);
     if (this.address.getAddressType() == this.ADDRESS_SPEC) {
         buffer=buffer+this.LESS_THAN;
     }
@@ -9286,7 +8633,6 @@ RecordRoute.prototype.encodeBodyBuffer =function(buffer){
  *  @version 1.0 
  */
 function MaxForwards(m) {
-    if(logger!=undefined) logger.debug("MaxForwards:MaxForwards()");
     this.serialVersionUID = "-3096874323347175943L";
     this.classname="MaxForwards";
     this.headerName=this.NAME;
@@ -9307,12 +8653,10 @@ MaxForwards.prototype.constructor=MaxForwards;
 MaxForwards.prototype.NAME="Max-Forwards";
 
 MaxForwards.prototype.getMaxForwards =function(){
-    if(logger!=undefined) logger.debug("MaxForwards:getMaxForwards()");
     return this.maxForwards;
 }
 
 MaxForwards.prototype.setMaxForwards =function(maxForwards){
-    if(logger!=undefined) logger.debug("MaxForwards:setMaxForwards():maxForwards="+maxForwards);
     if (maxForwards < 0 || maxForwards > 255)
     { 
         console.error("MaxForwards:setMaxForwards(): bad max forwards value " + maxForwards);
@@ -9322,18 +8666,15 @@ MaxForwards.prototype.setMaxForwards =function(maxForwards){
 }
 
 MaxForwards.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("MaxForwards:encodeBody()");
     return this.encodeBodyBuffer("").toString();
 }
 
 MaxForwards.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("MaxForwards:encodeBodyBuffer():buffer="+buffer);
     buffer=buffer+this.maxForwards;
     return buffer;
 }
 
 MaxForwards.prototype.hasReachedZero =function(){
-    if(logger!=undefined) logger.debug("MaxForwards:hasReachedZero()");
     if(this.maxForwards == 0)
     {
         return true;
@@ -9345,7 +8686,6 @@ MaxForwards.prototype.hasReachedZero =function(){
 }
 
 MaxForwards.prototype.decrementMaxForwards =function(){
-    if(logger!=undefined) logger.debug("MaxForwards:decrementMaxForwards()");
     if (this.maxForwards > 0)
     {
         this.maxForwards--;
@@ -9386,7 +8726,6 @@ MaxForwards.prototype.decrementMaxForwards =function(){
  *  @version 1.0 
  */
 function ContentType(contentType,contentSubtype) {
-    if(logger!=undefined) logger.debug("ContentType:ContentType()");
     this.serialVersionUID = "8475682204373446610L";
     this.classname="ContentType";
     this.mediaRange=new MediaRange();
@@ -9405,7 +8744,6 @@ ContentType.prototype.NAME="Content-Type";
 ContentType.prototype.SEMICOLON=";";
 
 ContentType.prototype.compareMediaRange =function(media){
-    if(logger!=undefined) logger.debug("ContentType:compareMediaRange():media="+media);
     var chaine1=(mediaRange.type + "/" + mediaRange.subtype).toLowerCase();
     var chaine2=media.toLowerCase();
     var c=0;
@@ -9435,12 +8773,10 @@ ContentType.prototype.compareMediaRange =function(media){
 }
 
 ContentType.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("ContentType:encodeBody()");
     return this.encodeBodyBuffer("").toString();
 }
 
 ContentType.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("ContentType:encodeBodyBuffer():buffer:"+buffer);
     buffer=this.mediaRange.encodeBuffer(buffer);
     if (this.hasParameters()) {
         buffer=buffer+this.SEMICOLON;
@@ -9450,42 +8786,34 @@ ContentType.prototype.encodeBodyBuffer =function(buffer){
 }
 
 ContentType.prototype.getMediaRange =function(){
-    if(logger!=undefined) logger.debug("ContentType:getMediaRange()");
     return this.mediaRange;
 }
 
 ContentType.prototype.getMediaType =function(){
-    if(logger!=undefined) logger.debug("ContentType:getMediaType()");
     return this.mediaRange.type;
 }
 
 ContentType.prototype.getMediaSubType =function(){
-    if(logger!=undefined) logger.debug("ContentType:getMediaSubType()");
     return this.mediaRange.subtype;
 }
 
 ContentType.prototype.getContentSubType =function(){
-    if(logger!=undefined) logger.debug("ContentType:getContentSubType()");
     return this.mediaRange == null ? null : this.mediaRange.getSubtype();
 }
 
 ContentType.prototype.getContentType =function(){
-    if(logger!=undefined) logger.debug("ContentType:getContentType()");
     return this.mediaRange == null ? null : this.mediaRange.getType();
 }
 
 ContentType.prototype.getCharset =function(){
-    if(logger!=undefined) logger.debug("ContentType:getCharset()");
     return this.getParameter("charset");
 }
 
 ContentType.prototype.setMediaRange =function(m){
-    if(logger!=undefined) logger.debug("ContentType:setMediaRange():m"+m);
     this.mediaRange = m;
 }
 
 ContentType.prototype.setContentType =function(){
-    if(logger!=undefined) logger.debug("ContentType:setContentType():arguments="+arguments.toString());
     if(arguments==1)
     {
         var contentType=arguments[0];
@@ -9514,7 +8842,6 @@ ContentType.prototype.setContentType =function(){
 }
 
 ContentType.prototype.setContentSubType =function(contentType){
-    if(logger!=undefined) logger.debug("ContentType:setContentSubType():contentType="+contentType);
     if (contentType == null)
     {
           console.error("ContentType:setContentSubType(): null contentType parameter");
@@ -9555,7 +8882,6 @@ ContentType.prototype.setContentSubType =function(contentType){
  *  @version 1.0 
  */
 function TimeStamp() {
-    if(logger!=undefined) logger.debug("TimeStamp:TimeStamp()");
     this.classname="TimeStamp";
     this.serialVersionUID = "-3711322366481232720L";
     this.timeStamp = -1;
@@ -9570,7 +8896,6 @@ TimeStamp.prototype.constructor=TimeStamp;
 TimeStamp.prototype.TIMESTAMP="Timestamp";
 
 TimeStamp.prototype.getTimeStampAsString =function(){
-    if(logger!=undefined) logger.debug("TimeStamp:getTimeStampAsString()");
     if (this.timeStamp == -1 && this.timeStampFloat == -1)
     {
         return "";
@@ -9586,7 +8911,6 @@ TimeStamp.prototype.getTimeStampAsString =function(){
 }
 
 TimeStamp.prototype.getDelayAsString =function(){
-    if(logger!=undefined) logger.debug("TimeStamp:getDelayAsString()");
     if (this.delay == -1 && this.delayFloat == -1)
     {
         return "";
@@ -9602,7 +8926,6 @@ TimeStamp.prototype.getDelayAsString =function(){
 }
 
 TimeStamp.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("TimeStamp:encodeBody()");
     var retval = "";
     var s1 = this.getTimeStampAsString();
     var s2 = this.getDelayAsString();
@@ -9622,7 +8945,6 @@ TimeStamp.prototype.encodeBody =function(){
 }
 
 TimeStamp.prototype.hasDelay =function(){
-    if(logger!=undefined) logger.debug("TimeStamp:hasDelay()");
     if(this.delay != -1)
     {
         return true;
@@ -9634,12 +8956,10 @@ TimeStamp.prototype.hasDelay =function(){
 }
 
 TimeStamp.prototype.removeDelay =function(){
-    if(logger!=undefined) logger.debug("TimeStamp:removeDelay()");
     delay = -1;
 }
 
 TimeStamp.prototype.setTimeStamp =function(timeStamp){
-    if(logger!=undefined) logger.debug("TimeStamp:setTimeStamp():timeStamp="+timeStamp);
     if (timeStamp < 0)
     {
         console.error("TimeStamp:setTimeStamp(): the timeStamp parameter is <0");
@@ -9650,7 +8970,6 @@ TimeStamp.prototype.setTimeStamp =function(timeStamp){
 }
 
 TimeStamp.prototype.getTimeStamp =function(){
-    if(logger!=undefined) logger.debug("TimeStamp:getTimeStamp()");
     if(this.timeStampFloat == -1)
     {
         return this.timeStamp;
@@ -9662,7 +8981,6 @@ TimeStamp.prototype.getTimeStamp =function(){
 }
 
 TimeStamp.prototype.getDelay =function(){
-    if(logger!=undefined) logger.debug("TimeStamp:getDelay()");
     if(this.delayFloat == -1)
     {
         return this.delay;
@@ -9674,7 +8992,6 @@ TimeStamp.prototype.getDelay =function(){
 }
 
 TimeStamp.prototype.setDelay =function(delay){
-    if(logger!=undefined) logger.debug("TimeStamp:setDelay():delay="+delay);
     if (delay < 0 && delay != -1)
     {
         console.error("TimeStamp:setDelay(): the delay parameter is <0");
@@ -9684,17 +9001,14 @@ TimeStamp.prototype.setDelay =function(delay){
     this.delay = -1;
 }
 TimeStamp.prototype.getTime =function(){
-    if(logger!=undefined) logger.debug("TimeStamp:getTime()");
     return this.timeStamp == -1 ? this.timeStampFloat : this.timeStamp;
 }
 
 TimeStamp.prototype.getTimeDelay =function(){
-    if(logger!=undefined) logger.debug("TimeStamp:getTimeDelay()");
     return this.delay == -1 ? this.delayFloat : this.delay;
 }
 
 TimeStamp.prototype.setTime =function(timeStamp){
-    if(logger!=undefined) logger.debug("TimeStamp:setTime(): timeStamp="+timeStamp);
     if (this.timeStamp < -1)
     {
         console.error("TimeStamp:setTime(): illegal timestamp");
@@ -9706,7 +9020,6 @@ TimeStamp.prototype.setTime =function(timeStamp){
 }
 
 TimeStamp.prototype.setTimeDelay =function(delay){
-    if(logger!=undefined) logger.debug("TimeStamp:setTimeDelay():delay="+delay);
     if (delay < -1)
     {
         console.error("TimeStamp:setTimeDelay(): value out of range " + delay);
@@ -9744,7 +9057,6 @@ TimeStamp.prototype.setTimeDelay =function(delay){
  *  @version 1.0 
  */
 function ContentLength(length) {
-    if(logger!=undefined) logger.debug("ContentLength:ContentLength(): length="+length);
     this.serialVersionUID = "1187190542411037027L";
     this.classname="ContentLength";
     this.headerName=this.NAME;
@@ -9765,13 +9077,11 @@ ContentLength.prototype.constructor=ContentLength;
 ContentLength.prototype.NAME="Content-Length";
 
 ContentLength.prototype.getContentLength =function(){
-    if(logger!=undefined) logger.debug("ContentLength:getContentLength()");
     var x=this.contentLength-0;
     return x;
 }
 
 ContentLength.prototype.setContentLength =function(contentLength){
-    if(logger!=undefined) logger.debug("ContentLength:setContentLength():contentLength="+contentLength);
     if (contentLength < 0)
     {
         console.error("ContentLength:setContentLength(): the contentLength parameter is < 0");
@@ -9781,12 +9091,10 @@ ContentLength.prototype.setContentLength =function(contentLength){
 }
 
 ContentLength.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("ContentLength:encodeBody()");
     return this.encodeBodyBuffer("").toString();
 }
 
 ContentLength.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("ContentLength:encodeBodyBuffer():buffer="+buffer);
     if (this.contentLength == null)
     {
         buffer=buffer+"0";
@@ -9799,7 +9107,6 @@ ContentLength.prototype.encodeBodyBuffer =function(buffer){
 }
 
 ContentLength.prototype.match =function(other){
-    if(logger!=undefined) logger.debug("ContentLength:match():other="+other);
     if (other instanceof ContentLength)
     {
         return true;
@@ -9838,7 +9145,6 @@ ContentLength.prototype.match =function(other){
  *  @version 1.0 
  */
 function ContentDisposition (m) {
-    if(logger!=undefined) logger.debug("ContentDisposition:ContentDisposition(): m="+m);
     this.serialVersionUID = "835596496276127003L";
     this.classname="ContentDisposition"; 
     this.dispositionType=null;
@@ -9853,7 +9159,6 @@ ContentDisposition.prototype.NAME="Content-Disposition";
 ContentDisposition.prototype.SEMICOLON=";";
 
 ContentDisposition.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("ContentDisposition:encodeBody()");
     var encoding = this.dispositionType;
     if (this.parameters.hmap.length!=0) {
         encoding=encoding+this.SEMICOLON+this.parameters.encode();
@@ -9862,7 +9167,6 @@ ContentDisposition.prototype.encodeBody =function(){
 }
 
 ContentDisposition.prototype.setDispositionType =function(dispositionType){
-    if(logger!=undefined) logger.debug("ContentDisposition:setDispositionType():dispositionType="+dispositionType);
     if (dispositionType == null)
     {
         console.error("ContentDisposition:setDispositionType(): the dispositionType parameter is null");
@@ -9872,17 +9176,14 @@ ContentDisposition.prototype.setDispositionType =function(dispositionType){
 }
 
 ContentDisposition.prototype.getDispositionType =function(){
-    if(logger!=undefined) logger.debug("ContentDisposition:getDispositionType()");
     return this.dispositionType;
 }
 
 ContentDisposition.prototype.getHandling =function(){
-    if(logger!=undefined) logger.debug("ContentDisposition:getHandling()");
     return this.getParameter("handling");
 }
 
 ContentDisposition.prototype.setHandling =function(handling){
-    if(logger!=undefined) logger.debug("ContentDisposition:setHandling():handling"+handling);
     if (handling == null)
     {
         console.error("ContentDisposition:setHandling(): the handling parameter is null");
@@ -9892,7 +9193,6 @@ ContentDisposition.prototype.setHandling =function(handling){
 }
 
 ContentDisposition.prototype.getContentDisposition =function(){
-    if(logger!=undefined) logger.debug("ContentDisposition:getContentDisposition()");
     return this.encodeBody();
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -9924,7 +9224,6 @@ ContentDisposition.prototype.getContentDisposition =function(){
  *  @version 1.0 
  */
 function CallIdentifier() {
-    if(logger!=undefined) logger.debug("CallIdentifier");
     this.serialVersionUID = "7314773655675451377L";
     this.classname="CallIdentifier";
     this.localId=null;
@@ -9948,12 +9247,10 @@ CallIdentifier.prototype.constructor=CallIdentifier;
 CallIdentifier.prototype.AT="@";
 
 CallIdentifier.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("CallIdentifier:encode()");
     return this.encodeBuffer("").toString();
 }
 
 CallIdentifier.prototype.encodeBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("CallIdentifier:encodeBuffer():buffer="+buffer);
     buffer=buffer+this.localId;
     if (this.host != null) {
         buffer=buffer+this.AT+this.host;
@@ -9962,7 +9259,6 @@ CallIdentifier.prototype.encodeBuffer =function(buffer){
 }
 
 CallIdentifier.prototype.hashCode =function(){
-    if(logger!=undefined) logger.debug("CallIdentifier:hashCode():");
     if (this.localId  == null ) 
     {
         console.error("CallIdentifier:hashCode(): hash code called before id is set");
@@ -9987,21 +9283,17 @@ CallIdentifier.prototype.hashCode =function(){
 }
 
 CallIdentifier.prototype.getLocalId =function(){
-    if(logger!=undefined) logger.debug("CallIdentifier:getLocalId()");
     return this.localId;
 }
 
 CallIdentifier.prototype.getHost =function(){
-    if(logger!=undefined) logger.debug("CallIdentifier:getHost()");
     return this.host;
 }
 
 CallIdentifier.prototype.setLocalId =function(localId){
-    if(logger!=undefined) logger.debug("CallIdentifier:setLocalId():localId="+localId);
     this.localId=localId;
 }
 CallIdentifier.prototype.setCallID =function(cid){
-    if(logger!=undefined) logger.debug("CallIdentifier:setCallID():cid="+cid);
     if (cid == null)
     {
         console.error("CallIdentifier:setCallID(): cid parameter is null");
@@ -10026,7 +9318,6 @@ CallIdentifier.prototype.setCallID =function(cid){
 }
 
 CallIdentifier.prototype.setHost =function(host){
-    if(logger!=undefined) logger.debug("CallIdentifier:setHost():host="+host);
     this.host=host;
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -10059,7 +9350,6 @@ CallIdentifier.prototype.setHost =function(host){
  */
 
 function CallID() {
-    if(logger!=undefined) logger.debug("CallID:CallID()");
     this.serialVersionUID = "-6463630258703731156L;";
     this.classname="CallID";
     this.headerName=this.NAME;
@@ -10076,12 +9366,10 @@ CallID.prototype.constructor=CallID;
 CallID.prototype.NAME="Call-ID";
 
 CallID.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("CallID:encodeBody()");
     return this.encodeBodyBuffer("").toString();
 }
 
 CallID.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("CallID:encodeBodyBuffer():buffer="+buffer);
     if (this.callIdentifier != null)
     {
         buffer=this.callIdentifier.encodeBuffer(buffer);
@@ -10090,22 +9378,18 @@ CallID.prototype.encodeBodyBuffer =function(buffer){
 }
 
 CallID.prototype.getCallId =function(){
-    if(logger!=undefined) logger.debug("CallID:getCallId()");
     return this.encodeBody();
 }
 
 CallID.prototype.getCallIdentifer =function(){
-    if(logger!=undefined) logger.debug("CallID:getCallIdentifer()");
     return this.callIdentifier;
 }
 
 CallID.prototype.setCallId =function(cid){
-    if(logger!=undefined) logger.debug("CallID:setCallId():cid="+cid);
     this.callIdentifier = new CallIdentifier(cid);
 }
 
 CallID.prototype.setCallIdentifier =function(cid){
-    if(logger!=undefined) logger.debug("CallID:setCallIdentifier():cid="+cid);
     this.callIdentifier=cid;
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -10137,7 +9421,6 @@ CallID.prototype.setCallIdentifier =function(cid){
  *  @version 1.0 
  */
 function CSeq() {
-    if(logger!=undefined) logger.debug("CSeq:CSeq()");
     this.serialVersionUID = "-5405798080040422910L";
     this.classname="CSeq";
     this.method=null;
@@ -10166,29 +9449,24 @@ CSeq.prototype.NEWLINE="\r\n";
 
 
 CSeq.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("CSeq:encode()");
     return this.headerName+this.COLON+this.SP+this.encodeBody()+this.NEWLINE;
 }
 
 CSeq.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("CSeq:encodeBody()");
     return this.encodeBodyBuffer("").toString();
 }
 
 CSeq.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("CSeq:encodeBodyBuffer():buffer="+buffer);
     buffer=buffer+this.seqno+this.SP+this.method.toUpperCase();
     return buffer;
 }
 
 CSeq.prototype.getMethod =function(){
-    if(logger!=undefined) logger.debug("CSeq:getMethod()");
    
    return this.method;
 }
 
 CSeq.prototype.setSeqNumber =function(sequenceNumber){
-    if(logger!=undefined) logger.debug("CSeq:setSeqNumber():sequenceNumber="+sequenceNumber);
     if (sequenceNumber < 0 )
     {
        console.error("CSeq:setSeqNumber(): the sequence number parameter is < 0 : " + sequenceNumber);
@@ -10203,12 +9481,10 @@ CSeq.prototype.setSeqNumber =function(sequenceNumber){
 }
 
 CSeq.prototype.setSequenceNumber =function(sequenceNumber){
-    if(logger!=undefined) logger.debug("CSeq:setSequenceNumber():sequenceNumber:"+sequenceNumber);
     this.setSeqNumber(sequenceNumber);
 }
 
 CSeq.prototype.setMethod =function(method){
-    if(logger!=undefined) logger.debug("CSeq:setMethod(): method="+method);
     if (method == null)
     {
         console.error("CSeq:setMethod(): the method parameter is null");
@@ -10219,7 +9495,6 @@ CSeq.prototype.setMethod =function(method){
 }
 
 CSeq.prototype.getSequenceNumber =function(){
-    if(logger!=undefined) logger.debug("CSeq:getSequenceNumber()");
     if (this.seqno == null)
     {
         return 0;
@@ -10230,7 +9505,6 @@ CSeq.prototype.getSequenceNumber =function(){
     }
 }
 CSeq.prototype.getSeqNumber =function(){
-    if(logger!=undefined) logger.debug("CSeq:getSeqNumber()");
     return this.seqno;
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -10262,7 +9536,6 @@ CSeq.prototype.getSeqNumber =function(){
  *  @version 1.0 
  */
 function Supported(option_tag) {
-    if(logger!=undefined) logger.debug("Supported:Supported()");
     this.serialVersionUID = "-7679667592702854542L";
     this.classname="Supported";
     this.optionTag=null;
@@ -10284,7 +9557,6 @@ Supported.prototype.COLON=":";
 Supported.prototype.NEWLINE="\r\n";
 
 Supported.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("Supported:encode()");
     var retval = this.headerName + this.COLON;
     if (this.optionTag != null)
     {
@@ -10295,12 +9567,10 @@ Supported.prototype.encode =function(){
 }
 
 Supported.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("Supported:encodeBody()");
     return this.optionTag != null ? this.optionTag : "";
 }
 
 Supported.prototype.setOptionTag =function(optionTag){
-    if(logger!=undefined) logger.debug("Supported:setOptionTag():optionTag="+optionTag);
     if (optionTag == null)
     {
         console.error("Supported:setOptionTag(): the optionTag parameter is null");
@@ -10310,7 +9580,6 @@ Supported.prototype.setOptionTag =function(optionTag){
 }
 
 Supported.prototype.getOptionTag =function(){
-    if(logger!=undefined) logger.debug("Supported:getOptionTag()");
     return this.optionTag;
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -10342,7 +9611,6 @@ Supported.prototype.getOptionTag =function(){
  *  @version 1.0 
  */
 function Expires() {
-    if(logger!=undefined) logger.debug("Expires:Expires()");
     this.serialVersionUID = "3134344915465784267L";
     this.classname="Expires";
     this.headerName=this.NAME;
@@ -10354,23 +9622,19 @@ Expires.prototype.constructor=Expires;
 Expires.prototype.NAME="Expires";
 
 Expires.prototype.encodeBody =function(){
-    if(logger!=undefined) logger.debug("Expires:encodeBody()");
     return this.encodeBodyBuffer("").toString();
 }
 
 Expires.prototype.encodeBodyBuffer =function(buffer){
-    if(logger!=undefined) logger.debug("Expires:encodeBodyBuffer():buffer="+buffer);
     buffer=buffer+this.expires;
     return buffer;
 }
 
 Expires.prototype.getExpires =function(){
-    if(logger!=undefined) logger.debug("Expires:getExpires()");
     return this.expires;
 }
 
 Expires.prototype.setExpires =function(expires){
-    if(logger!=undefined) logger.debug("Expires:setExpires():expires="+expires);
     if (expires < 0)
     {
         console.error("Expires:setExpires(): bad argument " + expires);
@@ -10407,7 +9671,6 @@ Expires.prototype.setExpires =function(expires){
  *  @version 1.0 
  */
 function ContactList() {
-    if(logger!=undefined) logger.debug("ContactList:ContactList()");
     this.serialVersionUID = "1224806837758986814L";
     this.classname="ContactList";
     this.headerName = this.NAME;
@@ -10420,7 +9683,6 @@ ContactList.prototype.constructor=ContactList;
 ContactList.prototype.NAME="Contact";
 
 ContactList.prototype.clone =function(){
-    if(logger!=undefined) logger.debug("ContactList:clone()");
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
  * and individual contributors
@@ -10451,7 +9713,6 @@ ContactList.prototype.clone =function(){
  *  @version 1.0 
  */
 function ViaList() {
-    if(logger!=undefined) logger.debug("ViaList:ViaList()");
     this.serialVersionUID = "3899679374556152313L";
     this.classname="ViaList";
     this.headerName = this.NAME;
@@ -10464,7 +9725,6 @@ ViaList.prototype.constructor=ViaList;
 ViaList.prototype.NAME="Via";
 
 ViaList.prototype.clone =function(){
-    if(logger!=undefined) logger.debug("ViaList:clone()"); 
 }
 
 /*
@@ -10497,7 +9757,6 @@ ViaList.prototype.clone =function(){
  *  @version 1.0 
  */
 function WWWAuthenticateList() {
-    if(logger!=undefined) logger.debug("WWWAuthenticateList:WWWAuthenticateList()");
     this.serialVersionUID = "-6978902284285501346L";
     this.classname="WWWAuthenticateList";
     this.headerName = this.NAME;
@@ -10510,7 +9769,6 @@ WWWAuthenticateList.prototype.constructor=WWWAuthenticateList;
 WWWAuthenticateList.prototype.NAME="WWW-Authenticate";
 
 WWWAuthenticateList.prototype.clone =function(){
-    if(logger!=undefined) logger.debug("WWWAuthenticateList:clone()"); 
 }
 
 /*
@@ -10543,7 +9801,6 @@ WWWAuthenticateList.prototype.clone =function(){
  *  @version 1.0 
  */
 function RouteList() {
-    if(logger!=undefined) logger.debug("RouteList:RouteList()");
     this.serialVersionUID = "1L";
     this.classname="RouteList";
     this.headerName = this.NAME;
@@ -10556,12 +9813,10 @@ RouteList.prototype.constructor=RouteList;
 RouteList.prototype.NAME="Route";
 
 RouteList.prototype.clone =function(){
-    if(logger!=undefined) logger.debug("RouteList:clone()");
     
 }
 
 RouteList.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("RouteList:encode()");
     if (this.hlist.length==0) 
     {
         return "";
@@ -10572,7 +9827,6 @@ RouteList.prototype.encode =function(){
     }
 }
 RouteList.prototype.equals =function(){
-    if(logger!=undefined) logger.debug("RouteList:equals()");
     
 }
 /*
@@ -10605,7 +9859,6 @@ RouteList.prototype.equals =function(){
  *  @version 1.0 
  */
 function ProxyAuthenticateList() {
-    if(logger!=undefined) logger.debug("ProxyAuthenticateList");
     this.serialVersionUID = "1L";
     this.classname="ProxyAuthenticateList";
     this.headerName = this.NAME;
@@ -10618,7 +9871,6 @@ ProxyAuthenticateList.prototype.constructor=ProxyAuthenticateList;
 ProxyAuthenticateList.prototype.NAME="Proxy-Authenticate";
 
 ProxyAuthenticateList.prototype.clone =function(){
-    if(logger!=undefined) logger.debug("ProxyAuthenticateList:clone()");
 }
 
 /*
@@ -10651,7 +9903,6 @@ ProxyAuthenticateList.prototype.clone =function(){
  *  @version 1.0 
  */
 function ProxyAuthorizationList() {
-    if(logger!=undefined) logger.debug("ProxyAuthorizationList:ProxyAuthorizationList()");
     this.serialVersionUID = "-1L";
     this.classname="ProxyAuthorizationList";
     this.headerName = this.NAME;
@@ -10663,7 +9914,6 @@ ProxyAuthorizationList.prototype.constructor=ProxyAuthorizationList;
 ProxyAuthorizationList.prototype.NAME="Proxy-Authorization";
 
 ProxyAuthorizationList.prototype.clone =function(){
-    if(logger!=undefined) logger.debug("ProxyAuthorizationList:clone()");
     
 }
 
@@ -10697,7 +9947,6 @@ ProxyAuthorizationList.prototype.clone =function(){
  *  @version 1.0 
  */
 function AuthorizationList() {
-    if(logger!=undefined) logger.debug("AuthorizationList:AuthorizationList()");
     this.serialVersionUID = "1L";
     this.classname="AuthorizationList";
     this.headerName = this.NAME;
@@ -10709,7 +9958,6 @@ AuthorizationList.prototype.constructor=AuthorizationList;
 AuthorizationList.prototype.NAME="Authorization";
 
 AuthorizationList.prototype.clone =function(){
-    if(logger!=undefined) logger.debug("AuthorizationList:clone()");
     
 }
 
@@ -10744,7 +9992,6 @@ AuthorizationList.prototype.clone =function(){
  */
 
 function AllowList() {
-    if(logger!=undefined) logger.debug("AllowList:AllowList()");
     this.serialVersionUID = "-4699795429662562358L";
     this.classname="AllowList";
     this.headerName = this.NAME;
@@ -10757,12 +10004,10 @@ AllowList.prototype.constructor=AllowList;
 AllowList.prototype.NAME="Allow";
 
 AllowList.prototype.clone =function(){
-    if(logger!=undefined) logger.debug("AllowList:clone()");
     
 }
 
 AllowList.prototype.getMethods =function(){
-    if(logger!=undefined) logger.debug("AllowList:getMethods()");
     var array=new Array();
     for(var i=0;i<this.hlist.length;i++)
     {
@@ -10773,7 +10018,6 @@ AllowList.prototype.getMethods =function(){
 }
 
 AllowList.prototype.setMethods =function(methods){
-    if(logger!=undefined) logger.debug("AllowList:setMethods():methods="+methods);
     var array=new Array();
     for(var i=0;i<methods.length;i++)
     {
@@ -10813,7 +10057,6 @@ AllowList.prototype.setMethods =function(methods){
  *  @version 1.0 
  */
 function RecordRouteList() {
-    if(logger!=undefined) logger.debug("RecordRouteList");
     this.serialVersionUID = "1724940469426766691L";
     this.classname="RecordRouteList";
     this.headerName = this.NAME;
@@ -10826,7 +10069,6 @@ RecordRouteList.prototype.constructor=RecordRouteList;
 RecordRouteList.prototype.NAME="Record-Route";
 
 RecordRouteList.prototype.clone =function(){
-    if(logger!=undefined) logger.debug("RecordRouteList:clone()");
     
 }
 
@@ -10860,7 +10102,6 @@ RecordRouteList.prototype.clone =function(){
  *  @version 1.0 
  */
 function SupportedList() {
-    if(logger!=undefined) logger.debug("SupportedList:SupportedList()");
     this.serialVersionUID = "-4539299544895602367L";
     this.classname="SupportedList";
     this.headerName = this.NAME;
@@ -10872,7 +10113,6 @@ SupportedList.prototype.constructor=SupportedList;
 SupportedList.prototype.NAME="Supported";
 
 SupportedList.prototype.clone =function(){
-    if(logger!=undefined) logger.debug("SupportedList:clone()");  
 }
 
 /*
@@ -10906,7 +10146,6 @@ SupportedList.prototype.clone =function(){
  */
 
 function HeaderFactoryImpl() {
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:HeaderFactoryImpl()");
     this.classname="HeaderFactoryImpl";
     this.stripAddressScopeZones = false;
 }
@@ -10916,13 +10155,11 @@ HeaderFactoryImpl.prototype.constructor=HeaderFactoryImpl;
 HeaderFactoryImpl.prototype.NAME="Authorization";
 
 HeaderFactoryImpl.prototype.setPrettyEncoding =function(flag){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:setPrettyEncoding():flag="+flag);
     var sipheaderlist=new SIPHeaderList();
     sipheaderlist.setPrettyEncode(flag);
 }
 
 HeaderFactoryImpl.prototype.createAllowEventsHeader =function(eventType){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createAllowEventsHeader():eventType="+eventType);
     if (eventType == null)
     {
         console.error("HeaderFactoryImpl:createAllowEventsHeader(): null arg eventType");
@@ -10934,7 +10171,6 @@ HeaderFactoryImpl.prototype.createAllowEventsHeader =function(eventType){
 }
 
 HeaderFactoryImpl.prototype.createAllowHeader =function(method){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createAllowHeader():method="+method);
     if (method == null)
     {
         console.error("HeaderFactoryImpl:createAllowHeader(): null arg method");
@@ -10946,7 +10182,6 @@ HeaderFactoryImpl.prototype.createAllowHeader =function(method){
 }
 
 HeaderFactoryImpl.prototype.createCSeqHeader =function(sequenceNumber,method){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createCSeqHeader(): sequenceNumber="+sequenceNumber+", method="+sequenceNumber);
     if (sequenceNumber < 0)
     {
         console.error("HeaderFactoryImpl:createCSeqHeader(): bad arg " + sequenceNumber);
@@ -10964,7 +10199,6 @@ HeaderFactoryImpl.prototype.createCSeqHeader =function(sequenceNumber,method){
 }
 
 HeaderFactoryImpl.prototype.createCallIdHeader =function(callId){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createCallIdHeader():callId="+callId);
     if (callId == null)
     {
         var chain=new Date();
@@ -10976,7 +10210,6 @@ HeaderFactoryImpl.prototype.createCallIdHeader =function(callId){
 }
 
 HeaderFactoryImpl.prototype.createContactHeader =function(){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createContactHeader()");
     if(arguments.length==0)
     {
         var contact = new Contact();
@@ -10999,7 +10232,6 @@ HeaderFactoryImpl.prototype.createContactHeader =function(){
 }
 
 HeaderFactoryImpl.prototype.createContentDispositionHeader =function(contentDisposition){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createContentLengthHeader():contentDisposition="+contentDisposition);
     if (contentDisposition < 0)
     {
         console.error("HeaderFactoryImpl:createContentDispositionHeader(): null arg contentDisposition");
@@ -11011,7 +10243,6 @@ HeaderFactoryImpl.prototype.createContentDispositionHeader =function(contentDisp
 }
 
 HeaderFactoryImpl.prototype.createContentLengthHeader =function(contentLength){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createContentLengthHeader():contentLength="+contentLength);
     if (contentLength < 0)
     {
         console.error("HeaderFactoryImpl:createContentLengthHeader(): bad contentLength");
@@ -11023,7 +10254,6 @@ HeaderFactoryImpl.prototype.createContentLengthHeader =function(contentLength){
 }
 
 HeaderFactoryImpl.prototype.createContentTypeHeader =function(contentType,contentSubType){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createContentTypeHeader():contentType="+contentType+",contentSubType="+contentSubType);
     if (contentType == null || contentSubType == null)
     {
         console.error("HeaderFactoryImpl:createContentTypeHeader(): null contentType or subType");
@@ -11036,7 +10266,6 @@ HeaderFactoryImpl.prototype.createContentTypeHeader =function(contentType,conten
 }
 
 HeaderFactoryImpl.prototype.createEventHeader =function(eventType){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createEventHeader():eventType="+eventType);
     if (eventType == null)
     {
         console.error("HeaderFactoryImpl:createEventHeader(): null eventType");
@@ -11048,7 +10277,6 @@ HeaderFactoryImpl.prototype.createEventHeader =function(eventType){
 }
 
 HeaderFactoryImpl.prototype.createExpiresHeader =function(expires){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createExpiresHeader(): expiers=");
     if (expires < 0)
     {
         console.error("HeaderFactoryImpl:createExpiresHeader(): bad value " + expires);
@@ -11061,7 +10289,6 @@ HeaderFactoryImpl.prototype.createExpiresHeader =function(expires){
 
 
 HeaderFactoryImpl.prototype.createExtensionHeader =function(name,value){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createExtensionHeader():name="+name+",value:"+value);
     if (name == null)
     {
         console.error("HeaderFactoryImpl:createExtensionHeader(): bad name");
@@ -11074,7 +10301,6 @@ HeaderFactoryImpl.prototype.createExtensionHeader =function(name,value){
 }
 
 HeaderFactoryImpl.prototype.createFromHeader =function(address,tag){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createFromHeader():address="+address+", tag="+tag);
     if (address == null)
     {
         console.error("HeaderFactoryImpl:createFromHeader(): null address arg");
@@ -11090,7 +10316,6 @@ HeaderFactoryImpl.prototype.createFromHeader =function(address,tag){
 }
 
 HeaderFactoryImpl.prototype.createMaxForwardsHeader =function(maxForwards){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createMaxForwardsHeader(): maxForwards="+maxForwards);
     if (maxForwards < 0 || maxForwards > 255)
     {
         console.error("HeaderFactoryImpl:createMaxForwardsHeader(): bad maxForwards arg " + maxForwards);
@@ -11102,7 +10327,6 @@ HeaderFactoryImpl.prototype.createMaxForwardsHeader =function(maxForwards){
 }
 
 HeaderFactoryImpl.prototype.createProxyAuthenticateHeader =function(scheme){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createProxyAuthenticateHeader():scheme="+scheme);
     if (scheme == null)
     {
         console.error("HeaderFactoryImpl:createProxyAuthenticateHeader(): null scheme arg");
@@ -11115,7 +10339,6 @@ HeaderFactoryImpl.prototype.createProxyAuthenticateHeader =function(scheme){
 
 
 HeaderFactoryImpl.prototype.createProxyAuthorizationHeader =function(scheme){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createProxyAuthorizationHeader():scheme="+scheme);
     if (scheme == null)
     {
         console.error("HeaderFactoryImpl:createProxyAuthorizationHeader(): null scheme arg");
@@ -11127,7 +10350,6 @@ HeaderFactoryImpl.prototype.createProxyAuthorizationHeader =function(scheme){
 }
 
 HeaderFactoryImpl.prototype.createReasonHeader =function(protocol,cause,text){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createReasonHeader():protocol="+protocol+", cause="+cause+",text="+text);
     if (protocol == null)
     {
         console.error("HeaderFactoryImpl:createReasonHeader(): null protocol arg");
@@ -11146,7 +10368,6 @@ HeaderFactoryImpl.prototype.createReasonHeader =function(protocol,cause,text){
 }
 
 HeaderFactoryImpl.prototype.createRecordRouteHeader =function(address){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createRecordRouteHeader():address="+address);
     if ( address == null) 
     {
         console.error("HeaderFactoryImpl:createRecordRouteHeader(): null address arg");
@@ -11158,7 +10379,6 @@ HeaderFactoryImpl.prototype.createRecordRouteHeader =function(address){
 }
 
 HeaderFactoryImpl.prototype.createRouteHeader =function(address){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createRouteHeader():address="+address);
     if (address == null)
     {
         console.error("HeaderFactoryImpl:createRouteHeader(): null address arg");
@@ -11170,7 +10390,6 @@ HeaderFactoryImpl.prototype.createRouteHeader =function(address){
 }
 
 HeaderFactoryImpl.prototype.createSubjectHeader =function(subject){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createSubjectHeader():subject="+subject);
     if (subject == null)
     {
         console.error("HeaderFactoryImpl:createSubjectHeader(): null subject arg");
@@ -11182,7 +10401,6 @@ HeaderFactoryImpl.prototype.createSubjectHeader =function(subject){
 }
 
 HeaderFactoryImpl.prototype.createSupportedHeader =function(optionTag){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createSupportedHeader():optionTag="+optionTag);
     if (optionTag == null)
     {
         console.error("HeaderFactoryImpl:createSupportedHeader(): null optionTag arg");
@@ -11194,7 +10412,6 @@ HeaderFactoryImpl.prototype.createSupportedHeader =function(optionTag){
 }
 
 HeaderFactoryImpl.prototype.createTimeStampHeader =function(timeStamp){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createTimeStampHeader():timeStamp="+timeStamp);
     if (timeStamp < 0)
     {
         console.error("HeaderFactoryImpl:createTimeStampHeader(): illegal timeStamp");
@@ -11206,7 +10423,6 @@ HeaderFactoryImpl.prototype.createTimeStampHeader =function(timeStamp){
 }
 
 HeaderFactoryImpl.prototype.createToHeader =function(address,tag){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createToHeader():address="+address+"tag="+address+","+tag);
     if (address == null)
     {
         console.error("HeaderFactoryImpl:createSupportedHeader(): null address arg");
@@ -11222,7 +10438,6 @@ HeaderFactoryImpl.prototype.createToHeader =function(address,tag){
 }
 
 HeaderFactoryImpl.prototype.createUserAgentHeader =function(product){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createUserAgentHeader():product="+product);
     if (product == null)
     {
         console.error("HeaderFactoryImpl:createUserAgentHeader(): null product arg");
@@ -11234,7 +10449,6 @@ HeaderFactoryImpl.prototype.createUserAgentHeader =function(product){
 }
 
 HeaderFactoryImpl.prototype.createViaHeader =function(host,port,transport,branch){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createViaHeader():hostt="+host+", port="+port+", transport="+transport+", branch="+branch);
     if (host == null || transport == null)
     {
         console.error("HeaderFactoryImpl:createViaHeader(): null host or  transport arg");
@@ -11275,7 +10489,6 @@ HeaderFactoryImpl.prototype.createViaHeader =function(host,port,transport,branch
 
 
 HeaderFactoryImpl.prototype.createWWWAuthenticateHeader =function(scheme){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createWWWAuthenticateHeader():scheme="+scheme);
     if (scheme == null)
     {
         console.error("HeaderFactoryImpl:createWWWAuthenticateHeader(): null scheme arg");
@@ -11287,7 +10500,6 @@ HeaderFactoryImpl.prototype.createWWWAuthenticateHeader =function(scheme){
 }
 
 HeaderFactoryImpl.prototype.createHeader =function(){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createHeader():arguments="+arguments.toString());
     if(arguments.length==1)
     {
         var headerText = arguments[0];
@@ -11334,7 +10546,6 @@ HeaderFactoryImpl.prototype.createHeader =function(){
 
 
 HeaderFactoryImpl.prototype.createHeaders =function(headers){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createHeaders():headers="+headers);
     if (headers == null)
     {
         console.error("HeaderFactoryImpl:createHeaders(): null headers arg");
@@ -11354,7 +10565,6 @@ HeaderFactoryImpl.prototype.createHeaders =function(headers){
 }
 
 HeaderFactoryImpl.prototype.createRouteList =function(recordRouteList){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createRouteList():recordRouteList"+recordRouteList);
     if(recordRouteList!=null)
     {
         var routeList = new RouteList();
@@ -11378,20 +10588,17 @@ HeaderFactoryImpl.prototype.createRouteList =function(recordRouteList){
 
 
 HeaderFactoryImpl.prototype.createRequestLine =function(requestLine){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createRequestLine():requestLine="+requestLine);
     var requestLineParser = new RequestLineParser(requestLine);
     return requestLineParser.parse();
 }
 
 
 HeaderFactoryImpl.prototype.createStatusLine =function(statusLine){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createStatusLine():statusLine="+statusLine);
     var statusLineParser = new StatusLineParser(statusLine);
     return statusLineParser.parse();
 }
 
 HeaderFactoryImpl.prototype.createAuthorizationHeader =function(){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createAuthorizationHeader()");
     if(arguments.length==1)
     {
         var scheme=arguments[0];
@@ -11401,14 +10608,14 @@ HeaderFactoryImpl.prototype.createAuthorizationHeader =function(){
     {
         var response=arguments[0];
         var request=arguments[1];
-        var password=arguments[2];
-        var sipuri=arguments[3];
-        return this.createAuthorizationHeaderargu2(response, request, password, sipuri);
+        var sipPassword=arguments[2];
+        var sipLogin=arguments[3];
+        var sipDomainUri=arguments[4];
+        return this.createAuthorizationHeaderargu2(response, request, sipPassword, sipLogin);
     }
 }
 
 HeaderFactoryImpl.prototype.createAuthorizationHeaderargu1 =function(scheme){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createAuthorizationHeader():scheme="+scheme);
     if (scheme == null)
     {
         console.error("HeaderFactoryImpl:createAuthorizationHeaderargu1(): null scheme arg");
@@ -11420,8 +10627,7 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu1 =function(scheme){
 }
 
 
-HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,request,password,sipuri){
-    if(logger!=undefined) logger.debug("HeaderFactoryImpl:createAuthorizationHeaderargu2():response="+response+",request="+request);
+HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,request,sipPassword,sipLogin){
     if(response.hasHeader("www-authenticate"))
     {
         var realm=response.getWWWAuthenticate().getRealm();
@@ -11440,34 +10646,35 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
     }
     var mda=new MessageDigestAlgorithm();
     var method=response.getCSeq().getMethod();
-    var user=request.getFrom().getAddress().getURI().getUser();
+
     var cnonce=Math.floor(Math.random()*16777215).toString(16);
     var nc="00000001"; 
-    var resp=mda.calculateResponse(user,realm,password,nonce,nc,cnonce, method,sipuri,null,qop);
+    var resp=mda.calculateResponse(sipLogin,realm,sipPassword,nonce,nc,cnonce, method,request.getRequestURI(),null,qop);
     
     if(response.hasHeader("www-authenticate"))
     {
-        authorization.setUsername(user);
+        authorization.setUsername(sipLogin);
         authorization.setRealm(realm);
         authorization.setNonce(nonce);
         authorization.setCNonce(cnonce);
         authorization.setNonceCount(nc);
         authorization.setScheme(scheme);
         authorization.setResponse(resp);
-        authorization.setURI(sipuri);
+        authorization.setURI(request.getRequestURI());
         authorization.setAlgorithm("MD5");
+        authorization.setQop(qop);
         return authorization;
     }
     else if(response.hasHeader("proxy-authenticate"))
     {
-        proxyauthorization.setUsername(user);
+        proxyauthorization.setUsername(sipLogin);
         proxyauthorization.setRealm(realm);
         proxyauthorization.setNonce(nonce);
         authorization.setCNonce(cnonce);
         authorization.setNonceCount(nc);
         proxyauthorization.setScheme(scheme);
         proxyauthorization.setResponse(resp);
-        proxyauthorization.setURI(sipuri);
+        proxyauthorization.setURI(request.getRequestURI());
         proxyauthorization.setAlgorithm("MD5");
         return proxyauthorization;
     }
@@ -11502,7 +10709,6 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
  *   
  */
 function Parser() {
-    if(logger!=undefined) logger.debug("Parser:Parser()");
     this.classname="Parser"; 
 }
 
@@ -11522,16 +10728,13 @@ Parser.prototype.ID=LexerCore.prototype.ID;
 Parser.prototype.SIP=LexerCore.prototype.START+3;
 
 Parser.prototype.createParseException =function(){
-    if(logger!=undefined) logger.debug("Parser:createParseException()"); 
 }
 
 Parser.prototype.getLexer =function(){
-    if(logger!=undefined) logger.debug("Parser:getLexer()");
     return this.lexer;
 }
 
 Parser.prototype.sipVersion =function(){
-    if(logger!=undefined) logger.debug("Parser:sipVersion()");
     var tok = this.lexer.match(this.SIP);
     if (tok.getTokenValue().toUpperCase()!="SIP") {
         this.createParseException("Expecting SIP");
@@ -11545,7 +10748,6 @@ Parser.prototype.sipVersion =function(){
     
 }
 Parser.prototype.method =function(){
-    if(logger!=undefined) logger.debug("Parser:method()");
     var tokens = this.lexer.peekNextToken(1);
     var token =  tokens[0];
     if (token.getTokenType() == this.INVITE
@@ -11568,7 +10770,6 @@ Parser.prototype.method =function(){
    
 }
 Parser.prototype.checkToken =function(token){
-    if(logger!=undefined) logger.debug("Parser:checkToken():token="+token);
     if (token == null || token.length == 0) {
         console.error("Parser:checkToken(): null or empty token");
         throw "Parser:method(): null or empty token";
@@ -11612,8 +10813,6 @@ Parser.prototype.checkToken =function(token){
  *   
  */
 function Lexer(lexerName, buffer) {
-    if(logger!=undefined) logger.debug("Lexer:Lexer(): lexerName="+lexerName);
-    if(logger!=undefined) logger.debug("Lexer:Lexer(): buffer="+buffer);
     this.classname="Lexer"; 
     this.buffer = buffer;
     this.bufferLen = buffer.length;
@@ -11707,7 +10906,6 @@ Lexer.prototype.ReferencesHeader="References";
 
 
 Lexer.prototype.getHeaderName =function(line){
-    if(logger!=undefined) logger.debug("Lexer:getHeaderName():line="+line);
     if (line == null)
     {
         return null;
@@ -11727,7 +10925,6 @@ Lexer.prototype.getHeaderName =function(line){
     return headerName;
 }
 Lexer.prototype.getHeaderValue =function(line){
-    if(logger!=undefined) logger.debug("Lexer:getHeaderValue():line="+line);
     if (line == null)
     {
         return null;
@@ -11743,7 +10940,6 @@ Lexer.prototype.getHeaderValue =function(line){
     return headerValue;
 }
 Lexer.prototype.selectLexer =function(lexerName){
-    if(logger!=undefined) logger.debug("Lexer:selectLexer():lexerName="+lexerName);
     //in javascript, we can not realize thread, so i ignore the key work synchronized in the function
     var n=null;
     for(var i=0;i<this.lexerTables.length;i++)
@@ -12006,7 +11202,6 @@ Lexer.prototype.selectLexer =function(lexerName){
  *   
  */
 function HeaderParser() {
-    if(logger!=undefined) logger.debug("HeaderParser:HeaderParser()");
     this.classname="HeaderParser"; 
     if(typeof arguments[0]=="string")
     {
@@ -12025,7 +11220,6 @@ HeaderParser.prototype = new Parser();
 HeaderParser.prototype.constructor=HeaderParser;
 
 HeaderParser.prototype.wkday =function(){
-    if(logger!=undefined) logger.debug("HeaderParser:wkday()");
     var tok = this.lexer.ttoken();
     var id = tok.toLowerCase();
     if (TokenNames.prototype.MON==id.toLowerCase()) {
@@ -12049,7 +11243,6 @@ HeaderParser.prototype.wkday =function(){
 }
 
 HeaderParser.prototype.date =function(){
-    if(logger!=undefined) logger.debug("HeaderParser:date()");
     try {
         var retval = new Date();
         var s1 = this.lexer.number();
@@ -12098,7 +11291,6 @@ HeaderParser.prototype.date =function(){
 }
 
 HeaderParser.prototype.time =function(calendar){
-    if(logger!=undefined) logger.debug("HeaderParser:time():calendar="+calendar);
     try {
         var s = this.lexer.number();
         var hour = s;
@@ -12119,7 +11311,6 @@ HeaderParser.prototype.time =function(calendar){
 
 
 HeaderParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("HeaderParser:parse()");
     var name = this.lexer.getNextToken(':');
     this.lexer.consume(1);
     var body = this.lexer.getLine().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
@@ -12128,7 +11319,6 @@ HeaderParser.prototype.parse =function(){
     return retval;
 }
 HeaderParser.prototype.headerName =function(tok){
-    if(logger!=undefined) logger.debug("HeaderParser:headerName():tok="+tok);
     this.lexer.match(tok);
     this.lexer.SPorHT();
     this.lexer.match(':');
@@ -12164,7 +11354,6 @@ HeaderParser.prototype.headerName =function(tok){
  *   
  */
 function ParametersParser() {
-    if(logger!=undefined) logger.debug("ParametersParser");
     this.classname="ParametersParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -12183,7 +11372,6 @@ ParametersParser.prototype = new HeaderParser();
 ParametersParser.prototype.constructor=ParametersParser;
 
 ParametersParser.prototype.parse =function(parametersHeader){
-    if(logger!=undefined) logger.debug("ParametersParser:parse():parametersHeader="+parametersHeader);
     this.lexer.SPorHT();
     while (this.lexer.lookAhead(0) == ';') {
         this.lexer.consume(1);
@@ -12194,7 +11382,6 @@ ParametersParser.prototype.parse =function(parametersHeader){
     }
 }
 ParametersParser.prototype.parseNameValueList =function(parametersHeader){
-    if(logger!=undefined) logger.debug("ParametersParser:parseNameValueList():parametersHeader="+parametersHeader);
     parametersHeader.removeParameters();
     while (true) {
         this.lexer.SPorHT();
@@ -12240,7 +11427,6 @@ ParametersParser.prototype.parseNameValueList =function(parametersHeader){
  *   
  */
 function TokenTypes() {
-    if(logger!=undefined) logger.debug("TokenTypes:TokenTypes()");
     this.classname="TokenTypes"; 
 }
 
@@ -12448,7 +11634,6 @@ TokenTypes.prototype.UNDERSCORE =  '_'.charCodeAt(0);/*
  *   
  */
 function TokenNames() {
-    if(logger!=undefined) logger.debug("TokenNames:TokenNames()");
     this.classname="TokenNames";
 }
 
@@ -12532,7 +11717,6 @@ TokenNames.prototype.B = "B";
  *   
  */
 function StringMsgParser(exhandler) {
-    if(logger!=undefined) logger.debug("StringMsgParser:StringMsgParser()");
     this.classname="StringMsgParser"; 
     this.readBody=true;
     this.parseExceptionListener=null;
@@ -12549,12 +11733,10 @@ function StringMsgParser(exhandler) {
 StringMsgParser.prototype.SIP_VERSION_STRING="SIP/2.0";
 
 StringMsgParser.prototype.setParseExceptionListener =function(pexhandler){
-    if(logger!=undefined) logger.debug("StringMsgParser:setParseExceptionListener():pexhandler="+pexhandler);
     this.parseExceptionListener = pexhandler;
 }
 
 StringMsgParser.prototype.parseSIPMessage =function(){
-    if(logger!=undefined) logger.debug("StringMsgParser:parseSIPMessage()");
     if(typeof arguments[0]=="string")
     {
         var msgString=arguments[0];
@@ -12568,7 +11750,6 @@ StringMsgParser.prototype.parseSIPMessage =function(){
 }
 
 StringMsgParser.prototype.parseSIPMessagestring =function(msgString){
-    if(logger!=undefined) logger.debug("StringMsgParser:():parseSIPMessagestring: msgString="+msgString);
     if (msgString == null || msgString.length == 0) {
         return null;
     }
@@ -12647,7 +11828,6 @@ StringMsgParser.prototype.parseSIPMessagestring =function(msgString){
     return message;
 }
 StringMsgParser.prototype.parseSIPMessagebyte =function(msgBuffer){
-    if(logger!=undefined) logger.debug("StringMsgParser:parseSIPMessagebyte(): msgBuffer="+msgBuffer);
     if (msgBuffer == null || msgBuffer.length == 0) {
         return null;
     }
@@ -12735,7 +11915,6 @@ StringMsgParser.prototype.parseSIPMessagebyte =function(msgBuffer){
 }
 
 StringMsgParser.prototype.trimEndOfLine =function(line){
-    if(logger!=undefined) logger.debug("StringMsgParser:trimEndOfLine():line="+line);
     if (line == null) {
         return line;
     }
@@ -12754,7 +11933,6 @@ StringMsgParser.prototype.trimEndOfLine =function(line){
 
 
 StringMsgParser.prototype.processFirstLine =function(firstLine){
-    if(logger!=undefined) logger.debug("StringMsgParser:processFirstLine():firstLine="+firstLine);
     var message=null;
     var constlength=this.SIP_VERSION_STRING.length;
     var n=0;
@@ -12801,7 +11979,6 @@ StringMsgParser.prototype.processFirstLine =function(firstLine){
 }
 
 StringMsgParser.prototype.processHeader =function(header, message){
-    if(logger!=undefined) logger.debug("StringMsgParser:processHeader():header="+ header+", message="+message.classname);
     if (header == null || header.length == 0) {
         return;
     }
@@ -12851,24 +12028,20 @@ StringMsgParser.prototype.processHeader =function(header, message){
 }
 
 StringMsgParser.prototype.parseAddress =function(address){
-    if(logger!=undefined) logger.debug("StringMsgParser:parseAddress():address="+address);
     var addressParser = new AddressParser(address);
     return addressParser.address(true);
 }
 
 StringMsgParser.prototype.parseHost =function(host){
-    if(logger!=undefined) logger.debug("StringMsgParser:parseHost():host="+host);
     var lexer = new Lexer("charLexer", host);
     return new HostNameParser(lexer).host();
 }
 
 StringMsgParser.prototype.parseTelephoneNumber =function(telephone_number){
-    if(logger!=undefined) logger.debug("StringMsgParser:parseTelephoneNumber():telephone_number="+telephone_number);
     return new URLParser(telephone_number).parseTelephoneNumber(true);
 }
 
 StringMsgParser.prototype.parseSIPUrl =function(url){
-    if(logger!=undefined) logger.debug("StringMsgParser:parseSIPUrl():url:"+url);
     try {
         return new URLParser(url).sipURL(true);
     } catch (ex) {
@@ -12878,12 +12051,10 @@ StringMsgParser.prototype.parseSIPUrl =function(url){
 }
 
 StringMsgParser.prototype.parseUrl =function(url){
-    if(logger!=undefined) logger.debug("StringMsgParser:parseUrl():url="+url);
     return new URLParser(url).parse();
 }
 
 StringMsgParser.prototype.parseSIPHeader =function(header){
-    if(logger!=undefined) logger.debug("StringMsgParser:parseSIPHeader():header="+header);
     var start = 0;
     var end = header.length - 1;
     try {
@@ -12933,24 +12104,20 @@ StringMsgParser.prototype.parseSIPHeader =function(header){
 }
 
 StringMsgParser.prototype.parseSIPRequestLine =function(requestLine){
-    if(logger!=undefined) logger.debug("StringMsgParser:parseSIPRequestLine():requestLine="+requestLine);
     requestLine += "\n";
     return new RequestLineParser(requestLine).parse();
 }
 
 StringMsgParser.prototype.parseSIPStatusLine =function(statusLine){
-    if(logger!=undefined) logger.debug("StringMsgParser:parseSIPStatusLine():statusLine="+statusLine);
     statusLine += "\n";
     return new StatusLineParser(statusLine).parse();
 }
 
 StringMsgParser.prototype.setComputeContentLengthFromMessage =function(computeContentLengthFromMessage){
-    if(logger!=undefined) logger.debug("StringMsgParser:setComputeContentLengthFromMessage():computeContentLengthFromMessage="+computeContentLengthFromMessage);
     this.computeContentLengthFromMessage = computeContentLengthFromMessage;
 }
 
 StringMsgParser.prototype.setStrict =function(strict){
-    if(logger!=undefined) logger.debug("StringMsgParser:setStrict():strict="+strict);
     this.strict = strict;
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -12983,7 +12150,6 @@ StringMsgParser.prototype.setStrict =function(strict){
  *   
  */
 function AddressParametersParser() {
-    if(logger!=undefined) logger.debug("AddressParametersParser:AddressParametersParser()");
     this.classname="AddressParametersParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -13002,7 +12168,6 @@ AddressParametersParser.prototype = new ParametersParser();
 AddressParametersParser.prototype.constructor=AddressParametersParser;
 
 AddressParametersParser.prototype.parse =function(addressParametersHeader){
-    if(logger!=undefined) logger.debug("AddressParametersParser:parse():addressParametersHeader="+addressParametersHeader);
     try {
         var addressParser = new AddressParser(this.getLexer());
         var addr = addressParser.address(false);
@@ -13049,7 +12214,6 @@ AddressParametersParser.prototype.parse =function(addressParametersHeader){
  *   
  */
 function ChallengeParser() {
-    if(logger!=undefined) logger.debug("ChallengeParser:ChallengeParser()");
     this.classname="ChallengeParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -13068,7 +12232,6 @@ ChallengeParser.prototype = new HeaderParser();
 ChallengeParser.prototype.constructor=ChallengeParser;
 
 ChallengeParser.prototype.parse =function(header){
-    if(logger!=undefined) logger.debug("ChallengeParser:parse():header:"+header);
     this.lexer.SPorHT();
     this.lexer.match(TokenTypes.prototype.ID);
     var type = this.lexer.getNextToken();
@@ -13087,7 +12250,6 @@ ChallengeParser.prototype.parse =function(header){
     }
 }
 ChallengeParser.prototype.parseParameter =function(header){
-    if(logger!=undefined) logger.debug("ChallengeParser:parseParameter():header="+header);
     var nv = this.nameValue('=');
     header.setParameter_nv(nv);
 }
@@ -13122,7 +12284,6 @@ ChallengeParser.prototype.parseParameter =function(header){
  *   
  */
 function URLParser() {
-    if(logger!=undefined) logger.debug("URLParser:URLParser()");
     this.classname="URLParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -13143,7 +12304,6 @@ URLParser.prototype.PLUS=TokenTypes.prototype.PLUS;
 URLParser.prototype.SEMICOLON=TokenTypes.prototype.SEMICOLON;
 
 URLParser.prototype.isMark =function(next){
-    if(logger!=undefined) logger.debug("URLParser:isMark():next="+next);
     switch (next) {
         case '-':
         case '_':
@@ -13161,7 +12321,6 @@ URLParser.prototype.isMark =function(next){
 }
 
 URLParser.prototype.isUnreserved =function(next){
-    if(logger!=undefined) logger.debug("URLParser:isUnreserved():next="+next);
     var lexer=new Lexer("","");
     if(lexer.isAlphaDigit(next) || this.isMark(next))
     {
@@ -13174,7 +12333,6 @@ URLParser.prototype.isUnreserved =function(next){
 }
 
 URLParser.prototype.isReservedNoSlash =function(next){
-    if(logger!=undefined) logger.debug("URLParser:isReservedNoSlash():next="+next);
     switch (next) {
         case ';':
         case '?':
@@ -13191,7 +12349,6 @@ URLParser.prototype.isReservedNoSlash =function(next){
 }
 
 URLParser.prototype.isUserUnreserved =function(la){
-    if(logger!=undefined) logger.debug("URLParser:():la="+la);
     switch (la) {
         case '&':
         case '?':
@@ -13209,7 +12366,6 @@ URLParser.prototype.isUserUnreserved =function(la){
 }
 
 URLParser.prototype.unreserved =function(){
-    if(logger!=undefined) logger.debug("URLParser:unreserved()");
     var next = this.lexer.lookAhead(0);
     if (this.isUnreserved(next)) {
         this.lexer.consume(1);
@@ -13221,7 +12377,6 @@ URLParser.prototype.unreserved =function(){
 }
 
 URLParser.prototype.paramNameOrValue =function(){
-    if(logger!=undefined) logger.debug("URLParser:paramNameOrValue()");
     var startIdx = this.lexer.getPtr();
     while (this.lexer.hasMoreChars()) {
         var next = this.lexer.lookAhead(0);
@@ -13248,7 +12403,6 @@ URLParser.prototype.paramNameOrValue =function(){
 }
 
 URLParser.prototype.uriParam =function(){
-    if(logger!=undefined) logger.debug("URLParser:uriParam()");
     var pvalue = "";
     var pname = this.paramNameOrValue();
     var next = this.lexer.lookAhead(0);
@@ -13267,7 +12421,6 @@ URLParser.prototype.uriParam =function(){
 }
 
 URLParser.prototype.isReserved =function(next){
-    if(logger!=undefined) logger.debug("URLParser:isReserved():next="+next);
     switch (next) {
         case ';':
         case '/':
@@ -13286,7 +12439,6 @@ URLParser.prototype.isReserved =function(next){
 }
 
 URLParser.prototype.reserved =function(){
-    if(logger!=undefined) logger.debug("URLParser:reserved()");
     var next = this.lexer.lookAhead(0);
     if (this.isReserved(next)) {
         this.lexer.consume(1);
@@ -13300,7 +12452,6 @@ URLParser.prototype.reserved =function(){
 }
 
 URLParser.prototype.isEscaped =function(){
-    if(logger!=undefined) logger.debug("URLParser:isEscaped()");
     try {
         var lexer=new Lexer("","");
         if(this.lexer.lookAhead(0) == '%'
@@ -13320,7 +12471,6 @@ URLParser.prototype.isEscaped =function(){
 }
 
 URLParser.prototype.escaped =function(){
-    if(logger!=undefined) logger.debug("URLParser:escaped()");
     var lexer=new Lexer("","");
     var retval = "";
     var next = this.lexer.lookAhead(0);
@@ -13339,7 +12489,6 @@ URLParser.prototype.escaped =function(){
 }
 
 URLParser.prototype.mark =function(){
-    if(logger!=undefined) logger.debug("URLParser:mark()");
     var next = this.lexer.lookAhead(0);
     if (this.isMark(next)) {
         this.lexer.consume(1);
@@ -13351,7 +12500,6 @@ URLParser.prototype.mark =function(){
 }
 
 URLParser.prototype.uric =function(){
-    if(logger!=undefined) logger.debug("URLParser:uric()");
     try {
         var lexer=new Lexer("","");
         var la = this.lexer.lookAhead(0);
@@ -13375,7 +12523,6 @@ URLParser.prototype.uric =function(){
 }
 
 URLParser.prototype.uricNoSlash =function(){
-    if(logger!=undefined) logger.debug("URLParser:uricNoSlash()");
     try {
         var lexer=new Lexer("","");
         var la = this.lexer.lookAhead(0);
@@ -13399,7 +12546,6 @@ URLParser.prototype.uricNoSlash =function(){
 }
 
 URLParser.prototype.uricString =function(){
-    if(logger!=undefined) logger.debug("URLParser:uricString()");
     var retval = "";
     while (true) {
         var next = this.uric();
@@ -13419,7 +12565,6 @@ URLParser.prototype.uricString =function(){
 }
 
 URLParser.prototype.uriReference =function(inBrackets){
-    if(logger!=undefined) logger.debug("URLParser:uriReference():inBrackets:"+inBrackets);
     var retval = null;
     var tokens = this.lexer.peekNextToken(2);
     var t1 = tokens[0];
@@ -13451,7 +12596,6 @@ URLParser.prototype.uriReference =function(inBrackets){
 }
 
 URLParser.prototype.base_phone_number =function(){
-    if(logger!=undefined) logger.debug("URLParser:base_phone_number()");
     var s = "";
     var lexer=new Lexer("","");
     var lc = 0;
@@ -13472,7 +12616,6 @@ URLParser.prototype.base_phone_number =function(){
 }
 
 URLParser.prototype.local_number =function(){
-    if(logger!=undefined) logger.debug("URLParser:local_number()");
     var s = "";
     var lexer=new Lexer("","");
     var lc = 0;
@@ -13494,7 +12637,6 @@ URLParser.prototype.local_number =function(){
 }
 
 URLParser.prototype.parseTelephoneNumber =function(inBrackets){
-    if(logger!=undefined) logger.debug("URLParser:parseTelephoneNumber():inBrackets="+inBrackets);
     var tn;
     this.lexer.selectLexer("charLexer");
     var lexer=new Lexer("","");
@@ -13514,7 +12656,6 @@ URLParser.prototype.parseTelephoneNumber =function(inBrackets){
 
 
 URLParser.prototype.global_phone_number =function(inBrackets){
-    if(logger!=undefined) logger.debug("URLParser:global_phone_number():inBrackets="+inBrackets);
     var tn = new TelephoneNumber();
     tn.setGlobal(true);
     var nv = null;
@@ -13533,7 +12674,6 @@ URLParser.prototype.global_phone_number =function(inBrackets){
 }
 
 URLParser.prototype.local_phone_number =function(inBrackets){
-    if(logger!=undefined) logger.debug("URLParser:local_phone_number():inBrackets:"+inBrackets);
     var tn = new TelephoneNumber();
     tn.setGlobal(false);
     var nv = null;
@@ -13560,7 +12700,6 @@ URLParser.prototype.local_phone_number =function(inBrackets){
 }
 
 URLParser.prototype.tel_parameters =function(){
-    if(logger!=undefined) logger.debug("URLParser:tel_parameters()");
     var nvList = new NameValueList();
     var nv;
     while (true) {
@@ -13586,7 +12725,6 @@ URLParser.prototype.tel_parameters =function(){
 }
 
 URLParser.prototype.phone_context =function(){
-    if(logger!=undefined) logger.debug("URLParser:phone_context()");
     this.lexer.match('=');
     var la = this.lexer.lookAhead(0);
     var value=null;
@@ -13605,7 +12743,6 @@ URLParser.prototype.phone_context =function(){
 
 
 URLParser.prototype.telURL =function(inBrackets){
-    if(logger!=undefined) logger.debug("URLParser:telURL():inBrackets="+inBrackets);
     this.lexer.match(TokenTypes.prototype.TEL);
     this.lexer.match(':');
     var tn = this.parseTelephoneNumber(inBrackets);
@@ -13615,7 +12752,6 @@ URLParser.prototype.telURL =function(inBrackets){
 }
 
 URLParser.prototype.sipURL =function(inBrackets){
-    if(logger!=undefined) logger.debug("URLParser:sipURL():inBrackets="+inBrackets);
     var retval = new SipUri();
     // pmusgrave - handle sips case
     var nextToken = this.lexer.peekNextToken();
@@ -13679,7 +12815,6 @@ URLParser.prototype.sipURL =function(inBrackets){
 }
 
 URLParser.prototype.peekScheme =function(){
-    if(logger!=undefined) logger.debug("URLParser:peekScheme()");
     var tokens = this.lexer.peekNextToken(1);
     if (tokens.length == 0) {
         return null;
@@ -13689,7 +12824,6 @@ URLParser.prototype.peekScheme =function(){
 }
 
 URLParser.prototype.qheader =function(){
-    if(logger!=undefined) logger.debug("URLParser:qheader()");
     var startIdx = this.lexer.ptr;
     while (true) {
         var la = this.lexer.lookAhead(0);
@@ -13708,7 +12842,6 @@ URLParser.prototype.qheader =function(){
 }
 
 URLParser.prototype.hvalue =function(){
-    if(logger!=undefined) logger.debug("URLParser:hvalue()");
     var retval = "";
     while (this.lexer.hasMoreChars()) {
         var la = this.lexer.lookAhead(0);
@@ -13747,7 +12880,6 @@ URLParser.prototype.hvalue =function(){
 }
 
 URLParser.prototype.urlString =function(){
-    if(logger!=undefined) logger.debug("URLParser:urlString()");
     var retval = "";
     this.lexer.selectLexer("charLexer");
     while (this.lexer.hasMoreChars()) {
@@ -13762,7 +12894,6 @@ URLParser.prototype.urlString =function(){
 }
 
 URLParser.prototype.user =function(){
-    if(logger!=undefined) logger.debug("URLParser:user()");
     var startIdx = this.lexer.getPtr();
     while (this.lexer.hasMoreChars()) {
         var la = this.lexer.lookAhead(0);
@@ -13779,7 +12910,6 @@ URLParser.prototype.user =function(){
 
 
 URLParser.prototype.password =function(){
-    if(logger!=undefined) logger.debug("URLParser:password()");
     var startIdx = this.lexer.getPtr();
     while (true) {
         var la = this.lexer.lookAhead(0);
@@ -13805,7 +12935,6 @@ URLParser.prototype.password =function(){
 }
 
 URLParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("URLParser:parse()");
     return this.uriReference(true);
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -13838,7 +12967,6 @@ URLParser.prototype.parse =function(){
  *   
  */
 function AddressParser() {
-    if(logger!=undefined) logger.debug("AddressParser:AddressParser()");
     this.classname="AddressParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -13859,7 +12987,6 @@ AddressParser.prototype.NAME_ADDR=1;
 AddressParser.prototype.ADDRESS_SPEC=2;
 
 AddressParser.prototype.nameAddr =function(){
-    if(logger!=undefined) logger.debug("AddressParser:nameAddr()");
     if (this.lexer.lookAhead(0) == '<') {
         this.lexer.consume(1);
         this.lexer.selectLexer("sip_urlLexer");
@@ -13901,7 +13028,6 @@ AddressParser.prototype.nameAddr =function(){
 }
 
 AddressParser.prototype.address =function(inclParams){
-    if(logger!=undefined) logger.debug("AddressParser:address():inclParams="+inclParams);
     var retval = null;
     var k = 0;
     while (this.lexer.hasMoreChars()) {
@@ -13966,7 +13092,6 @@ AddressParser.prototype.address =function(inclParams){
  *   
  */
 function ToParser() {
-    if(logger!=undefined) logger.debug("ToParser:ToParser()");
     this.classname="ToParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -13985,7 +13110,6 @@ ToParser.prototype = new AddressParametersParser();
 ToParser.prototype.constructor=ToParser;
 
 ToParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("ToParser:parse()");
     this.headerName(TokenTypes.prototype.TO);
     var to = new To();
     AddressParametersParser.prototype.parse.call(this,to);
@@ -14024,7 +13148,6 @@ ToParser.prototype.parse =function(){
  *   
  */
 function FromParser() {
-    if(logger!=undefined) logger.debug("FromParser:FromParser()");
     this.classname="FromParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -14043,7 +13166,6 @@ FromParser.prototype = new AddressParametersParser();
 FromParser.prototype.constructor=FromParser;
 
 FromParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("FromParser:parse()");
     var from = new From();
     this.lexer.match(TokenTypes.prototype.FROM);
     this.lexer.SPorHT();
@@ -14086,7 +13208,6 @@ FromParser.prototype.parse =function(){
  */
 
 function CSeqParser() {
-    if(logger!=undefined) logger.debug("CSeqParser:CSeqParser()");
     this.classname="CSeqParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -14106,7 +13227,6 @@ CSeqParser.prototype = new HeaderParser();
 CSeqParser.prototype.constructor=CSeqParser;
 
 CSeqParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("CSeqParser:parse()");
     var c = new CSeq();
     this.lexer.match(TokenTypes.prototype.CSEQ);
     this.lexer.SPorHT();
@@ -14154,7 +13274,6 @@ CSeqParser.prototype.parse =function(){
  *   
  */
 function ViaParser() {
-    if(logger!=undefined) logger.debug("ViaParser:ViaParser()");
     this.classname="ViaParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -14175,7 +13294,6 @@ ViaParser.prototype.RECEIVED="received";
 ViaParser.prototype.BRANCH="branch";
 
 ViaParser.prototype.parseVia =function(v){
-    if(logger!=undefined) logger.debug("ViaParser:parseVia():v="+v.classname);
     this.lexer.match(TokenTypes.prototype.ID);
     var protocolName = this.lexer.getNextToken();
     this.lexer.SPorHT();
@@ -14252,7 +13370,6 @@ ViaParser.prototype.parseVia =function(v){
 }
 
 ViaParser.prototype.nameValue =function(){
-    if(logger!=undefined) logger.debug("ViaParser:nameValue()");
     this.lexer.match(LexerCore.prototype.ID);
     var name = this.lexer.getNextToken();
     this.lexer.SPorHT();
@@ -14291,7 +13408,6 @@ ViaParser.prototype.nameValue =function(){
 }
 
 ViaParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("ViaParser:parseVia()");
     var viaList = new ViaList();
     this.lexer.match(TokenTypes.prototype.VIA);
     this.lexer.SPorHT(); // ignore blanks
@@ -14346,7 +13462,6 @@ ViaParser.prototype.parse =function(){
  *   
  */
 function ContactParser() {
-    if(logger!=undefined) logger.debug("ContactParser");
     this.classname="ContactParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -14365,7 +13480,6 @@ ContactParser.prototype = new AddressParametersParser();
 ContactParser.prototype.constructor=ContactParser;
 
 ContactParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("ContactParser:parse()");
     this.headerName(TokenTypes.prototype.CONTACT);
     var retval = new ContactList();
     while (true) {
@@ -14432,7 +13546,6 @@ ContactParser.prototype.parse =function(){
  *   
  */
 function ContentTypeParser() {
-    if(logger!=undefined) logger.debug("ContentTypeParser:ContentTypeParser()");
     this.classname="ContentTypeParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -14451,7 +13564,6 @@ ContentTypeParser.prototype = new ParametersParser();
 ContentTypeParser.prototype.constructor=ContentTypeParser;
 
 ContentTypeParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("ContentTypeParser:parse()");
     var contentType = new ContentType();
     this.headerName(TokenTypes.prototype.CONTENT_TYPE);
     this.lexer.match(TokenTypes.prototype.ID);
@@ -14499,7 +13611,6 @@ ContentTypeParser.prototype.parse =function(){
  *   
  */
 function ContentLengthParser() {
-    if(logger!=undefined) logger.debug("ContentLengthParser:ContentLengthParser()");
     this.classname="ContentLengthParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -14518,7 +13629,6 @@ ContentLengthParser.prototype = new HeaderParser();
 ContentLengthParser.prototype.constructor=ContentLengthParser;
 
 ContentLengthParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("ContentLengthParser:parse()");
     var contentLength = new ContentLength();
     this.headerName(TokenTypes.prototype.CONTENT_LENGTH);
     var number = this.lexer.number();
@@ -14559,7 +13669,6 @@ ContentLengthParser.prototype.parse =function(){
  *   
  */
 function AuthorizationParser() {
-    if(logger!=undefined) logger.debug("AuthorizationParser:AuthorizationParser()");
     this.classname="AuthorizationParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -14578,7 +13687,6 @@ AuthorizationParser.prototype = new ChallengeParser();
 AuthorizationParser.prototype.constructor=AuthorizationParser;
 
 AuthorizationParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("AuthorizationParser:parse()");
     this.headerName(TokenTypes.prototype.AUTHORIZATION);
     var auth = new Authorization();
     ChallengeParser.prototype.parse.call(this,auth);//used to call the method of challengeparser
@@ -14615,7 +13723,6 @@ AuthorizationParser.prototype.parse =function(){
  *   
  */
 function WWWAuthenticateParser() {
-    if(logger!=undefined) logger.debug("WWWAuthenticateParser:WWWAuthenticateParser()");
     this.classname="WWWAuthenticateParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -14634,7 +13741,6 @@ WWWAuthenticateParser.prototype = new ChallengeParser();
 WWWAuthenticateParser.prototype.constructor=WWWAuthenticateParser;
 
 WWWAuthenticateParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("WWWAuthenticateParser:parse()");
     this.headerName(TokenTypes.prototype.WWW_AUTHENTICATE);
     var wwwAuthenticate = new WWWAuthenticate();
     ChallengeParser.prototype.parse.call(this,wwwAuthenticate);
@@ -14673,7 +13779,6 @@ WWWAuthenticateParser.prototype.parse =function(){
  *   
  */
 function CallIDParser() {
-    if(logger!=undefined) logger.debug("CallIDParser:CallIDParser()");
     this.classname="CallIDParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -14692,7 +13797,6 @@ CallIDParser.prototype = new HeaderParser();
 CallIDParser.prototype.constructor=CallIDParser;
 
 CallIDParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("CallIDParser:parse()");
     this.lexer.match(TokenTypes.prototype.CALL_ID);
     this.lexer.SPorHT();
     this.lexer.match(':');
@@ -14735,7 +13839,6 @@ CallIDParser.prototype.parse =function(){
  *   
  */
 function RouteParser() {
-    if(logger!=undefined) logger.debug("RouteParser");
     this.classname="RouteParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -14754,7 +13857,6 @@ RouteParser.prototype = new AddressParametersParser();
 RouteParser.prototype.constructor=RouteParser;
 
 RouteParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("RouteParser:parse()");
     var routeList = new RouteList();
     this.lexer.match(TokenTypes.prototype.ROUTE);
     this.lexer.SPorHT();
@@ -14814,7 +13916,6 @@ RouteParser.prototype.parse =function(){
  *   
  */
 function RecordRouteParser() {
-    if(logger!=undefined) logger.debug("RecordRouteParser:RecordRouteParser()");
     this.classname="RecordRouteParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -14833,7 +13934,6 @@ RecordRouteParser.prototype = new AddressParametersParser();
 RecordRouteParser.prototype.constructor=RecordRouteParser;
 
 RecordRouteParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("RecordRouteParser:parse()");
     var recordRouteList = new RecordRouteList();
     this.lexer.match(TokenTypes.prototype.RECORD_ROUTE);
     this.lexer.SPorHT();
@@ -14894,7 +13994,6 @@ RecordRouteParser.prototype.parse =function(){
  *   
  */
 function ProxyAuthenticateParser() {
-    if(logger!=undefined) logger.debug("ProxyAuthenticateParser:ProxyAuthenticateParser()");
     this.classname="ProxyAuthenticateParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -14913,7 +14012,6 @@ ProxyAuthenticateParser.prototype = new ChallengeParser();
 ProxyAuthenticateParser.prototype.constructor=ProxyAuthenticateParser;
 
 ProxyAuthenticateParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("ProxyAuthenticateParser:parse()");
     this.headerName(TokenTypes.prototype.PROXY_AUTHENTICATE);
     var proxyAuth = new ProxyAuthenticate();
     ChallengeParser.prototype.parse.call(this,proxyAuth);
@@ -14951,7 +14049,6 @@ ProxyAuthenticateParser.prototype.parse =function(){
  *   
  */
 function ProxyAuthorizationParser() {
-    if(logger!=undefined) logger.debug("ProxyAuthorizationParser");
     this.classname="ProxyAuthorizationParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -14970,7 +14067,6 @@ ProxyAuthorizationParser.prototype = new ChallengeParser();
 ProxyAuthorizationParser.prototype.constructor=ProxyAuthorizationParser;
 
 ProxyAuthorizationParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("ProxyAuthorizationParser:parse()");
     this.headerName(TokenTypes.prototype.PROXY_AUTHORIZATION);
     var proxyAuth = new ProxyAuthorization();
     ChallengeParser.prototype.parse.call(this,proxyAuth);
@@ -15008,7 +14104,6 @@ ProxyAuthorizationParser.prototype.parse =function(){
  *   
  */
 function TimeStampParser() {
-    if(logger!=undefined) logger.debug("TimeStampParser:TimeStampParser()");
     this.classname="TimeStampParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -15028,7 +14123,6 @@ TimeStampParser.prototype.constructor=TimeStampParser;
 TimeStampParser.prototype.TIMESTAMP="Timestamp";
 
 TimeStampParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("TimeStampParser:parse()");
     var timeStamp = new TimeStamp();
     this.headerName(TokenTypes.prototype.TIMESTAMP);
     timeStamp.setHeaderName(this.TIMESTAMP);
@@ -15096,7 +14190,6 @@ TimeStampParser.prototype.parse =function(){
  *   
  */
 function UserAgentParser() {
-    if(logger!=undefined) logger.debug("UserAgentParser:UserAgentParser()");
     this.classname="UserAgentParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -15115,7 +14208,6 @@ UserAgentParser.prototype = new HeaderParser();
 UserAgentParser.prototype.constructor=UserAgentParser;
 
 UserAgentParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("UserAgentParser:parse()");
     var userAgent = new UserAgent();
     this.headerName(TokenTypes.prototype.USER_AGENT);
     if (this.lexer.lookAhead(0) == '\n')
@@ -15184,7 +14276,6 @@ UserAgentParser.prototype.parse =function(){
  *   
  */
 function SupportedParser() {
-    if(logger!=undefined) logger.debug("SupportedParser:SubjectParser()");
     this.classname="SupportedParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -15204,7 +14295,6 @@ SupportedParser.prototype.constructor=SupportedParser;
 SupportedParser.prototype.SUPPORTED="Supported";
 
 SupportedParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("SupportedParser:parse()");
     var supportedList = new SupportedList();
     this.headerName(TokenTypes.prototype.SUPPORTED);
     while (this.lexer.lookAhead(0) != '\n') {
@@ -15263,7 +14353,6 @@ SupportedParser.prototype.parse =function(){
  *   
  */
 function ServerParser() {
-    if(logger!=undefined) logger.debug("ServerParser:ServerParser()");
     this.classname="ServerParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -15282,7 +14371,6 @@ ServerParser.prototype = new HeaderParser();
 ServerParser.prototype.constructor=ServerParser;
 
 ServerParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("ServerParser:parse()");
     var server = new Server();
     this.headerName(TokenTypes.prototype.SERVER);
     if (this.lexer.lookAhead(0) == '\n')
@@ -15348,7 +14436,6 @@ ServerParser.prototype.parse =function(){
  *   
  */
 function SubjectParser() {
-    if(logger!=undefined) logger.debug("SubjectParser:SubjectParser()");
     this.classname="SubjectParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -15367,7 +14454,6 @@ SubjectParser.prototype = new HeaderParser();
 SubjectParser.prototype.constructor=SubjectParser;
 
 SubjectParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("SubjectParser:parse()");
     var subject = new Subject();
     this.headerName(TokenTypes.prototype.SUBJECT);
     this.lexer.SPorHT();
@@ -15407,7 +14493,6 @@ SubjectParser.prototype.parse =function(){
  *   
  */
 function MaxForwardsParser() {
-    if(logger!=undefined) logger.debug("MaxForwardsParser:MaxForwardsParser()");
     this.classname="MaxForwardsParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -15426,7 +14511,6 @@ MaxForwardsParser.prototype = new HeaderParser();
 MaxForwardsParser.prototype.constructor=MaxForwardsParser;
 
 MaxForwardsParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("MaxForwardsParser:parse()");
     var contentLength = new MaxForwards();
     this.headerName(TokenTypes.prototype.MAX_FORWARDS);
     var number = this.lexer.number();
@@ -15467,7 +14551,6 @@ MaxForwardsParser.prototype.parse =function(){
  *   
  */
 function ReasonParser() {
-    if(logger!=undefined) logger.debug("ReasonParser:ReasonParser()");
     this.classname="ReasonParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -15486,7 +14569,6 @@ ReasonParser.prototype = new ParametersParser();
 ReasonParser.prototype.constructor=ReasonParser;
 
 ReasonParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("ReasonParser:parse()");
     var reasonList = new ReasonList();
     this.headerName(TokenTypes.prototype.REASON);
     this.lexer.SPorHT();
@@ -15541,7 +14623,6 @@ ReasonParser.prototype.parse =function(){
  *   
  */
 function RequestLineParser() {
-    if(logger!=undefined) logger.debug("RequestLineParser:RequestLineParser()");
     this.classname="RequestLineParser"; 
     if(typeof arguments[0]=="string")
     {
@@ -15560,7 +14641,6 @@ RequestLineParser.prototype = new Parser();
 RequestLineParser.prototype.constructor=RequestLineParser;
 
 RequestLineParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("RequestLineParser:parse()");
     var retval = new RequestLine();
     var m = this.method();
     this.lexer.SPorHT();
@@ -15608,7 +14688,6 @@ RequestLineParser.prototype.parse =function(){
  */
 
 function ExpiresParser() {
-    if(logger!=undefined) logger.debug("ExpiresParser:ExpiresParser()");
     this.classname="ExpiresParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -15627,7 +14706,6 @@ ExpiresParser.prototype = new HeaderParser();
 ExpiresParser.prototype.constructor=ExpiresParser;
 
 ExpiresParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("ExpiresParser:parse()");
     var expires = new Expires();
     this.lexer.match(TokenTypes.prototype.EXPIRES);
     this.lexer.SPorHT();
@@ -15672,7 +14750,6 @@ ExpiresParser.prototype.parse =function(){
  */
 
 function EventParser() {
-    if(logger!=undefined) logger.debug("EventParser:EventParser()");
     this.classname="EventParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -15691,7 +14768,6 @@ EventParser.prototype = new ParametersParser();
 EventParser.prototype.constructor=EventParser;
 
 EventParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("EventParser:parse()");
     this.headerName(TokenTypes.prototype.EVENT);
     this.lexer.SPorHT();
     var event = new Event();
@@ -15736,7 +14812,6 @@ EventParser.prototype.parse =function(){
  *   
  */
 function StatusLineParser() {
-    if(logger!=undefined) logger.debug("StatusLineParser:StatusLineParser()");
     this.classname="StatusLineParser"; 
     if(typeof arguments[0]=="string")
     {
@@ -15755,17 +14830,14 @@ StatusLineParser.prototype = new Parser();
 StatusLineParser.prototype.constructor=StatusLineParser;
 
 StatusLineParser.prototype.statusCode =function(){
-    if(logger!=undefined) logger.debug("Parser:statusCode()");
     var scode = this.lexer.number();
     var retval = scode;
     return retval;
 }
 StatusLineParser.prototype.reasonPhrase =function(){
-    if(logger!=undefined) logger.debug("Parser:reasonPhrase()");
     return this.lexer.getRest().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
 }
 StatusLineParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("Parser:parse()");
     var retval = new StatusLine();
     var version = this.sipVersion();
     retval.setSipVersion(version);
@@ -15808,7 +14880,6 @@ StatusLineParser.prototype.parse =function(){
  *   
  */
 function ContentDispositionParser() {
-    if(logger!=undefined) logger.debug("ContentDispositionParser:ContentDispositionParser()");
     this.classname="ContentDispositionParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -15828,7 +14899,6 @@ ContentDispositionParser.prototype.constructor=ContentDispositionParser;
 ContentDispositionParser.prototype.CONTENT_DISPOSITION="Content-Disposition";
 
 ContentDispositionParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("ContentDispositionParser:parse()");
     this.headerName(TokenTypes.prototype.CONTENT_DISPOSITION);
     
     var cd = new ContentDisposition();
@@ -15881,7 +14951,6 @@ ContentDispositionParser.prototype.parse =function(){
  */
 
 function AllowParser() {
-    if(logger!=undefined) logger.debug("AllowParser:AllowParser()");
     this.classname="AllowParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -15901,7 +14970,6 @@ AllowParser.prototype.constructor=AllowParser;
 AllowParser.prototype.ALLOW="Allow";
 
 AllowParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("AllowParser:parse()");
     var list = new AllowList();
     this.headerName(TokenTypes.prototype.ALLOW);
     var allow = new Allow();
@@ -15956,7 +15024,6 @@ AllowParser.prototype.parse =function(){
  *   
  */
 function AllowEventsParser() {
-    if(logger!=undefined) logger.debug("AllowEventsParser");
     this.classname="AllowEventsParser"; 
     if(typeof arguments[0]=="object")
     {
@@ -15976,7 +15043,6 @@ AllowEventsParser.prototype.constructor=AllowEventsParser;
 AllowEventsParser.prototype.ALLOW_EVENTS="Allow-Events";
 
 AllowEventsParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("AllowEventsParser:parse()");
     var list = new AllowEventsList();
     this.headerName(TokenTypes.prototype.ALLOW_EVENTS);
     var allowEvents = new AllowEvents();
@@ -16033,7 +15099,6 @@ AllowEventsParser.prototype.parse =function(){
  *   
  */
 function ParserFactory() {
-    if(logger!=undefined) logger.debug("ParserFactory:ParserFactory()");
     this.classname="ParserFactory"; 
     this.parserTable=new Array();
     this.constructorArgs=null;
@@ -16079,7 +15144,6 @@ function ParserFactory() {
 }
 
 ParserFactory.prototype.createParser =function(line){
-    if(logger!=undefined) logger.debug("ParserFactory:createParser():line="+line);
     var lexer=new Lexer("","");
     var headerName = lexer.getHeaderName(line);
     var headerValue = lexer.getHeaderValue(line);
@@ -16117,7 +15181,6 @@ ParserFactory.prototype.createParser =function(line){
 }
 
 ParserFactory.prototype.put =function(table,name, value){
-    if(logger!=undefined) logger.debug("ParserFactory:put():table="+table.toString()+", name="+name+", value:"+value);
     var n=0;
     for(var i=0;i<table.length;i++)// loop for method put() of hashtable
     {
@@ -16169,7 +15232,6 @@ ParserFactory.prototype.put =function(table,name, value){
  *   
  */
 function WSMsgParser(sipstack,data) {
-    if(logger!=undefined) logger.debug("WSMsgParser:WSMsgParser()");
     this.classname="WSMsgParser"; 
     this.data=data;
     this.peerProtocol=null;
@@ -16181,7 +15243,6 @@ WSMsgParser.prototype.RPORT="rport";
 WSMsgParser.prototype.RECEIVED="received";
 
 WSMsgParser.prototype.parsermessage =function(requestsent){
-    if(logger!=undefined) logger.debug("WSMsgParser:parsermessage():requestsent="+requestsent);
     var smp = new StringMsgParser();
     var sipMessage = smp.parseSIPMessage(this.data);
     var cl =  sipMessage.getContentLength();
@@ -16200,7 +15261,6 @@ WSMsgParser.prototype.parsermessage =function(requestsent){
 }
 
 WSMsgParser.prototype.processMessage =function(sipMessage,requestSent){
-    if(logger!=undefined) logger.debug("WSMsgParser:processMessage():sipMessage="+sipMessage+", requestsent:"+requestSent);
     if (sipMessage.getFrom() == null
         ||  sipMessage.getTo() == null || sipMessage.getCallId() == null
         || sipMessage.getCSeq() == null || sipMessage.getViaHeaders() == null) {
@@ -16238,7 +15298,6 @@ WSMsgParser.prototype.processMessage =function(sipMessage,requestSent){
 
 
 WSMsgParser.prototype.getSIPStack =function(){
-    if(logger!=undefined) logger.debug("WSMsgParser:getSIPStack()");
     return this.sipStack;
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -16271,7 +15330,6 @@ WSMsgParser.prototype.getSIPStack =function(){
  *   
  */
 function MessageObject() {
-    if(logger!=undefined) logger.debug("MessageObject");
     this.classname="MessageObject";
 }
 
@@ -16279,7 +15337,6 @@ MessageObject.prototype = new GenericObject();
 MessageObject.prototype.constructor=MessageObject;
 
 MessageObject.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("MessageObject:encode()");
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
  * and individual contributors
@@ -16312,7 +15369,6 @@ MessageObject.prototype.encode =function(){
  */
 
 function ListMap() {
-    if(logger!=undefined) logger.debug("ListMap:ListMap()");
     this.classname="ListMap";
     this.headerListTable=new Array();
     this.initialized=null;
@@ -16320,7 +15376,6 @@ function ListMap() {
 }
 
 ListMap.prototype.put =function(hashtable, class1, class2){
-    if(logger!=undefined) logger.debug("ListMap:put():class1="+class1+", class2:"+class2);
     var n=0;
     for(var i=0;i<hashtable.length;i++)// loop for method put() of hashtable
     {
@@ -16344,7 +15399,6 @@ ListMap.prototype.put =function(hashtable, class1, class2){
 }
 
 ListMap.prototype.initializeListMap =function(){
-    if(logger!=undefined) logger.debug("ListMap:initializeListMap()");
     this.put(this.headerListTable, "Contact", "ContactList");
     this.put(this.headerListTable, "Via", "ViaList");
     this.put(this.headerListTable, "WWW-Authenticate", "WWWAuthenticateList");
@@ -16359,7 +15413,6 @@ ListMap.prototype.initializeListMap =function(){
 }
 
 ListMap.prototype.hasList =function(){
-    if(logger!=undefined) logger.debug("ListMap:hasList():sipHeader:"+arguments[0]);
     if (!this.initialized)
     {
         initializeListMap();
@@ -16401,7 +15454,6 @@ ListMap.prototype.hasList =function(){
 }
 
 ListMap.prototype.getListClass =function(sipHdrClass){
-    if(logger!=undefined) logger.debug("ListMap:getListClass():sipHdrClass="+sipHdrClass);
     if (!this.initialized)
     {
         initializeListMap();
@@ -16418,7 +15470,6 @@ ListMap.prototype.getListClass =function(sipHdrClass){
 }
 
 ListMap.prototype.getList =function(sipHeader){
-    if(logger!=undefined) logger.debug("ListMap:getList():sipHeader:"+sipHeader.classname);
     if (!this.initialized)
     {
         initializeListMap();
@@ -16475,7 +15526,6 @@ ListMap.prototype.getList =function(sipHeader){
  */
 
 function SIPMessage() {
-    if(logger!=undefined) logger.debug("SIPMessage:SIPMessage()");
     this.classname="SIPMessage";
     this.contentEncodingCharset = new MessageFactoryImpl().getDefaultContentEncodingCharset();
     this.nullRequest=null;
@@ -16514,7 +15564,6 @@ SIPMessage.prototype.CONTENT_DISPOSITION_LOWERCASE="content-disposition";
 SIPMessage.prototype.EXPIRES_LOWERCASE="expires";
 
 SIPMessage.prototype.isRequestHeader =function(sipHeader){
-    if(logger!=undefined) logger.debug("SIPMessage:isRequestHeader():sipHeader="+sipHeader.classname);
     if(sipHeader instanceof Authorization || sipHeader instanceof MaxForwards
         || sipHeader instanceof UserAgent|| sipHeader instanceof ProxyAuthorization
         || sipHeader instanceof Route|| sipHeader instanceof RouteList || sipHeader instanceof Subject)
@@ -16528,7 +15577,6 @@ SIPMessage.prototype.isRequestHeader =function(sipHeader){
 }
 
 SIPMessage.prototype.isResponseHeader =function(sipHeader){
-    if(logger!=undefined) logger.debug("SIPMessage:isResponseHeader():sipHeader:"+sipHeader.classname);
     if(sipHeader instanceof WWWAuthenticate
         || sipHeader instanceof ProxyAuthenticate)
         {
@@ -16541,7 +15589,6 @@ SIPMessage.prototype.isResponseHeader =function(sipHeader){
 }
 
 SIPMessage.prototype.getMessageAsEncodedStrings =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getMessageAsEncodedStrings()");
     var retval = new Array();
     for(var i=0;i<this.headers.length;i++)
     {
@@ -16563,7 +15610,6 @@ SIPMessage.prototype.getMessageAsEncodedStrings =function(){
 }
 
 SIPMessage.prototype.encodeSIPHeaders =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:encodeSIPHeaders()");
     var encoding = "";
     var string="";
     for(var i=0;i<this.headers.length;i++)
@@ -16579,15 +15625,12 @@ SIPMessage.prototype.encodeSIPHeaders =function(){
 }
 
 SIPMessage.prototype.encodeMessage =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:encodeMessage()");
 }
 
 SIPMessage.prototype.getDialogId =function(isServerTransaction){
-    if(logger!=undefined) logger.debug("SIPMessage:getDialogId():isServerTransaction="+isServerTransaction);
 }
 
 SIPMessage.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:encode()");
     var encoding = "";
     for(var i=0;i<this.headers.length;i++)
     {
@@ -16611,7 +15654,6 @@ SIPMessage.prototype.encode =function(){
 }
 
 SIPMessage.prototype.encodeAsBytes =function(transport){
-    if(logger!=undefined) logger.debug("SIPMessage:encodeAsBytes():transport="+transport);
     if (this instanceof SIPRequest && this.isNullRequest()) 
     {
         return this.getBytes("\r\n\r\n");
@@ -16642,7 +15684,6 @@ SIPMessage.prototype.encodeAsBytes =function(transport){
 }
 
 SIPMessage.prototype.attachHeader =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:attachHeader()");
     if(arguments.length==1)
     {
         var h=arguments[0];
@@ -16664,7 +15705,6 @@ SIPMessage.prototype.attachHeader =function(){
 }
 
 SIPMessage.prototype.attachHeaderargu1 =function(h){
-    if(logger!=undefined) logger.debug("SIPMessage:attachHeaderargu1():header:"+h.classname);
     if (h == null)
     {
         console.error("MessageFactoryImpl:attachHeaderargu1(): null header!");
@@ -16680,12 +15720,10 @@ SIPMessage.prototype.attachHeaderargu1 =function(h){
 }
 
 SIPMessage.prototype.attachHeaderargu2 =function(h, replaceflag){
-    if(logger!=undefined) logger.debug("SIPMessage:attachHeaderargu2():header,replaceglag:"+h.classname+","+replaceflag);
     this.attachHeaderargu3(h, replaceflag,false);
 }
 
 SIPMessage.prototype.attachHeaderargu3 =function(header, replaceFlag, top){
-    if(logger!=undefined) logger.debug("SIPMessage:attachHeaderargu3():header, replaceFlag, top:"+header.classname+","+replaceFlag+","+top);
     if (header == null)
     {
         console.error("MessageFactoryImpl:attachHeaderargu3(): null header!");
@@ -16793,7 +15831,6 @@ SIPMessage.prototype.attachHeaderargu3 =function(header, replaceFlag, top){
 
 
 SIPMessage.prototype.setHeader =function(sipHeader){
-    if(logger!=undefined) logger.debug("SIPMessage:setHeader():sipHeader="+sipHeader.classname);
     var header =  sipHeader;
     if (header == null)
     {
@@ -16813,7 +15850,6 @@ SIPMessage.prototype.setHeader =function(sipHeader){
 
 
 SIPMessage.prototype.setHeaders =function(headers){
-    if(logger!=undefined) logger.debug("SIPMessage:setHeaders():headers="+headers.toString());
     for(var i=0;i<headers.length;i++)
     {
         var sipHeader = headers[i];
@@ -16822,7 +15858,6 @@ SIPMessage.prototype.setHeaders =function(headers){
 }
 
 SIPMessage.prototype.removeHeader =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:removeHeader()");
     if(arguments.length==1)
     {
         var headerName=arguments[0];
@@ -16837,7 +15872,6 @@ SIPMessage.prototype.removeHeader =function(){
 }
 
 SIPMessage.prototype.removeHeaderargu1 =function(headerName){
-    if(logger!=undefined) logger.debug("SIPMessage:removeHeaderargu1():headerName="+headerName);
     if (headerName == null)
     {
         console.error("MessageFactoryImpl:removeHeaderargu1(): null header!");
@@ -16889,7 +15923,6 @@ SIPMessage.prototype.removeHeaderargu1 =function(headerName){
 
 
 SIPMessage.prototype.removeHeaderargu2 =function(headerName,top){
-    if(logger!=undefined) logger.debug("SIPMessage:removeHeaderargu2():headerName="+headerName+", top="+top);
     var headerNameLowerCase = headerName.toLowerCase();
     var toRemove=null;
     var l=null;
@@ -16933,7 +15966,6 @@ SIPMessage.prototype.removeHeaderargu2 =function(headerName,top){
 }
 
 SIPMessage.prototype.getTransactionId =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getTransactionId()");
     var topVia = new Via();
     if (this.getViaHeaders().hlist.length!=0) {
         topVia = this.getViaHeaders().getFirst();
@@ -16976,7 +16008,6 @@ SIPMessage.prototype.getTransactionId =function(){
 }
 
 SIPMessage.prototype.hashCode =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:hashCode()");
     if(this.callIdHeader == null)
     {  
         console.error("MessageFactoryImpl:hashCode(): invalid message! Cannot compute hashcode! call-id header is missing !");
@@ -17004,12 +16035,10 @@ SIPMessage.prototype.hashCode =function(){
     }
 }
 SIPMessage.prototype.hasContent =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:hasContent()");
     return this.messageContent != null;
 }
 
 SIPMessage.prototype.getHeaders =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getHeaders()");
     if(arguments.length!=0)
     {
         var headerName=arguments[0];
@@ -17048,12 +16077,10 @@ SIPMessage.prototype.getHeaders =function(){
 }
 
 SIPMessage.prototype.getHeader =function(headerName){
-    if(logger!=undefined) logger.debug("SIPMessage:getHeader():headerName:"+headerName);
     return this.getHeaderLowerCase(headerName.toLowerCase());
 }
 
 SIPMessage.prototype.getHeaderLowerCase =function(lowerCaseHeaderName){
-    if(logger!=undefined) logger.debug("SIPMessage:getHeaderLowerCase():lowerCaseHeaderName="+lowerCaseHeaderName);
     if (lowerCaseHeaderName == null)
     {
          console.error("MessageFactoryImpl:getHeaderLowerCase(): null lowerCaseHeaderName !");
@@ -17079,43 +16106,35 @@ SIPMessage.prototype.getHeaderLowerCase =function(lowerCaseHeaderName){
 
 
 SIPMessage.prototype.getContentTypeHeader =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getContentTypeHeader()");
     return this.getHeaderLowerCase(this.CONTENT_TYPE_LOWERCASE);
 }
 
 
 SIPMessage.prototype.getWWWAuthenticate =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getWWWAuthenticate()");
     return this.getHeaderLowerCase("www-authenticate");
 }
 
 SIPMessage.prototype.getProxyAuthenticate =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getproxyAuthenticate()");
     return this.getHeaderLowerCase("proxy-authenticate");
 }
 
 SIPMessage.prototype.getContentLengthHeader =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getContentLengthHeader()");
     return this.getContentLength();
 }
 
 SIPMessage.prototype.getFrom =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getFrom()");
     return this.fromHeader;
 }
 
 /*SIPMessage.prototype.getErrorInfoHeaders =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getErrorInfoHeaders()");
     
 }*/
 
 SIPMessage.prototype.getContactHeaders =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getContactHeaders()");
     return this.getSIPHeaderListLowerCase(this.CONTACT_LOWERCASE);
 }
 
 SIPMessage.prototype.getContactHeader =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getContactHeader()");
     var clist = this.getContactHeaders();
     if (clist != null) 
     {
@@ -17128,12 +16147,10 @@ SIPMessage.prototype.getContactHeader =function(){
 }
 
 SIPMessage.prototype.getViaHeaders =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getViaHeaders()");
     return this.getSIPHeaderListLowerCase(this.VIA_LOWERCASE);
 }
 
 SIPMessage.prototype.setVia =function(viaList){
-    if(logger!=undefined) logger.debug("SIPMessage:setVia():viaList:"+viaList.classname);
     if(viaList.classname=="Via")
     {
         var vList = new ViaList();
@@ -17152,7 +16169,6 @@ SIPMessage.prototype.setVia =function(viaList){
 }
 
 SIPMessage.prototype.getTopmostVia =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getTopmostVia()");
     if (this.getViaHeaders() == null)
     {
         return null;
@@ -17164,42 +16180,34 @@ SIPMessage.prototype.getTopmostVia =function(){
 }
 
 SIPMessage.prototype.getCSeq =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getCSeq()");
     return this.cSeqHeader;
 }
 
 SIPMessage.prototype.getAuthorization =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getAuthorization()");
     return this.getHeaderLowerCase(this.AUTHORIZATION_LOWERCASE);
 }
 
 SIPMessage.prototype.getProxyAuthorization =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getAuthorization()");
     return this.getHeaderLowerCase(this.PROXYAUTHORIZATION_LOWERCASE);
 }
 
 SIPMessage.prototype.getMaxForwards =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getMaxForwards()");
     return this.maxForwardsHeader;
 }
 
 SIPMessage.prototype.setMaxForwards =function(maxForwards){
-    if(logger!=undefined) logger.debug("SIPMessage:setMaxForwards():maxForwards="+maxForwards.classname);
     this.setHeader(maxForwards);
 }
 
 SIPMessage.prototype.getRouteHeaders =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getRouteHeaders()");
     return  this.getSIPHeaderListLowerCase(this.ROUTE_LOWERCASE);
 }
 
 SIPMessage.prototype.getCallId =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getCallId()");
     return this.callIdHeader;
 }
 
 SIPMessage.prototype.setCallId =function(callId){
-    if(logger!=undefined) logger.debug("SIPMessage:setCallId():callId="+callId.classname);
     if(typeof callId =="object")
     {
         this.setHeader(callId);
@@ -17214,41 +16222,33 @@ SIPMessage.prototype.setCallId =function(callId){
 }
 
 SIPMessage.prototype.getRecordRouteHeaders =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getRecordRouteHeaders()");
     return this.getSIPHeaderListLowerCase(this.RECORDROUTE_LOWERCASE);
 }
 
 SIPMessage.prototype.getTo =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getTo()");
     return this.toHeader;
 }
 
 SIPMessage.prototype.setTo =function(to){
-    if(logger!=undefined) logger.debug("SIPMessage:setTo():to:"+to.classname);
     this.setHeader(to);
 }
 
 SIPMessage.prototype.setFrom =function(from){
-    if(logger!=undefined) logger.debug("SIPMessage:setFrom():from:"+from.classname);
     this.setHeader(from);
 }
 SIPMessage.prototype.getContentLength =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getContentLength()");
     return this.contentLengthHeader;
 }
 
 SIPMessage.prototype.getMessageContent =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getMessageContent()");
     return this.messageContent;
 }
 
 SIPMessage.prototype.getRawContent =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getRawContent()");
     return this.messageContent;
 }
 
 SIPMessage.prototype.setMessageContent =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:setMessageContent()");
     if(arguments.length==1)
     {
         var content=arguments[0];
@@ -17285,7 +16285,6 @@ SIPMessage.prototype.setMessageContent =function(){
 }
 
 SIPMessage.prototype.setContent =function(content, contentTypeHeader){
-    if(logger!=undefined) logger.debug("SIPMessage:setContent():content,contentTypeHeader):"+content.classname+","+contentTypeHeader.classname);
     if (content == null)
     {
          console.error("MessageFactoryImpl:setContent(): null content !", 0);
@@ -17297,7 +16296,6 @@ SIPMessage.prototype.setContent =function(content, contentTypeHeader){
 }
 
 SIPMessage.prototype.getContent =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getContent()");
     if (this.messageContent != null)
     {
         return this.messageContent;
@@ -17309,7 +16307,6 @@ SIPMessage.prototype.getContent =function(){
 }
 
 SIPMessage.prototype.computeContentLength =function(content){
-    if(logger!=undefined) logger.debug("SIPMessage:computeContentLength():content="+content.length);
     var length = 0;
     if (content != null) {
         if (content instanceof String) {
@@ -17327,13 +16324,11 @@ SIPMessage.prototype.computeContentLength =function(content){
 }
 
 SIPMessage.prototype.removeContent =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:removeContent()");
     this.messageContent = null;
     this.contentLengthHeader.setContentLength(0);
 }
 
 SIPMessage.prototype.getHeaderAsFormattedString =function(name){
-    if(logger!=undefined) logger.debug("SIPMessage:getHeaderAsFormattedString(): name="+name);
     var lowerCaseName = name.toLowerCase();
     var l = null;
     for(var i=0;i<this.nameTable.length;i++)
@@ -17354,7 +16349,6 @@ SIPMessage.prototype.getHeaderAsFormattedString =function(name){
 }
 
 SIPMessage.prototype.getSIPHeaderListLowerCase =function(lowerCaseHeaderName){
-    if(logger!=undefined) logger.debug("SIPMessage:getSIPHeaderListLowerCase():lowerCaseHeaderName="+lowerCaseHeaderName);
     var l = null;
     for(var i=0;i<this.nameTable.length;i++)
     {
@@ -17375,7 +16369,6 @@ SIPMessage.prototype.getSIPHeaderListLowerCase =function(lowerCaseHeaderName){
 }
 
 SIPMessage.prototype.getHeaderList =function(headerName){
-    if(logger!=undefined) logger.debug("SIPMessage:getHeaderList():headerName="+headerName);
     var l=null;
     for(var i=0;i<this.nameTable.length;i++)
     {
@@ -17402,7 +16395,6 @@ SIPMessage.prototype.getHeaderList =function(headerName){
 }
 
 SIPMessage.prototype.hasHeader =function(headerName){
-    if(logger!=undefined) logger.debug("SIPMessage:hasHeader():headerName="+headerName);
     var l=null;
     for(var i=0;i<this.nameTable.length;i++)
     {
@@ -17422,41 +16414,33 @@ SIPMessage.prototype.hasHeader =function(headerName){
 }
 
 SIPMessage.prototype.hasFromTag =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:hasFromTag()");
     return this.fromHeader != null && this.fromHeader.getTag() != null;
 }
 
 SIPMessage.prototype.hasToTag =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:hasToTag()");
     return this.toHeader != null && this.toHeader.getTag() != null;
 }
 
 SIPMessage.prototype.getFromTag =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getFromTag()");
     return this.fromHeader == null ? null : this.fromHeader.getTag();
 }
 
 SIPMessage.prototype.setFromTag =function(tag){
-    if(logger!=undefined) logger.debug("SIPMessage:setFromTag():tag="+tag);
     this.fromHeader.setTag(tag);
 }
 
 SIPMessage.prototype.setToTag =function(tag){
-    if(logger!=undefined) logger.debug("SIPMessage:setToTag():tag="+tag);
     this.toHeader.setTag(tag);
 }
 
 SIPMessage.prototype.getToTag =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getToTag()");
     return this.toHeader == null ? null : this.toHeader.getTag(); 
 }
 
 SIPMessage.prototype.getFirstLine =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getFirstLine()");
 
 }
 SIPMessage.prototype.addHeader =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:addHeader():arguments="+arguments);
     if(typeof arguments[0]!="object")
     {
         var sipHeader=arguments[0];
@@ -17493,17 +16477,14 @@ SIPMessage.prototype.addHeader =function(){
 }
 
 SIPMessage.prototype.addUnparsed =function(unparsed){
-    if(logger!=undefined) logger.debug("SIPMessage:addUnparsed():unparsed="+unparsed);
     this.unrecognizedHeaders.push(unparsed);
 }
 
 SIPMessage.prototype.getUnrecognizedHeaders =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getUnrecognizedHeaders()");
     return this.unrecognizedHeaders
 }
 
 SIPMessage.prototype.getHeaderNames =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getHeaderNames()");
     var retval=new Array();
     for(var i=0;i<this.headers.length;i++)
     {
@@ -17516,41 +16497,33 @@ SIPMessage.prototype.getHeaderNames =function(){
 
 
 SIPMessage.prototype.getContentDisposition =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getContentDisposition()");
     return this.getHeaderLowerCase(this.CONTENT_DISPOSITION_LOWERCASE)
 }
 
 SIPMessage.prototype.getExpires =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getExpires()");
     return this.getHeaderLowerCase(this.EXPIRES_LOWERCASE);
 }
 
 SIPMessage.prototype.setExpires =function(expiresHeader){
-    if(logger!=undefined) logger.debug("SIPMessage:setExpires():expiresHeader="+expiresHeader.classname);
     this.setHeader(expiresHeader);
 }
 
 SIPMessage.prototype.setContentDisposition =function(contentDispositionHeader){
-    if(logger!=undefined) logger.debug("SIPMessage:setContentDisposition():contentDispositionHeader="+contentDispositionHeader);
     this.setHeader(contentDispositionHeader);
 }
 
 SIPMessage.prototype.setContentLength =function(contentLength){
-    if(logger!=undefined) logger.debug("SIPMessage:setContentLength():contentLength="+contentLength);
     this.contentLengthHeader.setContentLength(contentLength.getContentLength());
 }
 
 SIPMessage.prototype.setSize =function(size){
-    if(logger!=undefined) logger.debug("SIPMessage:setSize():size="+size);
     this.size = size;
 }
 
 SIPMessage.prototype.getSize =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getSize()");
     return this.size;
 }
 SIPMessage.prototype.addLast =function(header){
-    if(logger!=undefined) logger.debug("SIPMessage:addLast(): header="+header.classname);
     if (header == null)
     {
         console.error("SIPMessage:addLast(): null header arg!");
@@ -17560,7 +16533,6 @@ SIPMessage.prototype.addLast =function(header){
 }
 
 SIPMessage.prototype.addFirst =function(header){
-    if(logger!=undefined) logger.debug("SIPMessage:addFirst():header="+header.classname);
     if (header == null)
     {
         console.error("SIPMessage:addFirst(): null header arg!");
@@ -17570,7 +16542,6 @@ SIPMessage.prototype.addFirst =function(header){
 }
 
 SIPMessage.prototype.removeFirst =function(headerName){
-    if(logger!=undefined) logger.debug("SIPMessage:removeFirst():headerName="+headerName);
     if (headerName == null)
     {
         console.error("SIPMessage:removeFirst(): null headerName arg!");
@@ -17580,7 +16551,6 @@ SIPMessage.prototype.removeFirst =function(headerName){
 }
 
 SIPMessage.prototype.removeLast =function(headerName){
-    if(logger!=undefined) logger.debug("SIPMessage:removeLast():headerName:"+headerName);
     if (headerName == null)
     {
         console.error("SIPMessage:removeLast(): null headerName arg!");
@@ -17590,22 +16560,18 @@ SIPMessage.prototype.removeLast =function(headerName){
 }
 
 SIPMessage.prototype.setCSeq =function(cseqHeader){
-    if(logger!=undefined) logger.debug("SIPMessage:setCSeq():cseqHeader="+cseqHeader.classname);
     this.setHeader(cseqHeader);
 }
 
 SIPMessage.prototype.setApplicationData =function(applicationData){
-    if(logger!=undefined) logger.debug("SIPMessage:setApplicationData():applicationData:"+applicationData.classname);
     this.applicationData = applicationData;
 }
 
 SIPMessage.prototype.getApplicationData =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getApplicationData()");
     return this.applicationData;
 }
 
 SIPMessage.prototype.getMultipartMimeContent =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getMultipartMimeContent()");
     var retval = new MultipartMimeContentImpl(this.getContentTypeHeader());
     var rawContent = this.getRawContent();
     var body = new String(rawContent);
@@ -17614,32 +16580,26 @@ SIPMessage.prototype.getMultipartMimeContent =function(){
 }
 
 SIPMessage.prototype.getCallIdHeader =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getCallIdHeader()");
     return this.callIdHeader;
 }
 
 SIPMessage.prototype.getFromHeader =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getFromHeader()");
     return this.fromHeader;
 }
 
 SIPMessage.prototype.getToHeader =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getToHeader()");
     return this.toHeader;
 }
 
 SIPMessage.prototype.getTopmostViaHeader =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getTopmostViaHeader()");
     return this.getTopmostVia();
 }
 
 SIPMessage.prototype.getCSeqHeader =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getCSeqHeader()");
     return this.cSeqHeader;
 }
 
 SIPMessage.prototype.getCharset =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getCharset()");
     var ct = this.getContentTypeHeader();
     if (ct!=null) {
         var c = ct.getCharset();
@@ -17651,29 +16611,23 @@ SIPMessage.prototype.getCharset =function(){
 }
 
 SIPMessage.prototype.isNullRequest =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:isNullRequest()");
     return  this.nullRequest;
 }
 
 SIPMessage.prototype.setNullRequest =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:()");
     this.nullRequest = true;
 }
 
 SIPMessage.prototype.setSIPVersion =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:setSIPVersion()");
 }
 
 SIPMessage.prototype.getSIPVersion =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getSIPVersion()");
 }
 
 SIPMessage.prototype.toString =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:toString()");
 }
 
 SIPMessage.prototype.getBytes =function(str){
-    if(logger!=undefined) logger.debug("SIPMessage:getBytes():str="+str);
     var array=new Array();
     str=new String(str);
     for(var i=0;i<str.length;i++)
@@ -17684,17 +16638,14 @@ SIPMessage.prototype.getBytes =function(str){
 }
 
 SIPMessage.prototype.getStackTransaction =function(){
-    if(logger!=undefined) logger.debug("SIPMessage:getStackTransaction()");
     return this.stackTransaction;
 }
 
 SIPMessage.prototype.setStackTransaction =function(transaction){
-    if(logger!=undefined) logger.debug("SIPMessage:setStackTransaction():transaction="+transaction);
     this.stackTransaction = transaction;
 }
 
 SIPMessage.prototype.addViaHeaderList =function(viaheader){
-    if(logger!=undefined) logger.debug("SIPMessage:addViaHeaderList():viaheader="+viaheader);
     var hn=new Array();
     var n=0;
     for(var i=0;i<this.headers.length;i++)
@@ -17756,7 +16707,6 @@ SIPMessage.prototype.addViaHeaderList =function(viaheader){
  *   
  */
 function MessageFactoryImpl() {
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:MessageFactoryImpl()");
     this.classname="MessageFactoryImpl";
     this.testing = false;
     this.strict  = true;
@@ -17773,17 +16723,14 @@ function MessageFactoryImpl() {
 MessageFactoryImpl.prototype.CONTENTTYPEHEADER="Content-Type";
 
 MessageFactoryImpl.prototype.setStrict =function(){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:setStrict()");
     
 }
 
 MessageFactoryImpl.prototype.setTest =function(){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:setTest()");
     
 }
 
 MessageFactoryImpl.prototype.createRequest =function(){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequest()");
     if(arguments.length==1)
     {
         var requestString = arguments[0];
@@ -17850,16 +16797,6 @@ MessageFactoryImpl.prototype.createRequest =function(){
 
 
 MessageFactoryImpl.prototype.createRequestPrototype1 =function(requestURI,method,callId,cSeq,from,to,via,maxForwards,contentType,content){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():requestURI="+requestURI);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():method="+method);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():callId="+callId);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():cSeq="+cSeq);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():from="+from);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():to="+to);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():via="+via);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():maxForwards="+maxForwards);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():contentType="+contentType);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():content="+content);
     
     if (requestURI == null || method == null || callId == null
         || cSeq == null || from == null || to == null || via == null
@@ -17888,16 +16825,6 @@ MessageFactoryImpl.prototype.createRequestPrototype1 =function(requestURI,method
 
 
 MessageFactoryImpl.prototype.createRequestPrototype2 =function(requestURI,method,callId,cSeq,from,to,via,maxForwards,content,contentType){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():requestURI="+requestURI);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():method="+method);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():callId="+callId);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():cSeq="+cSeq);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():from="+from);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():to="+to);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():via="+via);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():maxForwards="+maxForwards);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():contentType="+contentType);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():content="+content);
     
     if (requestURI == null || method == null || callId == null
         || cSeq == null || from == null || to == null || via == null
@@ -17926,14 +16853,6 @@ MessageFactoryImpl.prototype.createRequestPrototype2 =function(requestURI,method
 }
 
 MessageFactoryImpl.prototype.createRequestPrototype3 =function(requestURI,method,callId,cSeq,from,to,via,maxForwards){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():requestURI="+requestURI);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():method="+method);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():callId="+callId);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():cSeq="+cSeq);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():from="+from);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():to="+to);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():via="+via);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():maxForwards="+maxForwards);
     
     if (requestURI == null || method == null || callId == null
         || cSeq == null || from == null || to == null || via == null
@@ -17958,16 +16877,6 @@ MessageFactoryImpl.prototype.createRequestPrototype3 =function(requestURI,method
 }
 
 MessageFactoryImpl.prototype.createRequestPrototype4 =function(requestURI,method,callId,cSeq,from,to,via,maxForwards,contentType,content){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():requestURI="+requestURI);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():method="+method);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():callId="+callId);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():cSeq="+cSeq);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():from="+from);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():to="+to);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():via="+via);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():maxForwards="+maxForwards);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():contentType="+contentType);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():content="+content);
     
     if (requestURI == null || method == null || callId == null
         || cSeq == null || from == null || to == null || via == null
@@ -17996,7 +16905,6 @@ MessageFactoryImpl.prototype.createRequestPrototype4 =function(requestURI,method
 
 
 MessageFactoryImpl.prototype.createRequestPrototype5 =function(requestString){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype5():requestString="+requestString);
     if (requestString == null || requestString.equals("")) {
         var retval = new SIPRequest();
         retval.setNullRequest();
@@ -18015,7 +16923,6 @@ MessageFactoryImpl.prototype.createRequestPrototype5 =function(requestString){
 
 
 MessageFactoryImpl.prototype.createResponse =function(){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createResponse()");
     if(arguments.length==1)
     {
         var responseString=arguments[0];
@@ -18121,15 +17028,6 @@ MessageFactoryImpl.prototype.createResponse =function(){
 }
 
 MessageFactoryImpl.prototype.createReponsePrototype1 =function(statusCode, callId, cSeq, from, to, via, maxForwards, content, contentType){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype1():statusCode="+statusCode);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype1():callId="+callId);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype1():cSeq="+cSeq);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype1():from="+from);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype1():to="+to);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype1():via="+via);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype1():maxForwards="+maxForwards);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype1():contentType="+contentType);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype1():content="+content);
     
     if (callId == null || cSeq == null || from == null || to == null
         || via == null || maxForwards == null || content == null
@@ -18161,15 +17059,6 @@ MessageFactoryImpl.prototype.createReponsePrototype1 =function(statusCode, callI
 }
 
 MessageFactoryImpl.prototype.createReponsePrototype2 =function(statusCode, callId, cSeq, from, to, via, maxForwards, content, contentType){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype2():statusCode="+statusCode);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype2():callId="+callId);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype2():cSeq="+cSeq);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype2():from="+from);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype2():to="+to);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype2():via="+via);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype2():maxForwards="+maxForwards);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype2():contentType="+contentType);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype2():content="+content);
     if (callId == null || cSeq == null || from == null || to == null
         || via == null || maxForwards == null || content == null
         || contentType == null)
@@ -18195,13 +17084,6 @@ MessageFactoryImpl.prototype.createReponsePrototype2 =function(statusCode, callI
 }
 
 MessageFactoryImpl.prototype.createReponsePrototype3 =function(statusCode,callId,cSeq,from,to,via,maxForwards){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype3():statusCode="+statusCode);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype3():callId="+callId);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype3():cSeq="+cSeq);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype3():from="+from);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype3():to="+to);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype3():via="+via);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype3():maxForwards="+maxForwards);
     if (callId == null || cSeq == null || from == null || to == null
         || via == null || maxForwards == null)
         {
@@ -18224,10 +17106,6 @@ MessageFactoryImpl.prototype.createReponsePrototype3 =function(statusCode,callId
 
 
 MessageFactoryImpl.prototype.createReponsePrototype4 =function(statusCode,request,contentType,content){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype4():statusCode="+statusCode);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype4():request="+request);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype4():contentType="+contentType);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype4():content="+content);
     if (request == null || content == null || contentType == null)
     {
         console.error("MessageFactoryImpl:createReponsePrototype4(): some parameters are missing, unable to create the response");
@@ -18244,10 +17122,6 @@ MessageFactoryImpl.prototype.createReponsePrototype4 =function(statusCode,reques
 
 
 MessageFactoryImpl.prototype.createReponsePrototype5 =function(statusCode,request,contentType,content){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype5():statusCode="+statusCode);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype5():request="+request);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype5():contentType="+contentType);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype5():content="+content);
     if (request == null || content == null || contentType == null)
     {
         console.error("MessageFactoryImpl:createReponsePrototype5(): some parameters are missing, unable to create the response");
@@ -18265,8 +17139,6 @@ MessageFactoryImpl.prototype.createReponsePrototype5 =function(statusCode,reques
 
 
 MessageFactoryImpl.prototype.createReponsePrototype6 =function(statusCode,request){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype6():statusCode="+statusCode);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype6():request="+request);
     if (request == null || content == null || contentType == null)
     {
         console.error("MessageFactoryImpl:createReponsePrototype6(): some parameters are missing, unable to create the response");
@@ -18284,15 +17156,6 @@ MessageFactoryImpl.prototype.createReponsePrototype6 =function(statusCode,reques
 
 
 MessageFactoryImpl.prototype.createReponsePrototype7 =function(statusCode, callId, cSeq, from, to, via, maxForwards, contentType, content){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype7():statusCode="+statusCode);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype7():callId="+callId);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype7():cSeq="+cSeq);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype7():from="+from);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype7():to="+to);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype7():via="+via);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype7():maxForwards="+maxForwards);
-     if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype7():contentType="+contentType);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype7():content="+content);
     if (callId == null || cSeq == null || from == null || to == null
         || via == null || maxForwards == null || content == null
         || contentType == null)
@@ -18325,15 +17188,6 @@ MessageFactoryImpl.prototype.createReponsePrototype7 =function(statusCode, callI
 
 
 MessageFactoryImpl.prototype.createReponsePrototype8 =function(statusCode, callId, cSeq, from, to, via, maxForwards, contentType, content){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype8():statusCode="+statusCode);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype8():callId="+callId);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype8():cSeq="+cSeq);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype8():from="+from);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype8():to="+to);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype8():via="+via);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype8():maxForwards="+maxForwards);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype8():contentType="+contentType);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype8():content="+content);
 
     if (callId == null || cSeq == null || from == null || to == null
         || via == null || maxForwards == null || content == null
@@ -18366,7 +17220,6 @@ MessageFactoryImpl.prototype.createReponsePrototype8 =function(statusCode, callI
 }
 
 MessageFactoryImpl.prototype.createReponsePrototype9 =function(responseString){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype9():responseString="+responseString);
     if (responseString == null)
     {
         return new SIPResponse();
@@ -18382,27 +17235,22 @@ MessageFactoryImpl.prototype.createReponsePrototype9 =function(responseString){
 }
 
 MessageFactoryImpl.prototype.setDefaultUserAgentHeader =function(userAgent){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:setDefaultUserAgentHeader():userAgent="+userAgent);
     this.userAgent = userAgent;
 }
 
 MessageFactoryImpl.prototype.setDefaultServerHeader =function(server){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:setDefaultServerHeader():server="+server);
     this.server = server;
 }
 
 MessageFactoryImpl.prototype.getDefaultUserAgentHeader =function(){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:getDefaultUserAgentHeader()");
     return this.userAgent;
 }
 
 MessageFactoryImpl.prototype.getDefaultServerHeader =function(){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:getDefaultServerHeader()");
     return this.server;
 }
 
 MessageFactoryImpl.prototype.setDefaultContentEncodingCharset =function(charset){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:setDefaultContentEncodingCharset():charset:"+charset);
     if (charset == null ) {
         throw new NullPointerException ("Null argument!");
     }
@@ -18410,13 +17258,11 @@ MessageFactoryImpl.prototype.setDefaultContentEncodingCharset =function(charset)
 }
 
 MessageFactoryImpl.prototype.getDefaultContentEncodingCharset =function(){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:getDefaultContentEncodingCharset()");
     return this.defaultContentEncodingCharset;
 }
 
 MessageFactoryImpl.prototype.createMultipartMimeContent =function(multipartMimeCth,contentType,
     contentSubtype,contentBody){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createMultipartMimeContent()");
     var boundary = multipartMimeCth.getParameter("boundary");
     var retval = new MultipartMimeContentImpl(multipartMimeCth);
     for (var i = 0 ;  i < contentType.length; i++ ) {
@@ -18429,7 +17275,6 @@ MessageFactoryImpl.prototype.createMultipartMimeContent =function(multipartMimeC
 }
 
 MessageFactoryImpl.prototype.getBytes =function(str){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:getBytes():str="+str);
     var array=new Array();
     str=new String(str);
     for(var i=0;i<str.length;i++)
@@ -18440,13 +17285,11 @@ MessageFactoryImpl.prototype.getBytes =function(str){
 }
 
 MessageFactoryImpl.prototype.addHeader =function(sipmessage,header){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:addHeader():sipmessage="+sipmessage+",header="+header);
     sipmessage.addHeader(header);
     return sipmessage;
 }
 
 MessageFactoryImpl.prototype.setNewViaHeader =function(sipmessage){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:setNewViaHeader():sipmessage="+sipmessage);
     this.viaheader=this.listeningpoint.getViaHeader();
     if(sipmessage instanceof SIPRequest)
     {
@@ -18514,7 +17357,6 @@ MessageFactoryImpl.prototype.setNewViaHeader =function(sipmessage){
  *   
  */
 function SIPRequest() {
-    if(logger!=undefined) logger.debug("SIPRequest:SIPRequest()");
     this.classname="SIPRequest";
     this.serialVersionUID = "3360720013577322927L";
     this.transactionPointer=null;
@@ -18581,7 +17423,6 @@ SIPRequest.prototype.COLON=":";
 //SIPRequest.prototype.UPDATE="UPDATE";
 
 SIPRequest.prototype.putName =function(name){
-    if(logger!=undefined) logger.debug("SIPRequest:putName():name="+name);
     var array=new Array();
     array[0]=name;
     array[1]=name;
@@ -18589,7 +17430,6 @@ SIPRequest.prototype.putName =function(name){
 }
 
 SIPRequest.prototype.isTargetRefresh =function(ucaseMethod){
-    if(logger!=undefined) logger.debug("SIPRequest:isTargetRefresh():ucaseMethod="+ucaseMethod);
     var x=null;
     for(var i=0;i<this.targetRefreshMethods;i++)
     {
@@ -18609,13 +17449,11 @@ SIPRequest.prototype.isTargetRefresh =function(ucaseMethod){
 }
 
 SIPRequest.prototype.isDialogCreating =function(ucaseMethod){
-    if(logger!=undefined) logger.debug("SIPRequest:isDialogCreating():ucaseMethod:"+ucaseMethod);
     var siptranstack=new SIPTransactionStack();
     return siptranstack.isDialogCreated(ucaseMethod);
 }
 
 SIPRequest.prototype.getCannonicalName =function(method){
-    if(logger!=undefined) logger.debug("SIPRequest:getCannonicalName():method:"+method);
     var x=null;
     for(var i=0;i<this.nameTable;i++)
     {
@@ -18635,17 +17473,14 @@ SIPRequest.prototype.getCannonicalName =function(method){
 }
 
 SIPRequest.prototype.getRequestLine =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:getRequestLine()");
     return this.requestLine;
 }
 
 SIPRequest.prototype.setRequestLine =function(requestLine){
-    if(logger!=undefined) logger.debug("SIPRequest:setRequestLine():requestLine="+requestLine.classname);
     this.requestLine = requestLine;
 }
 
 SIPRequest.prototype.checkHeaders =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:checkHeaders()");
     var prefix = "Missing a required header : ";
 
     if (this.getCSeq() == null) {
@@ -18734,7 +17569,6 @@ SIPRequest.prototype.checkHeaders =function(){
 
 
 SIPRequest.prototype.setDefaults =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:setDefaults()");
     if (this.requestLine == null)
     {
         return;
@@ -18759,7 +17593,6 @@ SIPRequest.prototype.setDefaults =function(){
 }
 
 SIPRequest.prototype.setRequestLineDefaults =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:setRequestLineDefaults()");
     var method = this.requestLine.getMethod();
     if (method == null) {
         var cseq =  this.getCSeq();
@@ -18771,7 +17604,6 @@ SIPRequest.prototype.setRequestLineDefaults =function(){
 }
 
 SIPRequest.prototype.getRequestURI =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:getRequestURI()");
     if (this.requestLine == null)
     {
         return null;
@@ -18783,7 +17615,6 @@ SIPRequest.prototype.getRequestURI =function(){
 }
 
 SIPRequest.prototype.setRequestURI =function(uri){
-    if(logger!=undefined) logger.debug("SIPRequest:setRequestURI():uri="+uri.encode());
     if ( uri == null ) {
         console.error("SIPRequest:setRequestURI(): null request URI");
         throw "SIPRequest:setRequestURI(): null request URI";
@@ -18796,7 +17627,6 @@ SIPRequest.prototype.setRequestURI =function(uri){
 }
 
 SIPRequest.prototype.setMethod =function(method){
-    if(logger!=undefined) logger.debug("SIPRequest:setMethod():method="+method);
     if (method == null)
     {
         console.error("SIPRequest:setMethod(): null method");
@@ -18814,7 +17644,6 @@ SIPRequest.prototype.setMethod =function(method){
 }
 
 SIPRequest.prototype.getMethod =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:getMethod()");
     if (this.requestLine == null)
     {
         return null;
@@ -18826,7 +17655,6 @@ SIPRequest.prototype.getMethod =function(){
 }
 
 SIPRequest.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:encode()");
     var retval=null;
     if (this.requestLine != null) {
         this.setRequestLineDefaults();
@@ -18840,7 +17668,6 @@ SIPRequest.prototype.encode =function(){
 }
 
 SIPRequest.prototype.encodeMessage =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:encodeMessage()");
     var retval;
     if (this.requestLine != null) 
     {
@@ -18859,12 +17686,10 @@ SIPRequest.prototype.encodeMessage =function(){
 }
 
 SIPRequest.prototype.toString =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:toString()");
     return this.encode();
 }
 
 SIPRequest.prototype.superencode =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:superencode()");
     var encoding = "";
     for(var i=0;i<this.headers.length;i++)
     {
@@ -18904,7 +17729,6 @@ SIPRequest.prototype.superencode =function(){
 }
 
 SIPRequest.prototype.getMessageAsEncodedStrings =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:getMessageAsEncodedStrings()");
     var retval = Object.getPrototypeOf(this).getMessageAsEncodedStrings();
     if (this.requestLine != null) {
         this.setRequestLineDefaults();
@@ -18914,7 +17738,6 @@ SIPRequest.prototype.getMessageAsEncodedStrings =function(){
 }
 
 SIPRequest.prototype.getDialogId =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:getDialogId()");
     if(arguments.length==1)
     {
         var isServer=arguments[0];
@@ -18929,7 +17752,6 @@ SIPRequest.prototype.getDialogId =function(){
 }
 
 SIPRequest.prototype.getDialogIdargu1 =function(isServer){
-    if(logger!=undefined) logger.debug("SIPRequest:getDialogId():isServer="+isServer);
     var cid = this.getCallId();
     var retval = cid.getCallId();
     var from = this.getFrom();
@@ -18954,7 +17776,6 @@ SIPRequest.prototype.getDialogIdargu1 =function(isServer){
 }
 
 SIPRequest.prototype.getDialogIdargu2 =function(isServer, toTag){
-    if(logger!=undefined) logger.debug("SIPRequest:getDialogIdargu2():isServer="+isServer+", toTag="+toTag);
     var from =  this.getFrom();
     var cid =  this.getCallId();
     var retval = cid.getCallId();
@@ -18977,7 +17798,6 @@ SIPRequest.prototype.getDialogIdargu2 =function(isServer, toTag){
 }
 
 SIPRequest.prototype.createResponse =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:createResponse()");
     if(arguments.length==1)
     {
         var statusCode=arguments[0];
@@ -19000,14 +17820,12 @@ SIPRequest.prototype.createResponse =function(){
 }
 
 SIPRequest.prototype.createResponseargu1 =function(statusCode){
-    if(logger!=undefined) logger.debug("SIPRequest:createResponseargu1():statusCode="+statusCode);
     var sipresponse=new SIPResponse();
     var reasonPhrase = sipresponse.getReasonPhrase(statusCode);
     return this.createResponseargu2(statusCode, reasonPhrase);
 }
 
 SIPRequest.prototype.createResponseargu2 =function(statusCode,reasonPhrase){
-    if(logger!=undefined) logger.debug("SIPRequest:createResponseargu2():statusCode="+statusCode+", reasonPhrase"+reasonPhrase);
     var newResponse= new SIPResponse();
     var headerIterator=null;
     var nextHeader=null;
@@ -19078,13 +17896,11 @@ SIPRequest.prototype.createResponseargu2 =function(statusCode,reasonPhrase){
 }
 
 SIPRequest.prototype.createResponseargu3 =function(response,requestsent){
-    if(logger!=undefined) logger.debug("SIPRequest:createResponseargu3():response="+response+", requestsent=" +requestsent);
     response.addContactUseragent(requestsent);
     return response;
 }
 
 SIPRequest.prototype.mustCopyRR =function(code){
-    if(logger!=undefined) logger.debug("SIPRequest:mustCopyRR():code="+code);
     if ( code>100 && code<300 ) {
         return this.isDialogCreating( this.getMethod() ) && this.getToTag() == null;
     } 
@@ -19094,7 +17910,6 @@ SIPRequest.prototype.mustCopyRR =function(code){
 }
 
 SIPRequest.prototype.createCancelRequest =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:createCancelRequest()");
     if (this.getMethod()!=this.INVITE)
     {
         console.error("SIPRequest:createCancelRequest(): Attempt to create CANCEL for " + this.getMethod());
@@ -19133,7 +17948,6 @@ SIPRequest.prototype.createAckRequest =function()
     }
 }
 SIPRequest.prototype.createAckRequest_argu1 =function(responseToHeader){
-    if(logger!=undefined) logger.debug("SIPRequest:createAckRequest_argu1():responseToHeader="+responseToHeader.classname);
     var newRequest = new SIPRequest();
     var nextHeader =null;
     newRequest.setRequestLine(this.requestLine);
@@ -19182,7 +17996,6 @@ SIPRequest.prototype.createAckRequest_argu1 =function(responseToHeader){
     return newRequest;
 }
 SIPRequest.prototype.createErrorAck =function(responseToHeader){
-    if(logger!=undefined) logger.debug("SIPRequest:createErrorAck():responseToHeader="+responseToHeader.classname);
     var newRequest = new SIPRequest();
     var newrequestline=new RequestLine();
     newrequestline.setMethod(this.ACK);
@@ -19208,7 +18021,6 @@ SIPRequest.prototype.createErrorAck =function(responseToHeader){
     return newRequest;
 }
 SIPRequest.prototype.createSIPRequest =function(requestLine, switchHeaders){
-    if(logger!=undefined) logger.debug("SIPRequest:createSIPRequest():requestLine="+requestLine.classname+", switchHeaders="+switchHeaders);
     var newRequest = new SIPRequest();
     newRequest.requestLine = requestLine;
     var headerIterator = this.getHeaders();
@@ -19264,27 +18076,23 @@ SIPRequest.prototype.createSIPRequest =function(requestLine, switchHeaders){
 
 
 SIPRequest.prototype.createBYERequest =function(switchHeaders){
-    if(logger!=undefined) logger.debug("SIPRequest:createBYERequest():switchHeaders="+switchHeaders);
     var requestLine =  this.requestLine;
     this.requestLine.setMethod("BYE");
     return this.createSIPRequest(requestLine, switchHeaders);
 }
 
 SIPRequest.prototype.createACKRequest_argu0 =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:createACKRequest_argu0()");
     var requestLine =  this.requestLine;
     this.requestLine.setMethod(this.ACK);
     return this.createSIPRequest(requestLine, false);
 }
 
 SIPRequest.prototype.getViaHost =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:getViaHost()");
     var via = this.getViaHeaders().getFirst();
     return via.getHost();
 }
 
 SIPRequest.prototype.getViaPort =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:getViaPort()");
     var via = this.getViaHeaders().getFirst();
     if (via.hasPort())
     {
@@ -19297,7 +18105,6 @@ SIPRequest.prototype.getViaPort =function(){
 }
 
 SIPRequest.prototype.getFirstLine =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:getFirstLine()");
     if (this.requestLine == null)
     {
         return null;
@@ -19309,7 +18116,6 @@ SIPRequest.prototype.getFirstLine =function(){
 }
 
 SIPRequest.prototype.setSIPVersion =function(sipVersion){
-    if(logger!=undefined) logger.debug("SIPRequest:setSIPVersion():sipVersion="+sipVersion);
     if (sipVersion == null || (sipVersion.toLowerCase()!=("SIP/2.0").toLowerCase()))
     {
         console.error("SIPRequest:setSIPVersion(): bad sipVersion", 0);
@@ -19319,32 +18125,26 @@ SIPRequest.prototype.setSIPVersion =function(sipVersion){
 }
 
 SIPRequest.prototype.getSIPVersion =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:getSIPVersion()");
     return this.requestLine.getSipVersion();
 }
 
 SIPRequest.prototype.getTransaction =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:getTransaction()");
     return this.transactionPointer;
 }
 
 SIPRequest.prototype.setTransaction =function(transaction){
-    if(logger!=undefined) logger.debug("SIPRequest:setTransaction():transaction:"+transaction);
     this.transactionPointer = transaction;
 }
 
 SIPRequest.prototype.getMessageChannel =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:getMessageChannel()");
     return this.messageChannel;
 }
 
 SIPRequest.prototype.setMessageChannel =function(messageChannel){
-    if(logger!=undefined) logger.debug("SIPRequest:setMessageChannel():messageChannel:"+messageChannel.classname);
     this.messageChannel=messageChannel;
 }
 
 SIPRequest.prototype.getMergeId =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:getMergeId()");
     /*
          * generate an identifier from the From tag, call-ID, and CSeq
          */
@@ -19368,17 +18168,14 @@ SIPRequest.prototype.getMergeId =function(){
 }
 
 SIPRequest.prototype.setInviteTransaction =function(inviteTransaction){
-    if(logger!=undefined) logger.debug("SIPRequest:setInviteTransaction():inviteTransaction="+inviteTransaction.classname);
     this.inviteTransaction=inviteTransaction;
 }
 
 SIPRequest.prototype.getInviteTransaction =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:getInviteTransaction()");
     return this.inviteTransaction;
 }
 
 SIPRequest.prototype.fortest =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:fortest()");
     var retval = this.requestLine.encode();
     for(var i=0;i<this.headers.length;i++)
     {
@@ -19423,7 +18220,6 @@ SIPRequest.prototype.fortest =function(){
  *   
  */
 function SIPResponse() {
-    if(logger!=undefined) logger.debug("SIPResponse:SIPResponse()");
     this.classname="SIPResponse";
     this.statusLine=new StatusLine();
     this.nameTable = new Array();
@@ -19511,7 +18307,6 @@ SIPResponse.prototype.getReasonPhrase=function()
 }
 
 SIPResponse.prototype.getReasonPhrase_argu1 =function(rc){
-    if(logger!=undefined) logger.debug("SIPResponse:getReasonPhrase_argu1():rc="+rc);
     var retval = null;
     switch (rc) {
         case this.TRYING :
@@ -19735,7 +18530,6 @@ SIPResponse.prototype.getReasonPhrase_argu1 =function(rc){
 }
 
 SIPResponse.prototype.setStatusCode =function(statusCode){
-    if(logger!=undefined) logger.debug("SIPResponse:setStatusCode():statusCode="+statusCode);
     if (statusCode < 100 || statusCode > 699)
     {
         console.error("SIPResponse:setStatusCode(): bad status code");
@@ -19749,17 +18543,14 @@ SIPResponse.prototype.setStatusCode =function(statusCode){
 }
 
 SIPResponse.prototype.getStatusLine =function(){
-    if(logger!=undefined) logger.debug("SIPResponse:getStatusLine()");
     return this.statusLine;
 }
 
 SIPResponse.prototype.getStatusCode =function(){
-    if(logger!=undefined) logger.debug("SIPResponse:getStatusCode()");
     return this.statusLine.getStatusCode();
 }
 
 SIPResponse.prototype.setReasonPhrase =function(reasonPhrase){
-    if(logger!=undefined) logger.debug("SIPResponse:setReasonPhrase():reasonPhrase="+reasonPhrase);
     if (reasonPhrase == null)
     {
         console.error("SIPResponse:setReasonPhrase(): bad reason phrase");
@@ -19773,7 +18564,6 @@ SIPResponse.prototype.setReasonPhrase =function(reasonPhrase){
 }
 
 SIPResponse.prototype.getReasonPhrase_argu0 =function(){
-    if(logger!=undefined) logger.debug("SIPResponse:getReasonPhrase_argu0()");
     if (this.statusLine == null || this.statusLine.getReasonPhrase() == null)
     {
         return "";
@@ -19785,7 +18575,6 @@ SIPResponse.prototype.getReasonPhrase_argu0 =function(){
 }
 
 SIPResponse.prototype.isFinalResponse =function(rc){
-    if(logger!=undefined) logger.debug("SIPResponse:isFinalResponse():rc="+rc);
     if(rc==null)
     {
         rc=this.statusLine.getStatusCode();
@@ -19801,12 +18590,10 @@ SIPResponse.prototype.isFinalResponse =function(rc){
 }
 
 SIPResponse.prototype.setStatusLine =function(sl){
-    if(logger!=undefined) logger.debug("SIPResponse:setStatusLine():sl="+sl.classname);
     this.statusLine = sl;
 }
 
 SIPResponse.prototype.checkHeaders =function(){
-    if(logger!=undefined) logger.debug("SIPResponse:checkHeaders()");
     
     if (this.getCSeq() == null) {
         console.error("SIPResponse:checkHeaders(): "+ this.CSeq+ " is missing ", 0);
@@ -19835,7 +18622,6 @@ SIPResponse.prototype.checkHeaders =function(){
 }
 
 SIPResponse.prototype.encode =function(){
-    if(logger!=undefined) logger.debug("SIPResponse:encode()");
     var retval;
     if (this.statusLine != null)
     {
@@ -19849,7 +18635,6 @@ SIPResponse.prototype.encode =function(){
 }
 
 SIPResponse.prototype.encodeMessage =function(){
-    if(logger!=undefined) logger.debug("SIPResponse:encodeMessage()");
     var retval;
     if (this.statusLine != null)
     {
@@ -19863,7 +18648,6 @@ SIPResponse.prototype.encodeMessage =function(){
 }
 
 SIPResponse.prototype.superencode =function(){
-    if(logger!=undefined) logger.debug("SIPRequest:superencode()");
     var encoding = "";
     for(var i=0;i<this.headers.length;i++)
     {
@@ -19903,7 +18687,6 @@ SIPResponse.prototype.superencode =function(){
 }
 
 SIPResponse.prototype.getMessageAsEncodedStrings =function(){
-    if(logger!=undefined) logger.debug("SIPResponse:getMessageAsEncodedStrings()");
     var retval = Object.getPrototypeOf(this).getMessageAsEncodedStrings();
     if (this.statusLine != null)
     {
@@ -19919,7 +18702,6 @@ SIPResponse.prototype.getMessageAsEncodedStrings =function(){
 }
 
 SIPResponse.prototype.encodeAsBytes =function(transport){
-    if(logger!=undefined) logger.debug("SIPResponse:encodeAsBytes():transport="+transport);
     var slbytes = new Array();
     if (this.statusLine != null) {
         slbytes = this.getBytes(this.statusLine.encode());
@@ -19931,7 +18713,6 @@ SIPResponse.prototype.encodeAsBytes =function(transport){
 }
 
 SIPResponse.prototype.getDialogId =function(){
-    if(logger!=undefined) logger.debug("SIPResponse:getDialogId()");
     if(arguments.length==1)
     {
         var isServer = arguments[0];
@@ -19945,7 +18726,6 @@ SIPResponse.prototype.getDialogId =function(){
     }
 }
 SIPResponse.prototype.getDialogIdargu1 =function(isServer){
-    if(logger!=undefined) logger.debug("SIPResponse:getDialogIdargu1():isServer="+isServer);
     var cid = this.getCallId();
     var retval = cid.getCallId();
     var from = this.getFrom();
@@ -19969,7 +18749,6 @@ SIPResponse.prototype.getDialogIdargu1 =function(isServer){
 }
 
 SIPResponse.prototype.getDialogIdargu2 =function(isServer, toTag){
-    if(logger!=undefined) logger.debug("SIPResponse:getDialogIdargu2():isServer="+isServer+", toTag="+toTag);
     var from =  this.getFrom();
     var cid =  this.getCallId();
     var retval = cid.getCallId();
@@ -19992,7 +18771,6 @@ SIPResponse.prototype.getDialogIdargu2 =function(isServer, toTag){
 }
 
 SIPResponse.prototype.setBranch =function(via, method){
-    if(logger!=undefined) logger.debug("SIPResponse:setBranch():via="+via.classname+", method="+method);
     var branch;
     if (method==this.ACK) {
         if (this.statusLine.getStatusCode() >= 300 ) {
@@ -20013,7 +18791,6 @@ SIPResponse.prototype.setBranch =function(via, method){
 }
 
 SIPResponse.prototype.getFirstLine =function(){
-    if(logger!=undefined) logger.debug("SIPResponse:getFirstLine()");
     if (this.statusLine == null)
     {
         return null;
@@ -20025,17 +18802,14 @@ SIPResponse.prototype.getFirstLine =function(){
 }
 
 SIPResponse.prototype.setSIPVersion =function(sipVersion){
-    if(logger!=undefined) logger.debug("SIPResponse:setSIPVersion():sipVersion="+sipVersion);
     this.statusLine.setSipVersion(sipVersion);
 }
 
 SIPResponse.prototype.getSIPVersion =function(){
-    if(logger!=undefined) logger.debug("SIPResponse:getSIPVersion()");
     return this.statusLine.getSipVersion();
 }
 
 SIPResponse.prototype.toString =function(){
-    if(logger!=undefined) logger.debug("SIPResponse:toString()");
     if (this.statusLine == null) {
         return  "";
     }
@@ -20045,11 +18819,6 @@ SIPResponse.prototype.toString =function(){
 }
 
 SIPResponse.prototype.createRequest =function(requestURI, via, cseq, from, to){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():requestURI="+requestURI);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():from="+from);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():to="+to);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():via="+via);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():cseq="+cseq);
     var newRequest = new SIPRequest();
     var method = cseq.getMethod();
     var callid=this.getCallId();
@@ -20100,7 +18869,6 @@ SIPResponse.prototype.createRequest =function(requestURI, via, cseq, from, to){
 }
 
 SIPResponse.prototype.getBytes =function(str){
-    if(logger!=undefined) logger.debug("SIPResponse:getBytes():str="+str);
     var array=new Array();
     str=new String(str);
     for(var i=0;i<str.length;i++)
@@ -20111,7 +18879,6 @@ SIPResponse.prototype.getBytes =function(str){
 }
 
 SIPResponse.prototype.addContactUseragent =function(requestsent){
-    if(logger!=undefined) logger.debug("SIPResponse:addContactUseragent():requestsent:"+requestsent);
     var contact=requestsent.getContactHeader();
     var useragent=requestsent.getHeader("User-Agent");
     this.addHeader(contact);
@@ -20119,7 +18886,6 @@ SIPResponse.prototype.addContactUseragent =function(requestsent){
 }
 
 SIPResponse.prototype.fortest =function(){
-    if(logger!=undefined) logger.debug("SIPResponse:fortest()");
     var retval = this.statusLine.encode();
     for(var i=0;i<this.headers.length;i++)
     {
@@ -20163,7 +18929,6 @@ SIPResponse.prototype.fortest =function(){
  *   
  */
 function HopImpl() {
-    if(logger!=undefined) logger.debug("HopImpl:HopImpl()");
     this.classname="HopImpl";
     this.host=null;
     this.port=null;
@@ -20174,7 +18939,6 @@ function HopImpl() {
     if(arguments.length==1)
     {
         var hop=arguments[0];
-        if(logger!=undefined) logger.debug("HopImpl:HopImpl(): hop="+hop);
         if (hop == null)
         {
             console.error("HopImpl:HopImpl(): null arg!");
@@ -20224,9 +18988,6 @@ function HopImpl() {
         var hostName = arguments[0];
         var portNumber = arguments[1];
         var trans = arguments[2];
-        if(logger!=undefined) logger.debug("HopImpl:HopImpl(): hostName="+hostName);
-        if(logger!=undefined) logger.debug("HopImpl:HopImpl(): portNumber="+portNumber);
-        if(logger!=undefined) logger.debug("HopImpl:HopImpl(): trans="+trans);
         this.host = hostName;
         if(this.host.indexOf(":") >= 0)
         {
@@ -20241,42 +19002,34 @@ function HopImpl() {
 }
 
 HopImpl.prototype.toString =function(){
-    if(logger!=undefined) logger.debug("HopImpl:toString()");
     return this.host + ":" +this.port + "/" + this.transport;
 }
 
 HopImpl.prototype.getHost =function(){
-    if(logger!=undefined) logger.debug("HopImpl:getHost()");
     return this.host;
 }
 
 HopImpl.prototype.getPort =function(){
-    if(logger!=undefined) logger.debug("HopImpl:getPort()");
     return this.port;
 }
 
 HopImpl.prototype.getTransport =function(){
-    if(logger!=undefined) logger.debug("HopImpl:getTransport()");
     return this.transport;
 }
 
 HopImpl.prototype.getURLWS =function(){
-    if(logger!=undefined) logger.debug("HopImpl:getURLWS()");
     return this.wsurl;
 }
 
 HopImpl.prototype.isURIRoute =function(){
-    if(logger!=undefined) logger.debug("HopImpl:isURIRoute()");
     return this.uriRoute;
 }
 
 HopImpl.prototype.setURIRouteFlag =function(){
-    if(logger!=undefined) logger.debug("HopImpl:setURIRouteFlag()");
     this.uriRoute=true;
 }
 
 HopImpl.prototype.setURLWS =function(wsurl){
-    if(logger!=undefined) logger.debug("HopImpl:setURLWS():wsurl="+wsurl);
     this.wsurl=wsurl;
 }
 /*
@@ -20310,7 +19063,6 @@ HopImpl.prototype.setURLWS =function(wsurl){
  *   
  */
 function SIPTransactionStack() {
-    if(logger!=undefined) logger.debug("SIPTransactionStack:SIPTransactionStack()");
     this.classname="SIPTransactionStack"; 
     
     this.messageProcessors=new Array();
@@ -20373,7 +19125,6 @@ SIPTransactionStack.prototype.TRYING=100;
 SIPTransactionStack.prototype.RINGING=180;
 
 SIPTransactionStack.prototype.reInit =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:reInit()");
     this.messageProcessors = new Array();
     this.pendingTransactions = new Array();
     this.clientTransactionTable = new Array();
@@ -20388,7 +19139,6 @@ SIPTransactionStack.prototype.reInit =function(){
 }
 
 SIPTransactionStack.prototype.addExtensionMethod =function(extensionMethod){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:addExtensionMethod():extensionMethod="+extensionMethod);
     if (extensionMethod!="NOTIFY") {
         var l=null;
         for(var i=0;i<this.dialogCreatingMethods.length;i++)
@@ -20406,7 +19156,6 @@ SIPTransactionStack.prototype.addExtensionMethod =function(extensionMethod){
 }
 
 SIPTransactionStack.prototype.removeDialog =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:removeDialog()");
     if(typeof arguments[0]=="objet")
     {
         var dialog=arguments[0];
@@ -20420,7 +19169,6 @@ SIPTransactionStack.prototype.removeDialog =function(){
 }
 
 SIPTransactionStack.prototype.removeDialogstring =function(dialogId){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:removeDialogstring():dialogId="+dialogId);
     var l=null;
     for(var i=0;i<this.dialogTable.length;i++)
     {
@@ -20436,7 +19184,6 @@ SIPTransactionStack.prototype.removeDialogstring =function(dialogId){
 }
 
 SIPTransactionStack.prototype.removeDialogobjet =function(dialog){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:removeDialogobjet():dialog="+dialog);
     var id = dialog.getDialogId();
     var earlyId = dialog.getEarlyDialogId();
     if (earlyId != null) {
@@ -20491,7 +19238,6 @@ SIPTransactionStack.prototype.removeDialogobjet =function(dialog){
 }
 
 SIPTransactionStack.prototype.findSubscribeTransaction =function(notifyMessage,listeningPoint){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:findSubscribeTransaction():notifyMessage="+notifyMessage+",listeningPoint="+listeningPoint);
     var retval = null;
     var thisToTag = notifyMessage.getTo().getTag();
     if (thisToTag == null) {
@@ -20524,7 +19270,6 @@ SIPTransactionStack.prototype.findSubscribeTransaction =function(notifyMessage,l
 }
 
 SIPTransactionStack.prototype.removeTransactionPendingAck =function(serverTransaction){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:removeTransactionPendingAck():serverTransaction="+serverTransaction);
     var branchId = serverTransaction.getRequest().getTopmostVia().getBranch();
     var l=null;
     for(var i=0;i<this.terminatedServerTransactionsPendingAck.length;i++)
@@ -20563,7 +19308,6 @@ SIPTransactionStack.prototype.removeTransactionPendingAck =function(serverTransa
 }
 
 SIPTransactionStack.prototype.removeTransactionHash =function(sipTransaction){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:removeTransactionHash():sipTransaction="+sipTransaction);
     var sipRequest = sipTransaction.getOriginalRequest();
     if (sipRequest == null) {
         return;
@@ -20595,7 +19339,6 @@ SIPTransactionStack.prototype.removeTransactionHash =function(sipTransaction){
 }
 
 SIPTransactionStack.prototype.removePendingTransaction =function(tr){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:removePendingTransaction():tr="+tr);
     var l=null;
     for(var i=0;i<this.pendingTransactions.length;i++)
     {
@@ -20611,7 +19354,6 @@ SIPTransactionStack.prototype.removePendingTransaction =function(tr){
 }
 
 SIPTransactionStack.prototype.isAlive =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:isAlive()");
     if(!this.toExit)
     {
         return true;
@@ -20623,12 +19365,10 @@ SIPTransactionStack.prototype.isAlive =function(){
 }
 
 SIPTransactionStack.prototype.getTimer =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getTimer()");
     return this.timer;
 }
 
 SIPTransactionStack.prototype.findCancelTransaction =function(cancelRequest,isServer){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:findCancelTransaction():cancelRequest="+cancelRequest+",isServer="+isServer);
     if (isServer) {
         for(var i=0;i<this.serverTransactionTable.length;i++)
         {
@@ -20653,7 +19393,6 @@ SIPTransactionStack.prototype.findCancelTransaction =function(cancelRequest,isSe
 }
 
 SIPTransactionStack.prototype.getDialog =function(dialogId){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getDialog():dialogId="+dialogId);
     var l=null;
     for(var i=0;i<this.dialogTable.length;i++)
     {
@@ -20674,7 +19413,6 @@ SIPTransactionStack.prototype.getDialog =function(dialogId){
 }
 
 SIPTransactionStack.prototype.isDialogCreated =function(method){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:isDialogCreated():method="+method);
     var l=null;
     for(var i=0;i<this.dialogCreatingMethods.length;i++)
     {
@@ -20694,12 +19432,10 @@ SIPTransactionStack.prototype.isDialogCreated =function(method){
 }
 
 SIPTransactionStack.prototype.isRfc2543Supported =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:isRfc2543Supported()");
     return this.rfc2543Supported;
 }
 
 SIPTransactionStack.prototype.createDialog =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:isRfc2543Supported()");
     if(arguments.length==1)
     {
         var transaction=arguments[0];
@@ -20723,7 +19459,6 @@ SIPTransactionStack.prototype.createDialog =function(){
 }
 
 SIPTransactionStack.prototype.createDialogargu1 =function(transaction){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:createDialogargu1():transaction:"+transaction);
     var retval = null;
     if (transaction instanceof SIPClientTransaction) {
         var dialogId = transaction.getRequest().getDialogId(false);
@@ -20761,7 +19496,6 @@ SIPTransactionStack.prototype.createDialogargu1 =function(transaction){
 }
 
 SIPTransactionStack.prototype.createDialogargu2 =function(transaction,sipResponse){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:createDialogargu2():transaction="+transaction+", sipResponse="+sipResponse);
     var dialogId = transaction.getRequest().getDialogId(false);
     var retval = null;
     var l=null;
@@ -20785,7 +19519,6 @@ SIPTransactionStack.prototype.createDialogargu2 =function(transaction,sipRespons
 }
 
 SIPTransactionStack.prototype.createRawMessageChannel =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:createRawMessageChannel()");
     var newChannel = null;
     //var l=null;
     for(var i=0;i<this.messageProcessors.length && newChannel == null;i++)
@@ -20799,7 +19532,6 @@ SIPTransactionStack.prototype.createRawMessageChannel =function(){
 }
 
 SIPTransactionStack.prototype.isNon2XXAckPassedToListener =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:isNon2XXAckPassedToListener()");
     if(this.non2XXAckPassedToListener)
     {
         return true;
@@ -20811,7 +19543,6 @@ SIPTransactionStack.prototype.isNon2XXAckPassedToListener =function(){
 }
 
 SIPTransactionStack.prototype.isTransactionPendingAck =function(serverTransaction){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:isTransactionPendingAck():serverTransaction="+serverTransaction);
     var branchId = serverTransaction.getRequest().getTopmostVia().getBranch();
     var l=null;
     for(var i=0;i<this.terminatedServerTransactionsPendingAck.length;i++)
@@ -20832,12 +19563,10 @@ SIPTransactionStack.prototype.isTransactionPendingAck =function(serverTransactio
 }
 
 SIPTransactionStack.prototype.setNon2XXAckPassedToListener =function(passToListener){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:setNon2XXAckPassedToListener():passToListener="+passToListener);
     this.non2XXAckPassedToListener = passToListener;
 }
 
 SIPTransactionStack.prototype.addForkedClientTransaction =function(clientTransaction){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:addForkedClientTransaction():clientTransaction="+clientTransaction);
     var l=null;
     for(var i=0;i<this.forkedClientTransactionTable.length;i++)
     {
@@ -20857,7 +19586,6 @@ SIPTransactionStack.prototype.addForkedClientTransaction =function(clientTransac
 }
 
 SIPTransactionStack.prototype.getForkedTransaction =function(transactionId){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getForkedTransaction():transactionId:"+transactionId);
     var l=null;
     for(var i=0;i<this.forkedClientTransactionTable.length;i++)
     {
@@ -20877,7 +19605,6 @@ SIPTransactionStack.prototype.getForkedTransaction =function(transactionId){
 }
 
 SIPTransactionStack.prototype.addTransactionPendingAck =function(serverTransaction){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:addTransactionPendingAck():serverTransaction="+serverTransaction);
     var branchId = serverTransaction.getRequest().getTopmostVia().getBranch();
     if (branchId != null) {
         var l=null;
@@ -20900,7 +19627,6 @@ SIPTransactionStack.prototype.addTransactionPendingAck =function(serverTransacti
 }
 
 SIPTransactionStack.prototype.findTransactionPendingAck =function(ackMessage){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:findTransactionPendingAck():ackMessage="+ackMessage);
     var l=null;
     for(var i=0;i<this.terminatedServerTransactionsPendingAck.length;i++)
     {
@@ -20920,7 +19646,6 @@ SIPTransactionStack.prototype.findTransactionPendingAck =function(ackMessage){
 }
 
 SIPTransactionStack.prototype.putDialog =function(dialog){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:putDialog():dialog="+dialog);
     var dialogId = dialog.getDialogId();
     var l=null;
     for(var i=0;i<this.dialogTable.length;i++)
@@ -20941,7 +19666,6 @@ SIPTransactionStack.prototype.putDialog =function(dialog){
 }
 
 SIPTransactionStack.prototype.findPendingTransaction =function(requestReceived){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:findPendingTransaction():requestReceived="+requestReceived);
     var l=null;
     for(var i=0;i<this.pendingTransactions.length;i++)
     {
@@ -20961,7 +19685,6 @@ SIPTransactionStack.prototype.findPendingTransaction =function(requestReceived){
 }
 
 SIPTransactionStack.prototype.putPendingTransaction =function(tr){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:putPendingTransaction():tr="+tr);
     var l=null;
     for(var i=0;i<this.pendingTransactions.length;i++)
     {
@@ -20981,7 +19704,6 @@ SIPTransactionStack.prototype.putPendingTransaction =function(tr){
 }
 
 SIPTransactionStack.prototype.removePendingTransaction =function(tr){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:removePendingTransaction():tr="+tr);
     var l=null;
     for(var i=0;i<this.pendingTransactions.length;i++)
     {
@@ -20994,17 +19716,14 @@ SIPTransactionStack.prototype.removePendingTransaction =function(tr){
 }
 
 SIPTransactionStack.prototype.getServerTransactionTableSize =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getServerTransactionTableSize()");
     return this.serverTransactionTable.length;
 }
 
 SIPTransactionStack.prototype.getClientTransactionTableSize =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getClientTransactionTableSize()");
     return this.clientTransactionTable.length;
 }
 
 SIPTransactionStack.prototype.findTransaction =function(sipMessage,isServer){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:findTransaction():sipMessage="+sipMessage+", isServer="+isServer);
     var retval = null;
     if (isServer) {
         var via = sipMessage.getTopmostVia();
@@ -21057,7 +19776,6 @@ SIPTransactionStack.prototype.findTransaction =function(sipMessage,isServer){
 }
 
 SIPTransactionStack.prototype.removeFromMergeTable =function(tr){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:removeFromMergeTable():tr="+tr);
     var key = tr.getRequest().getMergeId();
     var l=null
     if (key != null) {
@@ -21076,7 +19794,6 @@ SIPTransactionStack.prototype.removeFromMergeTable =function(tr){
 }
 
 SIPTransactionStack.prototype.putInMergeTable =function(sipTransaction,sipRequest){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:putInMergeTable():sipTransaction="+sipTransaction+", sipRequest="+sipRequest);
     var mergeKey = sipRequest.getMergeId();
     var l=null;
     if (mergeKey != null) {
@@ -21099,7 +19816,6 @@ SIPTransactionStack.prototype.putInMergeTable =function(sipTransaction,sipReques
 }
 
 SIPTransactionStack.prototype.addTransactionHash =function(sipTransaction){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:addTransactionHash():sipTransaction="+sipTransaction);
     var sipRequest = sipTransaction.getOriginalRequest();
     if (sipTransaction instanceof SIPClientTransaction) {
         this.activeClientTransactionCount++;
@@ -21142,16 +19858,13 @@ SIPTransactionStack.prototype.addTransactionHash =function(sipTransaction){
 }
 
 SIPTransactionStack.prototype.setMessageFactory =function(messageFactory){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:setMessageFactory():messageFactory="+messageFactory);
     this.sipMessageFactory = messageFactory; 
 }
 
 SIPTransactionStack.prototype.checkBranchIdFunction =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:checkBranchIdFunction()");
     return this.checkBranchId;    
 }
 SIPTransactionStack.prototype.addMessageProcessor =function(newMessageProcessor){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:addMessageProcessor():newMessageProcessor="+newMessageProcessor);
     var l=null
     for(var i=0;i<this.messageProcessors.length;i++)
     {
@@ -21167,7 +19880,6 @@ SIPTransactionStack.prototype.addMessageProcessor =function(newMessageProcessor)
 }
 
 SIPTransactionStack.prototype.findMergedTransaction =function(sipRequest){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:findMergedTransaction():sipRequest="+sipRequest);
     if (sipRequest.getMethod()!="INVITE") {
         return null;
     }
@@ -21205,7 +19917,6 @@ SIPTransactionStack.prototype.findMergedTransaction =function(sipRequest){
 }
 
 SIPTransactionStack.prototype.mapTransaction =function(transaction){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:mapTransaction():transaction"+transaction);
     if (transaction.isMapped) {
         return;
     }
@@ -21214,7 +19925,6 @@ SIPTransactionStack.prototype.mapTransaction =function(transaction){
 }
 
 SIPTransactionStack.prototype.createTransaction =function(request,mc,nextHop){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:createMessageChannel():request="+request+",mc="+","+mc+",nextHop="+nextHop);
     var returnChannel=null;
     if (mc == null) {
         return null;
@@ -21227,14 +19937,12 @@ SIPTransactionStack.prototype.createTransaction =function(request,mc,nextHop){
 }
 
 SIPTransactionStack.prototype.createClientTransaction =function(sipRequest,encapsulatedMessageChannel){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:createClientTransaction():sipRequest="+sipRequest+",encapsulatedMessageChannel="+encapsulatedMessageChannel);
     var ct = new SIPClientTransaction(this, encapsulatedMessageChannel);
     ct.setOriginalRequest(sipRequest);
     return ct;       
 }
 
 SIPTransactionStack.prototype.addTransaction =function(transaction){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:addTransaction():transaction="+transaction);
     if(transaction instanceof SIPServerTransaction)
     {
         transaction.map();
@@ -21243,7 +19951,6 @@ SIPTransactionStack.prototype.addTransaction =function(transaction){
 }
 
 SIPTransactionStack.prototype.transactionErrorEvent =function(transactionErrorEvent){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:transactionErrorEvent():transactionErrorEvent="+transactionErrorEvent);
     var transaction = transactionErrorEvent.getSource();
     if (transactionErrorEvent.getErrorID() == 2) {
         transaction.setState("TERMINATED");
@@ -21255,7 +19962,6 @@ SIPTransactionStack.prototype.transactionErrorEvent =function(transactionErrorEv
 }
 
 SIPTransactionStack.prototype.dialogErrorEvent =function(dialogErrorEvent){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:dialogErrorEvent():dialogErrorEvent="+dialogErrorEvent);
     var sipDialog = dialogErrorEvent.getSource();
     if (sipDialog != null) {
         sipDialog.delet();
@@ -21263,7 +19969,6 @@ SIPTransactionStack.prototype.dialogErrorEvent =function(dialogErrorEvent){
 }
 
 SIPTransactionStack.prototype.stopStack =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:stopStack()");
     if (this.timer != null) {
         clearTimeout(this.timer)
     }
@@ -21280,11 +19985,9 @@ SIPTransactionStack.prototype.stopStack =function(){
 }
 
 SIPTransactionStack.prototype.getMaxMessageSize =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getMaxMessageSize()");
     return this.maxMessageSize;
 }
 SIPTransactionStack.prototype.getNextHop =function(sipRequest){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getNextHop():sipRequest="+sipRequest);
     if (this.useRouterForAll) {
         if (this.router != null) {
             return this.router.getNextHop(sipRequest);
@@ -21307,12 +20010,10 @@ SIPTransactionStack.prototype.getNextHop =function(sipRequest){
 }
 
 SIPTransactionStack.prototype.setStackName =function(stackName){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:setStackName():stackName="+stackName);
     this.stackName = stackName;
 }
 
 SIPTransactionStack.prototype.setHostAddress =function(stackAddress){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:setHostAddress():stackAddress="+stackAddress);
     if (stackAddress.indexOf(':') != stackAddress.lastIndexOf(':')
         && stackAddress.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '').charAt(0) != '[') {
         this.stackAddress = '[' + stackAddress + ']';
@@ -21323,17 +20024,14 @@ SIPTransactionStack.prototype.setHostAddress =function(stackAddress){
 }
 
 SIPTransactionStack.prototype.getHostAddress =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getHostAddress()");
     return this.stackAddress;  
 }
 
 SIPTransactionStack.prototype.setRouter =function(router){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:setRouter():router="+router);
     this.router = router;
 }
 
 SIPTransactionStack.prototype.getRouter =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getRouter()");
     if(arguments.length==0)
     {
         this.getRouterargu0();
@@ -21346,12 +20044,10 @@ SIPTransactionStack.prototype.getRouter =function(){
 }
 
 SIPTransactionStack.prototype.getRouterargu0 =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getRouterargu0()");
     return this.router;
 }
 
 SIPTransactionStack.prototype.getRouterargu1 =function(request){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getRouterargu1():request="+request);
     if (request.getRequestLine() == null) {
         return this.defaultRouter;
     } 
@@ -21373,7 +20069,6 @@ SIPTransactionStack.prototype.getRouterargu1 =function(request){
 }
 
 SIPTransactionStack.prototype.removeMessageProcessor =function(oldMessageProcessor){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:removeMessageProcessor():oldMessageProcessor="+oldMessageProcessor);
     var l=null;
     for(var i=0;i<this.messageProcessors.lengt;i++)
     {
@@ -21388,11 +20083,9 @@ SIPTransactionStack.prototype.removeMessageProcessor =function(oldMessageProcess
 }
 
 SIPTransactionStack.prototype.getMessageProcessors =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getMessageProcessors()");
     return this.messageProcessors;
 }
 SIPTransactionStack.prototype.isEventForked =function(ename){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:isEventForked():ename="+ename);
     var l=null;
     for(var i=0;i<this.forkedEvents.length;i++)
     {
@@ -21412,22 +20105,18 @@ SIPTransactionStack.prototype.isEventForked =function(ename){
 }
 
 SIPTransactionStack.prototype.getActiveClientTransactionCount =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getActiveClientTransactionCount()");
     return this.activeClientTransactionCount;    
 }
 
 SIPTransactionStack.prototype.isCancelClientTransactionChecked =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:isCancelClientTransactionChecked()");
     return this.cancelClientTransactionChecked; 
 }
 
 SIPTransactionStack.prototype.isRemoteTagReassignmentAllowed =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:isRemoteTagReassignmentAllowed()");
     return this.remoteTagReassignmentAllowed;
 }
 
 SIPTransactionStack.prototype.getDialogs =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getDialogs()");
     if(arguments.length==0)
     {
         return this.getDialogsargu0();
@@ -21440,7 +20129,6 @@ SIPTransactionStack.prototype.getDialogs =function(){
 }
 
 SIPTransactionStack.prototype.getDialogsargu0 =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getDialogsargu0()");
     var dialogs = new Array();
     for(var i=0;i<this.dialogTable.length;i++)
     {
@@ -21476,7 +20164,6 @@ SIPTransactionStack.prototype.getDialogsargu0 =function(){
 }
 
 SIPTransactionStack.prototype.getDialogsargu1 =function(state){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getDialogsargu1():state="+state);
     var matchingDialogs = new Array();
     if ("EARLY"==state) {
         for(var i=0;i<this.earlyDialogTable.length;i++)
@@ -21519,16 +20206,13 @@ SIPTransactionStack.prototype.getDialogsargu1 =function(state){
 }
 
 SIPTransactionStack.prototype.setTimer =function(timer){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:setTimer():timer="+timer);
     this.timer = timer;
 }
 
 SIPTransactionStack.prototype.setDeliverDialogTerminatedEventForNullDialog =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:setDeliverDialogTerminatedEventForNullDialog()");
     this.isDialogTerminatedEventDeliveredForNullDialog = true;    
 }
 SIPTransactionStack.prototype.getAddressResolver =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getAddressResolver()");
     return this.addressResolver;      
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -21561,7 +20245,6 @@ SIPTransactionStack.prototype.getAddressResolver =function(){
  *   
  */
 function SIPTransactionErrorEvent(sourceTransaction,transactionErrorID) {
-    if(logger!=undefined) logger.debug("SIPTransactionErrorEvent:SIPTransactionErrorEvent(): sourceTransaction="+sourceTransaction+", transactionErrorID="+transactionErrorID);
     this.classname="SIPTransactionErrorEvent"; 
     this.serialVersionUID = "-2713188471978065031L";
     this.source=sourceTransaction;
@@ -21573,12 +20256,10 @@ SIPTransactionErrorEvent.prototype.TRANSPORT_ERROR = 64;
 SIPTransactionErrorEvent.prototype.TIMEOUT_RETRANSMIT = 64;
 
 SIPTransactionErrorEvent.prototype.getErrorID =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionErrorEvent:getErrorID()");
     return this.errorID;
 }
 
 SIPTransactionErrorEvent.prototype.getSource =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionErrorEvent:getSource()");
     return this.source;
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -21611,7 +20292,6 @@ SIPTransactionErrorEvent.prototype.getSource =function(){
  *   
  */
 function DefaultRouter() {
-    if(logger!=undefined) logger.debug("DefaultRouter:DefaultRouter()");
     this.classname="DefaultRouter"; 
     this.sipStack=null;
     this.defaultRoute=null;
@@ -21627,7 +20307,6 @@ function DefaultRouter() {
 }
 
 DefaultRouter.prototype.getNextHop =function(request){
-    if(logger!=undefined) logger.debug("DefaultRouter:getNextHop():request="+request);
     var sipRequest = request;
     var requestLine = sipRequest.getRequestLine();
     if (requestLine == null) {
@@ -21675,7 +20354,6 @@ DefaultRouter.prototype.getNextHop =function(request){
 }
 
 DefaultRouter.prototype.fixStrictRouting =function(req){
-    if(logger!=undefined) logger.debug("DefaultRouter:fixStrictRouting():req="+req);
     var routes = req.getRouteHeaders();
     var first = routes.getFirst();
     var firstUri = first.getAddress().getURI();
@@ -21688,7 +20366,6 @@ DefaultRouter.prototype.fixStrictRouting =function(req){
 }
 
 DefaultRouter.prototype.createHop =function(sipUri,request){
-    if(logger!=undefined) logger.debug("DefaultRouter:createHop():sipUri="+sipUri+", request="+request);
     var transport = sipUri.getTransportParam();
     if (transport == null) {
         var via = request.getHeader("Via");
@@ -21706,12 +20383,10 @@ DefaultRouter.prototype.createHop =function(sipUri,request){
 }
 
 DefaultRouter.prototype.getOutboundProxy =function(){
-    if(logger!=undefined) logger.debug("DefaultRouter:getOutboundProxy()");
     return this.defaultRoute;
 }
 
 DefaultRouter.prototype.getNextHops =function(request){
-    if(logger!=undefined) logger.debug("DefaultRouter:getNextHops():request="+request);
     try {
         var llist = new Array();
         llist.push(this.getNextHop(request));
@@ -21751,7 +20426,6 @@ DefaultRouter.prototype.getNextHops =function(request){
  *   
  */
 function WSMessageChannel() {
-    if(logger!=undefined) logger.debug("WSMessageChannel:WSMessageChannel()");
     this.classname="WSMessageChannel"; 
     this.myParser=null;
     this.key=null;
@@ -21778,12 +20452,10 @@ function WSMessageChannel() {
 }
 
 WSMessageChannel.prototype.isReliable =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:isReliable()");
     return true;
 }
 
 WSMessageChannel.prototype.createWebSocket =function(wsurl){
-    if(logger!=undefined) logger.debug("WSMessageChannel:createWebSocket():wsurl="+wsurl);
     this.websocket=new WebSocket(wsurl,"sip");
     var wsmc=this;
     this.websocket.onclose=function()
@@ -21816,34 +20488,28 @@ WSMessageChannel.prototype.createWebSocket =function(wsurl){
 }
 
 WSMessageChannel.prototype.close =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:close()");
     this.alive=false;
     this.websocket.close();
     this.websocket = null;
 }
 
 WSMessageChannel.prototype.getSIPStack =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getSIPStack()");
     return this.sipStack;
 }
 
 WSMessageChannel.prototype.getTransport =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getTransport()");
     return "WS";
 }
 
 WSMessageChannel.prototype.getURLWS =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getURLWS()");
     return this.wsurl;
 }
 
 WSMessageChannel.prototype.getPeerProtocol =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getPeerProtocol()");
     return this.peerProtocol;
 }
 
 WSMessageChannel.prototype.sendMessage = function(sipMessage){
-    if(logger!=undefined) logger.debug("WSMessageChannel:sendMessage()");
     if (sipMessage instanceof SIPRequest)
     {
         this.requestsent=sipMessage;
@@ -21859,7 +20525,6 @@ WSMessageChannel.prototype.sendMessage = function(sipMessage){
 }
 
 WSMessageChannel.prototype.getKey =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getKey()");
     if (this.key != null) {
         return this.key;
     } 
@@ -21871,12 +20536,10 @@ WSMessageChannel.prototype.getKey =function(){
 }
 
 WSMessageChannel.prototype.getViaHost =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getViaHost()");
     return this.myAddress;
 }
 
 WSMessageChannel.prototype.getViaHeader =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getViaHeader()");
     var channelViaHeader;
     channelViaHeader = new Via();
     channelViaHeader.setTransport(this.getTransport());
@@ -21885,19 +20548,16 @@ WSMessageChannel.prototype.getViaHeader =function(){
 }
 
 WSMessageChannel.prototype.getViaHost =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getViaHost()");
     return this.myAddress;
 }
 
 WSMessageChannel.prototype.getViaHostPort =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getViaHostPort()");
     var retval = new HostPort();
     retval.setHost(new Host(this.getViaHost()));
     return retval;
 }
 
 WSMessageChannel.prototype.getPeerAddress =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getPeerAddress()");
     if (this.peerAddress != null) {
         return this.peerAddress;
     } 
@@ -21908,12 +20568,10 @@ WSMessageChannel.prototype.getPeerAddress =function(){
 }
 
 WSMessageChannel.prototype.getHost =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getHost()");
     return this.sipStack.getHostAddress();
 }
 
 WSMessageChannel.prototype.createBadReqRes =function(badReq/*,pe*/){
-    if(logger!=undefined) logger.debug("WSMessageChannel:createBadReqRes():badReq="+badReq/*,pe*/);
     var buf = 512;
     buf=buf+"SIP/2.0 400 Bad Request";
     if (!this.copyViaHeaders(badReq, buf))
@@ -21955,7 +20613,6 @@ WSMessageChannel.prototype.createBadReqRes =function(badReq/*,pe*/){
 }
 
 WSMessageChannel.prototype.copyHeader =function(name,fromReq,buf){
-    if(logger!=undefined) logger.debug("WSMessageChannel:copyHeader():name="+name+", fromReq="+fromReq+",buf="+buf); 
     var start = fromReq.indexOf(name);
     if (start != -1) {
         var end = fromReq.indexOf("\r\n", start);
@@ -21968,7 +20625,6 @@ WSMessageChannel.prototype.copyHeader =function(name,fromReq,buf){
 }
 
 WSMessageChannel.prototype.copyViaHeaders =function(fromReq,buf){
-    if(logger!=undefined) logger.debug("WSMessageChannel:copyViaHeaders(): fromReq="+fromReq+",buf="+buf);
     var start = fromReq.indexOf(this.ViaHeader);
     var found = false;
     while (start != -1) {
@@ -21985,17 +20641,14 @@ WSMessageChannel.prototype.copyViaHeaders =function(fromReq,buf){
 }
 
 WSMessageChannel.prototype.getMessageProcessor =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getMessageProcessor()");
     return this.messageProcessor;
 }
 
 WSMessageChannel.prototype.isSecure =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:isSecure()");
     return false;
 }
 
 WSMessageChannel.prototype.getWebSocket =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getWebSocket()");
     return this.websocket;
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -22027,7 +20680,6 @@ WSMessageChannel.prototype.getWebSocket =function(){
  *   
  */
 function WSMessageProcessor() {
-    if(logger!=undefined) logger.debug("WSMessageProcessor:WSMessageProcessor()");
     this.classname="WSMessageProcessor"; 
     this.nConnections=null;
     this.isRunning=null;
@@ -22049,60 +20701,49 @@ function WSMessageProcessor() {
 }
 
 WSMessageProcessor.prototype.start =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:start()");
     return this.run();
 }
 
 WSMessageProcessor.prototype.run =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:run()");
     this.incomingwsMessageChannels = new WSMessageChannel(this);
     return this.incomingwsMessageChannels;
 }
 
 WSMessageProcessor.prototype.getTransport =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getTransport()");
     return "WS";
 }
 
 WSMessageProcessor.prototype.getIncomingwsMessageChannels =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getIncomingwsMessageChannels()");
     return this.incomingwsMessageChannels;
 }
 
 WSMessageProcessor.prototype.getSIPStack =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getSIPStack()");
     return this.sipStack;
 }
 
 WSMessageProcessor.prototype.getURLWS =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getURLWS()");
     return this.wsurl;
 }
 
 WSMessageProcessor.prototype.getInfoApp =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getURLWS()");
     return this.infoApp;
 }
 
 WSMessageProcessor.prototype.stop =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:stop()");
     this.isRunning = false;
     this.incomingwsMessageChannels.close();
 }
 
 WSMessageProcessor.prototype.createMessageChannel =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:createMessageChannel()");
     this.incomingwsMessageChannels = new WSMessageChannel(this.sipStack,this);
     return this.incomingwsMessageChannels;
 }
 
 WSMessageProcessor.prototype.getMaximumMessageSize =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getMaximumMessageSize()");
     return 0x7fffffff;
 }
 
 WSMessageProcessor.prototype.getViaHeader =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getViaHeader()");
     var via = new Via();
     if (this.sentByHostPort != null) {
         via.setSentBy(this.sentByHostPort);
@@ -22120,7 +20761,6 @@ WSMessageProcessor.prototype.getViaHeader =function(){
 }
 
 WSMessageProcessor.prototype.inUse =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:inUse()");
     if(this.useCount != 0)
     {
         return true;
@@ -22132,33 +20772,27 @@ WSMessageProcessor.prototype.inUse =function(){
 }
 
 WSMessageProcessor.prototype.getDefaultTargetPort =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getDefaultTargetPort()");
     return 5060;
 }
 
 WSMessageProcessor.prototype.isSecure =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:isSecure()");
     return false;
 }
 
 WSMessageProcessor.prototype.getListeningPoint =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getListeningPoint()");
     return this.listeningPoint;
 }
 
 WSMessageProcessor.prototype.setListeningPoint =function(lp){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:setListeningPoint():lp:"+lp);
     this.listeningPoint = lp;
 }
 
 WSMessageProcessor.prototype.initialize =function(infoApp,transactionStack){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:initialize():infoApp="+infoApp+", transactionStack="+transactionStack);
     this.sipStack = transactionStack;
     this.infoApp=infoApp;
 }
 
 WSMessageProcessor.prototype.setSentBy =function(sentBy){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:setSentBy():sentBy="+sentBy);
     var ind = sentBy.indexOf(":");
     if (ind == -1) {
         this.sentByHostPort = new HostPort();
@@ -22180,7 +20814,6 @@ WSMessageProcessor.prototype.setSentBy =function(sentBy){
 }
 
 WSMessageProcessor.prototype.getSentBy =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getSentBy()");
     if (this.sentBy == null && this.sentByHostPort != null) {
         this.sentBy = this.sentByHostPort.toString();
     }
@@ -22188,12 +20821,10 @@ WSMessageProcessor.prototype.getSentBy =function(){
 }
 
 WSMessageProcessor.prototype.getPort =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getPort()");
     return this.port;
 }
 
 WSMessageProcessor.prototype.getDefaultPort =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getDefaultPort()");
     var retval=5060
     return retval;
 }/*
@@ -22227,7 +20858,6 @@ WSMessageProcessor.prototype.getDefaultPort =function(){
  *   
  */
 function SIPDialog() {
-    if(logger!=undefined) logger.debug("SIPDialog:SIPDialog()");
     this.classname="SIPDialog"; 
     
     this.serialVersionUID = "-1429794423085204069L";
@@ -22369,7 +20999,6 @@ var variabletransaction=null;
 var variabledialog=null;
 var variablereinvite=null;
 function lingerTimerDialog(){
-    if(logger!=undefined) logger.debug("lingerTimerDialog()");
     var dialog = sipdialog;
     if (this.eventListeners != null) {
         this.eventListeners.clear();
@@ -22378,11 +21007,9 @@ function lingerTimerDialog(){
     dialog.sipStack.removeDialog(dialog);
 }
 function DialogDeleteTask(){
-    if(logger!=undefined) logger.debug("DialogDeleteTask()");
     sipdialog.dialogDeleteTask=null;
 }
 function DialogTimerTask(){
-    if(logger!=undefined) logger.debug("DialogTimerTask()");
     this.transaction=null;
     if(variabletransaction!=null)
     {
@@ -22403,7 +21030,6 @@ function DialogTimerTask(){
 }
 
 function DialogDeleteIfNoAckSentTask(seqno){
-    if(logger!=undefined) logger.debug("DialogDeleteIfNoAckSentTask():seqno="+seqno);
     this.seqno = seqno;
     var dialog = sipdialog;
     if (dialog.highestSequenceNumberAcknowledged < seqno) {
@@ -22443,7 +21069,6 @@ function DialogDeleteIfNoAckSentTask(seqno){
 }
 
 SIPDialog.prototype.ackReceived =function(sipRequest){
-    if(logger!=undefined) logger.debug("SIPDialog:ackReceived():sipRequest="+sipRequest);
     if (this.ackSeen) {
         return;
     }
@@ -22463,7 +21088,6 @@ SIPDialog.prototype.ackReceived =function(sipRequest){
 }
 
 SIPDialog.prototype.isTerminatedOnBye =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:isTerminatedOnBye()");
     if(this.terminateOnBye)
     {
         return true;
@@ -22475,7 +21099,6 @@ SIPDialog.prototype.isTerminatedOnBye =function(){
 }
 
 SIPDialog.prototype.setState =function(state){
-    if(logger!=undefined) logger.debug("SIPDialog:setState():state="+state);
     this.dialogState = state;
     if (state == this.TERMINATED_STATE) {
         if (this.sipStack.getTimer() != null) { 
@@ -22487,22 +21110,18 @@ SIPDialog.prototype.setState =function(state){
 }
 
 SIPDialog.prototype.getLocalTag =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getLocalTag()");
     return this.myTag;
 }
 
 SIPDialog.prototype.isAckSeen =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:isAckSeen()");
     return this.ackSeen;
 }
 
 SIPDialog.prototype.getLastAckSent =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getLastAckSent()");
     return this.lastAckSent;
 }
 
 SIPDialog.prototype.resendAck =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:resendAck()");
     if (this.getLastAckSent() != null) {
         if (this.getLastAckSent().getHeader(this.TimeStampHeader) != null
             && this.sipStack.generateTimeStampHeader) {
@@ -22516,17 +21135,14 @@ SIPDialog.prototype.resendAck =function(){
 }
 
 SIPDialog.prototype.getMethod =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getMethod()");
     return this.method;
 }
 
 SIPDialog.prototype.isBackToBackUserAgent =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:isBackToBackUserAgent()");
     return this.isBackToBackUserAgent;
 }
 
 SIPDialog.prototype.getState =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getState()");
     var x=null;
     if (this.dialogState == this.NULL_STATE) {
         x=null; // not yet initialized
@@ -22547,22 +21163,18 @@ SIPDialog.prototype.getState =function(){
 }
 
 SIPDialog.prototype.delet =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:delet()");
     this.setState(this.TERMINATED_STATE);
 }
 
 SIPDialog.prototype.isTerminatedOnBye =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:isTerminatedOnBye()");
     return this.terminateOnBye;
 }
 
 SIPDialog.prototype.getLastResponse =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getLastResponse()");
     return this.lastResponse;
 }
 
 SIPDialog.prototype.setLastResponse =function(transaction,sipResponse){
-    if(logger!=undefined) logger.debug("SIPDialog:setLastResponse():transaction="+transaction+", sipResponse="+sipResponse);
     this.callIdHeader = sipResponse.getCallId();
     var statusCode = sipResponse.getStatusCode();
     if (statusCode == 100) {
@@ -22686,7 +21298,6 @@ SIPDialog.prototype.setLastResponse =function(transaction,sipResponse){
 }
 
 SIPDialog.prototype.getDialogId =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getDialogId()");
     if (this.dialogId == null && this.lastResponse != null) {
         this.dialogId = this.lastResponse.getDialogId(this.isServer());
     }
@@ -22694,12 +21305,10 @@ SIPDialog.prototype.getDialogId =function(){
 }
 
 SIPDialog.prototype.isAssignedFunction =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:isAssigned()");
     return this.isAssigned;
 }
 
 SIPDialog.prototype.setResponseTags =function(sipResponse){
-    if(logger!=undefined) logger.debug("SIPDialog:setResponseTags():sipResponse="+sipResponse);
     if (this.getLocalTag() != null || this.getRemoteTag() != null) {
         return;
     }
@@ -22715,12 +21324,10 @@ SIPDialog.prototype.setResponseTags =function(sipResponse){
 }
 
 SIPDialog.prototype.getSipProvider =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getSipProvider()");
     return this.sipProvider;
 }
 
 SIPDialog.prototype.sendAck =function(request){
-    if(logger!=undefined) logger.debug("SIPDialog:sendAck():request="+request);
     var ackRequest = request;
     if (!ackRequest.getMethod()=="ACK") {
         console.error("SIPDialog:sendAck(): bad request method -- should be ACK");
@@ -22773,12 +21380,10 @@ SIPDialog.prototype.sendAck =function(request){
 }
 
 SIPDialog.prototype.getRemoteTag =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getRemoteTag()");
     return this.hisTag;
 }
 
 SIPDialog.prototype.isServer =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:isServer()");
     if (this.firstTransactionSeen == false) {
         return this.serverTransactionFlag;
     } 
@@ -22788,7 +21393,6 @@ SIPDialog.prototype.isServer =function(){
 }
 
 SIPDialog.prototype.addTransaction =function(transaction){
-    if(logger!=undefined) logger.debug("SIPDialog:addTransaction():transaction="+transaction);
     var sipRequest = transaction.getOriginalRequest();
     if (this.firstTransactionSeen && this.firstTransactionId!=(transaction.getBranchId())
         && transaction.getMethod()==this.firstTransactionMethod) {
@@ -22833,7 +21437,6 @@ SIPDialog.prototype.addTransaction =function(transaction){
 }
 
 SIPDialog.prototype.storeFirstTransactionInfo =function(dialog,transaction){
-    if(logger!=undefined) logger.debug("SIPDialog:storeFirstTransactionInfo():dialog="+dialog+",transaction="+transaction);
     dialog.firstTransaction = transaction;
     dialog.firstTransactionSeen = true;
     dialog.firstTransactionIsServerTransaction = transaction.isServerTransaction();
@@ -22855,7 +21458,6 @@ SIPDialog.prototype.storeFirstTransactionInfo =function(dialog,transaction){
 }
 
 SIPDialog.prototype.setLocalParty =function(sipMessage){
-    if(logger!=undefined) logger.debug("SIPDialog:setLocalParty():sipMessage="+sipMessage);
     if (!this.isServer()) {
         this.localParty = sipMessage.getFrom().getAddress();
     } else {
@@ -22864,7 +21466,6 @@ SIPDialog.prototype.setLocalParty =function(sipMessage){
 }
 
 SIPDialog.prototype.setRemoteParty =function(sipMessage){
-    if(logger!=undefined) logger.debug("SIPDialog:setRemoteParty():sipMessage="+sipMessage);
     if (!this.isServer()) {
         this.remoteParty = sipMessage.getTo().getAddress();
     } else {
@@ -22873,27 +21474,22 @@ SIPDialog.prototype.setRemoteParty =function(sipMessage){
 }
 
 SIPDialog.prototype.setCallId =function(sipRequest){
-    if(logger!=undefined) logger.debug("SIPDialog:setCallId():sipRequest="+sipRequest);
     this.callIdHeader = sipRequest.getCallId();
 }
 
 SIPDialog.prototype.setLocalSequenceNumber =function(lCseq){
-    if(logger!=undefined) logger.debug("SIPDialog:setLocalSequenceNumber():lCseq="+lCseq);
     this.localSequenceNumber = lCseq;
 }
 
 SIPDialog.prototype.getLocalParty =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getLocalParty()");
     return this.localParty;
 }
 
 SIPDialog.prototype.getRemoteParty =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getRemoteParty()");
     return this.remoteParty;
 }
 
 SIPDialog.prototype.addEventListener =function(newListener){
-    if(logger!=undefined) logger.debug("SIPDialog:addEventListener():newListener="+newListener);
     var l=null;
     for(var i=0;i<this.eventListeners;i++)
     {
@@ -22909,24 +21505,20 @@ SIPDialog.prototype.addEventListener =function(newListener){
 }
 
 SIPDialog.prototype.setAssigned =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:setAssigned()");
     this.isAssigned = true;
 }
 
 SIPDialog.prototype.testAndSetIsDialogTerminatedEventDelivered =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:testAndSetIsDialogTerminatedEventDelivered()");
     var retval = this.dialogTerminatedEventDelivered;
     this.dialogTerminatedEventDelivered = true;
     return retval;
 }
 
 SIPDialog.prototype.getFirstTransaction =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getFirstTransaction()");
     return this.firstTransaction;
 }
 
 SIPDialog.prototype.isClientDialog =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:isClientDialog()");
     var transaction = this.getFirstTransaction();
     if(transaction instanceof SIPClientTransaction)
     {
@@ -22939,7 +21531,6 @@ SIPDialog.prototype.isClientDialog =function(){
 }
 
 SIPDialog.prototype.addRoute =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:addRoute()");
     if(arguments[0] instanceof SIPResponse)
     {
         var sipResponse=arguments[0];
@@ -22958,7 +21549,6 @@ SIPDialog.prototype.addRoute =function(){
 }
 
 SIPDialog.prototype.addRouteResponse =function(sipResponse){
-    if(logger!=undefined) logger.debug("SIPDialog:addRouteResponse():sipResponse="+sipResponse);
     if (sipResponse.getStatusCode() == 100) {
         return;
     } 
@@ -22993,7 +21583,6 @@ SIPDialog.prototype.addRouteResponse =function(sipResponse){
 }
 
 SIPDialog.prototype.addRouteRequest =function(sipRequest){
-    if(logger!=undefined) logger.debug("SIPDialog:addRouteRequest():sipRequest="+sipRequest);
     var siprequest=new SIPRequest();
     if (this.dialogState == "CONFIRMED"&& siprequest.isTargetRefresh(sipRequest.getMethod())) {
         this.doTargetRefresh(sipRequest);
@@ -23018,7 +21607,6 @@ SIPDialog.prototype.addRouteRequest =function(sipRequest){
 }
 
 SIPDialog.prototype.addRouteList =function(recordRouteList){
-    if(logger!=undefined) logger.debug("SIPDialog:addRouteList():recordRouteList="+recordRouteList);
     if (this.isClientDialog()) {
         this.routeList = new RouteList();
         for(var i=recordRouteList.getHeaderList().length-1;i>=0;i--)
@@ -23049,32 +21637,26 @@ SIPDialog.prototype.addRouteList =function(recordRouteList){
 }
 
 SIPDialog.prototype.setRemoteTarget =function(contact){
-    if(logger!=undefined) logger.debug("SIPDialog:setRemoteTarget():contact:"+contact);
     this.remoteTarget = contact.getAddress();
 }
 
 SIPDialog.prototype.getRouteList =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getRouteList()");
     return this.routeList;
 }
 
 SIPDialog.prototype.setRouteList =function(routeList){
-    if(logger!=undefined) logger.debug("SIPDialog:setRouteList():routeList:"+routeList);
     this.routeList = routeList;
 }
 
 SIPDialog.prototype.setStack =function(sipStack){
-    if(logger!=undefined) logger.debug("SIPDialog:setStack():sipStack:"+sipStack);
     this.sipStack = sipStack;
 }
 
 SIPDialog.prototype.getStack =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getStack()");
     return this.sipStack;
 }
 
 SIPDialog.prototype.removeEventListener =function(oldListener){
-    if(logger!=undefined) logger.debug("SIPDialog:removeEventListener():oldListener:"+oldListener);
     var l=null;
     for(var i=0;i<this.eventListeners.length;i++)
     {
@@ -23087,22 +21669,18 @@ SIPDialog.prototype.removeEventListener =function(oldListener){
 }
 
 SIPDialog.prototype.setApplicationData =function(applicationData){
-    if(logger!=undefined) logger.debug("SIPDialog:setApplicationData():applicationData:"+applicationData);
     this.applicationData = applicationData;
 }
 
 SIPDialog.prototype.getApplicationData =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getApplicationData()");
     return this.applicationData;
 }
 
 SIPDialog.prototype.requestConsumed =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:requestConsumed()");
     this.nextSeqno = this.getRemoteSeqNumber() + 1;
 }
 
 SIPDialog.prototype.isRequestConsumable =function(dialogRequest){
-    if(logger!=undefined) logger.debug("SIPDialog:isRequestConsumable():dialogRequest:"+dialogRequest);
     if (dialogRequest.getMethod()=="ACK") {
         console.error("SIPDialog:isRequestConsumable(): Illegal method");
         throw "SIPDialog:isRequestConsumable(): Illegal method";
@@ -23121,7 +21699,6 @@ SIPDialog.prototype.isRequestConsumable =function(dialogRequest){
 }
 
 SIPDialog.prototype.doDeferredDelete =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:doDeferredDelete()");
     if (this.sipStack.getTimer() == null) {
         this.setState(this.TERMINATED_STATE);
     } else {
@@ -23134,7 +21711,6 @@ SIPDialog.prototype.doDeferredDelete =function(){
 }
 
 SIPDialog.prototype.isAckSent =function(cseqNo){
-    if(logger!=undefined) logger.debug("SIPDialog:isAckSent():cseqNo="+cseqNo);
     if (this.getLastTransaction() == null) {
         return true;
     }
@@ -23152,7 +21728,6 @@ SIPDialog.prototype.isAckSent =function(cseqNo){
 }
 
 SIPDialog.prototype.getRouteSet =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getRouteSet()");
     if (this.routeList == null) {
         this.routeList=new Array();
         return this.routeList;
@@ -23163,13 +21738,10 @@ SIPDialog.prototype.getRouteSet =function(){
 }
 
 SIPDialog.prototype.setDialogId =function(dialogId){
-    if(logger!=undefined) logger.debug("SIPDialog:setDialogId():dialogId="+dialogId);
     this.dialogId = dialogId;
 }
 
 SIPDialog.prototype.createFromNOTIFY =function(subscribeTx,notifyST){
-    if(logger!=undefined) logger.debug("SIPDialog:createFromNOTIFY(): subscribeTx="+subscribeTx);
-    if(logger!=undefined) logger.debug("SIPDialog:createFromNOTIFY(): notifyST="+notifyST);
     var d = new SIPDialog(notifyST);
     d.serverTransactionFlag = false;
     d.lastTransaction = subscribeTx;
@@ -23190,12 +21762,10 @@ SIPDialog.prototype.createFromNOTIFY =function(subscribeTx,notifyST){
 }
 
 SIPDialog.prototype.isReInvite =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:isReInvite()");
     return this.reInviteFlag;
 }
 
 SIPDialog.prototype.setRemoteTag =function(hisTag){
-    if(logger!=undefined) logger.debug("SIPDialog:setRemoteTag():hisTag:"+hisTag);
     if (this.hisTag != null && hisTag != null && hisTag!=this.hisTag) {
         if (this.getState() != "EARLY") {
             return;
@@ -23221,22 +21791,18 @@ SIPDialog.prototype.setRemoteTag =function(hisTag){
 }
 
 SIPDialog.prototype.getLastTransaction =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getLastTransaction()");
     return this.lastTransaction;
 }
 
 SIPDialog.prototype.getInviteTransaction =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getInviteTransaction()");
     return this.inviteTransaction;
 }
 
 SIPDialog.prototype.setInviteTransaction =function(transaction){
-    if(logger!=undefined) logger.debug("SIPDialog:getInviteTransaction():transaction="+transaction);
     this.inviteTransaction=transaction;
 }
 
 SIPDialog.prototype.setLocalSequenceNumber =function(lCseq){
-    if(logger!=undefined) logger.debug("SIPDialog:setLocalSequenceNumber():lCseq="+lCseq);
     if (lCseq <= this.localSequenceNumber) {
         console.error("SIPDialog:setLocalSequenceNumber(): sequence number should not decrease !");
         throw "SIPDialog:setLocalSequenceNumber(): sequence number should not decrease !";
@@ -23245,44 +21811,34 @@ SIPDialog.prototype.setLocalSequenceNumber =function(lCseq){
 }
 
 SIPDialog.prototype.setRemoteSequenceNumber =function(rCseq){
-    if(logger!=undefined) logger.debug("SIPDialog:setRemoteSequenceNumber():rCseq="+rCseq);
     this.remoteSequenceNumber = rCseq;
 }
 
 SIPDialog.prototype.incrementLocalSequenceNumber =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:incrementLocalSequenceNumber()");
     ++this.localSequenceNumber;
 }
 SIPDialog.prototype.getOriginalLocalSequenceNumber =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getOriginalLocalSequenceNumber()");
     return this.originalLocalSequenceNumber;
 }
 SIPDialog.prototype.getLocalSeqNumber =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getLocalSeqNumber()");
     return this.localSequenceNumber;
 }
 SIPDialog.prototype.getRemoteSeqNumber =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getRemoteSeqNumber()");
     return this.remoteSequenceNumber;
 }
 SIPDialog.prototype.setLocalTag =function(mytag){
-    if(logger!=undefined) logger.debug("SIPDialog:setLocalTag():mytag:"+mytag);
     this.myTag = mytag;
 }
 SIPDialog.prototype.getCallId =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getCallId()");
     return this.callIdHeader;
 }
 SIPDialog.prototype.getRemoteTarget =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getRemoteTarget()");
     return this.remoteTarget;
 }
 SIPDialog.prototype.isSecure =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:isSecure()");
     return this.firstTransactionSecure;
 }
 SIPDialog.prototype.createRequest =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:createRequest()");
     if(arguments.length==1)
     {
         var method=arguments[0];
@@ -23296,7 +21852,6 @@ SIPDialog.prototype.createRequest =function(){
     }
 }
 SIPDialog.prototype.createRequestargu1 =function(method){
-    if(logger!=undefined) logger.debug("SIPDialog:createRequestargu1():method:"+method);
     if (method=="ACK") {
         console.error("SIPDialog:createRequestargu1(): invalid method specified for createRequest:" + method);
         throw "SIPDialog:createRequestargu1(): invalid method specified for createRequest:" + method;
@@ -23311,7 +21866,6 @@ SIPDialog.prototype.createRequestargu1 =function(method){
 }
 
 SIPDialog.prototype.createRequestargu2 =function(method,sipResponse){
-    if(logger!=undefined) logger.debug("SIPDialog:createRequestargu2():method,sipResponse:"+method+","+sipResponse);
     if (method == null || sipResponse == null) {
         console.error("SIPDialog:createRequestargu2(): null argument");
         throw "SIPDialog:createRequestargu2(): null argument";
@@ -23386,7 +21940,6 @@ SIPDialog.prototype.createRequestargu2 =function(method,sipResponse){
 }
 
 SIPDialog.prototype.sendRequest =function(clientTransactionId){
-    if(logger!=undefined) logger.debug("SIPDialog:sendRequestargu2():clientTransactionId="+clientTransactionId);
     var dialogRequest =  clientTransactionId.getOriginalRequest();
     if (clientTransactionId == null) {
         console.error("SIPDialog:sendRequest(): null parameter");
@@ -23470,7 +22023,6 @@ SIPDialog.prototype.sendRequest =function(clientTransactionId){
 }
 
 SIPDialog.prototype.startTimer =function(transaction){
-    if(logger!=undefined) logger.debug("SIPDialog:startTimer():transaction="+transaction);
     if (this.timerTask != null && this.timerTask.transaction == transaction) {
         return;
     }
@@ -23490,7 +22042,6 @@ SIPDialog.prototype.startTimer =function(transaction){
 }
 
 SIPDialog.prototype.stopTimer =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:stopTimer()");
     if (this.timerTask != null) {
         clearTimeout(this.timer);
         this.timerTask = null;
@@ -23498,7 +22049,6 @@ SIPDialog.prototype.stopTimer =function(){
 }
 
 SIPDialog.prototype.updateRequest =function(sipRequest){
-    if(logger!=undefined) logger.debug("SIPDialog:updateRequest():sipRequest="+sipRequest);
     var rl = this.getRouteList();
     if (!rl.isEmpty()) {
         sipRequest.setHeader(rl);
@@ -23512,7 +22062,6 @@ SIPDialog.prototype.updateRequest =function(sipRequest){
 }
 
 SIPDialog.prototype.createAck =function(cseqno){
-    if(logger!=undefined) logger.debug("SIPDialog:createAck():cseqno="+cseqno);
     if (this.method!="INVITE") {
         console.error("SIPDialog:createAck(): dialog was not created with an INVITE" + this.method);
         throw "SIPDialog:createAck(): dialog was not created with an INVITE" + this.method;
@@ -23592,12 +22141,10 @@ SIPDialog.prototype.createAck =function(cseqno){
 }
 
 SIPDialog.prototype.setSipProvider =function(sipProvider){
-    if(logger!=undefined) logger.debug("SIPDialog:setSipProvider():sipProvider="+sipProvider);
     this.sipProvider = sipProvider;
 }
 
 SIPDialog.prototype.doTargetRefresh =function(sipMessage){
-    if(logger!=undefined) logger.debug("SIPDialog:doTargetRefresh():sipMessage="+sipMessage);
     var contactList = sipMessage.getContactHeaders();
     if (contactList != null) {
         var contact = contactList.getFirst();
@@ -23606,7 +22153,6 @@ SIPDialog.prototype.doTargetRefresh =function(sipMessage){
 }
 
 SIPDialog.prototype.createReliableProvisionalResponse =function(statusCode){
-    if(logger!=undefined) logger.debug("SIPDialog:createReliableProvisionalResponse():statusCode="+statusCode);
     if (!(this.firstTransactionIsServerTransaction)) {
         console.error("SIPDialog:createReliableProvisionalResponse(): not a Server Dialog!");
         throw "SIPDialog:createReliableProvisionalResponse(): not a Server Dialog!";
@@ -23643,7 +22189,6 @@ SIPDialog.prototype.createReliableProvisionalResponse =function(statusCode){
 }
 
 SIPDialog.prototype.sendReliableProvisionalResponse =function(relResponse){
-    if(logger!=undefined) logger.debug("SIPDialog:sendReliableProvisionalResponse():relResponse="+relResponse);
     if (!this.isServer()) {
         console.error("SIPDialog:sendReliableProvisionalResponse(): not a Server Dialog!");
         throw "SIPDialog:sendReliableProvisionalResponse(): not a Server Dialog!";
@@ -23684,32 +22229,26 @@ SIPDialog.prototype.sendReliableProvisionalResponse =function(relResponse){
 }
 
 SIPDialog.prototype.terminateOnBye =function(terminateFlag){
-    if(logger!=undefined) logger.debug("SIPDialog:terminateOnBye():terminateFlag:"+terminateFlag);
     this.terminateOnBye = terminateFlag;
 }
 
 SIPDialog.prototype.getMyContactHeader =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getMyContactHeader()");
     return this.contactHeader;
 }
 
 SIPDialog.prototype.handleAck =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:handleAck()");
     return true;
 }
 
 SIPDialog.prototype.setEarlyDialogId =function(earlyDialogId){
-    if(logger!=undefined) logger.debug("SIPDialog:setEarlyDialogId():earlyDialogId:"+earlyDialogId);
     this.earlyDialogId = earlyDialogId;
 }
 
 SIPDialog.prototype.getEarlyDialogId =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getEarlyDialogId()");
     return this.earlyDialogId;
 }
 
 SIPDialog.prototype.optionPresent =function(l,option){
-    if(logger!=undefined) logger.debug("SIPDialog:optionPresent():l,option:"+l+","+option);
     for(var i=0;i<l.length;i++)
     {
         var opt =  l[i];
@@ -23721,32 +22260,26 @@ SIPDialog.prototype.optionPresent =function(l,option){
 }
 
 SIPDialog.prototype.setLastAckReceived =function(lastAckReceived){
-    if(logger!=undefined) logger.debug("SIPDialog:setLastAckReceived():lastAckReceived:"+lastAckReceived);
     this.lastAckReceived = lastAckReceived;
 }
 
 SIPDialog.prototype.getLastAckReceived =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getLastAckReceived()");
     return this.lastAckReceived;
 }
 
 SIPDialog.prototype.setLastAckSent =function(lastAckSent){
-    if(logger!=undefined) logger.debug("SIPDialog:setLastAckSent():lastAckSent:"+lastAckSent);
     this.lastAckSent = lastAckSent;
 }
 
 SIPDialog.prototype.isAtleastOneAckSent =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:isAtleastOneAckSent()");
     return this.isAcknowledged;
 }
 
 SIPDialog.prototype.isBackToBackUserAgent =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:isBackToBackUserAgent()");
     return this.isBackToBackUserAgent;
 }
 
 SIPDialog.prototype.doDeferredDeleteIfNoAckSent =function(seqno){
-    if(logger!=undefined) logger.debug("SIPDialog:doDeferredDeleteIfNoAckSent():seqno:"+seqno);
     if (this.sipStack.getTimer() == null) {
         this.setState(this.TERMINATED_STATE);
     } 
@@ -23761,42 +22294,34 @@ SIPDialog.prototype.doDeferredDeleteIfNoAckSent =function(seqno){
 }
 
 SIPDialog.prototype.setBackToBackUserAgent =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:setBackToBackUserAgent()");
     this.isBackToBackUserAgent = true;
 }
 
 SIPDialog.prototype.getEventHeader =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:getEventHeader()");
     return eventHeader;
 }
 
 SIPDialog.prototype.setEventHeader =function(eventHeader){
-    if(logger!=undefined) logger.debug("SIPDialog:setEventHeader():eventHeader:"+eventHeader);
     this.eventHeader = eventHeader;
 }
 
 SIPDialog.prototype.setServerTransactionFlag =function(serverTransactionFlag){
-    if(logger!=undefined) logger.debug("SIPDialog:setServerTransactionFlag():serverTransactionFlag="+serverTransactionFlag);
     this.serverTransactionFlag = serverTransactionFlag;
 }
 
 SIPDialog.prototype.setReInviteFlag =function(reInviteFlag){
-    if(logger!=undefined) logger.debug("SIPDialog:setReInviteFlag():reInviteFlag="+reInviteFlag);
     this.reInviteFlag = reInviteFlag
 }
 
 SIPDialog.prototype.isSequnceNumberValidation =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:isSequnceNumberValidation()");
     return this.sequenceNumberValidation;
 }
 
 SIPDialog.prototype.disableSequenceNumberValidation =function(){
-    if(logger!=undefined) logger.debug("SIPDialog:disableSequenceNumberValidation()");
     this.sequenceNumberValidation = false;
 }
 
 SIPDialog.prototype.raiseErrorEvent =function(dialogTimeoutError){
-    if(logger!=undefined) logger.debug("SIPDialog:raiseErrorEvent():dialogTimeoutError="+dialogTimeoutError);
     var nextListener=null;
     var newErrorEvent = new SIPDialogErrorEvent(this, dialogTimeoutError);
     for(var i=0;i<this.eventListeners.length;i++)
@@ -23844,7 +22369,6 @@ SIPDialog.prototype.raiseErrorEvent =function(dialogTimeoutError){
  *   
  */
 function SIPDialogErrorEvent(sourceDialog,dialogErrorID) {
-    if(logger!=undefined) logger.debug("SIPDialogErrorEvent:SIPDialogErrorEvent()");
     this.classname="SIPDialogErrorEvent"; 
     this.errorID=dialogErrorID;
     this.source = sourceDialog;
@@ -23855,12 +22379,10 @@ SIPDialogErrorEvent.prototype.DIALOG_ACK_NOT_SENT_TIMEOUT=2;
 SIPDialogErrorEvent.prototype.DIALOG_REINVITE_TIMEOUT=3;
 
 SIPDialogErrorEvent.prototype.getErrorID =function(){
-    if(logger!=undefined) logger.debug("SIPDialogErrorEvent:getErrorID()");
     return this.errorID;
 }
 
 SIPDialogErrorEvent.prototype.getSource =function(){
-    if(logger!=undefined) logger.debug("SIPDialogErrorEvent:getSource()");
     return this.source;
 }
 /*
@@ -23894,12 +22416,10 @@ SIPDialogErrorEvent.prototype.getSource =function(){
  *   
  */
 function SIPDialogEventListener(dialogErrorEvent) {
-    if(logger!=undefined) logger.debug("SIPDialogEventListener:SIPDialogEventListener()");
     this.classname="SIPDialogEventListener"; 
 }
 
 SIPDialogEventListener.prototype.dialogErrorEvent =function(){
-    if(logger!=undefined) logger.debug("SIPDialogEventListener:dialogErrorEvent()");
 }
 
 /*
@@ -23934,7 +22454,6 @@ SIPDialogEventListener.prototype.dialogErrorEvent =function(){
  */
 var siptransaction;
 function SIPTransaction(newParentStack,newEncapsulatedChannel) {
-    if(logger!=undefined) logger.debug("SIPTransaction:SIPTransaction()");
     this.classname="SIPTransaction"; 
     this.toListener=null;
     this.applicationData=null;
@@ -24001,7 +22520,6 @@ SIPTransaction.prototype.TIMEOUT_RETRANSMIT = 3;
 SIPTransaction.prototype.CONNECTION_LINGER_TIME=8;
 
 function lingerTimer() {
-    if(logger!=undefined) logger.debug("lingerTimer()");
     var transaction = siptransaction;
     var sipStack = transaction.getSIPStack();
     if (transaction instanceof SIPClientTransaction) {
@@ -24013,12 +22531,10 @@ function lingerTimer() {
 }
 
 SIPTransaction.prototype.getBranchId =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getBranchId()");
     return this.branch;
 }
 
 SIPTransaction.prototype.setOriginalRequest =function(newOriginalRequest){
-    if(logger!=undefined) logger.debug("SIPTransaction:setOriginalRequest():newOriginalRequest="+newOriginalRequest);
     var newBranch= null;
     if (this.originalRequest != null
         && (this.originalRequest.getTransactionId()!=newOriginalRequest.getTransactionId())) {
@@ -24044,17 +22560,14 @@ SIPTransaction.prototype.setOriginalRequest =function(newOriginalRequest){
 }
 
 SIPTransaction.prototype.getOriginalRequest =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getOriginalRequest()");
     return this.originalRequest;
 }
 
 SIPTransaction.prototype.getRequest =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getRequest()");
     return this.originalRequest;
 }
 
 SIPTransaction.prototype.isInviteTransaction =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:isInviteTransaction()");
     if(this.getMethod()=="INVITE")
     {
         return true;
@@ -24066,7 +22579,6 @@ SIPTransaction.prototype.isInviteTransaction =function(){
 }
 
 SIPTransaction.prototype.isCancelTransaction =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:isCancelTransaction()");
     if(this.getMethod()=="CANCEL")
     {
         return true;
@@ -24078,7 +22590,6 @@ SIPTransaction.prototype.isCancelTransaction =function(){
 }
 
 SIPTransaction.prototype.isByeTransaction =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:isByeTransaction()");
     if(this.getMethod()=="BYE")
     {
         return true;
@@ -24090,16 +22601,13 @@ SIPTransaction.prototype.isByeTransaction =function(){
 }
 
 SIPTransaction.prototype.getMessageChannel =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getMessageChannel()");
     return this.encapsulatedChannel;
 }
 
 SIPTransaction.prototype.setBranch =function(newBranch){
-    if(logger!=undefined) logger.debug("SIPTransaction:setBranch():newBranch:"+newBranch);
     this.branch = newBranch;
 }
 SIPTransaction.prototype.getBranch =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getBranch()");
     if (this.branch == null) {
         this.branch = this.getOriginalRequest().getTopmostVia().getBranch();
     }
@@ -24107,17 +22615,14 @@ SIPTransaction.prototype.getBranch =function(){
 }
 
 SIPTransaction.prototype.getMethod =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getMethod()");
     return this.method;
 }
 
 SIPTransaction.prototype.getCSeq =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getCSeq()");
     return this.cSeq;
 }
 
 SIPTransaction.prototype.setState =function(newState){
-    if(logger!=undefined) logger.debug("SIPTransaction:setState():newState="+newState);
     if (this.currentState == "COMPLETED") {
         if (newState != "TERMINATED" && newState != "CONFIRMED")
             newState = "COMPLETED";
@@ -24139,22 +22644,18 @@ SIPTransaction.prototype.setState =function(newState){
 }
 
 SIPTransaction.prototype.getState =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getState()");
     return this.currentState;
 }
 
 SIPTransaction.prototype.enableTimeoutTimer =function(tickCount){
-    if(logger!=undefined) logger.debug("SIPTransaction:enableTimeoutTimer():tickCount="+tickCount);
     this.timeoutTimerTicksLeft = tickCount;
 }
 
 SIPTransaction.prototype.disableTimeoutTimer =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:disableTimeoutTimer()");
     this.timeoutTimerTicksLeft = -1;
 }
 
 SIPTransaction.prototype.fireTimer =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:fireTimer()");
     if (this.timeoutTimerTicksLeft != -1) {
         if (--this.timeoutTimerTicksLeft == 0) {
             this.fireTimeoutTimer();
@@ -24163,7 +22664,6 @@ SIPTransaction.prototype.fireTimer =function(){
 }
 
 SIPTransaction.prototype.isTerminated =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:isTerminated()");
     if(this.getState() == "TERMINATED")
     {
         return true;
@@ -24175,45 +22675,37 @@ SIPTransaction.prototype.isTerminated =function(){
 }
 
 SIPTransaction.prototype.getURLWS =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getURLWS()");
     return this.encapsulatedChannel.getURLWS();
 }
 
 SIPTransaction.prototype.getKey =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getKey()");
     return this.encapsulatedChannel.getKey();
 }
 
 SIPTransaction.prototype.getSIPStack =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getSIPStack()");
     return this.sipStack;
 }
 
 SIPTransaction.prototype.getTransport =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getTransport()");
     return this.encapsulatedChannel.getTransport();
 }
 
 SIPTransaction.prototype.isReliable =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:isReliable()");
     return true;
 }
 
 SIPTransaction.prototype.getViaHeader =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getViaHeader()");
     var channelViaHeader = WSMessageChannel.prototype.getViaHeader.call(this);
     channelViaHeader.setBranch(this.branch);
     return channelViaHeader;
 }
 
 SIPTransaction.prototype.sendMessage=function(messageToSend){
-    if(logger!=undefined) logger.debug("SIPTransaction:sendMessageargu1():messageToSend="+messageToSend);
     this.encapsulatedChannel.sendMessage(messageToSend);
 //this.startTransactionTimer();
 }
 
 SIPTransaction.prototype.addEventListener =function(newListener){
-    if(logger!=undefined) logger.debug("SIPTransaction:addEventListener():newListener="+newListener);
     var l=null;
     for(var i=0;i<this.eventListeners.length;i++)
     {
@@ -24229,7 +22721,6 @@ SIPTransaction.prototype.addEventListener =function(newListener){
 }
 
 SIPTransaction.prototype.removeEventListener =function(oldListener){
-    if(logger!=undefined) logger.debug("SIPTransaction:removeEventListener():oldListener="+oldListener);
     var l=null;
     for(var i=0;i<this.eventListeners.length;i++)
     {
@@ -24242,7 +22733,6 @@ SIPTransaction.prototype.removeEventListener =function(oldListener){
 }
 
 SIPTransaction.prototype.raiseErrorEvent =function(errorEventID){
-    if(logger!=undefined) logger.debug("SIPTransaction:raiseErrorEvent():errorEventID="+errorEventID);
     var nextListener=null;
     var newErrorEvent = new SIPTransactionErrorEvent(this, errorEventID);
     for(var i=0;i<this.eventListeners.length;i++)
@@ -24261,7 +22751,6 @@ SIPTransaction.prototype.raiseErrorEvent =function(errorEventID){
 }
 
 SIPTransaction.prototype.isServerTransaction =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:isServerTransaction()");
     if(this instanceof SIPServerTransaction)
     {
         return true;
@@ -24273,35 +22762,28 @@ SIPTransaction.prototype.isServerTransaction =function(){
 }
 
 SIPTransaction.prototype.getDialog =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getDialog()");
 }
 
 SIPTransaction.prototype.setDialog =function(sipDialog,dialogId){
-    if(logger!=undefined) logger.debug("SIPTransaction:setDialog():sipDialog="+sipDialog+", dialogId="+dialogId);
 }
 
 SIPTransaction.prototype.getViaHost =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getViaHost()");
     return this.getViaHeader().getHost();
 }
 
 SIPTransaction.prototype.getLastResponse =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getLastResponse()");
     return this.lastResponse;
 }
 
 SIPTransaction.prototype.getResponse =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getResponse()");
     return this.lastResponse;
 }
 
 SIPTransaction.prototype.getTransactionId =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getTransactionId()");
     return this.transactionId;
 }
 
 SIPTransaction.prototype.hashCode =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:hashCode()");
     if (this.transactionId == null)
     {
         return -1;
@@ -24328,17 +22810,14 @@ SIPTransaction.prototype.hashCode =function(){
 }
 
 SIPTransaction.prototype.getViaPort =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getViaPort()");
     return this.getViaHeader().getPort();
 }
 
 SIPTransaction.prototype.getPort =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getPort()");
     return this.encapsulatedChannel.getPort();
 }
 
 SIPTransaction.prototype.doesCancelMatchTransaction =function(requestToTest){
-    if(logger!=undefined) logger.debug("SIPTransaction:doesCancelMatchTransaction():requestToTest="+requestToTest);
     var viaHeaders;
     var topViaHeader;
     var messageBranch;
@@ -24385,79 +22864,64 @@ SIPTransaction.prototype.doesCancelMatchTransaction =function(requestToTest){
 }
 
 SIPTransaction.prototype.close =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:close()");
     this.encapsulatedChannel.close();
 }
 
 SIPTransaction.prototype.isSecure =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:isSecure()");
     return this.encapsulatedChannel.isSecure();
 }
 
 SIPTransaction.prototype.getMessageProcessor =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getMessageProcessor()");
     return this.encapsulatedChannel.getMessageProcessor();
 }
 
 SIPTransaction.prototype.setApplicationData =function(applicationData){
-    if(logger!=undefined) logger.debug("SIPTransaction:setApplicationData():applicationData="+applicationData);
     this.applicationData = applicationData;
 }
 
 SIPTransaction.prototype.getURLWS =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getURLWS()");
     return this.wsurl;
 }
 
 SIPTransaction.prototype.getApplicationData =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getApplicationData()");
     return this.applicationData;
 }
 
 SIPTransaction.prototype.setEncapsulatedChannel =function(messageChannel){
-    if(logger!=undefined) logger.debug("SIPTransaction:setEncapsulatedChannel():messageChannel="+messageChannel);
     this.encapsulatedChannel = messageChannel;
 }
 
 SIPTransaction.prototype.getSipProvider =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getSipProvider()");
     return this.getMessageProcessor().getListeningPoint().getProvider();
 }
 
 SIPTransaction.prototype.raiseIOExceptionEvent =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:raiseIOExceptionEvent()");
     this.setState("TERMINATED");
 }
 
 SIPTransaction.prototype.passToListener =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:passToListener()");
     return this.toListener;
 }
 
 SIPTransaction.prototype.setPassToListener =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:setPassToListener()");
     this.toListener = true;
 }
 
 SIPTransaction.prototype.testAndSetTransactionTerminatedEvent =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:testAndSetTransactionTerminatedEvent()");
     var retval=!this.terminatedEventDelivered;
     this.terminatedEventDelivered = true;
     return retval;
 }
 
 SIPTransaction.prototype.startTransactionTimer =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:startTransactionTimer()");
     
 }
 
 SIPTransaction.prototype.isMessagePartOfTransaction =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:isMessagePartOfTransaction()");
     
 }
 
 SIPTransaction.prototype.fireTimeoutTimer =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:fireTimeoutTimer()");
     
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -24491,7 +22955,6 @@ SIPTransaction.prototype.fireTimeoutTimer =function(){
  */
 
 function SIPClientTransaction(newSIPStack,newChannelToUse) {
-    if(logger!=undefined) logger.debug("SIPClientTransaction:SIPClientTransaction():");
     this.classname="SIPClientTransaction"; 
     this.encapsulatedChannel=newChannelToUse;
     this.wsurl=this.encapsulatedChannel.wsurl;
@@ -24553,17 +23016,14 @@ SIPClientTransaction.prototype.CONNECTION_LINGER_TIME=8;
 SIPClientTransaction.prototype.BASE_TIMER_INTERVAL=500;
 
 SIPClientTransaction.prototype.setResponseInterface =function(newRespondTo){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:setResponseInterface():newRespondTo="+newRespondTo);
     this.respondTo = newRespondTo;
 }
 
 SIPClientTransaction.prototype.getRequestChannel =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:getRequestChannel()");
     return this;
 }
 
 SIPClientTransaction.prototype.isMessagePartOfTransaction =function(messageToTest){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:isMessagePartOfTransaction():messageToTest="+messageToTest);
     var viaHeaders = messageToTest.getViaHeaders();
     var transactionMatches= false;
     var messageBranch =  viaHeaders.getFirst().getBranch();
@@ -24641,7 +23101,6 @@ SIPClientTransaction.prototype.isMessagePartOfTransaction =function(messageToTes
 }
 
 SIPClientTransaction.prototype.sendMessage =function(messageToSend){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:sendMessage():messageToSend="+messageToSend);
     var transactionRequest = messageToSend;
     var topVia =  transactionRequest.getViaHeaders().getFirst();
     topVia.setBranch(this.getBranch());
@@ -24686,7 +23145,6 @@ SIPClientTransaction.prototype.sendMessage =function(messageToSend){
 }
 
 SIPClientTransaction.prototype.processResponse =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:processResponse()");
     if(arguments.length==2)
     {
         var sipResponse=arguments[0];
@@ -24703,8 +23161,6 @@ SIPClientTransaction.prototype.processResponse =function(){
 }
 
 SIPClientTransaction.prototype.processResponseargu2 =function(sipResponse,incomingChannel){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:processResponseargu2(): sipResponse="+sipResponse);
-    if(logger!=undefined) logger.debug("SIPClientTransaction:processResponseargu2(): incomingChannel="+incomingChannel);
     var dialog = null;
     var method = sipResponse.getCSeq().getMethod();
     var dialogId = sipResponse.getDialogId(false);
@@ -24760,9 +23216,6 @@ SIPClientTransaction.prototype.processResponseargu2 =function(sipResponse,incomi
 }
 
 SIPClientTransaction.prototype.processResponseargu3 =function(transactionResponse,sourceChannel,dialog){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():transactionResponse="+transactionResponse);
-    if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():sourceChannel="+sourceChannel);
-    if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():sipDialog="+dialog);
 
     if (this.getState() == null)
     {
@@ -24789,9 +23242,6 @@ SIPClientTransaction.prototype.processResponseargu3 =function(transactionRespons
 }
 
 SIPClientTransaction.prototype.nonInviteClientTransaction =function(transactionResponse,sourceChannel,sipDialog){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():transactionResponse="+transactionResponse);
-    if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():sourceChannel="+sourceChannel);
-    if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():sipDialog="+sipDialog);
 
     var statusCode = transactionResponse.getStatusCode();
     if (this.TRYING == this.getState()) {
@@ -24838,9 +23288,6 @@ SIPClientTransaction.prototype.nonInviteClientTransaction =function(transactionR
 }
 
 SIPClientTransaction.prototype.inviteClientTransaction =function(transactionResponse,sourceChannel,dialog){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():transactionResponse="+transactionResponse);
-    if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():sourceChannel="+sourceChannel);
-    if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():dialog="+dialog);
     var statusCode = transactionResponse.getStatusCode();
     if (this.TERMINATED == this.getState()) {
         var ackAlreadySent = false;
@@ -24936,7 +23383,6 @@ SIPClientTransaction.prototype.inviteClientTransaction =function(transactionResp
 }
 
 SIPClientTransaction.prototype.sendRequest =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:sendRequest()");
     var sipRequest = this.getOriginalRequest();
     if (this.getState() != null)
     {
@@ -24987,7 +23433,6 @@ SIPClientTransaction.prototype.sendRequest =function(){
 }
 
 SIPClientTransaction.prototype.fireTimeoutTimer =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:fireTimeoutTimer()");
     clearTimeout(this.timer);
     var dialog = this.getDialog();
     if (this.CALLING == this.getState()|| this.TRYING == this.getState()
@@ -25021,7 +23466,6 @@ SIPClientTransaction.prototype.fireTimeoutTimer =function(){
 }
 
 SIPClientTransaction.prototype.createCancel =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:createCancel()");
     var originalRequest = this.getOriginalRequest();
     if (originalRequest == null)
     {
@@ -25046,7 +23490,6 @@ SIPClientTransaction.prototype.createCancel =function(){
 }
 
 SIPClientTransaction.prototype.createAck =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:createAck()");
     var originalRequest = this.getOriginalRequest();
     if (originalRequest == null)
     {
@@ -25114,7 +23557,6 @@ SIPClientTransaction.prototype.createAck =function(){
 }
 
 SIPClientTransaction.prototype.createErrorAck =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:createErrorAck()");
     var originalRequest = this.getOriginalRequest();
     if (originalRequest == null)
     {
@@ -25140,37 +23582,30 @@ SIPClientTransaction.prototype.createErrorAck =function(){
 }
 
 SIPClientTransaction.prototype.setViaPort =function(port){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:setViaPort():port="+port);
     this.viaPort = port;
 }
 
 SIPClientTransaction.prototype.setViaHost =function(host){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:setViaHost():host="+host);
     this.viaHost = host;
 }
 
 SIPClientTransaction.prototype.getViaPort =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:getViaPort()");
     return this.viaPort;
 }
 
 SIPClientTransaction.prototype.getViaHost =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:getViaHost()");
     return this.viaHost;
 }
 
 SIPClientTransaction.prototype.getOutgoingViaHeader =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:getOutgoingViaHeader()");
     return this.getMessageProcessor().getViaHeader();
 }
 
 SIPClientTransaction.prototype.clearState =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:clearState()");
     
 }
 
 SIPClientTransaction.prototype.setState =function(newState){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:setState():newState="+newState);
     if (newState == this.TERMINATED && this.isReliable()) {
         this.collectionTime = this.TIMER_J;
     }
@@ -25182,7 +23617,6 @@ SIPClientTransaction.prototype.setState =function(newState){
 }
 
 SIPClientTransaction.prototype.startTransactionTimer =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:startTransactionTimer()");
     if (this.transactionTimerStarted==false) {
         this.transactionTimerStarted=true;
         if (this.sipStack.getTimer() != null ) {
@@ -25203,12 +23637,10 @@ SIPClientTransaction.prototype.startTransactionTimer =function(){
 }
 
 SIPClientTransaction.prototype.terminate =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:terminate()");
     this.setState(this.TERMINATED);
 }
 
 SIPClientTransaction.prototype.checkFromTag =function(sipResponse){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:checkFromTag():sipResponse="+sipResponse);
     var originalFromTag = this.getRequest().getFromTag();
     if (this.defaultDialog != null) {
         if (originalFromTag == null ^ sipResponse.getFrom().getTag() == null) {
@@ -25223,7 +23655,6 @@ SIPClientTransaction.prototype.checkFromTag =function(sipResponse){
 }
 
 SIPClientTransaction.prototype.getDialog =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:getDialog()");
     if(arguments.length==0)
     {
         return this.getDialogargu0();
@@ -25236,7 +23667,6 @@ SIPClientTransaction.prototype.getDialog =function(){
 }
 
 SIPClientTransaction.prototype.getDialogargu0 =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:getDialogargu0()");
     var retval = null;
     if (this.lastResponse != null && this.lastResponse.getFromTag() != null
         && this.lastResponse.getToTag() != null
@@ -25251,7 +23681,6 @@ SIPClientTransaction.prototype.getDialogargu0 =function(){
 }
 
 SIPClientTransaction.prototype.getDialogargu1 =function(dialogId){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:getDialogargu1():dialogId="+dialogId);
     var retval=null;
     for(var i=0;i<this.sipDialogs.length;i++)
     {
@@ -25264,8 +23693,6 @@ SIPClientTransaction.prototype.getDialogargu1 =function(dialogId){
 }
 
 SIPClientTransaction.prototype.setDialog =function(sipDialog,dialogId){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:setDialog():sipDialog="+sipDialog);
-    if(logger!=undefined) logger.debug("SIPClientTransaction:setDialog():dialogId="+dialogId);
     if (sipDialog == null) {
         console.error("SIPClientTransaction:setDialog(): bad dialog argument");
         throw "SIPClientTransaction:setDialog(): bad dialog argument";
@@ -25297,22 +23724,18 @@ SIPClientTransaction.prototype.setDialog =function(sipDialog,dialogId){
 }
 
 SIPClientTransaction.prototype.getDefaultDialog =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:getDefaultDialog()");
     return this.defaultDialog;
 }
 
 SIPClientTransaction.prototype.setNextHop =function(hop){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:setNextHop():hop="+hop);
     this.nextHop = hop;
 }
 
 SIPClientTransaction.prototype.getNextHop =function(){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:getNextHop()");
     return this.nextHop;
 }
 
 SIPClientTransaction.prototype.alertIfStillInCallingStateBy =function(count){
-    if(logger!=undefined) logger.debug("SIPClientTransaction:alertIfStillInCallingStateBy():count="+count);
     this.timeoutIfStillInCallingState = true;
     this.callingStateTimeoutCount = count;
 }/*
@@ -25347,7 +23770,6 @@ SIPClientTransaction.prototype.alertIfStillInCallingStateBy =function(count){
  */
 var sipservertransaction=this;
 function SIPServerTransaction(sipStack,newChannelToUse) {
-    if(logger!=undefined) logger.debug("SIPServerTransaction:SIPServerTransaction()");
     this.classname="SIPServerTransaction"; 
     this.auditTag = 0;
     this.sipStack=sipStack;
@@ -25394,7 +23816,6 @@ SIPServerTransaction.prototype.ExpiresHeader="Expires";
 SIPServerTransaction.prototype.ContactHeader="Contact";
 
 function listenerExecutionMaxTimer(){
-    if(logger!=undefined) logger.debug("ListenerExecutionMaxTimer()");
     var serverTransaction = sipservertransaction;
     if (serverTransaction.getState() == null) {
         serverTransaction.terminate();
@@ -25405,17 +23826,14 @@ function listenerExecutionMaxTimer(){
 }
 
 SIPServerTransaction.prototype.setRequestInterface =function(newRequestOf){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:setRequestInterface():newRequestOf="+newRequestOf);
     this.requestOf = newRequestOf;
 }
 
 SIPServerTransaction.prototype.getResponseChannel =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:getResponseChannel()");
     return this;
 }
 
 SIPServerTransaction.prototype.isMessagePartOfTransaction =function(messageToTest){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:isMessagePartOfTransaction():messageToTest="+messageToTest);
     var transactionMatches = false;
     var method = messageToTest.getCSeq().getMethod();
     if (method==this.INVITE || !this.isTerminated()) {
@@ -25510,12 +23928,10 @@ SIPServerTransaction.prototype.isMessagePartOfTransaction =function(messageToTes
 }
 
 SIPServerTransaction.prototype.isTransactionMapped =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:isTransactionMapped()");
     return this.isMapped;
 }
 
 SIPServerTransaction.prototype.processRequest =function(transactionRequest,sourceChannel){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:processRequest():transactionRequest="+transactionRequest+", sourceChannel="+sourceChannel);
     var toTu = false;
     if (this.getRealState() == null) {
         this.setOriginalRequest(transactionRequest);
@@ -25584,7 +24000,6 @@ SIPServerTransaction.prototype.processRequest =function(transactionRequest,sourc
 }
 
 SIPServerTransaction.prototype.sendMessage =function(messageToSend){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:sendMessage():messageToSend="+messageToSend);
     var transactionResponse = messageToSend;
     var statusCode = transactionResponse.getStatusCode();
     if (this.getOriginalRequest().getTopmostVia().getBranch() != null) {
@@ -25663,17 +24078,14 @@ SIPServerTransaction.prototype.sendMessage =function(messageToSend){
 }
 
 SIPServerTransaction.prototype.getViaHost =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:getViaHost()");
     return this.getMessageChannel().getViaHost();
 }
 
 SIPServerTransaction.prototype.getViaPort =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:getViaPort()");
     return this.getMessageChannel().getViaPort();
 }
 
 SIPServerTransaction.prototype.fireTimeoutTimer =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:fireTimeoutTimer()");
     clearTimeout(this.timer);
     if (this.getMethod()=="INVITE" && this.sipStack.removeTransactionPendingAck(this)) {
         return;
@@ -25714,18 +24126,15 @@ SIPServerTransaction.prototype.fireTimeoutTimer =function(){
 }
 
 SIPServerTransaction.prototype.getLastResponse =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:getLastResponse()");
     return this.lastResponse;
 }
 
 SIPServerTransaction.prototype.sendResponseSRT =function(transactionResponse){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:sendResponseSRT():transactionResponse:"+transactionResponse);
     this.getMessageChannel().sendMessage(transactionResponse);
     this.startTransactionTimer();
 }
 
 SIPServerTransaction.prototype.sendResponse =function(response){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:sendResponse():response:"+response);
     var sipResponse = response;
     var dialog = this.dialog;
     if (response == null) {
@@ -25822,12 +24231,10 @@ SIPServerTransaction.prototype.sendResponse =function(response){
 }
 
 SIPServerTransaction.prototype.getRealState =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:getRealState()");
     return SIPTransaction.prototype.getState.call(this);
 }
 
 SIPServerTransaction.prototype.getState =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:getState()");
     if (this.isInviteTransaction() && "TRYING" == SIPTransaction.prototype.getState.call(this)) {
         return "PROCEEDING";
     } 
@@ -25837,7 +24244,6 @@ SIPServerTransaction.prototype.getState =function(){
 }
 
 SIPServerTransaction.prototype.setState =function(newState){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:setState():newState:"+newState);
     if (newState == "TERMINATED" && this.isReliable()) {
         this.collectionTime = this.TIMER_J;
     }
@@ -25845,7 +24251,6 @@ SIPServerTransaction.prototype.setState =function(newState){
 }
 
 SIPServerTransaction.prototype.startTransactionTimer =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:startTransactionTimer()");
     if(this.transactionTimerStarted==false)
     {
         this.transactionTimerStarted=true;
@@ -25864,12 +24269,10 @@ SIPServerTransaction.prototype.startTransactionTimer =function(){
 }
 
 SIPServerTransaction.prototype.getDialog =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:getDialog()");
     return this.dialog;
 }
 
 SIPServerTransaction.prototype.setDialog =function(sipDialog,dialogId){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:setDialog():sipDialog,dialogId:"+sipDialog+","+dialogId);
     this.dialog = sipDialog;
     if (dialogId != null) {
         this.dialog.setAssigned();
@@ -25877,42 +24280,34 @@ SIPServerTransaction.prototype.setDialog =function(sipDialog,dialogId){
 }
 
 SIPServerTransaction.prototype.terminate =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:terminate()");
     this.setState("TERMINATED");
 }
 
 SIPServerTransaction.prototype.setAckSeen =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:setAckSeen()");
     this.isAckSeen = true;
 }
 
 SIPServerTransaction.prototype.ackSeen =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:ackSeen()");
     return this.isAckSeen;
 }
 
 SIPServerTransaction.prototype.setMapped =function(b){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:setMapped():b="+b);
     this.isMapped = true;
 }
 
 SIPServerTransaction.prototype.setPendingSubscribe =function(pendingSubscribeClientTx){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:setPendingSubscribe():pendingSubscribeClientTx="+pendingSubscribeClientTx);
     this.pendingSubscribeTransaction = pendingSubscribeClientTx;
 }
 
 SIPServerTransaction.prototype.setInviteTransaction =function(st){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:setInviteTransaction():st:"+st);
     this.inviteTransaction = st;
 }
 
 SIPServerTransaction.prototype.getCanceledInviteTransaction =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:getCanceledInviteTransaction()");
     return this.inviteTransaction;
 }
 
 SIPServerTransaction.prototype.scheduleAckRemoval =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:scheduleAckRemoval()");
     if (this.getMethod() == null || this.getMethod()!="ACK") {
         console.error("SIPServerTransaction:scheduleAckRemoval():  method is null[" + (this.getMethod() == null)+ "] or method is not ACK[" + this.getMethod() + "]");
         throw "SIPServerTransaction:scheduleAckRemoval():  method is null[" + (this.getMethod() == null)+ "] or method is not ACK[" + this.getMethod() + "]";
@@ -25921,7 +24316,6 @@ SIPServerTransaction.prototype.scheduleAckRemoval =function(){
 }
 
 SIPServerTransaction.prototype.map =function(){
-    if(logger!=undefined) logger.debug("SIPServerTransaction:map()");
     var realState = this.getRealState();
     if (realState == null || realState == "TRYING") {
         this.isMapped = true;
@@ -25957,7 +24351,6 @@ SIPServerTransaction.prototype.map =function(){
  *  @version 1.0 
  */
 function Utils() {
-    if(logger!=undefined) logger.debug("Utils:Utils()");
     this.classname="Utils";
     //this.digester=null; 
     //there is no class MessageDigest, so i use the function digeste(MP5) to replace this object. 
@@ -25972,12 +24365,10 @@ function Utils() {
 Utils.prototype.BRANCH_MAGIC_COOKIE="z9hG4bK";
 
 Utils.prototype.getInstance =function(){
-    if(logger!=undefined) logger.debug("Utils:getInstance()");
     return new Function('return new ' + this.instance)();
 }
 
 Utils.prototype.toHexString =function(b){
-    if(logger!=undefined) logger.debug("Utils:toHexString():b="+b);
     var c = "";
     for (var i = 0; i < b.length; i++) {
         c=c+this.toHex[(b[i] >> 4) & 0x0F];
@@ -25987,12 +24378,10 @@ Utils.prototype.toHexString =function(b){
 }
 
 Utils.prototype.getQuotedString =function(str){
-    if(logger!=undefined) logger.debug("Utils:getQuotedString():str="+str);
     return '"' + str.replace( "\"", "\\\"" ) + '"';
 }
 
 Utils.prototype.reduceString =function(input){
-    if(logger!=undefined) logger.debug("Utils:reduceString():input="+input);
     var newString = input.toLowerCase();
     var len = newString.length();
     var retval = "";
@@ -26010,7 +24399,6 @@ Utils.prototype.reduceString =function(input){
 }
 
 Utils.prototype.generateCallIdentifier =function(address){
-    if(logger!=undefined) logger.debug("Utils:generateCallIdentifier():address="+address);
     var date = new Date().getTime() + this.callIDCounter+Math.round(this.rand*100000000000000000000);
     var x=new String(this.getBytes(date.toString()))
     var cid = this.digest(x);
@@ -26019,13 +24407,11 @@ Utils.prototype.generateCallIdentifier =function(address){
 }
 
 Utils.prototype.generateTag =function(){
-    if(logger!=undefined) logger.debug("Utils:generateTag()");
     var x=Math.round(this.rand*10000000000);
     return x.toString(16);
 }
 
 Utils.prototype.generateBranchId =function(){
-    if(logger!=undefined) logger.debug("Utils:generateBranchId()");
     var date=new Date().getTime();
     var num = Math.round(this.rand*100000000000000000000)+ this.counter+date;
     var x = new String(this.getBytes(num.toString()));
@@ -26035,7 +24421,6 @@ Utils.prototype.generateBranchId =function(){
 }
 
 Utils.prototype.responseBelongsToUs =function(response){
-    if(logger!=undefined) logger.debug("Utils:responseBelongsToUs():response="+response.classname);
     var topmostVia = response.getTopmostVia();
     var branch = topmostVia.getBranch();
     var x=branch.length-1;
@@ -26060,22 +24445,20 @@ Utils.prototype.responseBelongsToUs =function(response){
 
 
 Utils.prototype.getSignature =function(){
-    if(logger!=undefined) logger.debug("Utils:getSignature()");
     return this.signature;
 }
 
 Utils.prototype.randomString= function(stringLength) {
-	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-	var randomString = '';
-	for (var i=0; i<stringLength; i++) {
-		var rnum = Math.floor(Math.random() * chars.length);
-		randomString += chars.substring(rnum,rnum+1);
-	}
-	return randomString;
+        var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+        var randomString = '';
+        for (var i=0; i<stringLength; i++) {
+                var rnum = Math.floor(Math.random() * chars.length);
+                randomString += chars.substring(rnum,rnum+1);
+        }
+        return randomString;
 }
 
 Utils.prototype.getBytes =function(str){
-    if(logger!=undefined) logger.debug("Utils:getBytes():str="+str);
     var array=new Array();
     str=new String(str);
     for(var i=0;i<str.length;i++)
@@ -26086,7 +24469,6 @@ Utils.prototype.getBytes =function(str){
 }
 
 Utils.prototype.digest =function(string){
-    if(logger!=undefined) logger.debug("Utils:digest()");
     
     function RotateLeft(lValue, iShiftBits) {
         return (lValue<<iShiftBits) | (lValue>>>(32-iShiftBits));
@@ -26330,7 +24712,6 @@ Utils.prototype.digest =function(string){
  *   
  */
 function EventWrapper(sipEvent,transaction) {
-    if(logger!=undefined) logger.debug("EventWrapper:EventWrapper()");
     this.classname="EventWrapper";
     this.sipEvent= sipEvent;
     this.transaction= transaction;
@@ -26368,7 +24749,6 @@ function EventWrapper(sipEvent,transaction) {
  *   
  */
 function EventScanner(sipStackImpl) {
-    if(logger!=undefined) logger.debug("EventScanner:EventScanner()");
     this.classname="EventScanner";
     this.isStopped=null;
     this.refCount=null;
@@ -26381,18 +24761,15 @@ function EventScanner(sipStackImpl) {
 EventScanner.prototype.BRANCH_MAGIC_COOKIE="z9hG4bK";
 
 EventScanner.prototype.incrementRefcount =function(){
-    if(logger!=undefined) logger.debug("EventScanner:incrementRefcount()");
     
 }
 
 EventScanner.prototype.addEvent =function(eventWrapper){
-    if(logger!=undefined) logger.debug("EventScanner:addEvent():eventWrapper="+eventWrapper);
     this.pendingEvents.push(eventWrapper);
 //this.eventMutex.notify();
 }
 
 EventScanner.prototype.stop =function(){
-    if(logger!=undefined) logger.debug("EventScanner:stop()");
     if (this.refCount > 0)
     {
         this.refCount--;
@@ -26404,14 +24781,12 @@ EventScanner.prototype.stop =function(){
 }
 
 EventScanner.prototype.forceStop =function(){
-    if(logger!=undefined) logger.debug("EventScanner:forceStop()");
     this.isStopped = true;
     this.refCount = 0;
 //this.eventMutex.notify();
 }
 
 EventScanner.prototype.deliverEvent =function(eventWrapper){
-    if(logger!=undefined) logger.debug("EventScanner:deliverEvent():eventWrapper="+eventWrapper);
     var sipEvent = eventWrapper.sipEvent;
     var sipListener = this.sipStack.getSipListener();
     if (sipEvent instanceof RequestEvent) {
@@ -26496,7 +24871,6 @@ EventScanner.prototype.deliverEvent =function(eventWrapper){
 }
 
 EventScanner.prototype.run =function(){
-    if(logger!=undefined) logger.debug("EventScanner:run()");
     while (true) {
         var eventWrapper = null;
         var eventsToDeliver;
@@ -26553,15 +24927,12 @@ EventScanner.prototype.run =function(){
  *   
  */
 function DialogTerminatedEvent(source,dialog) {
-    if(logger!=undefined) logger.debug("DialogTerminatedEvent:DialogTerminatedEvent(): source="+source);
-    if(logger!=undefined) logger.debug("DialogTerminatedEvent:DialogTerminatedEvent(): dialog="+dialog);
     this.classname="DialogTerminatedEvent";
     this.mDialog=dialog;
     this.source=source;
 }
 
 DialogTerminatedEvent.prototype.getDialog =function(){
-    if(logger!=undefined) logger.debug("TimeoutEvent:getDialog()");
     return this.mDialog;
 }
 
@@ -26596,9 +24967,6 @@ DialogTerminatedEvent.prototype.getDialog =function(){
  *   
  */
 function DialogTimeoutEvent(source,dialog,reason) {
-    if(logger!=undefined) logger.debug("DialogTimeoutEvent:DialogTimeoutEvent(): source="+source);
-    if(logger!=undefined) logger.debug("DialogTimeoutEvent:DialogTimeoutEvent(): dialog="+dialog);
-    if(logger!=undefined) logger.debug("DialogTimeoutEvent:DialogTimeoutEvent(): reason="+reason);
     this.classname="DialogTimeoutEvent";
     this.serialVersionUID = "-2514000059989311925L";
     this.source=source;
@@ -26611,11 +24979,9 @@ DialogTimeoutEvent.prototype.AckNotSent="AckNotSent";
 DialogTimeoutEvent.prototype.ReInviteTimeout="ReInviteTimeout";
 
 DialogTimeoutEvent.prototype.getDialog =function(){
-    if(logger!=undefined) logger.debug("DialogTimeoutEvent:getDialog()");
     return this.m_dialog;
 }
 DialogTimeoutEvent.prototype.getReason =function(){
-    if(logger!=undefined) logger.debug("DialogTimeoutEvent:getReason()");
     return this.m_reason;
 }
 /*
@@ -26648,7 +25014,6 @@ DialogTimeoutEvent.prototype.getReason =function(){
  *  @version 1.0 
  */
 function TransactionTerminatedEvent() {
-    if(logger!=undefined) logger.debug("TransactionTerminatedEvent:TransactionTerminatedEvent()");
     this.classname="TransactionTerminatedEvent";
     this.mTimeout=null;
     this.mIsServerTransaction=null;
@@ -26674,17 +25039,14 @@ function TransactionTerminatedEvent() {
 }
 
 TransactionTerminatedEvent.prototype.isServerTransaction =function(){
-    if(logger!=undefined) logger.debug("TransactionTerminatedEvent:isServerTransaction()");
     return this.mIsServerTransaction;
 }
 
 TransactionTerminatedEvent.prototype.getClientTransaction =function(){
-    if(logger!=undefined) logger.debug("TransactionTerminatedEvent:getClientTransaction()");
     return this.mClientTransaction;
 }
 
 TransactionTerminatedEvent.prototype.getServerTransaction =function(){
-    if(logger!=undefined) logger.debug("TransactionTerminatedEvent:getServerTransaction()");
     return this.mServerTransaction;
 }
 /*
@@ -26717,7 +25079,6 @@ TransactionTerminatedEvent.prototype.getServerTransaction =function(){
  *  @version 1.0 
  */
 function RequestEvent(source,serverTransaction,dialog,request) {
-    if(logger!=undefined) logger.debug("RequestEvent:RequestEvent()");
     this.classname="RequestEvent";
     this.mDialog = dialog;
     this.mRequest = request;
@@ -26726,17 +25087,14 @@ function RequestEvent(source,serverTransaction,dialog,request) {
 }
 
 RequestEvent.prototype.getDialog =function(){
-    if(logger!=undefined) logger.debug("RequestEvent:getDialog()");
     return this.mDialog;
 }
 
 RequestEvent.prototype.getRequest =function(){
-    if(logger!=undefined) logger.debug("RequestEvent:getRequest()");
     return this.mRequest;
 }
 
 RequestEvent.prototype.getServerTransaction =function(){
-    if(logger!=undefined) logger.debug("RequestEvent:getServerTransaction()");
     return this.mServerTransaction;
 }
 
@@ -26770,7 +25128,6 @@ RequestEvent.prototype.getServerTransaction =function(){
  *  @version 1.0 
  */
 function TimeoutEvent() {
-    if(logger!=undefined) logger.debug("TimeoutEvent:TimeoutEvent()");
     this.classname="TimeoutEvent";
     this.mTimeout=null;
     this.mIsServerTransaction=null;
@@ -26803,7 +25160,6 @@ TimeoutEvent.prototype = new TransactionTerminatedEvent();
 TimeoutEvent.prototype.constructor=TimeoutEvent;
 
 TimeoutEvent.prototype.getTimeout =function(){
-    if(logger!=undefined) logger.debug("TimeoutEvent:getTimeout()");
     return this.mTimeout;
 }
 
@@ -26837,7 +25193,6 @@ TimeoutEvent.prototype.getTimeout =function(){
  *  @version 1.0 
  */
 function TransactionTerminatedEvent() {
-    if(logger!=undefined) logger.debug("TransactionTerminatedEvent:TransactionTerminatedEvent()");
     this.classname="TransactionTerminatedEvent";
     this.mTimeout=null;
     this.mIsServerTransaction=null;
@@ -26863,17 +25218,14 @@ function TransactionTerminatedEvent() {
 }
 
 TransactionTerminatedEvent.prototype.isServerTransaction =function(){
-    if(logger!=undefined) logger.debug("TransactionTerminatedEvent:isServerTransaction()");
     return this.mIsServerTransaction;
 }
 
 TransactionTerminatedEvent.prototype.getClientTransaction =function(){
-    if(logger!=undefined) logger.debug("TransactionTerminatedEvent:getClientTransaction()");
     return this.mClientTransaction;
 }
 
 TransactionTerminatedEvent.prototype.getServerTransaction =function(){
-    if(logger!=undefined) logger.debug("TransactionTerminatedEvent:getServerTransaction()");
     return this.mServerTransaction;
 }
 /*
@@ -26907,12 +25259,10 @@ TransactionTerminatedEvent.prototype.getServerTransaction =function(){
  *   
  */
 function DefaultAddressResolver() {
-    if(logger!=undefined) logger.debug("DefaultAddressResolver:DefaultAddressResolver()");
     this.classname="DefaultAddressResolver"; 
 }
 
 DefaultAddressResolver.prototype.resolveAddress =function(inputAddress){
-    if(logger!=undefined) logger.debug("DefaultAddressResolver:resolveAddress():inputAddress="+inputAddress);
     if  (inputAddress.getPort()  != -1)
     {
         return inputAddress;
@@ -26953,7 +25303,6 @@ DefaultAddressResolver.prototype.resolveAddress =function(inputAddress){
  *  @version 1.0 
  */
 function ResponseEvent(source,serverTransaction,dialog,response) {
-    if(logger!=undefined) logger.debug("ResponseEvent");
     this.classname="ResponseEvent";
     this.mDialog = dialog;
     this.mResponse = response;
@@ -26962,15 +25311,12 @@ function ResponseEvent(source,serverTransaction,dialog,response) {
 }
 
 ResponseEvent.prototype.getDialog =function(){
-    if(logger!=undefined) logger.debug("ResponseEvent:getDialog()");
     return this.mDialog;
 }
 ResponseEvent.prototype.getResponse =function(){
-    if(logger!=undefined) logger.debug("ResponseEvent:getResponse()");
     return this.mResponse;
 }
 ResponseEvent.prototype.getClientTransaction =function(){
-    if(logger!=undefined) logger.debug("ResponseEvent:getClientTransaction()");
     return this.mClientTransaction;
 }
 /*
@@ -27003,7 +25349,6 @@ ResponseEvent.prototype.getClientTransaction =function(){
  *  @version 1.0 
  */
 function ResponseEventExt(source,clientTransaction,dialog,response) {
-    if(logger!=undefined) logger.debug("ResponseEventExt");
     this.classname="ResponseEventExt";
     this.mDialog = dialog;
     this.mResponse = response;
@@ -27016,17 +25361,14 @@ ResponseEventExt.prototype = new ResponseEvent();
 ResponseEventExt.prototype.constructor=ResponseEventExt;
 
 ResponseEventExt.prototype.isForkedResponse =function(){
-    if(logger!=undefined) logger.debug("ResponseEvent:isForkedResponse()");
     return this.mServerTransaction == null && this.m_originalTransaction != null;
 }
 
 ResponseEventExt.prototype.setOriginalTransaction =function(originalTransaction){
-    if(logger!=undefined) logger.debug("ResponseEvent:setOriginalTransaction():originalTransaction="+originalTransaction);
     this.m_originalTransaction = originalTransaction;
 }
 
 ResponseEventExt.prototype.getOriginalTransaction =function(){
-    if(logger!=undefined) logger.debug("ResponseEvent:getOriginalTransaction()");
     return this.m_originalTransaction;
 }
 /*
@@ -27060,7 +25402,6 @@ ResponseEventExt.prototype.getOriginalTransaction =function(){
  *   
  */
 function DialogFilter(sipStack) {
-    if(logger!=undefined) logger.debug("DialogFilter:DialogFilter(): sipStack="+sipStack);
     this.classname="DialogFilter"; 
     this.sipStack=sipStack;
     this.transactionChannel=null;
@@ -27068,7 +25409,6 @@ function DialogFilter(sipStack) {
 }
 
 DialogFilter.prototype.processResponse =function(){
-    if(logger!=undefined) logger.debug("DialogFilter:processResponse()");
     if(arguments.length==2)
     {
         var sipResponse=arguments[0];
@@ -27085,8 +25425,6 @@ DialogFilter.prototype.processResponse =function(){
 }
 
 DialogFilter.prototype.processResponseargu2 =function(sipResponse,incomingChannel){
-    if(logger!=undefined) logger.debug("DialogFilter:processResponseargu2():sipResponse="+sipResponse);
-    if(logger!=undefined) logger.debug("DialogFilter:processResponseargu2():incomingChannel="+incomingChannel);
     var dialogID = sipResponse.getDialogId(false);
     var sipDialog = this.sipStack.getDialog(dialogID);
     var method = sipResponse.getCSeq().getMethod();
@@ -27174,9 +25512,6 @@ DialogFilter.prototype.processResponseargu2 =function(sipResponse,incomingChanne
 }
 
 DialogFilter.prototype.processResponseargu3 =function(response,incomingMessageChannel,dialog){
-    if(logger!=undefined) logger.debug("DialogFilter:processResponseargu3():response="+response);
-    if(logger!=undefined) logger.debug("DialogFilter:processResponseargu3(): incomingMessageChannel="+incomingMessageChannel);
-    if(logger!=undefined) logger.debug("DialogFilter:processResponseargu3(): ,dialog="+dialog);
     if (this.listeningPoint == null) {
         return;
     }
@@ -27233,14 +25568,10 @@ DialogFilter.prototype.processResponseargu3 =function(response,incomingMessageCh
 }
 
 DialogFilter.prototype.getSipStack =function(){
-    if(logger!=undefined) logger.debug("DialogFilter:getSipStack()");
     return this.sipStack;
 }
 
 DialogFilter.prototype.sendBadRequestResponse =function(sipRequest,transaction,reasonPhrase){
-    if(logger!=undefined) logger.debug("DialogFilter:sendBadRequestResponse():sipRequest="+sipRequest);
-        if(logger!=undefined) logger.debug("DialogFilter:sendBadRequestResponse(): transaction="+transaction);
-        if(logger!=undefined) logger.debug("DialogFilter:sendBadRequestResponse(): reasonPhrase"+reasonPhrase);
     var sipResponse = sipRequest.createResponse(400);
     if (reasonPhrase != null)
     {
@@ -27259,8 +25590,6 @@ DialogFilter.prototype.sendBadRequestResponse =function(sipRequest,transaction,r
 
 
 DialogFilter.prototype.sendCallOrTransactionDoesNotExistResponse =function(sipRequest,transaction){
-    if(logger!=undefined) logger.debug("DialogFilter:sendCallOrTransactionDoesNotExistResponse():sipRequest="+sipRequest);
-    if(logger!=undefined) logger.debug("DialogFilter:sendCallOrTransactionDoesNotExistResponse(): transaction="+transaction);
     var sipResponse = sipRequest.createResponse(481);
     var mfi=new MessageFactoryImpl();
     var serverHeader = mfi.getDefaultServerHeader();
@@ -27274,8 +25603,6 @@ DialogFilter.prototype.sendCallOrTransactionDoesNotExistResponse =function(sipRe
 }
 
 DialogFilter.prototype.sendLoopDetectedResponse =function(sipRequest,transaction){
-    if(logger!=undefined) logger.debug("DialogFilter:sendLoopDetectedResponse():sipRequest="+sipRequest);
-    if(logger!=undefined) logger.debug("DialogFilter:sendLoopDetectedResponse(): transaction="+transaction);
     var sipResponse = sipRequest.createResponse(482);
     var mfi=new MessageFactoryImpl();
     var serverHeader = mfi.getDefaultServerHeader();
@@ -27287,8 +25614,6 @@ DialogFilter.prototype.sendLoopDetectedResponse =function(sipRequest,transaction
 }
 
 DialogFilter.prototype.processRequest =function(sipRequest,incomingMessageChannel){
-    if(logger!=undefined) logger.debug("DialogFilter:processRequest(): sipRequest="+sipRequest);
-    if(logger!=undefined) logger.debug("DialogFilter:processRequest(): incomingMessageChannel="+incomingMessageChannel);
     if (this.listeningPoint == null) {
         return;
     }
@@ -27492,7 +25817,6 @@ DialogFilter.prototype.processRequest =function(sipRequest,incomingMessageChanne
 }
 
 DialogFilter.prototype.getProcessingInfo =function(){
-    if(logger!=undefined) logger.debug("DialogFilter:getProcessingInfo()");
     return null;
 }
 /*
@@ -27525,7 +25849,6 @@ DialogFilter.prototype.getProcessingInfo =function(){
  *  @version 1.0 
  */
 function ListeningPointImpl() {
-    if(logger!=undefined) logger.debug("ListeningPointImpl:ListeningPointImpl()");
     this.classname="ListeningPointImpl";
     this.transport="ws";
     this.messageProcessor=null;
@@ -27538,80 +25861,64 @@ function ListeningPointImpl() {
 }
 
 ListeningPointImpl.prototype.makeKey =function(host,transport){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:makeKey():host="+host);
-    if(logger!=undefined) logger.debug("ListeningPointImpl:makeKey():transport="+transport);
     var string="";
     string=(string+host+"/"+transport).toLowerCase();
     return string;
 }
 
 ListeningPointImpl.prototype.getKey =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getKey()");
     return this.makeKey(this.sipStack.getHostAddress(), this.transport);
 }
 
 ListeningPointImpl.prototype.getUserAgent =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getUserAgent()");
     return this.sipStack.getUserAgent();
 }
 
 ListeningPointImpl.prototype.setSipProvider =function(sipProviderImpl){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:setSipProvider():sipProviderImpl="+sipProviderImpl);
     this.sipProvider = sipProviderImpl;
 }
 
 ListeningPointImpl.prototype.removeSipProvider =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:removeSipProvider()");
     this.sipProvider = null;
 }
 
 ListeningPointImpl.prototype.getURLWS =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getURLWS()");
     return this.messageProcessor.getURLWS();
 }
 
 ListeningPointImpl.prototype.getTransport =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getTransport()");
     return this.messageProcessor.getTransport();
 }
 
 ListeningPointImpl.prototype.getProvider =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getProvider()");
     return this.sipProvider;
 }
 
 ListeningPointImpl.prototype.setSentBy =function(sentBy){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:setSentBy():sentBy="+sentBy);
     this.messageProcessor.setSentBy(sentBy);
 }
 
 ListeningPointImpl.prototype.getSentBy =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getSentBy()");
     return this.messageProcessor.getSentBy();
 }
 
 ListeningPointImpl.prototype.isSentBySet =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:isSentBySet()");
     return this.messageProcessor.isSentBySet();
 }
 
 ListeningPointImpl.prototype.getViaHeader =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getViaHeader()");
     return this.messageProcessor.getViaHeader();
 }
 
 ListeningPointImpl.prototype.getMessageProcessor =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getMessageProcessor()");
     return this.messageProcessor;
 }
 
 ListeningPointImpl.prototype.getHost =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getMessageProcessor()");
     return this.hostname;
 }
 
 ListeningPointImpl.prototype.createContactHeader =function(userName){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:createContactHeader()");
     try {
         var hostname = this.sipStack.getHostAddress();
         var sipURI = new SipUri();
@@ -27630,7 +25937,6 @@ ListeningPointImpl.prototype.createContactHeader =function(userName){
 }
 
 ListeningPointImpl.prototype.sendHeartbeat =function(infoApp){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:sendHeartbeat()");
     var messageChannel = this.messageProcessor.createMessageChannel(infoApp);
     var siprequest = new SIPRequest();
     siprequest.setNullRequest();
@@ -27638,17 +25944,14 @@ ListeningPointImpl.prototype.sendHeartbeat =function(infoApp){
 }
 
 ListeningPointImpl.prototype.createViaHeader =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:createViaHeader()");
     return this.getViaHeader();
 }
 
 ListeningPointImpl.prototype.getPort =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getPort()");
     return this.messageProcessor.getPort();
 }
 
 ListeningPointImpl.prototype.getHostAddress =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getHostAddress()");
     return this.sipStack.getHostAddress();
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -27680,14 +25983,11 @@ ListeningPointImpl.prototype.getHostAddress =function(){
  *  @version 1.0 
  */
 function NistSipMessageFactoryImpl(sipStack) {
-    if(logger!=undefined) logger.debug("NistSipMessageFactoryImpl:NistSipMessageFactoryImpl()");
     this.classname="NistSipMessageFactoryImpl"; 
     this.sipStack=sipStack;
 }
 
 NistSipMessageFactoryImpl.prototype.newSIPServerRequest =function(sipRequest,messageChannel){
-    if(logger!=undefined) logger.debug("NistSipMessageFactoryImpl:newSIPServerResponse(): sipRequest="+ sipRequest);
-    if(logger!=undefined) logger.debug("NistSipMessageFactoryImpl:newSIPServerResponse(): messageChannel:"+messageChannel);
     if (messageChannel == null || sipRequest == null) {
         console.error("NistSipMessageFactoryImpl:newSIPServerRequest(): null Arg!");
         throw "NistSipMessageFactoryImpl:newSIPServerRequest(): null Arg!";
@@ -27706,8 +26006,6 @@ NistSipMessageFactoryImpl.prototype.newSIPServerRequest =function(sipRequest,mes
 }
 
 NistSipMessageFactoryImpl.prototype.newSIPServerResponse =function(sipResponse,messageChannel){
-    if(logger!=undefined) logger.debug("NistSipMessageFactoryImpl:newSIPServerResponse(): sipRequest="+ sipResponse);
-    if(logger!=undefined) logger.debug("NistSipMessageFactoryImpl:newSIPServerResponse(): messageChannel:"+messageChannel);
     var theStack = messageChannel.getSIPStack();
     var tr = theStack.findTransaction(sipResponse, false);
     if (tr != null) {
@@ -27753,7 +26051,6 @@ NistSipMessageFactoryImpl.prototype.newSIPServerResponse =function(sipResponse,m
  *  @version 1.0 
  */
 function SipProviderImpl() {
-    if(logger!=undefined) logger.debug("SipProviderImpl:SipProviderImpl()");
     this.classname="SipProviderImpl"; 
     this.sipListener=null;
     this.sipStack=null;
@@ -27776,7 +26073,6 @@ function SipProviderImpl() {
 }
 
 SipProviderImpl.prototype.getListeningPoint =function(){
-    if(logger!=undefined) logger.debug("SipProviderImpl:getListeningPoint()");
     if (this.listeningPoints.length > 0)
     {
         return this.listeningPoints[0][1];
@@ -27788,12 +26084,9 @@ SipProviderImpl.prototype.getListeningPoint =function(){
 }
 
 SipProviderImpl.prototype.isAutomaticDialogSupportEnabled =function(){
-    if(logger!=undefined) logger.debug("SipProviderImpl:isAutomaticDialogSupportEnabled()");
     return this.automaticDialogSupportEnabled;
 }
 SipProviderImpl.prototype.handleEvent =function(sipEvent,transaction){
-    if(logger!=undefined) logger.debug("SipProviderImpl:handleEvent():sipEvent="+sipEvent);
-    if(logger!=undefined) logger.debug("SipProviderImpl:handleEvent():transaction="+transaction);
     var eventWrapper = new EventWrapper(sipEvent, transaction);
     if (!this.sipStack.reEntrantListener) 
     {
@@ -27806,7 +26099,6 @@ SipProviderImpl.prototype.handleEvent =function(sipEvent,transaction){
 }
 
 SipProviderImpl.prototype.addSipListener =function(sipListener){
-    if(logger!=undefined) logger.debug("SipProviderImpl:addSipListener():sipListener="+sipListener);
     if (this.sipStack.sipListener == null) {
         this.sipStack.sipListener = sipListener;
     }
@@ -27818,7 +26110,6 @@ SipProviderImpl.prototype.addSipListener =function(sipListener){
 }
 
 SipProviderImpl.prototype.setListeningPoint =function(listeningPoint){
-    if(logger!=undefined) logger.debug("SipProviderImpl:setListeningPoint():listeningPoint:"+listeningPoint);
     if (listeningPoint == null)
     {
         console.error("SipProviderImpl:setListeningPoint(): null listeningPoint argument");
@@ -27837,12 +26128,10 @@ SipProviderImpl.prototype.setListeningPoint =function(listeningPoint){
 }
 
 SipProviderImpl.prototype.getSipListener =function(){
-    if(logger!=undefined) logger.debug("SipProviderImpl:getSipListener()");
     return this.sipListener;
 }
 
 SipProviderImpl.prototype.stop =function(){
-    if(logger!=undefined) logger.debug("SipProviderImpl:stop()");
     for(var i=0;i<this.listeningPoints.length;i++)
     {
         var listeningPoint = this.listeningPoints[i][1];
@@ -27852,7 +26141,6 @@ SipProviderImpl.prototype.stop =function(){
 }
 
 SipProviderImpl.prototype.getNewCallId =function(){
-    if(logger!=undefined) logger.debug("SipProviderImpl:getNewCallId()");
     var utils=new Utils();
     var callId = utils.generateCallIdentifier(this.getListeningPoint().getHostAddress());
     var callid = new CallID();
@@ -27861,7 +26149,6 @@ SipProviderImpl.prototype.getNewCallId =function(){
 }
 
 SipProviderImpl.prototype.getNewClientTransaction =function(request){
-    if(logger!=undefined) logger.debug("SipProviderImpl:getNewClientTransaction():request="+request);
     if (request == null)
     {
         console.error("SipProviderImpl:getNewClientTransaction(): null request argument");
@@ -27984,7 +26271,6 @@ SipProviderImpl.prototype.getNewClientTransaction =function(request){
 }
 
 SipProviderImpl.prototype.getNewServerTransaction =function(request){
-    if(logger!=undefined) logger.debug("SipProviderImpl:getNewServerTransaction():request="+request);
     if (!this.sipStack.isAlive())
     {
         console.error("SipProviderImpl:getNewServerTransaction(): stack is stopped");
@@ -28128,12 +26414,10 @@ SipProviderImpl.prototype.getNewServerTransaction =function(request){
 }
 
 SipProviderImpl.prototype.getSipStack =function(){
-    if(logger!=undefined) logger.debug("SipProviderImpl:getSipStack()");
     return this.sipStack;
 }
 
 SipProviderImpl.prototype.removeSipListener =function(sipListener){
-    if(logger!=undefined) logger.debug("SipProviderImpl:removeSipListener():sipListener="+sipListener);
     if (sipListener == this.getSipListener()) {
         this.sipListener = null;
     }
@@ -28153,7 +26437,6 @@ SipProviderImpl.prototype.removeSipListener =function(sipListener){
 }
 
 SipProviderImpl.prototype.sendRequest =function(request){
-    if(logger!=undefined) logger.debug("SipProviderImpl:sendRequest():request="+request);
     if (!this.sipStack.isAlive())
     {
         console.error("SipProviderImpl:sendRequest(): stack is stopped");
@@ -28208,7 +26491,6 @@ SipProviderImpl.prototype.sendRequest =function(request){
 }
 
 SipProviderImpl.prototype.sendResponse =function(response){
-    if(logger!=undefined) logger.debug("SipProviderImpl:sendResponse():response="+response);
     if (!this.sipStack.isAlive())
     {
        console.error("SipProviderImpl:sendResponse(): stack is stopped");
@@ -28242,7 +26524,6 @@ SipProviderImpl.prototype.sendResponse =function(response){
 }
 
 SipProviderImpl.prototype.getNewDialog =function(transaction){
-    if(logger!=undefined) logger.debug("SipProviderImpl:getNewDialog():transaction="+transaction);
     if (transaction == null)
     {
         console.error("SipProviderImpl:sendResponse(): null transaction!");
@@ -28322,7 +26603,6 @@ SipProviderImpl.prototype.getNewDialog =function(transaction){
 
 
 SipProviderImpl.prototype.transactionErrorEvent =function(transactionErrorEvent){
-    if(logger!=undefined) logger.debug("SipProviderImpl:transactionErrorEvent():transactionErrorEvent="+transactionErrorEvent);
     var transaction = transactionErrorEvent.getSource();
     if (transactionErrorEvent.getErrorID() == 2) {
         var errorObject = transactionErrorEvent.getSource();
@@ -28368,7 +26648,6 @@ SipProviderImpl.prototype.transactionErrorEvent =function(transactionErrorEvent)
 
 
 SipProviderImpl.prototype.dialogErrorEvent =function(dialogErrorEvent){
-    if(logger!=undefined) logger.debug("SipProviderImpl:dialogErrorEvent():dialogErrorEvent="+dialogErrorEvent);
     var sipDialog = dialogErrorEvent.getSource();
     var reason = "AckNotReceived";
     if (dialogErrorEvent.getErrorID() == 2) {
@@ -28383,7 +26662,6 @@ SipProviderImpl.prototype.dialogErrorEvent =function(dialogErrorEvent){
 
 
 SipProviderImpl.prototype.getListeningPoints =function(){
-    if(logger!=undefined) logger.debug("SipProviderImpl:getListeningPoints()");
     var retval = new Array();
     for(var i=0;i<this.listeningPoints.length;i++)
     {
@@ -28393,7 +26671,6 @@ SipProviderImpl.prototype.getListeningPoints =function(){
 }
 
 SipProviderImpl.prototype.addListeningPoint =function(listeningPoint){
-    if(logger!=undefined) logger.debug("SipProviderImpl:addListeningPoint():listeningPoint="+listeningPoint);
     var lp = listeningPoint;
     if (lp.sipProvider != null && lp.sipProvider != this)
     {
@@ -28449,7 +26726,6 @@ SipProviderImpl.prototype.addListeningPoint =function(listeningPoint){
 
 
 SipProviderImpl.prototype.removeListeningPoint =function(listeningPoint){
-    if(logger!=undefined) logger.debug("SipProviderImpl:removeListeningPoint():listeningPoint="+listeningPoint);
     var lp = listeningPoint;
     /*if (lp.messageProcessor.inUse())
     {
@@ -28468,7 +26744,6 @@ SipProviderImpl.prototype.removeListeningPoint =function(listeningPoint){
 
 
 SipProviderImpl.prototype.removeListeningPoints =function(){
-    if(logger!=undefined) logger.debug("SipProviderImpl:removeListeningPoints()");
     for(var i=0;i<this.listeningPoints.length;i++)
     {
         var lp = this.listeningPoints[i][1];
@@ -28479,8 +26754,6 @@ SipProviderImpl.prototype.removeListeningPoints =function(){
 
 
 SipProviderImpl.prototype.setAutomaticDialogSupportEnabled =function(automaticDialogSupportEnabled){
-    if(logger!=undefined) logger.debug("SipProviderImpl:setAutomaticDialogSupportEnabled():automaticDialogSupportEnabled"
-        +automaticDialogSupportEnabled);
     this.automaticDialogSupportEnabled = automaticDialogSupportEnabled;
     if ( this.automaticDialogSupportEnabled ) {
         this.dialogErrorsAutomaticallyHandled = true;
@@ -28489,12 +26762,10 @@ SipProviderImpl.prototype.setAutomaticDialogSupportEnabled =function(automaticDi
 
 
 SipProviderImpl.prototype.setDialogErrorsAutomaticallyHandled =function(){
-    if(logger!=undefined) logger.debug("SipProviderImpl:setDialogErrorsAutomaticallyHandled()");
     this.dialogErrorsAutomaticallyHandled = true;
 }
 
 SipProviderImpl.prototype.isDialogErrorsAutomaticallyHandled =function(){
-    if(logger!=undefined) logger.debug("SipProviderImpl:isDialogErrorsAutomaticallyHandled()");
     return this.dialogErrorsAutomaticallyHandled;
 }
 /*
@@ -28527,7 +26798,6 @@ SipProviderImpl.prototype.isDialogErrorsAutomaticallyHandled =function(){
  *  @version 1.0 
  */
 function SipStackImpl() {
-    if(logger!=undefined) logger.debug("SipStackImpl:SipStackImpl()");
     this.classname="SipStackImpl"; 
     this.stackName=null;
     this.serverTransactionTable=new Array();
@@ -28567,27 +26837,22 @@ SipStackImpl.prototype.constructor=SipStackImpl;
 SipStackImpl.prototype.MAX_DATAGRAM_SIZE=8 * 1024;
 
 SipStackImpl.prototype.isAutomaticDialogSupportEnabledFunction =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:isAutomaticDialogSupportEnabledFunction()");
     return this.isAutomaticDialogSupportEnabled;
 }
 
 SipStackImpl.prototype.isAutomaticDialogErrorHandlingEnabledFunction =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:isAutomaticDialogErrorHandlingEnabledFunction()");
     return this.isAutomaticDialogErrorHandlingEnabled;
 }
 
 SipStackImpl.prototype.getEventScanner =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:getEventScanner()");
     return this.eventScanner;
 }
 
 SipStackImpl.prototype.getSipListener =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:getSipListener()");
     return this.sipListener;
 }
 
 SipStackImpl.prototype.createSipProvider =function(listeningPoint){
-    if(logger!=undefined) logger.debug("SipStackImpl:createSipProvider():listeningPoint="+listeningPoint);
     if (listeningPoint == null) {
         console.error("SipProviderImpl:createSipProvider(): null listeningPoint argument");
         throw "SipProviderImpl:createSipProvider(): null listeningPoint argument";
@@ -28618,7 +26883,6 @@ SipStackImpl.prototype.createSipProvider =function(listeningPoint){
 }
 
 SipStackImpl.prototype.createListeningPoint =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:createListeningPoint()");
     if (!this.isAlive()) {
         this.toExit = false;
         this.reInitialize();
@@ -28653,14 +26917,12 @@ SipStackImpl.prototype.createListeningPoint =function(){
 }
 
 SipStackImpl.prototype.createMessageProcessor =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:createMessageProcessor()");
     var wsMessageProcessor = new WSMessageProcessor(this);
     this.addMessageProcessor(wsMessageProcessor);
     return wsMessageProcessor;
 }
 
 SipStackImpl.prototype.reInitialize =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:reInitialize()");
     this.reInit();
     this.eventScanner = new EventScanner(this);
     this.listeningPoints = new Array();
@@ -28669,18 +26931,15 @@ SipStackImpl.prototype.reInitialize =function(){
 }
 
 SipStackImpl.prototype.getUrlWs =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:getUrlWs()");
     return this.wsurl;
 }
 
 SipStackImpl.prototype.getUserAgent =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:getUserAgent()");
     return this.userAgentName;
 }
 
 
 SipStackImpl.prototype.deleteListeningPoint =function(listeningPoint){
-    if(logger!=undefined) logger.debug("SipStackImpl:deleteListeningPoint():listeningPoint="+listeningPoint);
     if (listeningPoint == null) {
         console.error("SipProviderImpl:deleteListeningPoint(): null listeningPoint arg");
         throw "SipProviderImpl:deleteListeningPoint(): null listeningPoint arg";
@@ -28704,7 +26963,6 @@ SipStackImpl.prototype.deleteListeningPoint =function(listeningPoint){
 
 
 SipStackImpl.prototype.deleteSipProvider =function(sipProvider){
-    if(logger!=undefined) logger.debug("SipStackImpl:deleteSipProvider():sipProvider:"+sipProvider);
     if (sipProvider == null) {
         console.error("SipProviderImpl:deleteSipProvider(): null provider arg");
         throw "SipProviderImpl:deleteSipProvider(): null provider arg";
@@ -28734,12 +26992,10 @@ SipStackImpl.prototype.deleteSipProvider =function(sipProvider){
 }
 
 SipStackImpl.prototype.getListeningPoints =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:getListeningPoints()");
     return this.listeningPoints;
 }
 
 SipStackImpl.prototype.getSipProviders =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:getSipProviders()");
     if(this.sipProviders.length==1)
     {
         return this.sipProviders[0];
@@ -28751,17 +27007,14 @@ SipStackImpl.prototype.getSipProviders =function(){
 }
 
 SipStackImpl.prototype.getStackName =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:getStackName()");
     return this.stackName;
 }
 
 SipStackImpl.prototype.finalize =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:finalize()");
     this.stopStack();
 }
 
 SipStackImpl.prototype.stop =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:stop()");
     this.stopStack();
     this.sipProviders = new Array();
     this.listeningPoints = new Array();
@@ -28772,60 +27025,48 @@ SipStackImpl.prototype.stop =function(){
 }
 
 SipStackImpl.prototype.start =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:start()");
     if (this.eventScanner == null) {
         this.eventScanner = new EventScanner(this);
     }
 }
 
 SipStackImpl.prototype.getSipListener =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:getSipListener()");
     return this.sipListener;
 }
 
 SipStackImpl.prototype.setEnabledCipherSuites =function(newCipherSuites){
-    if(logger!=undefined) logger.debug("SipStackImpl:setEnabledCipherSuites():newCipherSuites="+newCipherSuites);
     this.cipherSuites = newCipherSuites;
 }
 
 SipStackImpl.prototype.getEnabledCipherSuites =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:getEnabledCipherSuites()");
     return this.cipherSuites;
 }
 
 SipStackImpl.prototype.setEnabledProtocols =function(newProtocols){
-    if(logger!=undefined) logger.debug("SipStackImpl:setEnabledProtocols():newProtocols="+newProtocols);
     this.enabledProtocols = newProtocols;
 }
 
 SipStackImpl.prototype.getEnabledProtocols =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:getEnabledProtocols()");
     return this.enabledProtocols;
 }
 
 SipStackImpl.prototype.setIsBackToBackUserAgent =function(flag){
-    if(logger!=undefined) logger.debug("SipStackImpl:setIsBackToBackUserAgent():flag="+flag);
     this.isBackToBackUserAgent = flag;
 }
 
 SipStackImpl.prototype.isBackToBackUserAgent =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:isBackToBackUserAgent()");
     return this.isBackToBackUserAgent;
 }
 
 SipStackImpl.prototype.isAutomaticDialogErrorHandlingEnabled =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:isAutomaticDialogErrorHandlingEnabled()");
     return this.isAutomaticDialogErrorHandlingEnabled;
 }
 
 SipStackImpl.prototype.getChannel =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:getChannel()");
     return this.messageChannel;
 }
 
 SipStackImpl.prototype.newSIPServerRequest =function(requestReceived,requestMessageChannel){
-    if(logger!=undefined) logger.debug("SipStackImpl:newSIPServerRequest(): requestReceived="+ requestReceived);
-    if(logger!=undefined) logger.debug("SipStackImpl:newSIPServerRequest(): requestMessageChannel="+requestMessageChannel);
     var nextTransaction=null;
     var currentTransaction=null;
     var key = requestReceived.getTransactionId();
@@ -28892,8 +27133,6 @@ SipStackImpl.prototype.newSIPServerRequest =function(requestReceived,requestMess
 
 
 SipStackImpl.prototype.newSIPServerResponse =function(responseReceived,responseMessageChannel){
-    if(logger!=undefined) logger.debug("SipStackImpl:newSIPServerResponse(): responseReceived="+responseReceived);
-    if(logger!=undefined) logger.debug("SipStackImpl:newSIPServerResponse(): responseMessageChannel="+responseMessageChannel);
     var nextTransaction=null;
     var currentTransaction=null;
     var key = responseReceived.getTransactionId();
@@ -28937,12 +27176,10 @@ SipStackImpl.prototype.newSIPServerResponse =function(responseReceived,responseM
 }
 
 SipStackImpl.prototype.createServerTransaction =function(encapsulatedMessageChannel){
-    if(logger!=undefined) logger.debug("SipStackImpl:createServerTransaction():encapsulatedMessageChannel="+encapsulatedMessageChannel);
     return new SIPServerTransaction(this, encapsulatedMessageChannel);
 }
 
 SipStackImpl.prototype.removeTransaction =function(sipTransaction){
-    if(logger!=undefined) logger.debug("SipStackImpl:removeTransaction():sipTransaction="+sipTransaction);
     if (sipTransaction instanceof SIPServerTransaction) {
         var key = sipTransaction.getTransactionId();
         var removed=null;
@@ -29019,7 +27256,6 @@ SipStackImpl.prototype.removeTransaction =function(sipTransaction){
  *  @version 1.0 
  */
 function SipListener() {
-    if(logger!=undefined) logger.debug("SipListener:SipListener()");
 }
 
 SipListener.prototype.processDialogTerminated =function(dialogTerminatedEvent){
@@ -29077,14 +27313,12 @@ SipListener.prototype.processConnectionError =function(){
  *  @version 1.0 
  */
 function SipFactory() {
-    if(logger!=undefined) logger.debug("SipFactory:SipFactory()");
     this.classname="SipFactory"; 
     this.sipFactory=null;
     this.mNameSipStackMap=new Array();
 }
 
 SipFactory.prototype.getInstance =function(){
-    if(logger!=undefined) logger.debug("SipFactory:getInstance()");
     if (this.sipFactory == null) 
     {
         this.sipFactory = new SipFactory();
@@ -29093,12 +27327,10 @@ SipFactory.prototype.getInstance =function(){
 }
 
 SipFactory.prototype.resetFactory =function(){
-    if(logger!=undefined) logger.debug("SipFactory:resetFactory()");
     this.mNameSipStackMap=new Array();
 }
 
 SipFactory.prototype.createSipStack =function(wsUrl,sipUserAgentName){
-    if(logger!=undefined) logger.debug("SipFactory:createSipStack()");
 
     var sipStack = null;
     for(var i=0;i<this.mNameSipStackMap.length;i++)
@@ -29120,7 +27352,6 @@ SipFactory.prototype.createSipStack =function(wsUrl,sipUserAgentName){
 
 
 SipFactory.prototype.createAddressFactory =function(){
-    if(logger!=undefined) logger.debug("SipFactory:createAddressFactory()");
     try {
         var afi=new AddressFactoryImpl();
         return afi;
@@ -29130,7 +27361,6 @@ SipFactory.prototype.createAddressFactory =function(){
     }
 }
 SipFactory.prototype.createHeaderFactory =function(){
-    if(logger!=undefined) logger.debug("SipFactory:createHeaderFactory()");
     try {
         var hfi=new HeaderFactoryImpl();
         return hfi;
@@ -29140,7 +27370,6 @@ SipFactory.prototype.createHeaderFactory =function(){
     }
 }
 SipFactory.prototype.createMessageFactory =function(listeningpoint){
-    if(logger!=undefined) logger.debug("SipFactory:createMessageFactory():listeningpoint:"+listeningpoint);
     try {
         var mfi=new MessageFactoryImpl(listeningpoint);
         return mfi;
