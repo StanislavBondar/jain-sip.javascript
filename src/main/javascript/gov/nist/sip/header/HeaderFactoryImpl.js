@@ -524,9 +524,10 @@ HeaderFactoryImpl.prototype.createAuthorizationHeader =function(){
     {
         var response=arguments[0];
         var request=arguments[1];
-        var password=arguments[2];
-        var sipuri=arguments[3];
-        return this.createAuthorizationHeaderargu2(response, request, password, sipuri);
+        var sipPassword=arguments[2];
+        var sipLogin=arguments[3];
+        var sipDomainUri=arguments[4];
+        return this.createAuthorizationHeaderargu2(response, request, sipPassword, sipLogin);
     }
 }
 
@@ -543,7 +544,7 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu1 =function(scheme){
 }
 
 
-HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,request,password,sipuri){
+HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,request,sipPassword,sipLogin){
     if(logger!=undefined) logger.debug("HeaderFactoryImpl:createAuthorizationHeaderargu2():response="+response+",request="+request);
     if(response.hasHeader("www-authenticate"))
     {
@@ -563,34 +564,35 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
     }
     var mda=new MessageDigestAlgorithm();
     var method=response.getCSeq().getMethod();
-    var user=request.getFrom().getAddress().getURI().getUser();
+
     var cnonce=Math.floor(Math.random()*16777215).toString(16);
     var nc="00000001"; 
-    var resp=mda.calculateResponse(user,realm,password,nonce,nc,cnonce, method,sipuri,null,qop);
+    var resp=mda.calculateResponse(sipLogin,realm,sipPassword,nonce,nc,cnonce, method,request.getRequestURI(),null,qop);
     
     if(response.hasHeader("www-authenticate"))
     {
-        authorization.setUsername(user);
+        authorization.setUsername(sipLogin);
         authorization.setRealm(realm);
         authorization.setNonce(nonce);
         authorization.setCNonce(cnonce);
         authorization.setNonceCount(nc);
         authorization.setScheme(scheme);
         authorization.setResponse(resp);
-        authorization.setURI(sipuri);
+        authorization.setURI(request.getRequestURI());
         authorization.setAlgorithm("MD5");
+        authorization.setQop(qop);
         return authorization;
     }
     else if(response.hasHeader("proxy-authenticate"))
     {
-        proxyauthorization.setUsername(user);
+        proxyauthorization.setUsername(sipLogin);
         proxyauthorization.setRealm(realm);
         proxyauthorization.setNonce(nonce);
         authorization.setCNonce(cnonce);
         authorization.setNonceCount(nc);
         proxyauthorization.setScheme(scheme);
         proxyauthorization.setResponse(resp);
-        proxyauthorization.setURI(sipuri);
+        proxyauthorization.setURI(request.getRequestURI());
         proxyauthorization.setAlgorithm("MD5");
         return proxyauthorization;
     }
