@@ -754,8 +754,7 @@ SipProviderImpl.prototype.removeListeningPoints =function(){
 
 
 SipProviderImpl.prototype.setAutomaticDialogSupportEnabled =function(automaticDialogSupportEnabled){
-    if(logger!=undefined) logger.debug("SipProviderImpl:setAutomaticDialogSupportEnabled():automaticDialogSupportEnabled"
-        +automaticDialogSupportEnabled);
+    if(logger!=undefined) logger.debug("SipProviderImpl:setAutomaticDialogSupportEnabled():automaticDialogSupportEnabled"+automaticDialogSupportEnabled);
     this.automaticDialogSupportEnabled = automaticDialogSupportEnabled;
     if ( this.automaticDialogSupportEnabled ) {
         this.dialogErrorsAutomaticallyHandled = true;
