@@ -121,6 +121,7 @@ Lexer.prototype.PServedUserHeader="P-Served-User";
 Lexer.prototype.PPreferredServiceHeader="P-Preferred-Service";
 Lexer.prototype.PAssertedServiceHeader="P-Asserted-Service";
 Lexer.prototype.ReferencesHeader="References";
+Lexer.prototype.AcceptContact="Accept-Contact";
 
 
 Lexer.prototype.getHeaderName =function(line){
@@ -382,6 +383,10 @@ Lexer.prototype.selectLexer =function(lexerName){
                     
             // added References header
             this.addKeyword(this.ReferencesHeader.toUpperCase(),TokenTypes.prototype.REFERENCES);
+			
+			// added Accept-Contact header
+			this.addKeyword(this.AcceptContact.toUpperCase(),TokenTypes.prototype.ACCEPT_CONTACT);
+			
         } else if (lexerName=="status_lineLexer") {
             this.addKeyword(TokenNames.prototype.SIP.toUpperCase(), TokenTypes.prototype.SIP);
         } else if (lexerName=="request_lineLexer") {

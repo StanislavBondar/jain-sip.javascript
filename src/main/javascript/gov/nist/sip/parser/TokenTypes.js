@@ -169,6 +169,8 @@ TokenTypes.prototype.P_ASSERTED_SERVICE = LexerCore.prototype.START + 97;
 //mranga - References header
 TokenTypes.prototype.REFERENCES = LexerCore.prototype.START + 98;
 
+TokenTypes.prototype.ACCEPT_CONTACT = LexerCore.prototype.START + 99;
+
 TokenTypes.prototype.ALPHA = LexerCore.prototype.ALPHA;
 TokenTypes.prototype.DIGIT = LexerCore.prototype.DIGIT;
 TokenTypes.prototype.ID = LexerCore.prototype.ID;
