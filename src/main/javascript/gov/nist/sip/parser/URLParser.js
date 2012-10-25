@@ -425,7 +425,7 @@ URLParser.prototype.global_phone_number =function(inBrackets){
     var tn = new TelephoneNumber();
     tn.setGlobal(true);
     var nv = null;
-    this.lexer.match(this.PLUS);
+    this.lexer.match('+');
     var b = this.base_phone_number();
     tn.setPhoneNumber(b);
     if (this.lexer.hasMoreChars()) {
