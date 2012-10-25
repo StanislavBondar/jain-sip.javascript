@@ -84,13 +84,15 @@ ParserFactory.prototype.createParser =function(line){
         throw "ParserFactory:createParser(): the header name or value is null";
     }
     var parserClass = null;
+	var lowercaseHeadervalue=headerName.toLowerCase();
     for(var i=0;i<this.parserTable.length;i++)
     {
-        if(this.parserTable[i][0]==headerName.toLowerCase())
+        if(this.parserTable[i][0]==lowercaseHeadervalue)
         {
             parserClass=this.parserTable[i][1];
         }
     }
+    
     if (parserClass != null) {
         var cons = null;
         for(i=0;i<this.parserConstructorCache.length;i++)
