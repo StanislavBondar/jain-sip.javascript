@@ -2527,6 +2527,20 @@ LexerCore.prototype.byteStringNoSemicolon =function(){
     return retval.toString();
 }
 
+LexerCore.prototype.byteStringNoWhiteSpace =function(){
+    var retval = "";
+    while (true) {
+        var next = this.lookAhead(0);
+        if (next == '\0' || next == '\n' || next == ' ') {
+            break;
+        } else {
+            this.consume(1);
+            retval=retval+next;
+        }
+    }
+    return retval.toString();
+}
+
 LexerCore.prototype.byteStringNoSlash =function(){
     var retval = "";
     while (true) {
@@ -3594,6 +3608,139 @@ Authority.prototype.hashCode=function(){
     }
     return this.hostPort.encode().hashCode();
 }
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP  TelURLImpl.
+ *  @author Yuemin Qin (yuemin.qin@orange.com)
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ *  @see  gov/nist/javax/sip/address/TelURLImpl.java  
+ */
+
+
+function TelURLImpl() {
+    this.serialVersionUID = "5873527320305915954L";
+    this.classname="TelURLImpl";
+    this.telephoneNumber=new TelephoneNumber();
+    this.scheme = "tel";
+}
+
+TelURLImpl.prototype = new GenericURI();
+TelURLImpl.prototype.constructor=TelURLImpl;
+
+TelURLImpl.prototype.setTelephoneNumber =function(telephoneNumber){
+    this.telephoneNumber = telephoneNumber;
+}
+
+TelURLImpl.prototype.getIsdnSubAddress =function(){
+    return this.telephoneNumber.getIsdnSubaddress();
+}
+
+TelURLImpl.prototype.getPostDial =function(){
+    return this.telephoneNumber.getPostDial();
+}
+
+TelURLImpl.prototype.getScheme =function(){
+    return this.scheme;
+}
+
+TelURLImpl.prototype.isGlobal =function(){
+    return this.telephoneNumber.isGlobal();
+}
+
+TelURLImpl.prototype.isSipURI =function(){
+    return false;
+}
+
+TelURLImpl.prototype.setGlobal =function(global){
+    this.telephoneNumber.setGlobal(global);
+}
+
+TelURLImpl.prototype.setIsdnSubAddress =function(isdnSubAddress){
+    this.telephoneNumber.setIsdnSubaddress(isdnSubAddress);
+}
+
+TelURLImpl.prototype.setPostDial =function(postDial){
+    this.telephoneNumber.setPostDial(postDial);
+}
+
+TelURLImpl.prototype.setPhoneNumber =function(telephoneNumber){
+    this.telephoneNumber.setPhoneNumber(telephoneNumber);
+} 
+
+TelURLImpl.prototype.getPhoneNumber =function(){
+    return this.telephoneNumber.getPhoneNumber();
+}
+
+TelURLImpl.prototype.toString =function(){
+    return this.scheme + ":" + this.telephoneNumber.encode();
+}
+
+TelURLImpl.prototype.encode =function(){
+    return this.encodeBuffer("").toString();
+}
+
+TelURLImpl.prototype.encodeBuffer =function(buffer){
+    buffer=buffer+this.scheme+":";
+    buffer=this.telephoneNumber.encodeBuffer(buffer);
+    return buffer;
+}
+
+TelURLImpl.prototype.getParameter =function(parameterName){
+    return this.telephoneNumber.getParameter(parameterName);
+}
+
+TelURLImpl.prototype.setParameter =function(name, value){
+    this.telephoneNumber.setParameter(name, value);
+}
+
+TelURLImpl.prototype.getParameterNames =function(){
+    return this.telephoneNumber.getParameterNames();
+}
+
+TelURLImpl.prototype.getParameters =function(){
+    return this.telephoneNumber.getParameters();
+}
+
+TelURLImpl.prototype.removeParameter =function(name){
+    this.telephoneNumber.removeParameter(name);
+}
+
+TelURLImpl.prototype.setPhoneContext =function(phoneContext){
+    if (phoneContext==null) {
+        this.removeParameter("phone-context");
+    } 
+    else 
+    {
+        this.setParameter("phone-context",phoneContext);
+    }
+}
+
+TelURLImpl.prototype.getPhoneContext =function(){
+    return this.getParameter("phone-context");
+}
+
 /*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
  * and individual contributors
@@ -10903,6 +11050,7 @@ Lexer.prototype.PServedUserHeader="P-Served-User";
 Lexer.prototype.PPreferredServiceHeader="P-Preferred-Service";
 Lexer.prototype.PAssertedServiceHeader="P-Asserted-Service";
 Lexer.prototype.ReferencesHeader="References";
+Lexer.prototype.AcceptContact="Accept-Contact";
 
 
 Lexer.prototype.getHeaderName =function(line){
@@ -11161,6 +11309,10 @@ Lexer.prototype.selectLexer =function(lexerName){
                     
             // added References header
             this.addKeyword(this.ReferencesHeader.toUpperCase(),TokenTypes.prototype.REFERENCES);
+                        
+                        // added Accept-Contact header
+                        this.addKeyword(this.AcceptContact.toUpperCase(),TokenTypes.prototype.ACCEPT_CONTACT);
+                        
         } else if (lexerName=="status_lineLexer") {
             this.addKeyword(TokenNames.prototype.SIP.toUpperCase(), TokenTypes.prototype.SIP);
         } else if (lexerName=="request_lineLexer") {
@@ -11565,6 +11717,8 @@ TokenTypes.prototype.P_PREFERRED_SERVICE = LexerCore.prototype.START + 96;
 TokenTypes.prototype.P_ASSERTED_SERVICE = LexerCore.prototype.START + 97;
 //mranga - References header
 TokenTypes.prototype.REFERENCES = LexerCore.prototype.START + 98;
+
+TokenTypes.prototype.ACCEPT_CONTACT = LexerCore.prototype.START + 99;
 
 TokenTypes.prototype.ALPHA = LexerCore.prototype.ALPHA;
 TokenTypes.prototype.DIGIT = LexerCore.prototype.DIGIT;
@@ -12659,7 +12813,7 @@ URLParser.prototype.global_phone_number =function(inBrackets){
     var tn = new TelephoneNumber();
     tn.setGlobal(true);
     var nv = null;
-    this.lexer.match(this.PLUS);
+    this.lexer.match('+');
     var b = this.base_phone_number();
     tn.setPhoneNumber(b);
     if (this.lexer.hasMoreChars()) {
@@ -14215,6 +14369,7 @@ UserAgentParser.prototype.parse =function(){
         console.error("UserAgentParser:parse(): empty header");
         throw "UserAgentParser:parse(): empty header";
     }
+
     while (this.lexer.lookAhead(0) != '\n'
         && this.lexer.lookAhead(0) != '\0') {
         if (this.lexer.lookAhead(0) == '(') {
@@ -14228,10 +14383,10 @@ UserAgentParser.prototype.parse =function(){
                 throw "UserAgentParser:parse():expected product string";
             }
             var productSb = product;
-            if (this.lexer.peekNextToken().getTokenType() == TokenTypes.prototype.SLASH) {
-                this.lexer.match(TokenTypes.prototype.SLASH);
+            if (this.lexer.peekNextToken().getTokenValue() == '/') {
+                this.lexer.match('/');
                 this.getLexer().SPorHT();
-                var productVersion = this.lexer.byteStringNoSlash();
+                var productVersion = this.lexer.byteStringNoWhiteSpace();
                 if ( productVersion == null ) {
                     console.error("UserAgentParser:parse(): expected product version");
                     throw "UserAgentParser:parse(): expected product version";
@@ -14244,6 +14399,7 @@ UserAgentParser.prototype.parse =function(){
     }
     return userAgent;
 }
+
 
 /*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -15152,13 +15308,15 @@ ParserFactory.prototype.createParser =function(line){
         throw "ParserFactory:createParser(): the header name or value is null";
     }
     var parserClass = null;
+        var lowercaseHeadervalue=headerName.toLowerCase();
     for(var i=0;i<this.parserTable.length;i++)
     {
-        if(this.parserTable[i][0]==headerName.toLowerCase())
+        if(this.parserTable[i][0]==lowercaseHeadervalue)
         {
             parserClass=this.parserTable[i][1];
         }
     }
+    
     if (parserClass != null) {
         var cons = null;
         for(i=0;i<this.parserConstructorCache.length;i++)
