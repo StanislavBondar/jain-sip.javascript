@@ -48,7 +48,7 @@ UserAgentParser.prototype = new HeaderParser();
 UserAgentParser.prototype.constructor=UserAgentParser;
 
 UserAgentParser.prototype.parse =function(){
-    if(logger!=undefined) logger.debug("UserAgentParser:parse()");
+    if(logger!=undefined) logger.debug("UserAgentParser:UserAgentParser()");
     var userAgent = new UserAgent();
     this.headerName(TokenTypes.prototype.USER_AGENT);
     if (this.lexer.lookAhead(0) == '\n')
@@ -56,6 +56,7 @@ UserAgentParser.prototype.parse =function(){
         console.error("UserAgentParser:parse(): empty header");
         throw "UserAgentParser:parse(): empty header";
     }
+
     while (this.lexer.lookAhead(0) != '\n'
         && this.lexer.lookAhead(0) != '\0') {
         if (this.lexer.lookAhead(0) == '(') {
@@ -69,10 +70,10 @@ UserAgentParser.prototype.parse =function(){
                 throw "UserAgentParser:parse():expected product string";
             }
             var productSb = product;
-            if (this.lexer.peekNextToken().getTokenType() == TokenTypes.prototype.SLASH) {
-                this.lexer.match(TokenTypes.prototype.SLASH);
+            if (this.lexer.peekNextToken().getTokenValue() == '/') {
+                this.lexer.match('/');
                 this.getLexer().SPorHT();
-                var productVersion = this.lexer.byteStringNoSlash();
+                var productVersion = this.lexer.byteStringNoWhiteSpace();
                 if ( productVersion == null ) {
                     console.error("UserAgentParser:parse(): expected product version");
                     throw "UserAgentParser:parse(): expected product version";
@@ -85,4 +86,5 @@ UserAgentParser.prototype.parse =function(){
     }
     return userAgent;
 }
+
 

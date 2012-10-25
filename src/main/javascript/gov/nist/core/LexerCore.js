@@ -572,6 +572,20 @@ LexerCore.prototype.byteStringNoSemicolon =function(){
     return retval.toString();
 }
 
+LexerCore.prototype.byteStringNoWhiteSpace =function(){
+    var retval = "";
+    while (true) {
+        var next = this.lookAhead(0);
+        if (next == '\0' || next == '\n' || next == ' ') {
+            break;
+        } else {
+            this.consume(1);
+            retval=retval+next;
+        }
+    }
+    return retval.toString();
+}
+
 LexerCore.prototype.byteStringNoSlash =function(){
     //if(logger!=undefined) logger.debug("LexerCore:byteStringNoSlash()");
     var retval = "";
