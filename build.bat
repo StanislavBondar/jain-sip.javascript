@@ -17,6 +17,7 @@ copy /b .\build\jain-sip.js.temp+.\src\main\javascript\gov\nist\core\MessageDige
 copy /b .\build\jain-sip.js.temp+.\src\main\javascript\gov\nist\sip\address\GenericURI.js .\build\jain-sip.js.temp
 copy /b .\build\jain-sip.js.temp+.\src\main\javascript\gov\nist\sip\address\UserInfo.js .\build\jain-sip.js.temp
 copy /b .\build\jain-sip.js.temp+.\src\main\javascript\gov\nist\sip\address\Authority.js .\build\jain-sip.js.temp
+copy /b .\build\jain-sip.js.temp+.\src\main\javascript\gov\nist\sip\address\TelURLImpl.js .\build\jain-sip.js.temp 
 copy /b .\build\jain-sip.js.temp+.\src\main\javascript\gov\nist\sip\address\TelephoneNumber.js .\build\jain-sip.js.temp
 copy /b .\build\jain-sip.js.temp+.\src\main\javascript\gov\nist\sip\address\SipUri.js .\build\jain-sip.js.temp
 copy /b .\build\jain-sip.js.temp+.\src\main\javascript\gov\nist\sip\address\AddressImpl.js .\build\jain-sip.js.temp
