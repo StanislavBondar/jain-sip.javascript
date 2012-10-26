@@ -21,44 +21,44 @@
  */
 
 
-function ApplicationSipTest(sipWsUrl) {
-    console.debug("ApplicationSipTest:ApplicationSipTest(): sipWsUrl="+sipWsUrl);
+function SimpleWebRtcSipPhone(sipWsUrl) {
+    console.debug("SimpleWebRtcSipPhone:SimpleWebRtcSipPhone(): sipWsUrl="+sipWsUrl);
     // SIP Stack config
     this.sipWsUrl=sipWsUrl;
-    this.sipUserAgentName="WebRTC JAIN SIP JS UserAgent";
+    this.sipUserAgentName="SimpleWebRtcSipPhone";
     this.init();
 }
 
 // SIP listener heritage 
-ApplicationSipTest.prototype = new SipListener();
-ApplicationSipTest.prototype.constructor=ApplicationSipTest;
+SimpleWebRtcSipPhone.prototype = new SipListener();
+SimpleWebRtcSipPhone.prototype.constructor=SimpleWebRtcSipPhone;
 
 //  State of REGISTER peerConnectionState machine
-ApplicationSipTest.prototype.UNREGISTERED_STATE="UNREGISTERED_STATE";
-ApplicationSipTest.prototype.REGISTERING_STATE="REGISTERING_STATE";
-ApplicationSipTest.prototype.REGISTER_REFRESHING_STATE="REGISTER_REFRESHING_STATE";
-ApplicationSipTest.prototype.REGISTERING_401_STATE="REGISTERING_401_STATE";
-ApplicationSipTest.prototype.REGISTERED_STATE="REGISTERED_STATE";
-ApplicationSipTest.prototype.UNREGISTERING_401_STATE="UNREGISTERING_401_STATE";
-ApplicationSipTest.prototype.UNREGISTERING_STATE="UNREGISTERING_STATE";
+SimpleWebRtcSipPhone.prototype.UNREGISTERED_STATE="UNREGISTERED_STATE";
+SimpleWebRtcSipPhone.prototype.REGISTERING_STATE="REGISTERING_STATE";
+SimpleWebRtcSipPhone.prototype.REGISTER_REFRESHING_STATE="REGISTER_REFRESHING_STATE";
+SimpleWebRtcSipPhone.prototype.REGISTERING_401_STATE="REGISTERING_401_STATE";
+SimpleWebRtcSipPhone.prototype.REGISTERED_STATE="REGISTERED_STATE";
+SimpleWebRtcSipPhone.prototype.UNREGISTERING_401_STATE="UNREGISTERING_401_STATE";
+SimpleWebRtcSipPhone.prototype.UNREGISTERING_STATE="UNREGISTERING_STATE";
 
 //  State of outgoing call peerConnectionState machine
-ApplicationSipTest.prototype.INVITING_INITIAL_STATE="INVITING_INITIAL_STATE";
-ApplicationSipTest.prototype.INVITING_STATE="INVITING_STATE";
-ApplicationSipTest.prototype.INVITING_407_STATE="INVITING_407_STATE";
-ApplicationSipTest.prototype.INVITING_ACCEPTED_STATE="INVITING_ACCEPTED_STATE";
-ApplicationSipTest.prototype.INVITING_LOCAL_HANGINGUP_STATE="INVITING_LOCAL_HANGINGUP_STATE";
-ApplicationSipTest.prototype.INVITING_LOCAL_HANGINGUP_407_STATE="INVITING_LOCAL_HANGINGUP_407_STATE";
+SimpleWebRtcSipPhone.prototype.INVITING_INITIAL_STATE="INVITING_INITIAL_STATE";
+SimpleWebRtcSipPhone.prototype.INVITING_STATE="INVITING_STATE";
+SimpleWebRtcSipPhone.prototype.INVITING_407_STATE="INVITING_407_STATE";
+SimpleWebRtcSipPhone.prototype.INVITING_ACCEPTED_STATE="INVITING_ACCEPTED_STATE";
+SimpleWebRtcSipPhone.prototype.INVITING_LOCAL_HANGINGUP_STATE="INVITING_LOCAL_HANGINGUP_STATE";
+SimpleWebRtcSipPhone.prototype.INVITING_LOCAL_HANGINGUP_407_STATE="INVITING_LOCAL_HANGINGUP_407_STATE";
 
 //  State of outgoing call peerConnectionState machine
-ApplicationSipTest.prototype.INVITED_INITIAL_STATE="INVITED_INITIAL_STATE";
-ApplicationSipTest.prototype.INVITED_ACCEPTED_STATE="INVITED_ACCEPTED_STATE";
-ApplicationSipTest.prototype.INVITED_LOCAL_HANGINGUP_STATE="INVITED_LOCAL_HANGINGUP_STATE";
-ApplicationSipTest.prototype.INVITED_LOCAL_HANGINGUP_407_STATE="INVITED_LOCAL_HANGINGUP_407_STATE";
-ApplicationSipTest.prototype.INVITED_HANGUP_STATE="INVITED_HANGUP_STATE";
+SimpleWebRtcSipPhone.prototype.INVITED_INITIAL_STATE="INVITED_INITIAL_STATE";
+SimpleWebRtcSipPhone.prototype.INVITED_ACCEPTED_STATE="INVITED_ACCEPTED_STATE";
+SimpleWebRtcSipPhone.prototype.INVITED_LOCAL_HANGINGUP_STATE="INVITED_LOCAL_HANGINGUP_STATE";
+SimpleWebRtcSipPhone.prototype.INVITED_LOCAL_HANGINGUP_407_STATE="INVITED_LOCAL_HANGINGUP_407_STATE";
+SimpleWebRtcSipPhone.prototype.INVITED_HANGUP_STATE="INVITED_HANGUP_STATE";
 
-ApplicationSipTest.prototype.init =function(){
-    console.debug ("ApplicationSipTest:init()");  
+SimpleWebRtcSipPhone.prototype.init =function(){
+    console.debug ("SimpleWebRtcSipPhone:init()");  
     
     this.initGUI();
     this.initSipAccount();
@@ -69,16 +69,16 @@ ApplicationSipTest.prototype.init =function(){
     this.initJainSipStack(); 
 }
 
-ApplicationSipTest.prototype.initGUI=function(){
-    console.debug ("ApplicationSipTest:initGUI()");  
+SimpleWebRtcSipPhone.prototype.initGUI=function(){
+    console.debug ("SimpleWebRtcSipPhone:initGUI()");  
     hideCallButton();
     hideUnRegisterButton();
     showRegisterButton();
     hideByeButton();
 }
 
-ApplicationSipTest.prototype.initSipAccount=function(){
-    console.debug ("ApplicationSipTest:initSipAccount()");    
+SimpleWebRtcSipPhone.prototype.initSipAccount=function(){
+    console.debug ("SimpleWebRtcSipPhone:initSipAccount()");    
     // SIP account config        
     this.sipDomain=null;
     this.sipDisplayName=null;
@@ -87,8 +87,8 @@ ApplicationSipTest.prototype.initSipAccount=function(){
     this.sipPassword=null;
 }
 
-ApplicationSipTest.prototype.initSipRegisterStateMachine=function(){
-    console.debug ("ApplicationSipTest:initSipRegisterStateMachine()");  
+SimpleWebRtcSipPhone.prototype.initSipRegisterStateMachine=function(){
+    console.debug ("SimpleWebRtcSipPhone:initSipRegisterStateMachine()");  
     // SIP REGISTER machine 
     if(this.refreshRegisterTimer) clearTimeout(this.refreshRegisterTimer);
     this.registerState=this.UNREGISTERED_STATE;
@@ -101,8 +101,8 @@ ApplicationSipTest.prototype.initSipRegisterStateMachine=function(){
     
 }
 
-ApplicationSipTest.prototype.initSipInvitingStateMachine=function(){
-    console.debug ("ApplicationSipTest:initSipInvitingStateMachine()");  
+SimpleWebRtcSipPhone.prototype.initSipInvitingStateMachine=function(){
+    console.debug ("SimpleWebRtcSipPhone:initSipInvitingStateMachine()");  
     // SIP ougoing call (INVITING) state machine 
     this.callee=null;
     this.invitingState=this.INVITING_INITIAL_STATE;
@@ -111,8 +111,8 @@ ApplicationSipTest.prototype.initSipInvitingStateMachine=function(){
     this.jainSipInvitingTransaction=null;
 }
 
-ApplicationSipTest.prototype.initSipInvitedStateMachine=function(){
-    console.debug ("ApplicationSipTest:initSipInvitedStateMachine()");  
+SimpleWebRtcSipPhone.prototype.initSipInvitedStateMachine=function(){
+    console.debug ("SimpleWebRtcSipPhone:initSipInvitedStateMachine()");  
     // SIP ougoing call (INVITED) state machine 
     this.invitedState=this.INVITED_INITIAL_STATE;
     this.jainSipInvitedReceivedRequest=null;
@@ -120,8 +120,8 @@ ApplicationSipTest.prototype.initSipInvitedStateMachine=function(){
     this.jainSipInvitedTransaction=null;
 }
     
-ApplicationSipTest.prototype.initJainSipStack=function(){
-    console.debug ("ApplicationSipTest:initJainSipStack()");  
+SimpleWebRtcSipPhone.prototype.initJainSipStack=function(){
+    console.debug ("SimpleWebRtcSipPhone:initJainSipStack()");  
    
     // Create JAIN SIP main object
     this.sipFactory=new SipFactory();
@@ -135,12 +135,10 @@ ApplicationSipTest.prototype.initJainSipStack=function(){
     this.sipStack.start();
 }
  
-ApplicationSipTest.prototype.initPeerConnectionStateMachine=function(){
-    console.debug ("ApplicationSipTest:initPeerConnectionStateMachine()");     
+SimpleWebRtcSipPhone.prototype.initPeerConnectionStateMachine=function(){
+    console.debug ("SimpleWebRtcSipPhone:initPeerConnectionStateMachine()");     
     
     // PeerConnection/Media call context
-    this.jsepPeerConnectionConstructor = webkitPeerConnection00;
-    this.sessionDescriptionConstructor = SessionDescription;
     var stunServer=document.getElementById("stunServer").value;
     if(stunServer!="")
     {
@@ -148,7 +146,7 @@ ApplicationSipTest.prototype.initPeerConnectionStateMachine=function(){
     }
     if(this.peerConnection)
     {
-        console.debug ("ApplicationSipTest:initPeerConnectionStateMachine(): force peerConnection close");
+        console.debug ("SimpleWebRtcSipPhone:initPeerConnectionStateMachine(): force peerConnection close");
         document.getElementById("remoteVideo").pause();
         document.getElementById("remoteVideo").src= null;
         this.peerConnection.close();
@@ -166,39 +164,39 @@ ApplicationSipTest.prototype.initPeerConnectionStateMachine=function(){
   
   
 //SIPListener interface implementation
-ApplicationSipTest.prototype.processDialogTerminated =function(dialogTerminatedEvent){
-    console.debug ("ApplicationSipTest:processDialogTerminated()");  
+SimpleWebRtcSipPhone.prototype.processDialogTerminated =function(dialogTerminatedEvent){
+    console.debug ("SimpleWebRtcSipPhone:processDialogTerminated()");  
 }
 
 //SIPListener interface implementation
-ApplicationSipTest.prototype.processIOException =function(exceptionEvent){
-    console.error("ApplicationSipTest:processIOException()");   
+SimpleWebRtcSipPhone.prototype.processIOException =function(exceptionEvent){
+    console.error("SimpleWebRtcSipPhone:processIOException()");   
 }
 
 //SIPListener interface implementation
-ApplicationSipTest.prototype.processTimeout =function(timeoutEvent){
-    console.debug("ApplicationSipTest:processTimeout()"); 
+SimpleWebRtcSipPhone.prototype.processTimeout =function(timeoutEvent){
+    console.debug("SimpleWebRtcSipPhone:processTimeout()"); 
 }
 
 //SIPListener interface implementation
-ApplicationSipTest.prototype.processTransactionTerminated =function(transactionTerminatedEvent){
-    console.debug("ApplicationSipTest:processTransactionTerminated()"); 
+SimpleWebRtcSipPhone.prototype.processTransactionTerminated =function(transactionTerminatedEvent){
+    console.debug("SimpleWebRtcSipPhone:processTransactionTerminated()"); 
 }
 //SIPListener interface implementation
-ApplicationSipTest.prototype.processDisconnected =function(){   
-    console.error("ApplicationSipTest:processDisconnected()"); 
+SimpleWebRtcSipPhone.prototype.processDisconnected =function(){   
+    console.error("SimpleWebRtcSipPhone:processDisconnected()"); 
     alert("disconnected with SIP server");
     this.initGUI();
 }
 
 //SIPListener interface implementation
-ApplicationSipTest.prototype.processConnectionError =function(error){
-    console.error("ApplicationSipTest:processConnectionError():error="+error); 
+SimpleWebRtcSipPhone.prototype.processConnectionError =function(error){
+    console.error("SimpleWebRtcSipPhone:processConnectionError():error="+error); 
 }
 
 //SIPListener interface implementation
-ApplicationSipTest.prototype.processConnected =function(){
-    console.debug("ApplicationSipTest:processConnected()");
+SimpleWebRtcSipPhone.prototype.processConnected =function(){
+    console.debug("SimpleWebRtcSipPhone:processConnected()");
     this.register(
         document.getElementById("sipDomain").value,
         document.getElementById("sipDisplayName").value,
@@ -208,8 +206,8 @@ ApplicationSipTest.prototype.processConnected =function(){
 }
 
 //SIPListener interface implementation
-ApplicationSipTest.prototype.processResponse =function(responseEvent){
-    console.debug("ApplicationSipTest:processResponse()");  
+SimpleWebRtcSipPhone.prototype.processResponse =function(responseEvent){
+    console.debug("SimpleWebRtcSipPhone:processResponse()");  
     var jainSipResponse=responseEvent.getResponse(); 
     if(jainSipResponse.getCSeq().getMethod()=="REGISTER")
     {
@@ -219,13 +217,13 @@ ApplicationSipTest.prototype.processResponse =function(responseEvent){
     else if(this.invitedState!=this.INVITED_INITIAL_STATE)  this.handleStateMachineInvitedResponseEvent(responseEvent);
     else
     {
-        console.debug("ApplicationSipTest:processResponse(): response ignored");      
+        console.debug("SimpleWebRtcSipPhone:processResponse(): response ignored");      
     }
 }
 
 //SIPListener interface implementation
-ApplicationSipTest.prototype.processRequest =function(requestEvent){
-    console.debug("ApplicationSipTest:processRequest()");
+SimpleWebRtcSipPhone.prototype.processRequest =function(requestEvent){
+    console.debug("SimpleWebRtcSipPhone:processRequest()");
     var jainSipRequest=requestEvent.getRequest(); 
     var jainSipRequestMethod=jainSipRequest.getMethod();   
     if((jainSipRequestMethod=="BYE")||(jainSipRequestMethod=="ACK")||(jainSipRequestMethod=="CANCEL"))
@@ -235,7 +233,7 @@ ApplicationSipTest.prototype.processRequest =function(requestEvent){
         else if(this.invitedState!=this.INVITED_INITIAL_STATE)  this.handleStateMachineInvitedRequestEvent(requestEvent);
         else
         {
-            console.debug("ApplicationSipTest:processResponse(): request ignored");      
+            console.debug("SimpleWebRtcSipPhone:processResponse(): request ignored");      
         }
     }
     else if(jainSipRequestMethod=="INVITE")
@@ -265,18 +263,18 @@ ApplicationSipTest.prototype.processRequest =function(requestEvent){
     }
     else
     {
-        console.debug("ApplicationSipTest:processResponse(): request ignored");      
+        console.debug("SimpleWebRtcSipPhone:processResponse(): request ignored");      
     }
 }
 
 
 
-ApplicationSipTest.prototype.register =function(sipDomain, sipDisplayName, sipUserName, sipLogin, sipPassword){
-    console.debug("ApplicationSipTest:register(): sipDomain="+sipDomain);
-    console.debug("ApplicationSipTest:register(): sipDisplayName="+sipDisplayName);
-    console.debug("ApplicationSipTest:register(): sipUserName="+sipUserName);
-    console.debug("ApplicationSipTest:register(): sipLogin="+sipLogin);
-    console.debug("ApplicationSipTest:register(): sipPassword="+sipPassword);
+SimpleWebRtcSipPhone.prototype.register =function(sipDomain, sipDisplayName, sipUserName, sipLogin, sipPassword){
+    console.debug("SimpleWebRtcSipPhone:register(): sipDomain="+sipDomain);
+    console.debug("SimpleWebRtcSipPhone:register(): sipDisplayName="+sipDisplayName);
+    console.debug("SimpleWebRtcSipPhone:register(): sipUserName="+sipUserName);
+    console.debug("SimpleWebRtcSipPhone:register(): sipLogin="+sipLogin);
+    console.debug("SimpleWebRtcSipPhone:register(): sipPassword="+sipPassword);
     if(this.registerState==this.UNREGISTERED_STATE)
     {
         try
@@ -297,8 +295,9 @@ ApplicationSipTest.prototype.register =function(sipDomain, sipDisplayName, sipUs
             var jainSipCallIdHeader=this.headerFactory.createCallIdHeader();
             var jainSipExpiresHeader=this.headerFactory.createExpiresHeader(3600);
             var jainSipMaxForwardHeader=this.headerFactory.createMaxForwardsHeader(70);
+            var jainSipSupportedHeader=this.headerFactory.createSupportedHeader("path");
             var jainSipRequestUri=this.addressFactory.createSipURI_user_host(null,this.sipDomain);
-            var jainSipAllowListHeader=this.headerFactory.createHeaders("Allow: INVITE,ACK,CANCEL,BYE");
+            var jainSipAllowListHeader=this.headerFactory.createHeaders("Allow: INVITE,UPDATE,ACK,CANCEL,BYE,NOTIFY,OPTIONS,MESSAGE,REFER");
             var jainSipFromUri=this.addressFactory.createSipURI_user_host(null,fromSipUriString);
             var jainSipFromAddress=this.addressFactory.createAddress_name_uri(null,jainSipFromUri);
             var random=new Date();
@@ -309,7 +308,8 @@ ApplicationSipTest.prototype.register =function(sipDomain, sipDisplayName, sipUs
             this.messageFactory.addHeader(jainSipRegisterRequest, jainSipExpiresHeader);
             this.messageFactory.addHeader(jainSipRegisterRequest, this.jainSipUserAgentHeader);
             this.messageFactory.addHeader(jainSipRegisterRequest, jainSipAllowListHeader);
-            this.messageFactory.addHeader(jainSipRegisterRequest, this.jainSipContactHeader);   
+            this.messageFactory.addHeader(jainSipRegisterRequest, this.jainSipContactHeader); 
+            this.messageFactory.addHeader(jainSipRegisterRequest, jainSipSupportedHeader); 
             this.jainSipRegisterSentRequest=jainSipRegisterRequest;
             var jainSipClientTransaction = this.sipProvider.getNewClientTransaction(jainSipRegisterRequest);
             jainSipRegisterRequest.setTransaction(jainSipClientTransaction);
@@ -320,19 +320,19 @@ ApplicationSipTest.prototype.register =function(sipDomain, sipDisplayName, sipUs
         {
             this.initGUI();
             this.initSipRegisterStateMachine();
-            console.error("ApplicationSipTest:register(): catched exception:"+exception);
-            alert("ApplicationSipTest:register(): catched exception:"+exception);  
+            console.error("SimpleWebRtcSipPhone:register(): catched exception:"+exception);
+            alert("SimpleWebRtcSipPhone:register(): catched exception:"+exception);  
         }
     }
     else
     {
-        alert("ApplicationSipTest:register(): bad state, action register unauthorized");      
+        alert("SimpleWebRtcSipPhone:register(): bad state, action register unauthorized");      
     }  
 }
 
 
-ApplicationSipTest.prototype.keepAliveRegister =function(){
-    console.debug("ApplicationSipTest:keepAliveRegister()");
+SimpleWebRtcSipPhone.prototype.keepAliveRegister =function(){
+    console.debug("SimpleWebRtcSipPhone:keepAliveRegister()");
     
     if(this.registerState==this.REGISTERED_STATE)
     {
@@ -347,12 +347,12 @@ ApplicationSipTest.prototype.keepAliveRegister =function(){
     }
     else
     {
-        throw "ApplicationSipTest:keepAliveRegister(): bad state, action keep alive register unauthorized";            
+        throw "SimpleWebRtcSipPhone:keepAliveRegister(): bad state, action keep alive register unauthorized";            
     }
 }
 
-ApplicationSipTest.prototype.unRegister =function(){
-    console.debug("ApplicationSipTest:unRegister()");
+SimpleWebRtcSipPhone.prototype.unRegister =function(){
+    console.debug("SimpleWebRtcSipPhone:unRegister()");
     if(this.registerState==this.REGISTERED_STATE)
     {
         this.registerState=this.UNREGISTERING_STATE;
@@ -371,7 +371,7 @@ ApplicationSipTest.prototype.unRegister =function(){
     }
     else if(this.registerState==this.UNREGISTERED_STATE)
     {
-        throw "ApplicationSipTest:unRegister(): bad state, action keep alive register unauthorized";            
+        console.warn("SimpleWebRtcSipPhone:unRegister(): bad state, action keep alive register unauthorized");            
     }
     else
     {
@@ -379,19 +379,19 @@ ApplicationSipTest.prototype.unRegister =function(){
     }
 }
 
-ApplicationSipTest.prototype.handleStateMachineRegisterResponseEvent =function(responseEvent){
-    console.debug("ApplicationSipTest:handleStateMachineRegisterResponseEvent(): this.registerState="+this.registerState);
+SimpleWebRtcSipPhone.prototype.handleStateMachineRegisterResponseEvent =function(responseEvent){
+    console.debug("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): this.registerState="+this.registerState);
     var jainSipResponse=responseEvent.getResponse(); 
     var statusCode = parseInt(jainSipResponse.getStatusCode()); 
     if(this.registerState==this.UNREGISTERED_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");  
+        console.error("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");  
     }
     else if((this.registerState==this.REGISTERING_STATE) || (this.registerState==this.REGISTER_REFRESHING_STATE))
     {   
-        if(statusCode< 200)
+        if(statusCode < 200)
         {
-            console.debug("ApplicationSipTest:handleStateMachineRegisterResponseEvent(): 1XX response ignored"); 
+            console.debug("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): 1XX response ignored"); 
         }
         else if(statusCode==401)
         {
@@ -399,7 +399,7 @@ ApplicationSipTest.prototype.handleStateMachineRegisterResponseEvent =function(r
             this.jainSipRegisterSentRequest.removeHeader("Authorization");
             var num=new Number(this.jainSipRegisterSentRequest.getCSeq().getSeqNumber());
             this.jainSipRegisterSentRequest.getCSeq().setSeqNumber(num+1);
-            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.sipPassword,this.sipLogin);
+            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.sipPassword,"sip:sip.mobistar.com",this.sipLogin);
             this.messageFactory.addHeader(this.jainSipRegisterSentRequest, jainSipAuthorizationHeader); 
             this.jainSipRegisterSentRequest = this.messageFactory.setNewViaHeader(this.jainSipRegisterSentRequest);
             var jainSipClientTransaction = this.sipProvider.getNewClientTransaction(this.jainSipRegisterSentRequest);
@@ -438,14 +438,14 @@ ApplicationSipTest.prototype.handleStateMachineRegisterResponseEvent =function(r
     {
         if(statusCode < 200)
         {
-            console.debug("ApplicationSipTest:handleStateMachineRegisterResponseEvent(): 1XX response ignored"); 
+            console.debug("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): 1XX response ignored"); 
         }
         else if(statusCode==200)
         {
             this.registerState=this.REGISTERED_STATE; 
             if(this.registeredFlag==false)
             {
-                console.debug("ApplicationSipTest:handleStateMachineRegisterResponseEvent(): this.registeredFlag=true"); 
+                console.debug("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): this.registeredFlag=true"); 
                 this.registeredFlag=true;
                 showCallButton();
                 showUnRegisterButton();
@@ -467,18 +467,18 @@ ApplicationSipTest.prototype.handleStateMachineRegisterResponseEvent =function(r
         else
         {
             alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
-            this.init();
+            this.initGUI();
         } 
     }
     else if(this.registerState==this.REGISTERED_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");   
+        console.error("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");   
     }
     else if(this.registerState==this.UNREGISTERING_STATE)
     {
         if(statusCode< 200)
         {
-            console.debug("ApplicationSipTest:handleStateMachineRegisterResponseEvent(): 1XX response ignored"); 
+            console.debug("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): 1XX response ignored"); 
         }
         else if(statusCode==401)
         {
@@ -486,7 +486,7 @@ ApplicationSipTest.prototype.handleStateMachineRegisterResponseEvent =function(r
             this.jainSipRegisterSentRequest.removeHeader("Authorization");
             var num=new Number(this.jainSipRegisterSentRequest.getCSeq().getSeqNumber());
             this.jainSipRegisterSentRequest.getCSeq().setSeqNumber(num+1);
-            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.sipPassword,this.sipLogin);
+            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.sipPassword,"sip:sip.mobistar.com",this.sipLogin);
             this.messageFactory.addHeader(this.jainSipRegisterSentRequest, jainSipAuthorizationHeader); 
             this.jainSipRegisterSentRequest = this.messageFactory.setNewViaHeader(this.jainSipRegisterSentRequest);
             var jainSipClientTransaction = this.sipProvider.getNewClientTransaction(this.jainSipRegisterSentRequest);
@@ -498,7 +498,7 @@ ApplicationSipTest.prototype.handleStateMachineRegisterResponseEvent =function(r
             this.registerState=this.UNREGISTERED_STATE;
             if(this.registeredFlag==true)
             {
-                console.debug("ApplicationSipTest:handleStateMachineRegisterResponseEvent(): this.registeredFlag=false"); 
+                console.debug("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): this.registeredFlag=false"); 
                 hideCallButton();
                 hideUnRegisterButton();
                 showRegisterButton();
@@ -508,21 +508,21 @@ ApplicationSipTest.prototype.handleStateMachineRegisterResponseEvent =function(r
         else
         {
             alert("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());  
-            this.init();
+            this.initGUI();
         }
     }
     else if(this.registerState==this.UNREGISTERING_401_STATE)
     {
         if(statusCode< 200)
         {
-            console.debug("ApplicationSipTest:handleStateMachineRegisterResponseEvent(): 1XX response ignored"); 
+            console.debug("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): 1XX response ignored"); 
         }
         else if(statusCode==200)
         {
             this.registerState=this.UNREGISTERED_STATE;
             if(this.registeredFlag==true)
             {
-                console.debug("ApplicationSipTest:handleStateMachineRegisterResponseEvent(): this.registeredFlag=false"); 
+                console.debug("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): this.registeredFlag=false"); 
                 this.registeredFlag=false;
                 hideCallButton();
                 hideUnRegisterButton();
@@ -533,22 +533,22 @@ ApplicationSipTest.prototype.handleStateMachineRegisterResponseEvent =function(r
         else
         {
             alert("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
-            this.init();
+            this.initGUI();
         }
     }
     else if(this.registerState==this.UNREGISTERED_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");  
+        console.error("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");  
     }
     else
     {
-        console.error("ApplicationSipTest:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");    
+        console.error("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");    
     }
 }
 
 
-ApplicationSipTest.prototype.call =function(to){
-    console.debug("ApplicationSipTest:call():to: "+to);
+SimpleWebRtcSipPhone.prototype.call =function(to){
+    console.debug("SimpleWebRtcSipPhone:call():to: "+to);
     if(this.registeredFlag==true)
     {
         if(this.invitingState==this.INVITING_INITIAL_STATE)
@@ -562,12 +562,17 @@ ApplicationSipTest.prototype.call =function(to){
                     has_audio: true, 
                     has_video: true
                 });
-                this.peerConnectionMarkActionNeeded(); 
+                var application=this;
+                this.peerConnection.createOffer(function(offer) {
+                    application.onPeerConnectionCreateOfferSuccessCallback(offer);
+                }, function(error) {
+                    application.onPeerConnectionCreateOfferErrorCallback(error);
+                });
             }
             catch(exception)
             {
-                console.error("ApplicationSipTest:call(): catched exception:"+exception);
-                alert("ApplicationSipTest:call(): catched exception:"+exception);  
+                console.error("SimpleWebRtcSipPhone:call(): catched exception:"+exception);
+                alert("SimpleWebRtcSipPhone:call(): catched exception:"+exception);  
                 this.initPeerConnectionStateMachine();
                 this.initSipInvitingStateMachine();
                 showCallButton(); 
@@ -575,18 +580,18 @@ ApplicationSipTest.prototype.call =function(to){
         }
         else
         {
-            alert("ApplicationSipTest:call(): bad state, action call unauthorized");    
+            alert("SimpleWebRtcSipPhone:call(): bad state, action call unauthorized");    
         }
     }
     else
     {
-        alert("ApplicationSipTest:call(): unregistered, action call unauthorized");           
+        alert("SimpleWebRtcSipPhone:call(): unregistered, action call unauthorized");           
     }
 }
 
 
-ApplicationSipTest.prototype.sendInviteSipRequest =function(sdpOffer){
-    console.debug("ApplicationSipTest:sendInviteSipRequest()"); 
+SimpleWebRtcSipPhone.prototype.sendInviteSipRequest =function(sdpOffer){
+    console.debug("SimpleWebRtcSipPhone:sendInviteSipRequest()"); 
     try{
         var fromSipUriString=this.sipUserName+"@"+this.sipDomain;
         var toSipUriString= this.callee+"@"+this.sipDomain;
@@ -623,16 +628,16 @@ ApplicationSipTest.prototype.sendInviteSipRequest =function(sdpOffer){
     }
     catch(exception)
     {
-        console.error("ApplicationSipTest:sendInviteSipRequest(): catched exception:"+exception);
-        throw("ApplicationSipTest:sendInviteSipRequest(): catched exception:"+exception);  
+        console.error("SimpleWebRtcSipPhone:sendInviteSipRequest(): catched exception:"+exception);
+        throw("SimpleWebRtcSipPhone:sendInviteSipRequest(): catched exception:"+exception);  
         this.initPeerConnectionStateMachine();
         this.initSipInvitingStateMachine();
         showCallButton();   
     }
 }
 
-ApplicationSipTest.prototype.send200OKSipResponse =function(sdpOffer){
-    console.debug("ApplicationSipTest:send200OKSipResponse()"); 
+SimpleWebRtcSipPhone.prototype.send200OKSipResponse =function(sdpOffer){
+    console.debug("SimpleWebRtcSipPhone:send200OKSipResponse()"); 
     try{
         this.invitedState=this.INVITED_ACCEPTED_STATE;
         var jainSip200OKResponse=this.jainSipInvitedReceivedRequest.createResponse(200, "OK");
@@ -649,16 +654,16 @@ ApplicationSipTest.prototype.send200OKSipResponse =function(sdpOffer){
         this.initPeerConnectionStateMachine();
         this.initSipInvitingStateMachine();
         showCallButton();
-        console.error("ApplicationSipTest:send200OKSipResponse(): catched exception:"+exception);
-        throw("ApplicationSipTest:send200OKSipResponse(): catched exception:"+exception);  
+        console.error("SimpleWebRtcSipPhone:send200OKSipResponse(): catched exception:"+exception);
+        throw("SimpleWebRtcSipPhone:send200OKSipResponse(): catched exception:"+exception);  
    
     }
 }
 
 
 
-ApplicationSipTest.prototype.bye =function(){
-    console.debug("ApplicationSipTest:bye()");
+SimpleWebRtcSipPhone.prototype.bye =function(){
+    console.debug("SimpleWebRtcSipPhone:bye()");
    
     if(this.invitingState==this.INVITING_ACCEPTED_STATE)
     {
@@ -673,8 +678,8 @@ ApplicationSipTest.prototype.bye =function(){
         }
         catch(exception)
         {
-            console.error("ApplicationSipTest:bye(): catched exception:"+exception);
-            alert("ApplicationSipTest:bye(): catched exception:"+exception); 
+            console.error("SimpleWebRtcSipPhone:bye(): catched exception:"+exception);
+            alert("SimpleWebRtcSipPhone:bye(): catched exception:"+exception); 
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();
             hideByeButton();
@@ -694,8 +699,8 @@ ApplicationSipTest.prototype.bye =function(){
         }
         catch(exception)
         {
-            console.error("ApplicationSipTest:bye(): catched exception:"+exception);
-            alert("ApplicationSipTest:bye(): catched exception:"+exception); 
+            console.error("SimpleWebRtcSipPhone:bye(): catched exception:"+exception);
+            alert("SimpleWebRtcSipPhone:bye(): catched exception:"+exception); 
             this.initPeerConnectionStateMachine();
             this.initSipInvitedStateMachine();
             hideByeButton();
@@ -705,20 +710,20 @@ ApplicationSipTest.prototype.bye =function(){
     }
     else
     {
-        alert("ApplicationSipTest:bye(): bad state, action call unauthorized");     
+        alert("SimpleWebRtcSipPhone:bye(): bad state, action call unauthorized");     
     }
    
 }
 
-ApplicationSipTest.prototype.handleStateMachineInvitingResponseEvent =function(responseEvent){
-    console.debug("ApplicationSipTest:handleStateMachineInvitingResponseEvent(): this.invitingState="+this.invitingState);
+SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingResponseEvent =function(responseEvent){
+    console.debug("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): this.invitingState="+this.invitingState);
     var jainSipResponse=responseEvent.getResponse(); 
     var statusCode = parseInt(jainSipResponse.getStatusCode()); 
     if(this.invitingState==this.INVITING_STATE)
     {
         if(statusCode< 200)
         {
-            console.debug("ApplicationSipTest:handleStateMachineInvitingResponseEvent(): 1XX response ignored"); 
+            console.debug("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): 1XX response ignored"); 
         }
         else if(statusCode==407)
         {
@@ -742,9 +747,18 @@ ApplicationSipTest.prototype.handleStateMachineInvitingResponseEvent =function(r
             var jainSipMessageACK = responseEvent.getOriginalTransaction().createAck();
             this.jainSipInvitingDialog.sendAck(jainSipMessageACK);
             var sdpAnswerString = jainSipResponse.getContent();
-            this.peerConnection.setRemoteDescription(this.peerConnection.SDP_ANSWER,new this.sessionDescriptionConstructor(sdpAnswerString));
-            console.log("ApplicationSipTest:handleStateMachineInvitingResponseEvent(): sdpAnswerString="+sdpAnswerString);
-            this.peerConnectionState = 'established';  
+            var sdpAnswer = new RTCSessionDescription({
+                type: 'answer',
+                sdp: sdpAnswerString
+            });
+            var application=this;
+            this.peerConnectionState = 'answer-received';
+            this.peerConnection.setRemoteDescription(sdpAnswer, function() {
+                application.onPeerConnectionSetRemoteDescriptionSuccessCallback();
+            }, function(error) {
+                application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
+            });
+            
         }
         else
         {
@@ -761,7 +775,7 @@ ApplicationSipTest.prototype.handleStateMachineInvitingResponseEvent =function(r
     {
         if(statusCode< 200)
         {
-            console.debug("ApplicationSipTest:handleStateMachineInvitingResponseEvent(): 1XX response ignored"); 
+            console.debug("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): 1XX response ignored"); 
         }
         else if(statusCode==200)
         {
@@ -785,11 +799,11 @@ ApplicationSipTest.prototype.handleStateMachineInvitingResponseEvent =function(r
     } 
     else if(this.invitingState==this.INVITING_FAILED_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored");        
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored");        
     } 
     else if(this.invitingState==this.INVITING_ACCEPTED_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored");        
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored");        
     } 
     else if(this.invitingState==this.INVITING_LOCAL_HANGINGUP_STATE)
     {
@@ -826,7 +840,7 @@ ApplicationSipTest.prototype.handleStateMachineInvitingResponseEvent =function(r
     } 
     else if(this.invitingState==this.INVITING_LOCAL_HANGINGUP_407_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored"); 
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored"); 
         if(statusCode==200)
         {
             hideByeButton();
@@ -851,22 +865,22 @@ ApplicationSipTest.prototype.handleStateMachineInvitingResponseEvent =function(r
     } 
 }
 
-ApplicationSipTest.prototype.handleStateMachineInvitingRequestEvent =function(requestEvent){
-    console.debug("ApplicationSipTest:handleStateMachineInvitingRequestEvent(): this.invitingState="+this.invitingState);
+SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingRequestEvent =function(requestEvent){
+    console.debug("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): this.invitingState="+this.invitingState);
     var jainSipRequest=requestEvent.getRequest();
     var requestMethod = jainSipRequest.getMethod();
     
     if(this.invitingState==this.INVITING_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");  
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");  
     } 
     else if(this.invitingState==this.INVITING_407_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");  
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");  
     } 
     else if(this.invitingState==this.INVITING_FAILED_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");        
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");        
     } 
     else if(this.invitingState==this.INVITING_ACCEPTED_STATE)
     {
@@ -886,30 +900,30 @@ ApplicationSipTest.prototype.handleStateMachineInvitingRequestEvent =function(re
         }
         else
         {
-            console.error("ApplicationSipTest:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
+            console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
         }
     } 
     else if(this.invitingState==this.INVITING_LOCAL_HANGINGUP_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");
     } 
     else if(this.invitingState==this.INVITING_LOCAL_HANGINGUP_407_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");        
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");        
     } 
 }
 
-ApplicationSipTest.prototype.handleStateMachineInvitedResponseEvent =function(responseEvent){
-    console.debug("ApplicationSipTest:handleStateMachineInvitedResponseEvent(): this.invitingState="+this.invitingState);
+SimpleWebRtcSipPhone.prototype.handleStateMachineInvitedResponseEvent =function(responseEvent){
+    console.debug("SimpleWebRtcSipPhone:handleStateMachineInvitedResponseEvent(): this.invitingState="+this.invitingState);
     var jainSipResponse=responseEvent.getResponse(); 
     var statusCode = parseInt(jainSipResponse.getStatusCode()); 
     if(this.invitedState==this.INVITED_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored");    
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored");    
     } 
     else if(this.invitedState==this.INVITED_ACCEPTED_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored");        
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored");        
     } 
     else if(this.invitedState==this.INVITED_LOCAL_HANGINGUP_STATE)
     {
@@ -962,8 +976,8 @@ ApplicationSipTest.prototype.handleStateMachineInvitedResponseEvent =function(re
     } 
 }
 
-ApplicationSipTest.prototype.handleStateMachineInvitedRequestEvent =function(requestEvent){
-    console.debug("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): this.invitedState="+this.invitedState);
+SimpleWebRtcSipPhone.prototype.handleStateMachineInvitedRequestEvent =function(requestEvent){
+    console.debug("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): this.invitedState="+this.invitedState);
     var jainSipRequest=requestEvent.getRequest();
     var requestMethod = jainSipRequest.getMethod();
     var headerFrom = jainSipRequest.getHeader("From");
@@ -975,7 +989,7 @@ ApplicationSipTest.prototype.handleStateMachineInvitedRequestEvent =function(req
         requestEvent.getServerTransaction().sendResponse(jainSip180ORingingResponse);
             
         var sipUri = headerFrom.getAddress().getURI();
-        console.debug("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): sipUri.getUser()="+sipUri.getUser());
+        console.debug("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): sipUri.getUser()="+sipUri.getUser());
         var result = confirm("Call from "+sipUri.getUser()+ ": Accept or Reject");
         if (result==true)
         {
@@ -991,10 +1005,17 @@ ApplicationSipTest.prototype.handleStateMachineInvitedRequestEvent =function(req
                     has_video: true
                 });
                 this.lastReceivedSdpOfferString = jainSipRequest.getContent();
-                var sdpOffer = new this.sessionDescriptionConstructor(this.lastReceivedSdpOfferString);
-                this.peerConnection.setRemoteDescription(this.peerConnection.SDP_OFFER,	sdpOffer);
+                var sdpOffer = new RTCSessionDescription({
+                    type: 'offer',
+                    sdp: this.lastReceivedSdpOfferString
+                });
+                var application=this;
                 this.peerConnectionState = 'offer-received';
-                this.peerConnectionMarkActionNeeded();
+                this.peerConnection.setRemoteDescription(sdpOffer, function() {
+                    application.onPeerConnectionSetRemoteDescriptionSuccessCallback();
+                }, function(error) {
+                    application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
+                });
             }
             catch(exception)
             {
@@ -1008,8 +1029,8 @@ ApplicationSipTest.prototype.handleStateMachineInvitedRequestEvent =function(req
                 showUnRegisterButton(); 
                 this.initPeerConnectionStateMachine();
                 this.initSipInvitedStateMachine();
-                console.error("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): catched exception:"+exception);
-                alert("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): catched exception:"+exception);  
+                console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): catched exception:"+exception);
+                alert("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): catched exception:"+exception);  
             }
         }
         else
@@ -1052,171 +1073,315 @@ ApplicationSipTest.prototype.handleStateMachineInvitedRequestEvent =function(req
             this.jainSipInvitedDialog=requestEvent.getServerTransaction().getDialog();
         }
         else {
-            console.error("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
+            console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
         }
     } 
     else if(this.invitedState==this.INVITED_LOCAL_HANGINGUP_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored");
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored");
     } 
     else if(this.invitedState==this.INVITED_LOCAL_HANGINGUP_407_STATE)
     {
-        console.error("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored");        
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored");        
     } 
 }
-    
-ApplicationSipTest.prototype.createPeerConnection =function(){
-    console.debug("ApplicationSipTest:createPeerConnection()");
-    var that = this;
-    this.peerConnection = new this.jsepPeerConnectionConstructor(
-        this.peerConnectionStunServer,
-        function(candidate, more) 
-        {       
-            console.debug("ApplicationSipTest:createPeerConnection():candidate="+candidate+" more="+more);
-            if (more == false) 
-            {
-                // At the moment, we do not renegotiate when new candidates
-                // show up after the more flag has been false once.
-                that.peerConnectionMoreIceComing = false;
-                that.peerConnectionMarkActionNeeded();
-            }
-            else
-            {
-                console.debug("ApplicationSipTest:createPeerConnection():candidate.constructor.toString()="+candidate.constructor.toString());
-            }
-            that.peerConnectionIceCandidateCount += 1;
-        }
-        );	
+ 
+ 
+ 
+// RTCPeerConnection  state machine
+ 
+SimpleWebRtcSipPhone.prototype.createPeerConnection =function(){
+    console.debug("SimpleWebRtcSipPhone:createPeerConnection()");
+    var application = this;
+    this.peerConnection = new webkitRTCPeerConnection(null, null);	
 		
-    this.peerConnection.onaddstream = function(event) 
-    {
-        console.debug("ApplicationSipTest:PeerConnection():onaddstream()");
-        that.remoteAudioVideoMediaStream = event.stream;
-        var url = webkitURL.createObjectURL(that.remoteAudioVideoMediaStream);
-        document.getElementById("remoteVideo").src= url;
-        document.getElementById("remoteVideo").play();
-    }
-		
-    this.peerConnection.onremovestream = function(event) 
-    {
-        console.debug("ApplicationSipTest:PeerConnection():onremovestream()");
-        that.remoteAudioVideoMediaStream = null;
-        document.getElementById("remoteVideo").pause();
-        document.getElementById("remoteVideo").src= null;
+    this.peerConnection.onaddstream = function(event) {
+        application.onPeerConnectionOnAddStreamCallback(event);
+    }  
+	
+    this.peerConnection.onremovestream = function(event) {
+        application.onPeerConnectionOnRemoveStreamCallback(event);
+    }   
+    
+    this.peerConnection.onopen= function(event) {
+        application.onPeerConnectionOnOpenCallback(event);
     }
     
-    
-    this.peerConnection.onopen= function(event) 
-    {
-        console.debug("ApplicationSipTest:PeerConnection():onopen()");
+    this.peerConnection.onstatechange= function(event) {
+        application.onPeerConnectionStateChangeCallback(event);
     }
     
-    this.peerConnection.onstatechange= function(event) 
-    {
-        var peerConnection = event.target;
-        console.debug("ApplicationSipTest:PeerConnection():onstatechange():peerConnection.readyState="+peerConnection.readyState);
+    this.peerConnection.onicecandidate= function(rtcIceCandidateEvent) {
+        application.onPeerConnectionIceCandidateCallback(rtcIceCandidateEvent);
     }
-   
     
-    this.peerConnection.onconnecting= function(event) 
-    {
-        console.debug("ApplicationSipTest:PeerConnection():onconnecting()");
+    this.peerConnection.onnegotationneeded= function(event) {
+        application.onPeerConnectionIceNegotationNeededCallback(event);
     }
-            
-    this.peerConnectionMarkActionNeeded();
+    
+    this.peerConnection.ongatheringchange= function(event) {
+        application.onPeerConnectionGatheringChangeCallback(event);
+    }
+
+    this.peerConnection.onicechange= function(event) {
+        application.onPeerConnectionIceChangeCallback(event);
+    } 
+    
+    this.peerConnection.onidentityresult= function(event) {
+        application.onPeerConnectionIdentityResultCallback(event);
+    }
 }
+ 
+
+  
+SimpleWebRtcSipPhone.prototype.onPeerConnectionOnAddStreamCallback =function(event){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback(): event="+event); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback():this.peerConnection.readyState="+this.peerConnection.readyState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback: this.peerConnectionState="+this.peerConnectionState);
     
-ApplicationSipTest.prototype.peerConnectionMarkActionNeeded =function(){
-    console.debug("ApplicationSipTest:peerConnectionMarkActionNeeded()");
-    this.peerConnectionActionNeeded = true;
-    var that = this; // make this available in closure.
-    // Post an event to myself so that I get called a while later.
-    // (needs more JS/DOM info. Just call the processing function on a delay
-    // for now.)
-    window.setTimeout(function() {
-        that.peerConnectionOnStableState();
-    },1);
+    this.remoteAudioVideoMediaStream = event.stream;
+    var url = webkitURL.createObjectURL(this.remoteAudioVideoMediaStream);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback():url="+url); 
+    document.getElementById("remoteVideo").src= url;
+    document.getElementById("remoteVideo").play();   
 }
 
-// Internal function for the Connection: Called when a stable peerConnectionState
-// is entered by the browser (to allow for multiple AddStream calls or
-// other interesting actions).
-// This function will generate an offer or answer, as needed, and send
-// to the remote party using our onsignalingmessage function.
-ApplicationSipTest.prototype.peerConnectionOnStableState =function(timeoutEvent){
-    console.debug("ApplicationSipTest:peerConnectionOnStableState(): peerConnectionState="+this.peerConnectionState); 
-    console.debug("ApplicationSipTest:peerConnectionOnStableState(): this.peerConnectionActionNeeded="+this.peerConnectionActionNeeded); 
-    var mySDP;
-    if (this.peerConnectionActionNeeded) 
+SimpleWebRtcSipPhone.prototype.onPeerConnectionOnRemoveStreamCallback =function(event){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback(): event="+event); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.readyState="+this.peerConnection.readyState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback: this.peerConnectionState="+this.peerConnectionState);
+    
+    this.remoteAudioVideoMediaStream = null;
+    document.getElementById("remoteVideo").pause();
+    document.getElementById("remoteVideo").src= null; 
+}
+
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionOnOpenCallback =function(event){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback(): event="+event); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback():this.peerConnection.readyState="+this.peerConnection.readyState);   
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback: this.peerConnectionState="+this.peerConnectionState);
+}
+ 
+SimpleWebRtcSipPhone.prototype.onPeerConnectionStateChangeCallback =function(event){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): event="+event); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);   
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback: this.peerConnectionState="+this.peerConnectionState);
+}
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionIceCandidateCallback =function(rtcIceCandidateEvent){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): rtcIceCandidateEvent="+rtcIceCandidateEvent); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback: this.peerConnectionState="+this.peerConnectionState);
+    
+    if(rtcIceCandidateEvent.candidate!=null)
     {
-        if (this.peerConnectionState == 'new' || this.peerConnectionState == 'established') 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback: RTCIceCandidateEvent.candidate.candidate="+rtcIceCandidateEvent.candidate.candidate);
+    }
+    else
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback: no anymore ICE candidate");
+        if(this.peerConnectionState == 'preparing-offer') 
         {
-            // See if the current offer is the same as what we already sent.
-            // If not, no change is needed.
-            var newOffer = this.peerConnection.createOffer({
-                has_audio:true, 
-                has_video:true
-            });
-				
-            // CLM allowing only sending sdp in 'new' peerConnectionState ==> to avoid sending the same SDP we already sent (chrome bug??),
-            // as the GW does not support this yet
-            if (newOffer.toSdp() != this.peerConnectionLastSdpOffer && this.peerConnectionState == 'new') 
-            {
-                // Prepare to send an offer.
-                this.peerConnection.setLocalDescription(this.peerConnection.SDP_OFFER,newOffer);
-                console.log("ApplicationSipTest:peerConnectionOnStableState(): newOffer="+newOffer);
-                this.peerConnection.startIce();
-                this.peerConnectionState = 'preparing-offer';
-                this.peerConnectionMarkActionNeeded();
-                return;
-            } 
-            else
-            {
-                console.log("ApplicationSipTest:peerConnectionOnStableState(): Not sending a new offer:");
-            }
-        } 
-        else if (this.peerConnectionState == 'preparing-offer') 
-        {
-            // Don't do anything until we have the ICE candidates.
-            if (this.peerConnectionMoreIceComing)  return;		
-            // Now able to send the offer we've already prepared.
-            this.peerConnectionLastSdpOffer = this.peerConnection.localDescription.toSdp();
-            this.sendInviteSipRequest(this.peerConnectionLastSdpOffer);
-            // Not done: Retransmission on non-response.
+            // Send INVITE
+            this.sendInviteSipRequest(this.peerConnection.localDescription.sdp);
             this.peerConnectionState = 'offer-sent';
         } 
-        else if (this.peerConnectionState == 'offer-received') 
+        else if (this.peerConnectionState == 'preparing-answer') 
         {
-            var sdpAnswer = this.peerConnection.createAnswer(this.lastReceivedSdpOfferString , {
-                has_audio:true, 
-                has_video:true
-            });
-            this.peerConnection.setLocalDescription(this.peerConnection.SDP_ANSWER,sdpAnswer);
-            this.peerConnectionState = 'offer-received-preparing-answer';
-            if (!this.peerConnectionIceStarted) 
-            {
-                var now = new Date();
-                console.log("ApplicationSipTest:peerConnectionOnStableState():"+ now.getTime() + ": Starting ICE in responder");
-                this.peerConnection.startIce();
-                this.peerConnectionIceStarted = true;
-            } 
-            else 
-            {
-                this.peerConnectionMarkActionNeeded();
-                return;
-            }
-        } 
-        else if (this.peerConnectionState == 'offer-received-preparing-answer') 
-        {
-            if (this.peerConnectionMoreIceComing) 
-                return;
-            var localSdp = this.peerConnection.localDescription;
-            this.send200OKSipResponse(localSdp.toSdp())
+            // Send 200 OK
+            this.send200OKSipResponse(this.peerConnection.localDescription.sdp)
             this.peerConnectionState = 'established';
+        }
+        else if (this.peerConnectionState == 'established') 
+        {
+           // Why this last ice candidate event
         } 
-        else 
-            console.error("ApplicationSipTest:peerConnectionOnStableState(): dazed and confused in state " + this.peerConnectionState +", stopping here");	
-            
-        this.peerConnectionActionNeeded = false;
+        else
+        {
+            console.log("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): RTCPeerConnection bad state!");
+        }
     }
 }
+
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionCreateOfferSuccessCallback =function(offer){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferSuccessCallback(): newOffer="+offer); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
+ 
+    if (this.peerConnectionState == 'new') 
+    {
+        // Preparing offer.
+        var application=this;
+        this.peerConnectionState = 'preparing-offer';
+        this.peerConnection.setLocalDescription(offer, function() {
+            application.onPeerConnectionSetLocalDescriptionSuccessCallback();
+        }, function(error) {
+            application.onPeerConnectionSetLocalDescriptionErrorCallback(error);
+        });
+    } 
+    else
+    {
+        console.error("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferSuccessCallback(): RTCPeerConnection bad state!");
+    }
+}
+
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionCreateOfferErrorCallback =function(error){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback():error="+error); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback: this.peerConnectionState="+this.peerConnectionState);
+    alert("error:"+error);
+    // TODO Notify Error to INVITE state machine
+}
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionSetLocalDescriptionSuccessCallback =function(){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback()"); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
+     
+    // Nothing to do, just waiting end ICE resolution
+}
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionSetLocalDescriptionErrorCallback =function(error){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback():error="+error); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback: this.peerConnectionState="+this.peerConnectionState);
+    alert("error:"+error);
+   // TODO Notify Error to INVITE state machine
+}
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionCreateAnswerSuccessCallback =function(answer){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback():answer="+answer); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
+
+    if (this.peerConnectionState == 'offer-received') 
+    {
+        // Prepare answer.
+        var application=this;
+        this.peerConnectionState = 'preparing-answer';
+        this.peerConnection.setLocalDescription(answer, function() {
+            application.onPeerConnectionSetLocalDescriptionSuccessCallback();
+        }, function(error) {
+            application.onPeerConnectionSetLocalDescriptionErrorCallback(error);
+        });
+    } 
+    else
+    {
+        console.log("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): RTCPeerConnection bad state!");
+    }
+}
+
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionCreateAnswerErrorCallback =function(error){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback():error="+error);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback: this.peerConnectionState="+this.peerConnectionState);
+
+    alert("error:"+error);
+    // TODO Notify Error to INVITE state machine
+}
+
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionSetRemoteDescriptionSuccessCallback =function(){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback()");
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
+
+    if (this.peerConnectionState == 'answer-received') 
+    {            
+        this.peerConnectionState = 'established';
+    }
+    else if (this.peerConnectionState == 'offer-received') 
+    {            
+        var application=this;
+        this.peerConnection.createAnswer(function(answer) {
+            application.onPeerConnectionCreateAnswerSuccessCallback(answer);
+        }, function(error) {
+            application.onPeerConnectionCreateAnswerErrorCallback(error);
+        }); 
+    }
+    else {
+        console.log("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): RTCPeerConnection bad state!");
+    }
+}
+
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionSetRemoteDescriptionErrorCallback =function(error){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback():error="+error);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback: this.peerConnectionState="+this.peerConnectionState);
+  
+    alert("error:"+error);
+    // TODO Notify Error to INVITE state machine
+}
+
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionIceNegotationNeededCallback =function(event){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback():event="+event);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback: this.peerConnectionState="+this.peerConnectionState);
+     
+    // Nothing to do?
+}
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionGatheringChangeCallback =function(event){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback():event="+event);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback: this.peerConnectionState="+this.peerConnectionState);
+   
+     // Nothing to do?
+}
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionIceChangeCallback =function(event){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback():event="+event);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback: this.peerConnectionState="+this.peerConnectionState);
+    
+    // Nothing to do?
+}
+
+SimpleWebRtcSipPhone.prototype.onPeerConnectionIdentityResultCallback =function(event){
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback():event="+event);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback: this.peerConnectionState="+this.peerConnectionState);
+
+    // Nothing to do?
+}
+
