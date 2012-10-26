@@ -1,10 +1,7 @@
 <html>
     <head>
         <title>MobicentsWebRTCPhone</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <script type='text/javascript'>   
-            var logger =  undefined; //console;
-        </script>	
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">	
         <link rel="icon" type="image/png" href="img/telestax-favicon.png">
         <link href="css/bootstrap.min.css" rel="stylesheet"> 
         <link href="css/bootstrap-responsive.css" rel="stylesheet">
@@ -14,7 +11,11 @@
         <div class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-inner">        
                 <div class="container">
-                    <a class="brand" href="#">Mobicents HTML5 WebRTC Client, By </a><a href="http://www.telestax.com"><img style="display: block;" alt="TeleStax" src="img/TeleStax_logo_small.png" /></a>
+                    <a class="brand" href="#">Mobicents HTML5 WebRTC Client, By </a>
+                    <div class="container">
+                        <img  width="50"  height="50" alt="Orange" src="img/logo-orange.jpg" />
+                        <img alt="TeleStax" src="img/TeleStax_logo_small.png" />
+                    </div>
                 </div>
                 <!--div class="container">
                   <a class="brand" href="#">By</a>    
@@ -162,6 +163,8 @@
             var defaultSipPassword="mobicents";
             var defaultSipContactPhoneNumber="telestax@mobicents.com";
             var localAudioVideoMediaStream=null;
+            var localAudioMediaStream=null;
+            var localVideoMediaStream=null;
             
             function onLoad()
             {
@@ -174,7 +177,15 @@
                 document.getElementById("sipLogin").value=defaultSipLogin;
                 document.getElementById("sipPassword").value=defaultSipPassword;
                 document.getElementById("sipContactPhoneNumber").value=defaultSipContactPhoneNumber;
-                navigator.webkitGetUserMedia({audio:true, video:true},gotLocalAudioVideoStream, gotLocalAudioVideoFailed);
+                if(navigator.mozGetUserMedia)
+                {
+                    navigator.mozGetUserMedia({video:true},gotLocalVideoStream, gotLocalVideoFailed);
+                    navigator.mozGetUserMedia({audio:true, fake:true},gotLocalAudioStream, gotLocalAudioFailed);
+                }
+                else if(navigator.webkitGetUserMedia)
+                {
+                    navigator.webkitGetUserMedia({audio:true, video:true},gotLocalAudioVideoStream, gotLocalAudioVideoFailed);
+                }
             }
 
             function onBeforeUnload()
@@ -185,12 +196,60 @@
                     console.log("OnBeforeUnLoad()");  
                 }     
             }
+                  
+            function gotLocalAudioStream (localStream) {
+                console.debug("gotLocalAudioStream");
+                localAudioMediaStream=localStream;
+            }
+
+            function  gotLocalAudioFailed(error) 
+            {
+                console.debug("gotLocalAudioFailed");
+                alert("Failed to get access to local audio media. Error code was " + error.code + ".");
+            }	
+            
+            function gotLocalVideoStream (localStream) {
+                console.debug("gotLocalVideoStream");
+                localVideoMediaStream=localStream;
+                var video = document.getElementById("localVideoPreview");
+                if (navigator.mozGetUserMedia)
+                {
+                    video.mozSrcObject = localVideoMediaStream;
+                    video.play();
+                }
+               showRegisterButton();
+            }
+
+            function  gotLocalVideoFailed(error) 
+            {
+                console.debug("gotLocalVideoFailed");
+                alert("Failed to get access to local video media. Error code was " + error.code + ".");
+            }
             
             function gotLocalAudioVideoStream (localStream) {
+                console.debug("gotLocalAudioVideoStream");
                 localAudioVideoMediaStream=localStream;
-                var url = webkitURL.createObjectURL(localStream);
-                document.getElementById("localVideoPreview").src=url;
-                document.getElementById("localVideoPreview").play();
+                var video = document.getElementById("localVideoPreview");
+                if (window.webkitURL) 
+                {
+                    video.src = window.webkitURL.createObjectURL(localAudioVideoMediaStream);
+                    video.play();
+                }
+                else if (video.mozSrcObject !== undefined)
+                {
+                    video.mozSrcObject = localAudioVideoMediaStream;
+                    video.play();
+                }
+                else if (navigator.mozGetUserMedia)
+                {
+                    video.src = localAudioVideoMediaStream;
+                    video.play();
+                }
+                else if (window.URL)
+                {
+                    video.src = window.URL.createObjectURL(localAudioVideoMediaStream);
+                    video.play();
+                }
                 showRegisterButton();
             }
 

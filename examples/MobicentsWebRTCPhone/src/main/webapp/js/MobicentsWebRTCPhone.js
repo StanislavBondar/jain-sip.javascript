@@ -19,6 +19,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
+
 function MobicentsWebRTCPhone(sipWsUrl) {
     console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): sipWsUrl="+sipWsUrl);
     // SIP Stack config
@@ -137,8 +139,6 @@ MobicentsWebRTCPhone.prototype.initPeerConnectionStateMachine=function(){
     console.debug ("MobicentsWebRTCPhone:initPeerConnectionStateMachine()");     
     
     // PeerConnection/Media call context
-    this.jsepPeerConnectionConstructor = webkitPeerConnection00;
-    this.sessionDescriptionConstructor = SessionDescription;
     var stunServer=document.getElementById("stunServer").value;
     if(stunServer!="")
     {
@@ -149,9 +149,10 @@ MobicentsWebRTCPhone.prototype.initPeerConnectionStateMachine=function(){
         console.debug ("MobicentsWebRTCPhone:initPeerConnectionStateMachine(): force peerConnection close");
         document.getElementById("remoteVideo").pause();
         document.getElementById("remoteVideo").src= null;
-	document.getElementById("remoteVideo").style.visibility = "hidden";
+        document.getElementById("remoteVideo").style.visibility = "hidden";
         this.peerConnection.close();
     }
+
     this.peerConnection = null;
     this.peerConnectionMessage=null;
     this.peerConnectionActionNeeded = false;
@@ -231,7 +232,7 @@ MobicentsWebRTCPhone.prototype.processRequest =function(requestEvent){
     var jainSipRequestMethod=jainSipRequest.getMethod();   
     if((jainSipRequestMethod=="BYE")||(jainSipRequestMethod=="ACK")||(jainSipRequestMethod=="CANCEL"))
     {
-	stopRinging();
+        stopRinging();
         // Subscequent request on ongoing dialog
         if(this.invitingState!=this.INVITING_INITIAL_STATE) this.handleStateMachineInvitingRequestEvent(requestEvent); 
         else if(this.invitedState!=this.INVITED_INITIAL_STATE)  this.handleStateMachineInvitedRequestEvent(requestEvent);
@@ -300,7 +301,7 @@ MobicentsWebRTCPhone.prototype.register =function(sipDomain, sipDisplayName, sip
             var jainSipExpiresHeader=this.headerFactory.createExpiresHeader(3600);
             var jainSipMaxForwardHeader=this.headerFactory.createMaxForwardsHeader(70);
             var jainSipRequestUri=this.addressFactory.createSipURI_user_host(null,this.sipDomain);
-            var jainSipAllowListHeader=this.headerFactory.createHeaders("Allow: INVITE,ACK,CANCEL,BYE");
+            var jainSipAllowListHeader=this.headerFactory.createHeaders("Allow: INVITE,UPDATE,ACK,CANCEL,BYE,NOTIFY,OPTIONS,MESSAGE,REFER");
             var jainSipFromUri=this.addressFactory.createSipURI_user_host(null,fromSipUriString);
             var jainSipFromAddress=this.addressFactory.createAddress_name_uri(null,jainSipFromUri);
             var random=new Date();
@@ -311,7 +312,7 @@ MobicentsWebRTCPhone.prototype.register =function(sipDomain, sipDisplayName, sip
             this.messageFactory.addHeader(jainSipRegisterRequest, jainSipExpiresHeader);
             this.messageFactory.addHeader(jainSipRegisterRequest, this.jainSipUserAgentHeader);
             this.messageFactory.addHeader(jainSipRegisterRequest, jainSipAllowListHeader);
-            this.messageFactory.addHeader(jainSipRegisterRequest, this.jainSipContactHeader);   
+            this.messageFactory.addHeader(jainSipRegisterRequest, this.jainSipContactHeader); 
             this.jainSipRegisterSentRequest=jainSipRegisterRequest;
             var jainSipClientTransaction = this.sipProvider.getNewClientTransaction(jainSipRegisterRequest);
             jainSipRegisterRequest.setTransaction(jainSipClientTransaction);
@@ -373,7 +374,7 @@ MobicentsWebRTCPhone.prototype.unRegister =function(){
     }
     else if(this.registerState==this.UNREGISTERED_STATE)
     {
-        throw "MobicentsWebRTCPhone:unRegister(): bad state, action keep alive register unauthorized";            
+        console.warn("MobicentsWebRTCPhone:unRegister(): bad state, action keep alive register unauthorized");            
     }
     else
     {
@@ -564,7 +565,12 @@ MobicentsWebRTCPhone.prototype.call =function(to){
                     has_audio: true, 
                     has_video: true
                 });
-                this.peerConnectionMarkActionNeeded(); 
+                var application=this;
+                this.peerConnection.createOffer(function(offer) {
+                    application.onPeerConnectionCreateOfferSuccessCallback(offer);
+                }, function(error) {
+                    application.onPeerConnectionCreateOfferErrorCallback(error);
+                });
             }
             catch(exception)
             {
@@ -586,7 +592,6 @@ MobicentsWebRTCPhone.prototype.call =function(to){
         modal_alert("MobicentsWebRTCPhone:call(): unregistered, action call unauthorized");           
     }
 }
-
 
 MobicentsWebRTCPhone.prototype.sendInviteSipRequest =function(sdpOffer){
     console.debug("MobicentsWebRTCPhone:sendInviteSipRequest()"); 
@@ -721,7 +726,7 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitingResponseEvent =function
     {
         if(statusCode< 200)
         {
-	    startRinging();
+            startRinging();
             console.debug("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): 1XX response ignored"); 
         }
         else if(statusCode==407)
@@ -738,7 +743,7 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitingResponseEvent =function
         }
         else if(statusCode==200)
         {
-	    stopRinging();
+            stopRinging();
             this.jainSipInvitingDialog=responseEvent.getOriginalTransaction().getDialog();
             this.invitingState=this.INVITING_ACCEPTED_STATE;
             showByeButton();
@@ -747,9 +752,17 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitingResponseEvent =function
             var jainSipMessageACK = responseEvent.getOriginalTransaction().createAck();
             this.jainSipInvitingDialog.sendAck(jainSipMessageACK);
             var sdpAnswerString = jainSipResponse.getContent();
-            this.peerConnection.setRemoteDescription(this.peerConnection.SDP_ANSWER,new this.sessionDescriptionConstructor(sdpAnswerString));
-            console.log("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): sdpAnswerString="+sdpAnswerString);
-            this.peerConnectionState = 'established';  
+            var sdpAnswer = new RTCSessionDescription({
+                type: 'answer',
+                sdp: sdpAnswerString
+            });
+            var application=this;
+            this.peerConnectionState = 'answer-received';
+            this.peerConnection.setRemoteDescription(sdpAnswer, function() {
+                application.onPeerConnectionSetRemoteDescriptionSuccessCallback();
+            }, function(error) {
+                application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
+            });  
         }
         else
         {
@@ -759,7 +772,7 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitingResponseEvent =function
             showCallButton();
             hideByeButton();
             showUnRegisterButton();
-	    stopRinging();
+            stopRinging();
         }     
     } 
     else if(this.invitingState==this.INVITING_407_STATE)
@@ -979,20 +992,20 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitedRequestEvent =function(r
     var headerFrom = jainSipRequest.getHeader("From");
     if(this.invitedState==this.INVITED_INITIAL_STATE)
     {
-	startRinging();
+        startRinging();
         var jainSip180ORingingResponse=jainSipRequest.createResponse(180, "Ringing");
         jainSip180ORingingResponse.addHeader(this.jainSipContactHeader);
         jainSip180ORingingResponse.addHeader(this.jainSipUserAgentHeader);
         requestEvent.getServerTransaction().sendResponse(jainSip180ORingingResponse);
 
-	mobicentsWebRTCPhone.jainSipInvitedReceivedRequest=jainSipRequest;
-	mobicentsWebRTCPhone.jainSipInvitedTransaction=requestEvent.getServerTransaction();
-        mobicentsWebRTCPhone.jainSipInvitedDialog=requestEvent.getServerTransaction().getDialog();
+        this.jainSipInvitedReceivedRequest=jainSipRequest;
+        this.jainSipInvitedTransaction=requestEvent.getServerTransaction();
+        this.jainSipInvitedDialog=requestEvent.getServerTransaction().getDialog();
             
         var sipUri = headerFrom.getAddress().getURI();
         console.debug("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): sipUri.getUser()="+sipUri.getUser());
-	show_desktop_notification("Incoming Call from " + sipUri.getUser());
-	$("#call_message").html("<p>Incoming Call from " + sipUri.getUser() +"</p>");
+        show_desktop_notification("Incoming Call from " + sipUri.getUser());
+        $("#call_message").html("<p>Incoming Call from " + sipUri.getUser() +"</p>");
         $('#callModal').modal(); 
     } 
     else if(this.invitedState==this.INVITED_ACCEPTED_STATE)
@@ -1011,7 +1024,7 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitedRequestEvent =function(r
             this.jainSipInvitedDialog=null;
             document.getElementById("remoteVideo").pause();
             document.getElementById("remoteVideo").src= null;
-	    document.getElementById("remoteVideo").style.visibility = "hidden";
+            document.getElementById("remoteVideo").style.visibility = "hidden";
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();
             modal_alert("Contact has hangup"); 
@@ -1033,185 +1046,335 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitedRequestEvent =function(r
         console.error("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored");        
     } 
 }
-    
+
+
+ 
+// RTCPeerConnection  state machine
+ 
 MobicentsWebRTCPhone.prototype.createPeerConnection =function(){
     console.debug("MobicentsWebRTCPhone:createPeerConnection()");
-    var that = this;
-    this.peerConnection = new this.jsepPeerConnectionConstructor(
-        this.peerConnectionStunServer,
-        function(candidate, more) 
-        {       
-            console.debug("MobicentsWebRTCPhone:createPeerConnection():candidate="+candidate+" more="+more);
-            if (more == false) 
-            {
-                // At the moment, we do not renegotiate when new candidates
-                // show up after the more flag has been false once.
-                that.peerConnectionMoreIceComing = false;
-                that.peerConnectionMarkActionNeeded();
-            }
-            else
-            {
-                console.debug("MobicentsWebRTCPhone:createPeerConnection():candidate.constructor.toString()="+candidate.constructor.toString());
-            }
-            that.peerConnectionIceCandidateCount += 1;
-        }
-        );	
+    var application = this;
+    this.peerConnection = new webkitRTCPeerConnection(null, null);	
 		
-    this.peerConnection.onaddstream = function(event) 
-    {
-        console.debug("MobicentsWebRTCPhone:PeerConnection():onaddstream()");
-        that.remoteAudioVideoMediaStream = event.stream;
-        var url = webkitURL.createObjectURL(that.remoteAudioVideoMediaStream);
-        document.getElementById("remoteVideo").src= url;
-        document.getElementById("remoteVideo").play();
-	document.getElementById("remoteVideo").style.visibility = "visible";
+    this.peerConnection.onaddstream = function(event) {
+        application.onPeerConnectionOnAddStreamCallback(event);
+    }  
+	
+    this.peerConnection.onremovestream = function(event) {
+        application.onPeerConnectionOnRemoveStreamCallback(event);
+    }   
+    
+    this.peerConnection.onopen= function(event) {
+        application.onPeerConnectionOnOpenCallback(event);
     }
-		
-    this.peerConnection.onremovestream = function(event) 
-    {
-        console.debug("MobicentsWebRTCPhone:PeerConnection():onremovestream()");
-        that.remoteAudioVideoMediaStream = null;
-        document.getElementById("remoteVideo").pause();
-        document.getElementById("remoteVideo").src= null;
-	document.getElementById("remoteVideo").style.visibility = "hidden";
+    
+    this.peerConnection.onstatechange= function(event) {
+        application.onPeerConnectionStateChangeCallback(event);
+    }
+    
+    this.peerConnection.onicecandidate= function(rtcIceCandidateEvent) {
+        application.onPeerConnectionIceCandidateCallback(rtcIceCandidateEvent);
+    }
+    
+    this.peerConnection.onnegotationneeded= function(event) {
+        application.onPeerConnectionIceNegotationNeededCallback(event);
+    }
+    
+    this.peerConnection.ongatheringchange= function(event) {
+        application.onPeerConnectionGatheringChangeCallback(event);
+    }
 
-    }
+    this.peerConnection.onicechange= function(event) {
+        application.onPeerConnectionIceChangeCallback(event);
+    } 
     
-    
-    this.peerConnection.onopen= function(event) 
-    {
-        console.debug("MobicentsWebRTCPhone:PeerConnection():onopen()");
+    this.peerConnection.onidentityresult= function(event) {
+        application.onPeerConnectionIdentityResultCallback(event);
     }
-    
-    this.peerConnection.onstatechange= function(event) 
-    {
-        var peerConnection = event.target;
-        console.debug("MobicentsWebRTCPhone:PeerConnection():onstatechange():peerConnection.readyState="+peerConnection.readyState);
-    }
-   
-    
-    this.peerConnection.onconnecting= function(event) 
-    {
-        console.debug("MobicentsWebRTCPhone:PeerConnection():onconnecting()");
-    }
-            
-    this.peerConnectionMarkActionNeeded();
 }
+ 
+
+  
+MobicentsWebRTCPhone.prototype.onPeerConnectionOnAddStreamCallback =function(event){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback(): event="+event); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback():this.peerConnection.readyState="+this.peerConnection.readyState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback: this.peerConnectionState="+this.peerConnectionState);
     
-MobicentsWebRTCPhone.prototype.peerConnectionMarkActionNeeded =function(){
-    console.debug("MobicentsWebRTCPhone:peerConnectionMarkActionNeeded()");
-    this.peerConnectionActionNeeded = true;
-    var that = this; // make this available in closure.
-    // Post an event to myself so that I get called a while later.
-    // (needs more JS/DOM info. Just call the processing function on a delay
-    // for now.)
-    window.setTimeout(function() {
-        that.peerConnectionOnStableState();
-    },1);
+    this.remoteAudioVideoMediaStream = event.stream;
+    var url = webkitURL.createObjectURL(this.remoteAudioVideoMediaStream);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback():url="+url); 
+    document.getElementById("remoteVideo").src= url;
+    document.getElementById("remoteVideo").play();
+    document.getElementById("remoteVideo").style.visibility = "visible";   
 }
 
-// Internal function for the Connection: Called when a stable peerConnectionState
-// is entered by the browser (to allow for multiple AddStream calls or
-// other interesting actions).
-// This function will generate an offer or answer, as needed, and send
-// to the remote party using our onsignalingmessage function.
-MobicentsWebRTCPhone.prototype.peerConnectionOnStableState =function(timeoutEvent){
-    console.debug("MobicentsWebRTCPhone:peerConnectionOnStableState(): peerConnectionState="+this.peerConnectionState); 
-    console.debug("MobicentsWebRTCPhone:peerConnectionOnStableState(): this.peerConnectionActionNeeded="+this.peerConnectionActionNeeded); 
-    var mySDP;
-    if (this.peerConnectionActionNeeded) 
+MobicentsWebRTCPhone.prototype.onPeerConnectionOnRemoveStreamCallback =function(event){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback(): event="+event); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.readyState="+this.peerConnection.readyState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback: this.peerConnectionState="+this.peerConnectionState);
+    
+    this.remoteAudioVideoMediaStream = null;
+    document.getElementById("remoteVideo").pause();
+    document.getElementById("remoteVideo").src= null; 
+    document.getElementById("remoteVideo").style.visibility = "hidden";
+ 
+}
+
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionOnOpenCallback =function(event){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback(): event="+event); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback():this.peerConnection.readyState="+this.peerConnection.readyState);   
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback: this.peerConnectionState="+this.peerConnectionState);
+}
+ 
+MobicentsWebRTCPhone.prototype.onPeerConnectionStateChangeCallback =function(event){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback(): event="+event); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);   
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback: this.peerConnectionState="+this.peerConnectionState);
+}
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionIceCandidateCallback =function(rtcIceCandidateEvent){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): rtcIceCandidateEvent="+rtcIceCandidateEvent); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback: this.peerConnectionState="+this.peerConnectionState);
+    
+    if(rtcIceCandidateEvent.candidate!=null)
     {
-        if (this.peerConnectionState == 'new' || this.peerConnectionState == 'established') 
+        console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback: RTCIceCandidateEvent.candidate.candidate="+rtcIceCandidateEvent.candidate.candidate);
+    }
+    else
+    {
+        console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback: no anymore ICE candidate");
+        if(this.peerConnectionState == 'preparing-offer') 
         {
-            // See if the current offer is the same as what we already sent.
-            // If not, no change is needed.
-            var newOffer = this.peerConnection.createOffer({
-                has_audio:true, 
-                has_video:true
-            });
-				
-            // CLM allowing only sending sdp in 'new' peerConnectionState ==> to avoid sending the same SDP we already sent (chrome bug??),
-            // as the GW does not support this yet
-            if (newOffer.toSdp() != this.peerConnectionLastSdpOffer && this.peerConnectionState == 'new') 
-            {
-                // Prepare to send an offer.
-                this.peerConnection.setLocalDescription(this.peerConnection.SDP_OFFER,newOffer);
-                console.log("MobicentsWebRTCPhone:peerConnectionOnStableState(): newOffer="+newOffer);
-                this.peerConnection.startIce();
-                this.peerConnectionState = 'preparing-offer';
-                this.peerConnectionMarkActionNeeded();
-                return;
-            } 
-            else
-            {
-                console.log("MobicentsWebRTCPhone:peerConnectionOnStableState(): Not sending a new offer:");
-            }
-        } 
-        else if (this.peerConnectionState == 'preparing-offer') 
-        {
-            // Don't do anything until we have the ICE candidates.
-            if (this.peerConnectionMoreIceComing)  return;		
-            // Now able to send the offer we've already prepared.
-            this.peerConnectionLastSdpOffer = this.peerConnection.localDescription.toSdp();
-            this.sendInviteSipRequest(this.peerConnectionLastSdpOffer);
-            // Not done: Retransmission on non-response.
+            // Send INVITE
+            this.sendInviteSipRequest(this.peerConnection.localDescription.sdp);
             this.peerConnectionState = 'offer-sent';
         } 
-        else if (this.peerConnectionState == 'offer-received') 
+        else if (this.peerConnectionState == 'preparing-answer') 
         {
-            var sdpAnswer = this.peerConnection.createAnswer(this.lastReceivedSdpOfferString , {
-                has_audio:true, 
-                has_video:true
-            });
-            this.peerConnection.setLocalDescription(this.peerConnection.SDP_ANSWER,sdpAnswer);
-            this.peerConnectionState = 'offer-received-preparing-answer';
-            if (!this.peerConnectionIceStarted) 
-            {
-                var now = new Date();
-                console.log("MobicentsWebRTCPhone:peerConnectionOnStableState():"+ now.getTime() + ": Starting ICE in responder");
-                this.peerConnection.startIce();
-                this.peerConnectionIceStarted = true;
-            } 
-            else 
-            {
-                this.peerConnectionMarkActionNeeded();
-                return;
-            }
-        } 
-        else if (this.peerConnectionState == 'offer-received-preparing-answer') 
-        {
-            if (this.peerConnectionMoreIceComing) 
-                return;
-            var localSdp = this.peerConnection.localDescription;
-            this.send200OKSipResponse(localSdp.toSdp())
+            // Send 200 OK
+            this.send200OKSipResponse(this.peerConnection.localDescription.sdp)
             this.peerConnectionState = 'established';
+        }
+        else if (this.peerConnectionState == 'established') 
+        {
+        // Why this last ice candidate event
         } 
-        else 
-            console.error("MobicentsWebRTCPhone:peerConnectionOnStableState(): dazed and confused in state " + this.peerConnectionState +", stopping here");	
-            
-        this.peerConnectionActionNeeded = false;
+        else
+        {
+            console.log("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): RTCPeerConnection bad state!");
+        }
     }
 }
+
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionCreateOfferSuccessCallback =function(offer){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferSuccessCallback(): newOffer="+offer); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
+ 
+    if (this.peerConnectionState == 'new') 
+    {
+        // Preparing offer.
+        var application=this;
+        this.peerConnectionState = 'preparing-offer';
+        this.peerConnection.setLocalDescription(offer, function() {
+            application.onPeerConnectionSetLocalDescriptionSuccessCallback();
+        }, function(error) {
+            application.onPeerConnectionSetLocalDescriptionErrorCallback(error);
+        });
+    } 
+    else
+    {
+        console.error("MobicentsWebRTCPhone:onPeerConnectionCreateOfferSuccessCallback(): RTCPeerConnection bad state!");
+    }
+}
+
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionCreateOfferErrorCallback =function(error){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferErrorCallback():error="+error); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferErrorCallback: this.peerConnectionState="+this.peerConnectionState);
+    alert("error:"+error);
+// TODO Notify Error to INVITE state machine
+}
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionSetLocalDescriptionSuccessCallback =function(){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionSuccessCallback()"); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
+     
+// Nothing to do, just waiting end ICE resolution
+}
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionSetLocalDescriptionErrorCallback =function(error){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionErrorCallback():error="+error); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionErrorCallback: this.peerConnectionState="+this.peerConnectionState);
+    alert("error:"+error);
+// TODO Notify Error to INVITE state machine
+}
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionCreateAnswerSuccessCallback =function(answer){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerSuccessCallback():answer="+answer); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
+
+    if (this.peerConnectionState == 'offer-received') 
+    {
+        // Prepare answer.
+        var application=this;
+        this.peerConnectionState = 'preparing-answer';
+        this.peerConnection.setLocalDescription(answer, function() {
+            application.onPeerConnectionSetLocalDescriptionSuccessCallback();
+        }, function(error) {
+            application.onPeerConnectionSetLocalDescriptionErrorCallback(error);
+        });
+    } 
+    else
+    {
+        console.log("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerSuccessCallback(): RTCPeerConnection bad state!");
+    }
+}
+
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionCreateAnswerErrorCallback =function(error){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerErrorCallback():error="+error);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerErrorCallback: this.peerConnectionState="+this.peerConnectionState);
+
+    alert("error:"+error);
+// TODO Notify Error to INVITE state machine
+}
+
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionSetRemoteDescriptionSuccessCallback =function(){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback()");
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
+
+    if (this.peerConnectionState == 'answer-received') 
+    {            
+        this.peerConnectionState = 'established';
+    }
+    else if (this.peerConnectionState == 'offer-received') 
+    {            
+        var application=this;
+        this.peerConnection.createAnswer(function(answer) {
+            application.onPeerConnectionCreateAnswerSuccessCallback(answer);
+        }, function(error) {
+            application.onPeerConnectionCreateAnswerErrorCallback(error);
+        }); 
+    }
+    else {
+        console.log("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): RTCPeerConnection bad state!");
+    }
+}
+
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionSetRemoteDescriptionErrorCallback =function(error){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionErrorCallback():error="+error);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionErrorCallback: this.peerConnectionState="+this.peerConnectionState);
+  
+    alert("error:"+error);
+// TODO Notify Error to INVITE state machine
+}
+
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionIceNegotationNeededCallback =function(event){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback():event="+event);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback: this.peerConnectionState="+this.peerConnectionState);
+     
+// Nothing to do?
+}
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionGatheringChangeCallback =function(event){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback():event="+event);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback: this.peerConnectionState="+this.peerConnectionState);
+   
+// Nothing to do?
+}
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionIceChangeCallback =function(event){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback():event="+event);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback: this.peerConnectionState="+this.peerConnectionState);
+    
+// Nothing to do?
+}
+
+MobicentsWebRTCPhone.prototype.onPeerConnectionIdentityResultCallback =function(event){
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback():event="+event);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback: this.peerConnectionState="+this.peerConnectionState);
+
+// Nothing to do?
+}
+ 
 
 // Accept modal 
 $('#callModal .accept-btn').click(function() {
-// Accepted 
     try
-    {               
+    {
+        stopRinging();
         mobicentsWebRTCPhone.createPeerConnection();
         mobicentsWebRTCPhone.peerConnection.addStream(mobicentsWebRTCPhone.localAudioVideoMediaStream, {
             has_audio: true, 
             has_video: true
         });
         mobicentsWebRTCPhone.lastReceivedSdpOfferString = mobicentsWebRTCPhone.jainSipInvitedReceivedRequest.getContent();
-        var sdpOffer = new mobicentsWebRTCPhone.sessionDescriptionConstructor(mobicentsWebRTCPhone.lastReceivedSdpOfferString);
-        mobicentsWebRTCPhone.peerConnection.setRemoteDescription(mobicentsWebRTCPhone.peerConnection.SDP_OFFER,sdpOffer);
+        var sdpOffer = new RTCSessionDescription({
+            type: 'offer',
+            sdp: mobicentsWebRTCPhone.lastReceivedSdpOfferString
+        });
+        var application=mobicentsWebRTCPhone;
         mobicentsWebRTCPhone.peerConnectionState = 'offer-received';
-        mobicentsWebRTCPhone.peerConnectionMarkActionNeeded();
+        mobicentsWebRTCPhone.peerConnection.setRemoteDescription(sdpOffer, function() {
+            application.onPeerConnectionSetRemoteDescriptionSuccessCallback();
+        }, function(error) {
+            application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
+        });
     }
     catch(exception)
     {
-	alert("MobicentsWebRTCPhone:accept(): catched exception:"+exception);  
         // Temporarily Unavailable
         var jainSipResponse480=mobicentsWebRTCPhone.jainSipInvitedReceivedRequest.createResponse(480,"Temporarily Unavailable");
         jainSipResponse480.addHeader(mobicentsWebRTCPhone.jainSipContactHeader);
@@ -1224,13 +1387,13 @@ $('#callModal .accept-btn').click(function() {
         mobicentsWebRTCPhone.initPeerConnectionStateMachine();
         mobicentsWebRTCPhone.initSipInvitedStateMachine();
         console.error("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): catched exception:"+exception);
-        alert("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): catched exception:"+exception);  
     }
+
 });
 
 // Reject modal
 $('#callModal .reject-btn').click(function() {
-// Rejected 
+    // Rejected 
     // Temporarily Unavailable
     var jainSipResponse480=mobicentsWebRTCPhone.jainSipInvitedReceivedRequest.createResponse(480,"Temporarily Unavailable");
     jainSipResponse480.addHeader(mobicentsWebRTCPhone.jainSipContactHeader);
@@ -1245,16 +1408,16 @@ $('#callModal .reject-btn').click(function() {
 });
 
 function modal_alert(message) {
-	$("#modal_message").html(message);
-	$('#messageModal').modal(); 
+    $("#modal_message").html(message);
+    $('#messageModal').modal(); 
 }
 
 function show_desktop_notification(message) {
-	if (window.webkitNotifications && window.webkitNotifications.checkPermission() == 0) {
-		var thumb = "img/TeleStax-logo-globe-only-transparent-bg.png";
-		var title = "Mobicents HTML5 WebRTC Client";
-		var popup = window.webkitNotifications.createNotification(thumb, title, message);
-		//Show the popup
-		popup.show();
-	}
+    if (window.webkitNotifications && window.webkitNotifications.checkPermission() == 0) {
+        var thumb = "img/TeleStax-logo-globe-only-transparent-bg.png";
+        var title = "Mobicents HTML5 WebRTC Client";
+        var popup = window.webkitNotifications.createNotification(thumb, title, message);
+        //Show the popup
+        popup.show();
+    }
 }
