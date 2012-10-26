@@ -295,7 +295,6 @@ SimpleWebRtcSipPhone.prototype.register =function(sipDomain, sipDisplayName, sip
             var jainSipCallIdHeader=this.headerFactory.createCallIdHeader();
             var jainSipExpiresHeader=this.headerFactory.createExpiresHeader(3600);
             var jainSipMaxForwardHeader=this.headerFactory.createMaxForwardsHeader(70);
-            var jainSipSupportedHeader=this.headerFactory.createSupportedHeader("path");
             var jainSipRequestUri=this.addressFactory.createSipURI_user_host(null,this.sipDomain);
             var jainSipAllowListHeader=this.headerFactory.createHeaders("Allow: INVITE,UPDATE,ACK,CANCEL,BYE,NOTIFY,OPTIONS,MESSAGE,REFER");
             var jainSipFromUri=this.addressFactory.createSipURI_user_host(null,fromSipUriString);
@@ -309,7 +308,6 @@ SimpleWebRtcSipPhone.prototype.register =function(sipDomain, sipDisplayName, sip
             this.messageFactory.addHeader(jainSipRegisterRequest, this.jainSipUserAgentHeader);
             this.messageFactory.addHeader(jainSipRegisterRequest, jainSipAllowListHeader);
             this.messageFactory.addHeader(jainSipRegisterRequest, this.jainSipContactHeader); 
-            this.messageFactory.addHeader(jainSipRegisterRequest, jainSipSupportedHeader); 
             this.jainSipRegisterSentRequest=jainSipRegisterRequest;
             var jainSipClientTransaction = this.sipProvider.getNewClientTransaction(jainSipRegisterRequest);
             jainSipRegisterRequest.setTransaction(jainSipClientTransaction);
@@ -399,7 +397,7 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineRegisterResponseEvent =function
             this.jainSipRegisterSentRequest.removeHeader("Authorization");
             var num=new Number(this.jainSipRegisterSentRequest.getCSeq().getSeqNumber());
             this.jainSipRegisterSentRequest.getCSeq().setSeqNumber(num+1);
-            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.sipPassword,"sip:sip.mobistar.com",this.sipLogin);
+            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.sipPassword,this.sipLogin);
             this.messageFactory.addHeader(this.jainSipRegisterSentRequest, jainSipAuthorizationHeader); 
             this.jainSipRegisterSentRequest = this.messageFactory.setNewViaHeader(this.jainSipRegisterSentRequest);
             var jainSipClientTransaction = this.sipProvider.getNewClientTransaction(this.jainSipRegisterSentRequest);
@@ -486,7 +484,7 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineRegisterResponseEvent =function
             this.jainSipRegisterSentRequest.removeHeader("Authorization");
             var num=new Number(this.jainSipRegisterSentRequest.getCSeq().getSeqNumber());
             this.jainSipRegisterSentRequest.getCSeq().setSeqNumber(num+1);
-            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.sipPassword,"sip:sip.mobistar.com",this.sipLogin);
+            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.sipPassword,this.sipLogin);
             this.messageFactory.addHeader(this.jainSipRegisterSentRequest, jainSipAuthorizationHeader); 
             this.jainSipRegisterSentRequest = this.messageFactory.setNewViaHeader(this.jainSipRegisterSentRequest);
             var jainSipClientTransaction = this.sipProvider.getNewClientTransaction(this.jainSipRegisterSentRequest);
