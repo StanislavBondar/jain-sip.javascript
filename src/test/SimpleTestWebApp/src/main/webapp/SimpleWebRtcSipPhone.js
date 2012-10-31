@@ -1134,81 +1134,118 @@ SimpleWebRtcSipPhone.prototype.createPeerConnection =function(){
   
 SimpleWebRtcSipPhone.prototype.onPeerConnectionOnAddStreamCallback =function(event){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback(): event="+event); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback():this.peerConnection.readyState="+this.peerConnection.readyState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback: this.peerConnectionState="+this.peerConnectionState);
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback():this.peerConnection.readyState="+this.peerConnection.readyState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback: this.peerConnectionState="+this.peerConnectionState);
     
-    this.remoteAudioVideoMediaStream = event.stream;
-    var url = webkitURL.createObjectURL(this.remoteAudioVideoMediaStream);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback():url="+url); 
-    document.getElementById("remoteVideo").src= url;
-    document.getElementById("remoteVideo").play();   
+        this.remoteAudioVideoMediaStream = event.stream;
+        var url = webkitURL.createObjectURL(this.remoteAudioVideoMediaStream);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback():url="+url); 
+        document.getElementById("remoteVideo").src= url;
+        document.getElementById("remoteVideo").play();   
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback(): this.peerConnection is null, bug in state machine!, bug in state machine!");        
+    }
 }
 
 SimpleWebRtcSipPhone.prototype.onPeerConnectionOnRemoveStreamCallback =function(event){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback(): event="+event); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.readyState="+this.peerConnection.readyState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback: this.peerConnectionState="+this.peerConnectionState);
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.readyState="+this.peerConnection.readyState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback: this.peerConnectionState="+this.peerConnectionState);
     
-    this.remoteAudioVideoMediaStream = null;
-    document.getElementById("remoteVideo").pause();
-    document.getElementById("remoteVideo").src= null; 
+        this.remoteAudioVideoMediaStream = null;
+        document.getElementById("remoteVideo").pause();
+        document.getElementById("remoteVideo").src= null; 
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection is null, bug in state machine!");        
+    }
 }
 
 
 SimpleWebRtcSipPhone.prototype.onPeerConnectionOnOpenCallback =function(event){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback(): event="+event); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback():this.peerConnection.readyState="+this.peerConnection.readyState);   
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback: this.peerConnectionState="+this.peerConnectionState);
+     
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback():this.peerConnection.readyState="+this.peerConnection.readyState);   
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback: this.peerConnectionState="+this.peerConnectionState);
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback(): this.peerConnection is null, bug in state machine!");        
+    }
 }
  
 SimpleWebRtcSipPhone.prototype.onPeerConnectionStateChangeCallback =function(event){
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): event="+event); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);   
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback: this.peerConnectionState="+this.peerConnectionState);
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): event="+event);
+     
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);   
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback: this.peerConnectionState="+this.peerConnectionState);
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): this.peerConnection is null, bug in state machine!");        
+    }
 }
 
 SimpleWebRtcSipPhone.prototype.onPeerConnectionIceCandidateCallback =function(rtcIceCandidateEvent){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): rtcIceCandidateEvent="+rtcIceCandidateEvent); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback: this.peerConnectionState="+this.peerConnectionState);
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback: this.peerConnectionState="+this.peerConnectionState);
     
-    if(rtcIceCandidateEvent.candidate!=null)
-    {
-        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback: RTCIceCandidateEvent.candidate.candidate="+rtcIceCandidateEvent.candidate.candidate);
-    }
-    else
-    {
-        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback: no anymore ICE candidate");
-        if(this.peerConnectionState == 'preparing-offer') 
+        if(rtcIceCandidateEvent.candidate!=null)
         {
-            // Send INVITE
-            this.sendInviteSipRequest(this.peerConnection.localDescription.sdp);
-            this.peerConnectionState = 'offer-sent';
-        } 
-        else if (this.peerConnectionState == 'preparing-answer') 
-        {
-            // Send 200 OK
-            this.send200OKSipResponse(this.peerConnection.localDescription.sdp)
-            this.peerConnectionState = 'established';
+            console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback: RTCIceCandidateEvent.candidate.candidate="+rtcIceCandidateEvent.candidate.candidate);
         }
-        else if (this.peerConnectionState == 'established') 
-        {
-           // Why this last ice candidate event
-        } 
         else
         {
-            console.log("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): RTCPeerConnection bad state!");
+            console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback: no anymore ICE candidate");
+            if(this.peerConnectionState == 'preparing-offer') 
+            {
+                // Send INVITE
+                this.sendInviteSipRequest(this.peerConnection.localDescription.sdp);
+                this.peerConnectionState = 'offer-sent';
+            } 
+            else if (this.peerConnectionState == 'preparing-answer') 
+            {
+                // Send 200 OK
+                this.send200OKSipResponse(this.peerConnection.localDescription.sdp)
+                this.peerConnectionState = 'established';
+            }
+            else if (this.peerConnectionState == 'established') 
+            {
+            // Why this last ice candidate event
+            } 
+            else
+            {
+                console.log("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): RTCPeerConnection bad state!");
+            }
         }
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection is null, bug in state machine!");        
     }
 }
 
@@ -1220,166 +1257,250 @@ SimpleWebRtcSipPhone.prototype.onPeerConnectionCreateOfferSuccessCallback =funct
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
  
-    if (this.peerConnectionState == 'new') 
+    if(this.peerConnection!=null)
     {
-        // Preparing offer.
-        var application=this;
-        this.peerConnectionState = 'preparing-offer';
-        this.peerConnection.setLocalDescription(offer, function() {
-            application.onPeerConnectionSetLocalDescriptionSuccessCallback();
-        }, function(error) {
-            application.onPeerConnectionSetLocalDescriptionErrorCallback(error);
-        });
-    } 
-    else
+        if (this.peerConnectionState == 'new') 
+        {
+            // Preparing offer.
+            var application=this;
+            this.peerConnectionState = 'preparing-offer';
+            this.peerConnection.setLocalDescription(offer, function() {
+                application.onPeerConnectionSetLocalDescriptionSuccessCallback();
+            }, function(error) {
+                application.onPeerConnectionSetLocalDescriptionErrorCallback(error);
+            });
+        } 
+        else
+        {
+            console.error("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferSuccessCallback(): RTCPeerConnection bad state!");
+        }
+    }
+    else 
     {
-        console.error("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferSuccessCallback(): RTCPeerConnection bad state!");
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferSuccessCallback(): this.peerConnection is null, bug in state machine!");        
     }
 }
 
-
 SimpleWebRtcSipPhone.prototype.onPeerConnectionCreateOfferErrorCallback =function(error){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback():error="+error); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback: this.peerConnectionState="+this.peerConnectionState);
-    alert("error:"+error);
+     
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback: this.peerConnectionState="+this.peerConnectionState);
     // TODO Notify Error to INVITE state machine
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection is null, bug in state machine!");        
+    }
+    alert("error:"+error);
 }
 
 SimpleWebRtcSipPhone.prototype.onPeerConnectionSetLocalDescriptionSuccessCallback =function(){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback()"); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
      
-    // Nothing to do, just waiting end ICE resolution
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection is null, bug in state machine!");        
+    }
+// Nothing to do, just waiting end ICE resolution
 }
 
 SimpleWebRtcSipPhone.prototype.onPeerConnectionSetLocalDescriptionErrorCallback =function(error){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback():error="+error); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback: this.peerConnectionState="+this.peerConnectionState);
+     
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback: this.peerConnectionState="+this.peerConnectionState);
+    // TODO Notify Error to INVITE state machine
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection is null, bug in state machine!");        
+    }
     alert("error:"+error);
-   // TODO Notify Error to INVITE state machine
+
 }
 
 SimpleWebRtcSipPhone.prototype.onPeerConnectionCreateAnswerSuccessCallback =function(answer){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback():answer="+answer); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
 
-    if (this.peerConnectionState == 'offer-received') 
+        if (this.peerConnectionState == 'offer-received') 
+        {
+            // Prepare answer.
+            var application=this;
+            this.peerConnectionState = 'preparing-answer';
+            this.peerConnection.setLocalDescription(answer, function() {
+                application.onPeerConnectionSetLocalDescriptionSuccessCallback();
+            }, function(error) {
+                application.onPeerConnectionSetLocalDescriptionErrorCallback(error);
+            });
+        } 
+        else
+        {
+            console.log("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): RTCPeerConnection bad state!");
+        }
+    }
+    else 
     {
-        // Prepare answer.
-        var application=this;
-        this.peerConnectionState = 'preparing-answer';
-        this.peerConnection.setLocalDescription(answer, function() {
-            application.onPeerConnectionSetLocalDescriptionSuccessCallback();
-        }, function(error) {
-            application.onPeerConnectionSetLocalDescriptionErrorCallback(error);
-        });
-    } 
-    else
-    {
-        console.log("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): RTCPeerConnection bad state!");
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection is null, bug in state machine!");        
     }
 }
 
 
 SimpleWebRtcSipPhone.prototype.onPeerConnectionCreateAnswerErrorCallback =function(error){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback():error="+error);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback: this.peerConnectionState="+this.peerConnectionState);
-
-    alert("error:"+error);
+     
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback: this.peerConnectionState="+this.peerConnectionState);
     // TODO Notify Error to INVITE state machine
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection is null, bug in state machine!");        
+    }
+    alert("error:"+error);
+
 }
 
 
 SimpleWebRtcSipPhone.prototype.onPeerConnectionSetRemoteDescriptionSuccessCallback =function(){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback()");
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
+    
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
 
-    if (this.peerConnectionState == 'answer-received') 
-    {            
-        this.peerConnectionState = 'established';
+        if (this.peerConnectionState == 'answer-received') 
+        {            
+            this.peerConnectionState = 'established';
+        }
+        else if (this.peerConnectionState == 'offer-received') 
+        {            
+            var application=this;
+            this.peerConnection.createAnswer(function(answer) {
+                application.onPeerConnectionCreateAnswerSuccessCallback(answer);
+            }, function(error) {
+                application.onPeerConnectionCreateAnswerErrorCallback(error);
+            }); 
+        }
+        else {
+            console.log("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): RTCPeerConnection bad state!");
+        }
     }
-    else if (this.peerConnectionState == 'offer-received') 
-    {            
-        var application=this;
-        this.peerConnection.createAnswer(function(answer) {
-            application.onPeerConnectionCreateAnswerSuccessCallback(answer);
-        }, function(error) {
-            application.onPeerConnectionCreateAnswerErrorCallback(error);
-        }); 
-    }
-    else {
-        console.log("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): RTCPeerConnection bad state!");
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection is null, bug in state machine!");        
     }
 }
 
 
 SimpleWebRtcSipPhone.prototype.onPeerConnectionSetRemoteDescriptionErrorCallback =function(error){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback():error="+error);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback: this.peerConnectionState="+this.peerConnectionState);
-  
-    alert("error:"+error);
+     
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback: this.peerConnectionState="+this.peerConnectionState);
     // TODO Notify Error to INVITE state machine
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection is null, bug in state machine!");        
+    }
+    alert("error:"+error);
+
 }
 
 
 SimpleWebRtcSipPhone.prototype.onPeerConnectionIceNegotationNeededCallback =function(event){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback():event="+event);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback: this.peerConnectionState="+this.peerConnectionState);
      
-    // Nothing to do?
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback: this.peerConnectionState="+this.peerConnectionState);
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection is null, bug in state machine!");        
+    }
 }
 
 SimpleWebRtcSipPhone.prototype.onPeerConnectionGatheringChangeCallback =function(event){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback():event="+event);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback: this.peerConnectionState="+this.peerConnectionState);
-   
-     // Nothing to do?
+     
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback: this.peerConnectionState="+this.peerConnectionState);
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection is null, bug in state machine!");        
+    }
 }
 
 SimpleWebRtcSipPhone.prototype.onPeerConnectionIceChangeCallback =function(event){
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback():event="+event);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback: this.peerConnectionState="+this.peerConnectionState);
-    
-    // Nothing to do?
+    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback():event="+event);  
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback: this.peerConnectionState="+this.peerConnectionState);
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback(): this.peerConnection is null, bug in state machine!");        
+    }
 }
 
 SimpleWebRtcSipPhone.prototype.onPeerConnectionIdentityResultCallback =function(event){
     console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback():event="+event);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback: this.peerConnectionState="+this.peerConnectionState);
-
-    // Nothing to do?
+     
+    if(this.peerConnection!=null)
+    {
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
+        console.debug("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback: this.peerConnectionState="+this.peerConnectionState);
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback(): this.peerConnection is null, bug in state machine!");        
+    }
 }
 
