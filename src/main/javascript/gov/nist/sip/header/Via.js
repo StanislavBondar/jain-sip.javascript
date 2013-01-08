@@ -34,7 +34,8 @@ function Via() {
     this.sentProtocol=new Protocol();
     this.sentBy=new HostPort();
     this.comment=null;
-    this.rPortFlag = false;
+    // Set to true for reSIProcate SIP Over WebSockets workaround http://code.google.com/p/jain-sip/issues/detail?id=35
+    this.rPortFlag = true;
     this.headerName=this.NAME;
     this.parameters = new NameValueList();
     this.duplicates = new DuplicateNameValueList();
