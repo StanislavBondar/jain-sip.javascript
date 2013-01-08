@@ -348,7 +348,7 @@ SipStackImpl.prototype.newSIPServerRequest =function(requestReceived,requestMess
         var length=this.BRANCH_MAGIC_COOKIE_LOWER_CASE.length;
         var chaine=key.toLowerCase().substr(0, length-1);
         if (chaine!=this.BRANCH_MAGIC_COOKIE_LOWER_CASE) {
-            for(i=0;i<this.serverTransactionTable.length&& currentTransaction == null;i++)
+            for(i=0;(i<this.serverTransactionTable.length) && (currentTransaction == null);i++)
             {
                 nextTransaction=this.serverTransactionTable[i][1];
                 if (nextTransaction.isMessagePartOfTransaction(requestReceived)) {
@@ -415,9 +415,9 @@ SipStackImpl.prototype.newSIPServerResponse =function(responseReceived,responseM
     if (currentTransaction == null
         || (!currentTransaction.isMessagePartOfTransaction(responseReceived) 
             && chaine!=this.BRANCH_MAGIC_COOKIE_LOWER_CASE)) {
-        for(i=0;i<this.clientTransactionTable.length&& currentTransaction == null;i++)
+        for(i=0;(i<this.clientTransactionTable.length) && (currentTransaction == null);i++)
         {
-            nextTransaction=this.serverTransactionTable[i][1];
+            nextTransaction=this.clientTransactionTable[i][1];
             if (nextTransaction.isMessagePartOfTransaction(responseReceived)) {
                 currentTransaction = nextTransaction;
             }
