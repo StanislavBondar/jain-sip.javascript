@@ -1029,13 +1029,12 @@ SIPMessage.prototype.addHeader =function(){
     else
     {
         sipHeader=arguments[0];
-        sh = sipHeader;
         try {
-            if ((sipHeader instanceof Via) || (sipHeader instanceof RecordRoute)){
-                this.attachHeader(sh, false, true);
+            if ((sipHeader instanceof ViaList) || (sipHeader instanceof RecordRouteList)){
+                this.attachHeader(sipHeader, false, true);
             } 
             else{
-                this.attachHeader(sh, false, false);
+                this.attachHeader(sipHeader, false, false);
             }
         } catch (ex) {
             console.error("SIPMessage:addHeader(): catched exception:"+ex);
