@@ -1125,17 +1125,10 @@ SIPDialog.prototype.createRequestargu2 =function(method,sipResponse){
     if (this.getState() == null
         || (this.getState() == "TERMINATED" && method.toUpperCase()!="BYE")
         || (this.isServer() && this.getState() == "EARLY" && method.toUpperCase()=="BYE")) {
-        console.error("SIPDialog:createRequestargu2(): dialog  " + getDialogId()+" not yet established or terminated " + this.getState());
-        throw "SIPDialog:createRequestargu2(): dialog  " + getDialogId()+" not yet established or terminated " + this.getState();
+        console.error("SIPDialog:createRequestargu2(): dialog  " + this.getDialogId()+" not yet established or terminated " + this.getState());
+        throw "SIPDialog:createRequestargu2(): dialog  " + this.getDialogId()+" not yet established or terminated " + this.getState();
     }
     var sipUri = null;
-    if (this.getRemoteTarget() != null) {
-        sipUri = this.getRemoteTarget().getURI();
-    } 
-    else {
-        sipUri = this.getRemoteParty().getURI();
-        sipUri.clearUriParms();
-    }
     if(this.isServer())
     {
         var contactHeader=this.getInviteTransaction().getOriginalRequest().getContactHeader();
