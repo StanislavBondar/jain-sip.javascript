@@ -561,10 +561,7 @@ MobicentsWebRTCPhone.prototype.call =function(to){
                 this.callee=to;
                 hideCallButton();
                 this.createPeerConnection();
-                this.peerConnection.addStream(this.localAudioVideoMediaStream, {
-                    has_audio: true, 
-                    has_video: true
-                });
+                this.peerConnection.addStream(this.localAudioVideoMediaStream);
                 var application=this;
                 this.peerConnection.createOffer(function(offer) {
                     application.onPeerConnectionCreateOfferSuccessCallback(offer);
@@ -1262,7 +1259,6 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionCreateOfferErrorCallback =functio
         console.warn("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection is null, bug in state machine!");        
     }
     alert("error:"+error);
-
 }
 
 MobicentsWebRTCPhone.prototype.onPeerConnectionSetLocalDescriptionSuccessCallback =function(){
@@ -1471,10 +1467,7 @@ $('#callModal .accept-btn').click(function() {
     {
         stopRinging();
         mobicentsWebRTCPhone.createPeerConnection();
-        mobicentsWebRTCPhone.peerConnection.addStream(mobicentsWebRTCPhone.localAudioVideoMediaStream, {
-            has_audio: true, 
-            has_video: true
-        });
+        mobicentsWebRTCPhone.peerConnection.addStream(mobicentsWebRTCPhone.localAudioVideoMediaStream);
         mobicentsWebRTCPhone.lastReceivedSdpOfferString = mobicentsWebRTCPhone.jainSipInvitedReceivedRequest.getContent();
         var sdpOffer = new RTCSessionDescription({
             type: 'offer',

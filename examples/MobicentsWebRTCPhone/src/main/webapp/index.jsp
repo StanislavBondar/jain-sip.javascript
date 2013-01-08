@@ -154,7 +154,7 @@
         <script src="js/MobicentsWebRTCPhone.js" type="text/javascript" ></script>
         <script type='text/javascript'>	
             var mobicentsWebRTCPhone=null;         
-            var defaultSipWsUrl="ws://10.193.7.29:5082"
+            var defaultSipWsUrl="ws://10.193.31.142:5082"
             var defaultStunServer="";
             var defaultSipDomain="mobicents.com";
             var defaultSipDisplayName="TeleStax";
