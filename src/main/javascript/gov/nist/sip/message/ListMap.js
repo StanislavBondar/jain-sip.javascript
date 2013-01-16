@@ -71,7 +71,7 @@ ListMap.prototype.initializeListMap =function(){
     //this.put(this.headerListTable, "ProxyAuthorization", "ProxyAuthorizationList");
     //this.put(this.headerListTable, "Authorization", "AuthorizationList");
     this.put(this.headerListTable, "Allow", "AllowList");
-    this.put(this.headerListTable, "RecordRoute", "RecordRouteList");
+    this.put(this.headerListTable, "Record-Route", "RecordRouteList");
     this.put(this.headerListTable, "Supported", "SupportedList");
     this.initialized = true;
 }
