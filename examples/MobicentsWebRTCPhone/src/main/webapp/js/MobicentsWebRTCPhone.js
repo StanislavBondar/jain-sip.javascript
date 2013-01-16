@@ -642,7 +642,7 @@ MobicentsWebRTCPhone.prototype.send200OKSipResponse =function(sdpOffer){
         this.invitedState=this.INVITED_ACCEPTED_STATE;
         var jainSip200OKResponse=this.jainSipInvitedReceivedRequest.createResponse(200, "OK");
         jainSip200OKResponse.addHeader(this.jainSipContactHeader);
-        jainSip200OKResponse.addHeader(this.jainSipUserAgentHeader);
+        jainSip200OKResponse.addHeader(this.jainSipUserAgentHeader);  
         jainSip200OKResponse.setMessageContent("application","sdp",sdpOffer);
         this.jainSipInvitedTransaction.sendResponse(jainSip200OKResponse);
         showByeButton();
@@ -721,7 +721,7 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitingResponseEvent =function
     var statusCode = parseInt(jainSipResponse.getStatusCode()); 
     if(this.invitingState==this.INVITING_STATE)
     {
-        if(statusCode< 200)
+        if(statusCode < 200)
         {
             startRinging();
             console.debug("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): 1XX response ignored"); 
@@ -787,6 +787,18 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitingResponseEvent =function
             this.jainSipInvitingDialog.setRemoteTarget(jainSipResponse.getHeader("Contact"));
             var jainSipMessageACK = responseEvent.getOriginalTransaction().createAck();
             this.jainSipInvitingDialog.sendAck(jainSipMessageACK);
+            var sdpAnswerString = jainSipResponse.getContent();
+            var sdpAnswer = new RTCSessionDescription({
+                type: 'answer',
+                sdp: sdpAnswerString
+            });
+            var application=this;
+            this.peerConnectionState = 'answer-received';
+            this.peerConnection.setRemoteDescription(sdpAnswer, function() {
+                application.onPeerConnectionSetRemoteDescriptionSuccessCallback();
+            }, function(error) {
+                application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
+            });  
         }
         else
         {
@@ -796,6 +808,7 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitingResponseEvent =function
             showUnRegisterButton();
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();
+            stopRinging();
         }    
     } 
     else if(this.invitingState==this.INVITING_FAILED_STATE)
