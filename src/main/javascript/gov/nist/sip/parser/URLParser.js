@@ -688,7 +688,7 @@ URLParser.prototype.user =function(){
 URLParser.prototype.password =function(){
     if(logger!=undefined) logger.debug("URLParser:password()");
     var startIdx = this.lexer.getPtr();
-    while (true) {
+    while (this.lexer.hasMoreChars()) {
         var la = this.lexer.lookAhead(0);
         var isValidChar = false;
         switch (la) {
@@ -706,7 +706,6 @@ URLParser.prototype.password =function(){
         } else {
             break;
         }
-
     }
     return this.lexer.getBuffer().substring(startIdx, this.lexer.getPtr());
 }
