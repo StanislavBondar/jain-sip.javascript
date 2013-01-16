@@ -559,12 +559,11 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         realm=response.getProxyAuthenticate().getRealm();
         scheme=response.getProxyAuthenticate().getScheme();
         nonce=response.getProxyAuthenticate().getNonce(); 
+		qop=response.getProxyAuthenticate().getQop();
         var proxyauthorization=new ProxyAuthorization();
-        qop=response.getWWWAuthenticate().getQop();
     }
     var mda=new MessageDigestAlgorithm();
     var method=response.getCSeq().getMethod();
-
     var cnonce=Math.floor(Math.random()*16777215).toString(16);
     var nc="00000001"; 
     var resp=mda.calculateResponse(sipLogin,realm,sipPassword,nonce,nc,cnonce, method,request.getRequestURI(),null,qop);
@@ -588,12 +587,13 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         proxyauthorization.setUsername(sipLogin);
         proxyauthorization.setRealm(realm);
         proxyauthorization.setNonce(nonce);
-        authorization.setCNonce(cnonce);
-        authorization.setNonceCount(nc);
+        proxyauthorization.setCNonce(cnonce);
+        proxyauthorization.setNonceCount(nc);
         proxyauthorization.setScheme(scheme);
         proxyauthorization.setResponse(resp);
         proxyauthorization.setURI(request.getRequestURI());
         proxyauthorization.setAlgorithm("MD5");
+		proxyauthorization.setQop(qop);
         return proxyauthorization;
     }
 }
