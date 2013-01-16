@@ -165,7 +165,7 @@ AddressFactoryImpl.prototype.createAddress_address =function(address){
         throw "AddressFactoryImpl:createAddress_address():  null address arg";
     }
 
-    if (address.equals("*")) {
+    if (address=="*") {
         var addressImpl = new AddressImpl();
         addressImpl.setAddressType(addressImpl.wild_card);
         var uri = new SipUri();
@@ -173,8 +173,10 @@ AddressFactoryImpl.prototype.createAddress_address =function(address){
         addressImpl.setURI(uri);
         return addressImpl;
     } else {
-        var smp = new gov.nist.js.parser.StringMsgParser();
-        return smp.parseAddress(address);
+        var addressImpl = new AddressImpl();
+        var uri = this.createURI(address);
+        addressImpl.setURI(uri);
+        return addressImpl;
     }
 }
 
