@@ -5180,7 +5180,7 @@ AddressFactoryImpl.prototype.createAddress_address =function(address){
         throw "AddressFactoryImpl:createAddress_address():  null address arg";
     }
 
-    if (address.equals("*")) {
+    if (address=="*") {
         var addressImpl = new AddressImpl();
         addressImpl.setAddressType(addressImpl.wild_card);
         var uri = new SipUri();
@@ -5188,8 +5188,10 @@ AddressFactoryImpl.prototype.createAddress_address =function(address){
         addressImpl.setURI(uri);
         return addressImpl;
     } else {
-        var smp = new gov.nist.js.parser.StringMsgParser();
-        return smp.parseAddress(address);
+        var addressImpl = new AddressImpl();
+        var uri = this.createURI(address);
+        addressImpl.setURI(uri);
+        return addressImpl;
     }
 }
 
@@ -10790,12 +10792,11 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         realm=response.getProxyAuthenticate().getRealm();
         scheme=response.getProxyAuthenticate().getScheme();
         nonce=response.getProxyAuthenticate().getNonce(); 
+                qop=response.getProxyAuthenticate().getQop();
         var proxyauthorization=new ProxyAuthorization();
-        qop=response.getWWWAuthenticate().getQop();
     }
     var mda=new MessageDigestAlgorithm();
     var method=response.getCSeq().getMethod();
-
     var cnonce=Math.floor(Math.random()*16777215).toString(16);
     var nc="00000001"; 
     var resp=mda.calculateResponse(sipLogin,realm,sipPassword,nonce,nc,cnonce, method,request.getRequestURI(),null,qop);
@@ -10819,12 +10820,13 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         proxyauthorization.setUsername(sipLogin);
         proxyauthorization.setRealm(realm);
         proxyauthorization.setNonce(nonce);
-        authorization.setCNonce(cnonce);
-        authorization.setNonceCount(nc);
+        proxyauthorization.setCNonce(cnonce);
+        proxyauthorization.setNonceCount(nc);
         proxyauthorization.setScheme(scheme);
         proxyauthorization.setResponse(resp);
         proxyauthorization.setURI(request.getRequestURI());
         proxyauthorization.setAlgorithm("MD5");
+                proxyauthorization.setQop(qop);
         return proxyauthorization;
     }
 }/*
@@ -13067,7 +13069,7 @@ URLParser.prototype.user =function(){
 
 URLParser.prototype.password =function(){
     var startIdx = this.lexer.getPtr();
-    while (true) {
+    while (this.lexer.hasMoreChars()) {
         var la = this.lexer.lookAhead(0);
         var isValidChar = false;
         switch (la) {
@@ -13085,7 +13087,6 @@ URLParser.prototype.password =function(){
         } else {
             break;
         }
-
     }
     return this.lexer.getBuffer().substring(startIdx, this.lexer.getPtr());
 }
@@ -15567,7 +15568,7 @@ ListMap.prototype.initializeListMap =function(){
     //this.put(this.headerListTable, "ProxyAuthorization", "ProxyAuthorizationList");
     //this.put(this.headerListTable, "Authorization", "AuthorizationList");
     this.put(this.headerListTable, "Allow", "AllowList");
-    this.put(this.headerListTable, "RecordRoute", "RecordRouteList");
+    this.put(this.headerListTable, "Record-Route", "RecordRouteList");
     this.put(this.headerListTable, "Supported", "SupportedList");
     this.initialized = true;
 }

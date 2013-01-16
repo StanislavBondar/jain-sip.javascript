@@ -5180,7 +5180,7 @@ AddressFactoryImpl.prototype.createAddress_address =function(address){
         throw "AddressFactoryImpl:createAddress_address():  null address arg";
     }
 
-    if (address.equals("*")) {
+    if (address=="*") {
         var addressImpl = new AddressImpl();
         addressImpl.setAddressType(addressImpl.wild_card);
         var uri = new SipUri();
@@ -7303,7 +7303,8 @@ function Via() {
     this.sentProtocol=new Protocol();
     this.sentBy=new HostPort();
     this.comment=null;
-    this.rPortFlag = false;
+    // Set to true for reSIProcate SIP Over WebSockets workaround http://code.google.com/p/jain-sip/issues/detail?id=35
+    this.rPortFlag = true;
     this.headerName=this.NAME;
     this.parameters = new NameValueList();
     this.duplicates = new DuplicateNameValueList();
@@ -7597,7 +7598,8 @@ Via.prototype.getSentProtocolField =function(){
         return this.sentProtocol.encode();
     }
     return null;
-}/*
+}
+/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
@@ -16616,13 +16618,12 @@ SIPMessage.prototype.addHeader =function(){
     else
     {
         sipHeader=arguments[0];
-        sh = sipHeader;
         try {
-            if ((sipHeader instanceof Via) || (sipHeader instanceof RecordRoute)){
-                this.attachHeader(sh, false, true);
+            if ((sipHeader instanceof ViaList) || (sipHeader instanceof RecordRouteList)){
+                this.attachHeader(sipHeader, false, true);
             } 
             else{
-                this.attachHeader(sh, false, false);
+                this.attachHeader(sipHeader, false, false);
             }
         } catch (ex) {
             console.error("SIPMessage:addHeader(): catched exception:"+ex);
@@ -22035,17 +22036,10 @@ SIPDialog.prototype.createRequestargu2 =function(method,sipResponse){
     if (this.getState() == null
         || (this.getState() == "TERMINATED" && method.toUpperCase()!="BYE")
         || (this.isServer() && this.getState() == "EARLY" && method.toUpperCase()=="BYE")) {
-        console.error("SIPDialog:createRequestargu2(): dialog  " + getDialogId()+" not yet established or terminated " + this.getState());
-        throw "SIPDialog:createRequestargu2(): dialog  " + getDialogId()+" not yet established or terminated " + this.getState();
+        console.error("SIPDialog:createRequestargu2(): dialog  " + this.getDialogId()+" not yet established or terminated " + this.getState());
+        throw "SIPDialog:createRequestargu2(): dialog  " + this.getDialogId()+" not yet established or terminated " + this.getState();
     }
     var sipUri = null;
-    if (this.getRemoteTarget() != null) {
-        sipUri = this.getRemoteTarget().getURI();
-    } 
-    else {
-        sipUri = this.getRemoteParty().getURI();
-        sipUri.clearUriParms();
-    }
     if(this.isServer())
     {
         var contactHeader=this.getInviteTransaction().getOriginalRequest().getContactHeader();
@@ -27246,7 +27240,7 @@ SipStackImpl.prototype.newSIPServerRequest =function(requestReceived,requestMess
         var length=this.BRANCH_MAGIC_COOKIE_LOWER_CASE.length;
         var chaine=key.toLowerCase().substr(0, length-1);
         if (chaine!=this.BRANCH_MAGIC_COOKIE_LOWER_CASE) {
-            for(i=0;i<this.serverTransactionTable.length&& currentTransaction == null;i++)
+            for(i=0;(i<this.serverTransactionTable.length) && (currentTransaction == null);i++)
             {
                 nextTransaction=this.serverTransactionTable[i][1];
                 if (nextTransaction.isMessagePartOfTransaction(requestReceived)) {
@@ -27311,9 +27305,9 @@ SipStackImpl.prototype.newSIPServerResponse =function(responseReceived,responseM
     if (currentTransaction == null
         || (!currentTransaction.isMessagePartOfTransaction(responseReceived) 
             && chaine!=this.BRANCH_MAGIC_COOKIE_LOWER_CASE)) {
-        for(i=0;i<this.clientTransactionTable.length&& currentTransaction == null;i++)
+        for(i=0;(i<this.clientTransactionTable.length) && (currentTransaction == null);i++)
         {
-            nextTransaction=this.serverTransactionTable[i][1];
+            nextTransaction=this.clientTransactionTable[i][1];
             if (nextTransaction.isMessagePartOfTransaction(responseReceived)) {
                 currentTransaction = nextTransaction;
             }
