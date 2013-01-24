@@ -59,6 +59,7 @@ LexerCore.prototype.START = 2048;
 LexerCore.prototype.END = LexerCore.prototype.START + 2048;
 LexerCore.prototype.ID = LexerCore.prototype.END - 1;
 LexerCore.prototype.SAFE = LexerCore.prototype.END - 2;
+LexerCore.prototype.ID_NO_WHITESPACE = LexerCore.prototype.END - 3;
 LexerCore.prototype.WHITESPACE = LexerCore.prototype.END + 1;
 LexerCore.prototype.DIGIT = LexerCore.prototype.END + 2;
 LexerCore.prototype.ALPHA = LexerCore.prototype.END + 3;
@@ -183,7 +184,7 @@ LexerCore.prototype.getNextToken =function(){
     {
         var delim=arguments[0];
         var startIdx = this.ptr;
-        while (true) {
+        while (this.hasMoreChars()) {
             var la = this.lookAhead(0);
             if (la == delim) 
             {

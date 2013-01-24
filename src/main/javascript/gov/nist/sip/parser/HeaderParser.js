@@ -145,7 +145,7 @@ HeaderParser.prototype.parse =function(){
     if(logger!=undefined) logger.debug("HeaderParser:parse()");
     var name = this.lexer.getNextToken(':');
     this.lexer.consume(1);
-    var body = this.lexer.getLine().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
+    var body = this.lexer.getLine().replace(/^(\s)+|(\s)+$/g, '');
     var retval = new ExtensionHeaderImpl(name);
     retval.setValue(body);
     return retval;
