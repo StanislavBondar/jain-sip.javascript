@@ -439,7 +439,7 @@ SIPTransaction.prototype.doesCancelMatchTransaction =function(requestToTest){
     var topViaHeader;
     var messageBranch;
     var transactionMatches = false;
-    if (this.getOriginalRequest() == null || this.getOriginalRequest().getMethod()=="CANCEL")
+    if (this.getOriginalRequest() == null || this.getMethod()=="CANCEL")
     {
         return false;
     }

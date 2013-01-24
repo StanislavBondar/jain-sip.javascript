@@ -489,7 +489,7 @@ SIPClientTransaction.prototype.sendRequest =function(){
         throw "SIPClientTransaction:sendRequest(): "+ex;
     }
     try {
-        if (this.getOriginalRequest().getMethod()==this.CANCEL
+        if (this.getMethod()==this.CANCEL
             && this.sipStack.isCancelClientTransactionChecked()) {
             var ct = this.sipStack.findCancelTransaction(this.getOriginalRequest(), false);
             if (ct == null) {
