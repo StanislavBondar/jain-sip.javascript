@@ -80,16 +80,15 @@ Host.prototype.encodeBuffer =function(buffer){
      * @param obj Object to set
      * @return boolean
      */
-Host.prototype.equals =function(obj){
+Host.prototype.equals =function(otherHost){
     //if(logger!=undefined) logger.debug("Host:equals():obj="+obj);
-    if ( obj == null ) 
+    if ( otherHost == null ) 
     {
         return false;
     }
-    if (this.classname!=obj.classname) {
+    if (this.classname!=otherHost.classname) {
         return false;
     }
-    var otherHost = new Host();
     if(otherHost.hostname==this.hostname)
     {
         return true;

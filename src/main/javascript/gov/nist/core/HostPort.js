@@ -58,7 +58,7 @@ HostPort.prototype.equals =function(other){
     if (other == null) {
         return false;
     }
-    if (this.classname==other.classname) {
+    if (this.classname!=other.classname) {
         return false;
     }
     var that =  other;
