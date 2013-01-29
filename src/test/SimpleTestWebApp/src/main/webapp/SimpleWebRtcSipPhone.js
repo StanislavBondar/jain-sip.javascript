@@ -881,6 +881,7 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingResponseEvent =function
         {
             this.jainSipInvitingDialog=responseEvent.getOriginalTransaction().getDialog();
             this.invitingState=this.INVITING_ACCEPTED_STATE;
+            
             showByeButton();
             hideCancelButton();
             hideUnRegisterButton();
@@ -888,9 +889,11 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingResponseEvent =function
             hideAcceptButton();
             hideRejectButton();
             hideCallButton();
+            
             this.jainSipInvitingDialog.setRemoteTarget(jainSipResponse.getHeader("Contact"));
             var jainSipMessageACK = responseEvent.getOriginalTransaction().createAck();
             this.jainSipInvitingDialog.sendAck(jainSipMessageACK);
+            
             var sdpAnswerString = jainSipResponse.getContent();
             var sdpAnswer = new RTCSessionDescription({
                 type: 'answer',
@@ -902,8 +905,7 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingResponseEvent =function
                 application.onPeerConnectionSetRemoteDescriptionSuccessCallback();
             }, function(error) {
                 application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
-            });
-            
+            });        
         } 
         else if(statusCode==480)
         {
@@ -980,6 +982,7 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingResponseEvent =function
         {
             this.jainSipInvitingDialog=responseEvent.getOriginalTransaction().getDialog();
             this.invitingState=this.INVITING_ACCEPTED_STATE;
+            
             showByeButton();
             hideCancelButton();
             hideUnRegisterButton();
@@ -987,9 +990,23 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingResponseEvent =function
             hideAcceptButton();
             hideRejectButton();
             hideCallButton();
+            
             this.jainSipInvitingDialog.setRemoteTarget(jainSipResponse.getHeader("Contact"));
             var jainSipMessageACK = responseEvent.getOriginalTransaction().createAck();
             this.jainSipInvitingDialog.sendAck(jainSipMessageACK);
+            
+            var sdpAnswerString = jainSipResponse.getContent();
+            var sdpAnswer = new RTCSessionDescription({
+                type: 'answer',
+                sdp: sdpAnswerString
+            });
+            var application=this;
+            this.peerConnectionState = 'answer-received';
+            this.peerConnection.setRemoteDescription(sdpAnswer, function() {
+                application.onPeerConnectionSetRemoteDescriptionSuccessCallback();
+            }, function(error) {
+                application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
+            });
         }
         else
         {

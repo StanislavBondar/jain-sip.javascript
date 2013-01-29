@@ -8,15 +8,48 @@
             
             // Test domain 
             var simpleWebRtcSipPhone=null;
+            var sipWsUrl="ws://10.193.7.209:8090/WebRtcSipSignalingGateway-1.0-SNAPSHOT/WS/WebSocketConnector";
+            // test URL http://localhost:8080/SimpleTestWebApp/?sipDomain=sipasf.fr&sipLogin=1111@sipasf.fr&sipPassword=1234&sipUserName=1111&sipDisplayName=lolo&sipContactUserName=2222
             
-            var defaultSipWsUrl="ws://10.193.7.209:5082";
-            var defaultSipDomain="test.com";
-            var defaultSipDisplayName="1111";
-            var defaultSipUserName="1111";
-            var defaultSipLogin="1111@test.com";
-            var defaultSipPassword="1234";
-            var defaultSipContactPhoneNumber="2222";
- 
+            // SIP profile
+            var sipDomain=undefined;
+            var sipDisplayName=undefined;
+            var sipUserName=undefined;
+            var sipLogin=undefined;
+            var sipPassword=undefined;
+            var sipDomain=undefined;
+            var sipContactUserName=undefined;
+                        
+            if(location.search.length>0)
+            {
+                var argumentsString = location.search.substring(1);
+                var arguments = argumentsString.split('&');
+                if(arguments.length==0) arguments = [argumentsString];
+                for(var i=0;i<arguments.length;i++)
+                {   
+                    var argument = arguments[i].split("=");
+                    if("sipUserName"==argument[0])
+                    {
+                       sipUserName =argument[1];
+                    } else if("sipDomain"==argument[0])
+                    {
+                       sipDomain =argument[1];
+                    } else if("sipDisplayName"==argument[0])
+                    {
+                       sipDisplayName =argument[1];
+                    } else if("sipPassword"==argument[0])
+                    {
+                       sipPassword =argument[1];
+                    } else if("sipLogin"==argument[0])
+                    {
+                       sipLogin =argument[1];
+                    }  else if("sipContactUserName"==argument[0])
+                    {
+                       sipContactUserName =argument[1];
+                    }
+                }
+            }
+           
             var defaultStunServer="";         
             var localAudioVideoMediaStream=null;
             
@@ -24,13 +57,13 @@
             {
                 console.debug("onLoad");
                 document.getElementById("stunServer").value=defaultStunServer;
-                document.getElementById("sipWsUrl").value=defaultSipWsUrl;
-                document.getElementById("sipDomain").value=defaultSipDomain;
-                document.getElementById("sipDisplayName").value=defaultSipDisplayName;
-                document.getElementById("sipUserName").value=defaultSipUserName;
-                document.getElementById("sipLogin").value=defaultSipLogin;
-                document.getElementById("sipPassword").value=defaultSipPassword;
-                document.getElementById("sipContactPhoneNumber").value=defaultSipContactPhoneNumber;
+                document.getElementById("sipWsUrl").value=sipWsUrl;
+                document.getElementById("sipDomain").value=sipDomain;
+                document.getElementById("sipDisplayName").value=sipDisplayName;
+                document.getElementById("sipUserName").value=sipUserName;
+                document.getElementById("sipLogin").value=sipLogin;
+                document.getElementById("sipPassword").value=sipPassword;
+                document.getElementById("sipContactPhoneNumber").value=sipContactUserName;
                 navigator.webkitGetUserMedia({audio:true, video:true},gotLocalAudioVideoStream, gotLocalAudioVideoFailed);
             }
 
@@ -206,27 +239,27 @@
             </div>
             <div id='sipDomainDiv'>
                 <label>SIP Domain:</label>
-                <input id="sipDomain"  type="text" size="30" value="sipasf.fr"> 
+                <input id="sipDomain"  type="text" size="30"> 
             </div>           
             <div id='sipDisplayNameDiv'>
                 <label>SIP Display Name:</label>
-                <input id="sipDisplayName"  type="text" size="30" value="laurent"> 
+                <input id="sipDisplayName"  type="text" size="30" > 
             </div>
             <div id='sipUserNameDiv'>
                 <label>SIP User Name:</label>
-                <input id="sipUserName"  type="text" size="30" value="9999"> 
+                <input id="sipUserName"  type="text" size="30"> 
             </div>
             <div id='sipLoginDiv'>
                 <label>SIP Login:</label>
-                <input id="sipLogin"   type="text" size="30" value="9999@sipasf.fr"> 
+                <input id="sipLogin"   type="text" size="30"> 
             </div>
             <div id='sipPasswordDiv'>
                 <label>SIP Password:</label>
-                <input id="sipPassword"   type="password" size="30" value="1234"> 
+                <input id="sipPassword"   type="password" size="30"> 
             </div>
             <div id='sipContactPhoneNumberDiv'>
                 <label>SIP Contact phone number:</label>
-                <input id="sipContactPhoneNumber"  type="text" size="30" value="7777"> 
+                <input id="sipContactPhoneNumber"  type="text" size="30" > 
             </div>
         </div>
         <div id='input'>
