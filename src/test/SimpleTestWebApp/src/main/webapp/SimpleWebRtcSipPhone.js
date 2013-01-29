@@ -49,6 +49,7 @@ SimpleWebRtcSipPhone.prototype.INVITING_407_STATE="INVITING_407_STATE";
 SimpleWebRtcSipPhone.prototype.INVITING_ACCEPTED_STATE="INVITING_ACCEPTED_STATE";
 SimpleWebRtcSipPhone.prototype.INVITING_LOCAL_HANGINGUP_STATE="INVITING_LOCAL_HANGINGUP_STATE";
 SimpleWebRtcSipPhone.prototype.INVITING_LOCAL_HANGINGUP_407_STATE="INVITING_LOCAL_HANGINGUP_407_STATE";
+SimpleWebRtcSipPhone.prototype.INVITING_CANCELLING_STATE="INVITING_CANCELLING_STATE";
 
 //  State of outgoing call peerConnectionState machine
 SimpleWebRtcSipPhone.prototype.INVITED_INITIAL_STATE="INVITED_INITIAL_STATE";
@@ -71,10 +72,13 @@ SimpleWebRtcSipPhone.prototype.init =function(){
 
 SimpleWebRtcSipPhone.prototype.initGUI=function(){
     console.debug ("SimpleWebRtcSipPhone:initGUI()");  
+    hideRejectButton();
+    hideAcceptButton();
     hideCallButton();
+    hideByeButton();
+    hideCancelButton();
     hideUnRegisterButton();
     showRegisterButton();
-    hideByeButton();
 }
 
 SimpleWebRtcSipPhone.prototype.initSipAccount=function(){
@@ -97,8 +101,7 @@ SimpleWebRtcSipPhone.prototype.initSipRegisterStateMachine=function(){
     this.refreshRegisterFlag=false;
     this.jainSipRegisterSentRequest=null;
     this.registeredFlag=false;
-    this.unregisterPendingFlag=false;
-    
+    this.unregisterPendingFlag=false;    
 }
 
 SimpleWebRtcSipPhone.prototype.initSipInvitingStateMachine=function(){
@@ -106,16 +109,17 @@ SimpleWebRtcSipPhone.prototype.initSipInvitingStateMachine=function(){
     // SIP ougoing call (INVITING) state machine 
     this.callee=null;
     this.invitingState=this.INVITING_INITIAL_STATE;
-    this.jainSipInvitingSentRequest=null;
+    this.jainSipInvitingRequest=null;
     this.jainSipInvitingDialog=null;
     this.jainSipInvitingTransaction=null;
 }
 
 SimpleWebRtcSipPhone.prototype.initSipInvitedStateMachine=function(){
     console.debug ("SimpleWebRtcSipPhone:initSipInvitedStateMachine()");  
-    // SIP ougoing call (INVITED) state machine 
+    // SIP incoming call (INVITED) state machine 
+    this.caller=null;
     this.invitedState=this.INVITED_INITIAL_STATE;
-    this.jainSipInvitedReceivedRequest=null;
+    this.jainSipInvitedRequest=null;
     this.jainSipInvitedDialog=null;
     this.jainSipInvitedTransaction=null;
 }
@@ -185,6 +189,7 @@ SimpleWebRtcSipPhone.prototype.processTransactionTerminated =function(transactio
 //SIPListener interface implementation
 SimpleWebRtcSipPhone.prototype.processDisconnected =function(){   
     console.error("SimpleWebRtcSipPhone:processDisconnected()"); 
+    this.registeredFlag=false;
     alert("disconnected with SIP server");
     this.initGUI();
 }
@@ -217,7 +222,7 @@ SimpleWebRtcSipPhone.prototype.processResponse =function(responseEvent){
     else if(this.invitedState!=this.INVITED_INITIAL_STATE)  this.handleStateMachineInvitedResponseEvent(responseEvent);
     else
     {
-        console.debug("SimpleWebRtcSipPhone:processResponse(): response ignored");      
+        console.warn("SimpleWebRtcSipPhone:processResponse(): response ignored");      
     }
 }
 
@@ -226,17 +231,7 @@ SimpleWebRtcSipPhone.prototype.processRequest =function(requestEvent){
     console.debug("SimpleWebRtcSipPhone:processRequest()");
     var jainSipRequest=requestEvent.getRequest(); 
     var jainSipRequestMethod=jainSipRequest.getMethod();   
-    if((jainSipRequestMethod=="BYE")||(jainSipRequestMethod=="ACK")||(jainSipRequestMethod=="CANCEL"))
-    {
-        // Subscequent request on ongoing dialog
-        if(this.invitingState!=this.INVITING_INITIAL_STATE) this.handleStateMachineInvitingRequestEvent(requestEvent); 
-        else if(this.invitedState!=this.INVITED_INITIAL_STATE)  this.handleStateMachineInvitedRequestEvent(requestEvent);
-        else
-        {
-            console.debug("SimpleWebRtcSipPhone:processResponse(): request ignored");      
-        }
-    }
-    else if(jainSipRequestMethod=="INVITE")
+    if(jainSipRequestMethod=="INVITE")
     {
         // Incoming call 
         if(this.invitingState!=this.INVITING_INITIAL_STATE)
@@ -261,9 +256,25 @@ SimpleWebRtcSipPhone.prototype.processRequest =function(requestEvent){
             this.handleStateMachineInvitedRequestEvent(requestEvent);
         }
     }
-    else
+    else  if((jainSipRequestMethod=="BYE")||(jainSipRequestMethod=="ACK"))
     {
-        console.debug("SimpleWebRtcSipPhone:processResponse(): request ignored");      
+        // Subscequent request on ongoing dialog
+        if(this.invitingState!=this.INVITING_INITIAL_STATE) this.handleStateMachineInvitingRequestEvent(requestEvent); 
+        else if(this.invitedState!=this.INVITED_INITIAL_STATE)  this.handleStateMachineInvitedRequestEvent(requestEvent);
+        else
+        {
+            console.warn("SimpleWebRtcSipPhone:processRequest(): request ignored");      
+        }
+    }
+    if(jainSipRequestMethod=="CANCEL")
+
+    {
+        // Subscequent request on ongoing dialog
+        this.handleStateMachineInvitedRequestEvent(requestEvent);
+    }
+    else 
+    {
+        console.warn("SimpleWebRtcSipPhone:processResponse(): request ignored");      
     }
 }
 
@@ -324,7 +335,8 @@ SimpleWebRtcSipPhone.prototype.register =function(sipDomain, sipDisplayName, sip
     }
     else
     {
-        alert("SimpleWebRtcSipPhone:register(): bad state, action register unauthorized");      
+        alert("SimpleWebRtcSipPhone:register(): bad state, action register unauthorized"); 
+        console.warn("SimpleWebRtcSipPhone:register(): bad state, action register unauthorized"); 
     }  
 }
 
@@ -332,7 +344,7 @@ SimpleWebRtcSipPhone.prototype.register =function(sipDomain, sipDisplayName, sip
 SimpleWebRtcSipPhone.prototype.keepAliveRegister =function(){
     console.debug("SimpleWebRtcSipPhone:keepAliveRegister()");
     
-    if(this.registerState==this.REGISTERED_STATE)
+    if( this.registeredFlag==true)
     {
         this.refreshRegisterTimer=null;
         this.registerState=this.REGISTER_REFRESHING_STATE;
@@ -345,7 +357,7 @@ SimpleWebRtcSipPhone.prototype.keepAliveRegister =function(){
     }
     else
     {
-        throw "SimpleWebRtcSipPhone:keepAliveRegister(): bad state, action keep alive register unauthorized";            
+        console.warn("SimpleWebRtcSipPhone:keepAliveRegister(): bad state, action keep alive register unauthorized");            
     }
 }
 
@@ -369,6 +381,7 @@ SimpleWebRtcSipPhone.prototype.unRegister =function(){
     }
     else if(this.registerState==this.UNREGISTERED_STATE)
     {
+        alert("SimpleWebRtcSipPhone:unRegister(): bad state, action keep alive register unauthorized"); 
         console.warn("SimpleWebRtcSipPhone:unRegister(): bad state, action keep alive register unauthorized");            
     }
     else
@@ -383,6 +396,7 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineRegisterResponseEvent =function
     var statusCode = parseInt(jainSipResponse.getStatusCode()); 
     if(this.registerState==this.UNREGISTERED_STATE)
     {
+        alert("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");     
         console.error("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");  
     }
     else if((this.registerState==this.REGISTERING_STATE) || (this.registerState==this.REGISTER_REFRESHING_STATE))
@@ -414,6 +428,8 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineRegisterResponseEvent =function
                 showUnRegisterButton();
                 hideRegisterButton();
                 hideByeButton();
+                hideAcceptButton();
+                hideRejectButton();
             }
             
             if(this.unregisterPendingFlag==true) {
@@ -429,7 +445,8 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineRegisterResponseEvent =function
         }
         else
         {
-            alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine())    
+            console.error("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString()); 
+            alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString())    
         }
     }                     
     else if(this.registerState==this.REGISTERING_401_STATE)
@@ -449,6 +466,8 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineRegisterResponseEvent =function
                 showUnRegisterButton();
                 hideRegisterButton();
                 hideByeButton();
+                hideAcceptButton();
+                hideRejectButton();
             }
                         
             if(this.unregisterPendingFlag==true) {
@@ -464,12 +483,14 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineRegisterResponseEvent =function
         }
         else
         {
-            alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            console.error("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString()); 
+            alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
             this.initGUI();
         } 
     }
     else if(this.registerState==this.REGISTERED_STATE)
     {
+        alert("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");     
         console.error("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");   
     }
     else if(this.registerState==this.UNREGISTERING_STATE)
@@ -497,15 +518,13 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineRegisterResponseEvent =function
             if(this.registeredFlag==true)
             {
                 console.debug("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): this.registeredFlag=false"); 
-                hideCallButton();
-                hideUnRegisterButton();
-                showRegisterButton();
-                hideByeButton();
+                this.initGUI();
             }
         }
         else
         {
-            alert("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());  
+            console.error("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());  
+            alert("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());  
             this.initGUI();
         }
     }
@@ -522,28 +541,27 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineRegisterResponseEvent =function
             {
                 console.debug("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): this.registeredFlag=false"); 
                 this.registeredFlag=false;
-                hideCallButton();
-                hideUnRegisterButton();
-                showRegisterButton();
-                hideByeButton();
+                this.initGUI();
             }
         }
         else
         {
-            alert("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            console.error("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());  
+            alert("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
             this.initGUI();
         }
     }
     else if(this.registerState==this.UNREGISTERED_STATE)
     {
         console.error("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");  
+        alert("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");
     }
     else
     {
-        console.error("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");    
+        console.error("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");  
+        alert("SimpleWebRtcSipPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");
     }
 }
-
 
 SimpleWebRtcSipPhone.prototype.call =function(to){
     console.debug("SimpleWebRtcSipPhone:call():to: "+to);
@@ -555,6 +573,11 @@ SimpleWebRtcSipPhone.prototype.call =function(to){
             {
                 this.callee=to;
                 hideCallButton();
+                hideRegisterButton();
+                hideUnRegisterButton();
+                hideAcceptButton();
+                hideRejectButton();
+                showCancelButton();
                 this.createPeerConnection();
                 this.peerConnection.addStream(this.localAudioVideoMediaStream, {
                     has_audio: true, 
@@ -573,17 +596,189 @@ SimpleWebRtcSipPhone.prototype.call =function(to){
                 alert("SimpleWebRtcSipPhone:call(): catched exception:"+exception);  
                 this.initPeerConnectionStateMachine();
                 this.initSipInvitingStateMachine();
-                showCallButton(); 
+                showCallButton();
+                hideCancelButton();
             }
         }
         else
         {
+            console.error("SimpleWebRtcSipPhone:call(): bad state, action call unauthorized");
             alert("SimpleWebRtcSipPhone:call(): bad state, action call unauthorized");    
         }
     }
     else
     {
+        console.error("SimpleWebRtcSipPhone:call(): unregistered, action call unauthorized");
         alert("SimpleWebRtcSipPhone:call(): unregistered, action call unauthorized");           
+    }
+}
+
+SimpleWebRtcSipPhone.prototype.cancelCall =function(){
+    console.debug("SimpleWebRtcSipPhone:cancelCall()");
+   
+    if(this.invitingState==this.INVITING_STATE || this.invitingState==this.INVITING_407_STATE)
+    {
+        try
+        {
+            this.jainSipInvitingCancelRequest = this.jainSipInvitingTransaction.createCancel();
+            this.jainSipInvitingCancelRequest.addHeader(this.jainSipContactHeader);
+            this.jainSipInvitingCancelRequest.addHeader(this.jainSipUserAgentHeader);
+            this.jainSipInvitingCancelTransaction = this.sipProvider.getNewClientTransaction(this.jainSipInvitingCancelRequest);
+            this.jainSipInvitingCancelTransaction.sendRequest();
+            this.invitingState=this.INVITING_CANCELLING_STATE;
+        }
+        catch(exception)
+        {
+            console.error("SimpleWebRtcSipPhone:cancelCall(): catched exception:"+exception);
+            alert("SimpleWebRtcSipPhone:cancelCall(): catched exception:"+exception); 
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitingStateMachine();
+            hideByeButton();
+            showCallButton();
+        }
+    }
+    else
+    {
+        alert("SimpleWebRtcSipPhone:cancelCall(): bad state, action call unauthorized");     
+    }
+   
+}
+
+SimpleWebRtcSipPhone.prototype.acceptCall =function(){
+    console.debug("SimpleWebRtcSipPhone:acceptCall()");
+   
+    if(this.invitedState==this.INVITED_INITIAL_STATE)
+    {
+        // Accepted 
+        try
+        {
+            this.createPeerConnection();
+            this.peerConnection.addStream(this.localAudioVideoMediaStream, {
+                has_audio: true, 
+                has_video: true
+            });
+            this.lastReceivedSdpOfferString = this.jainSipInvitedRequest.getContent();
+            var sdpOffer = new RTCSessionDescription({
+                type: 'offer',
+                sdp: this.lastReceivedSdpOfferString
+            });
+            var application=this;
+            this.peerConnectionState = 'offer-received';
+            this.peerConnection.setRemoteDescription(sdpOffer, function() {
+                application.onPeerConnectionSetRemoteDescriptionSuccessCallback();
+            }, function(error) {
+                application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
+            });
+        }
+        catch(exception)
+        {
+            // Temporarily Unavailable
+            var jainSipResponse480=this.jainSipInvitedRequest.createResponse(480,"Temporarily Unavailable");
+            jainSipResponse480.addHeader(this.jainSipContactHeader);
+            jainSipResponse480.addHeader(this.jainSipUserAgentHeader);
+            this.jainSipInvitedTransaction.sendResponse(jainSipResponse480);
+            hideByeButton();
+            hideAcceptButton();
+            hideRejectButton();
+            hideRegisterButton();
+            showCallButton();
+            showUnRegisterButton(); 
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitedStateMachine();
+            alert("SimpleWebRtcSipPhone:acceptCall(): catched exception:"+exception);
+            console.error("SimpleWebRtcSipPhone:acceptCall(): catched exception:"+exception);
+        }
+    } 
+    else
+    {
+        alert("SimpleWebRtcSipPhone:acceptCall(): bad state, action call unauthorized");   
+        console.error("SimpleWebRtcSipPhone:acceptCall(): bad state, action call unauthorized");   
+    }
+}
+
+SimpleWebRtcSipPhone.prototype.rejectCall =function(){
+    console.debug("SimpleWebRtcSipPhone:rejectCall()");
+   
+    if(this.invitedState==this.INVITED_INITIAL_STATE)
+    {
+        // Rejected  Temporarily Unavailable
+        var jainSipResponse480= this.jainSipInvitedRequest.createResponse(480,"Temporarily Unavailable");
+        jainSipResponse480.addHeader(this.jainSipContactHeader);
+        jainSipResponse480.addHeader(this.jainSipUserAgentHeader);
+        this.jainSipInvitedTransaction.sendResponse(jainSipResponse480);
+        hideByeButton();
+        hideAcceptButton();
+        hideRejectButton();
+        hideRegisterButton();
+        showCallButton();
+        showUnRegisterButton(); 
+        this.initPeerConnectionStateMachine();
+        this.initSipInvitedStateMachine(); 
+    }
+    else
+    {
+        alert("SimpleWebRtcSipPhone:rejectCall(): bad state, action call unauthorized"); 
+        console.error("SimpleWebRtcSipPhone:rejectCall(): bad state, action call unauthorized");
+    }
+}
+
+SimpleWebRtcSipPhone.prototype.byeCall =function(){
+    console.debug("SimpleWebRtcSipPhone:byeCall()");
+   
+    if(this.invitingState==this.INVITING_ACCEPTED_STATE)
+    {
+        try
+        {
+            var jainSipByeRequest=this.jainSipInvitingDialog.createRequest("BYE");
+            jainSipByeRequest.addHeader(this.jainSipContactHeader);
+            jainSipByeRequest.addHeader(this.jainSipUserAgentHeader);
+            var clientTransaction  = this.sipProvider.getNewClientTransaction(jainSipByeRequest);
+            this.jainSipInvitingDialog.sendRequest(clientTransaction);
+            this.invitingState=this.INVITING_LOCAL_HANGINGUP_STATE;
+        }
+        catch(exception)
+        {
+            console.error("SimpleWebRtcSipPhone:byeCall(): catched exception:"+exception);
+            alert("SimpleWebRtcSipPhone:byeCall(): catched exception:"+exception); 
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitingStateMachine();
+            hideByeButton();
+            hideAcceptButton();
+            hideRejectButton();
+            hideRegisterButton();
+            showCallButton();
+            showUnRegisterButton();
+        }
+    }
+    else if(this.invitedState==this.INVITED_ACCEPTED_STATE)
+    {
+        try
+        {
+            var jainSipByeRequest=this.jainSipInvitedDialog.createRequest("BYE");
+            jainSipByeRequest.addHeader(this.jainSipContactHeader);
+            jainSipByeRequest.addHeader(this.jainSipUserAgentHeader);
+            var clientTransaction  = this.sipProvider.getNewClientTransaction(jainSipByeRequest);
+            this.jainSipInvitedDialog.sendRequest(clientTransaction);
+            this.invitedState=this.INVITED_LOCAL_HANGINGUP_STATE;
+        }
+        catch(exception)
+        {
+            console.error("SimpleWebRtcSipPhonebyeCallbye(): catched exception:"+exception);
+            alert("SimpleWebRtcSipPhone:byeCall(): catched exception:"+exception); 
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitedStateMachine();
+            hideByeButton();
+            hideAcceptButton();
+            hideRejectButton();
+            hideRegisterButton();
+            showCallButton();
+            showUnRegisterButton();
+        }
+    }
+    else
+    {
+        console.error("SimpleWebRtcSipPhone:byeCall(): bad state, action call unauthorized"); 
+        alert("SimpleWebRtcSipPhone:byeCall(): bad state, action call unauthorized");     
     }
 }
 
@@ -607,7 +802,7 @@ SimpleWebRtcSipPhone.prototype.sendInviteSipRequest =function(sdpOffer){
         var jainSipToAddress=this.addressFactory.createAddress_name_uri(null,jainSiptoUri);
         var jainSipToHeader=this.headerFactory.createToHeader(jainSipToAddress, null);           
         var jainSipContentTypeHeader=this.headerFactory.createContentTypeHeader("application","sdp");
-        this.jainSipInvitingSentRequest=this.messageFactory.createRequest(jainSipRequestUri,"INVITE",
+        this.jainSipInvitingRequest=this.messageFactory.createRequest(jainSipRequestUri,"INVITE",
             jainSipCallIdHeader,
             jainSipCseqHeader,
             jainSipFromHeader,
@@ -616,12 +811,12 @@ SimpleWebRtcSipPhone.prototype.sendInviteSipRequest =function(sdpOffer){
             jainSipContentTypeHeader,
             sdpOffer); 
                       
-        this.messageFactory.addHeader( this.jainSipInvitingSentRequest, this.jainSipUserAgentHeader);
-        this.messageFactory.addHeader( this.jainSipInvitingSentRequest, jainSipAllowListHeader);
-        this.messageFactory.addHeader( this.jainSipInvitingSentRequest, this.jainSipContactHeader);   
+        this.messageFactory.addHeader( this.jainSipInvitingRequest, this.jainSipUserAgentHeader);
+        this.messageFactory.addHeader( this.jainSipInvitingRequest, jainSipAllowListHeader);
+        this.messageFactory.addHeader( this.jainSipInvitingRequest, this.jainSipContactHeader);   
         this.invitingState=this.INVITING_STATE;
-        this.jainSipInvitingTransaction = this.sipProvider.getNewClientTransaction(this.jainSipInvitingSentRequest);
-        this.jainSipInvitingSentRequest.setTransaction(this.jainSipInvitingTransaction);
+        this.jainSipInvitingTransaction = this.sipProvider.getNewClientTransaction(this.jainSipInvitingRequest);
+        this.jainSipInvitingRequest.setTransaction(this.jainSipInvitingTransaction);
         this.jainSipInvitingTransaction.sendRequest();
     }
     catch(exception)
@@ -638,7 +833,7 @@ SimpleWebRtcSipPhone.prototype.send200OKSipResponse =function(sdpOffer){
     console.debug("SimpleWebRtcSipPhone:send200OKSipResponse()"); 
     try{
         this.invitedState=this.INVITED_ACCEPTED_STATE;
-        var jainSip200OKResponse=this.jainSipInvitedReceivedRequest.createResponse(200, "OK");
+        var jainSip200OKResponse=this.jainSipInvitedRequest.createResponse(200, "OK");
         jainSip200OKResponse.addHeader(this.jainSipContactHeader);
         jainSip200OKResponse.addHeader(this.jainSipUserAgentHeader);
         jainSip200OKResponse.setMessageContent("application","sdp",sdpOffer);
@@ -660,59 +855,6 @@ SimpleWebRtcSipPhone.prototype.send200OKSipResponse =function(sdpOffer){
 
 
 
-SimpleWebRtcSipPhone.prototype.bye =function(){
-    console.debug("SimpleWebRtcSipPhone:bye()");
-   
-    if(this.invitingState==this.INVITING_ACCEPTED_STATE)
-    {
-        try
-        {
-            var jainSipByeRequest=this.jainSipInvitingDialog.createRequest("BYE");
-            jainSipByeRequest.addHeader(this.jainSipContactHeader);
-            jainSipByeRequest.addHeader(this.jainSipUserAgentHeader);
-            var clientTransaction  = this.sipProvider.getNewClientTransaction(jainSipByeRequest);
-            this.jainSipInvitingDialog.sendRequest(clientTransaction);
-            this.invitingState=this.INVITING_LOCAL_HANGINGUP_STATE;
-        }
-        catch(exception)
-        {
-            console.error("SimpleWebRtcSipPhone:bye(): catched exception:"+exception);
-            alert("SimpleWebRtcSipPhone:bye(): catched exception:"+exception); 
-            this.initPeerConnectionStateMachine();
-            this.initSipInvitingStateMachine();
-            hideByeButton();
-            showCallButton();
-        }
-    }
-    else if(this.invitedState==this.INVITED_ACCEPTED_STATE)
-    {
-        try
-        {
-            var jainSipByeRequest=this.jainSipInvitedDialog.createRequest("BYE");
-            jainSipByeRequest.addHeader(this.jainSipContactHeader);
-            jainSipByeRequest.addHeader(this.jainSipUserAgentHeader);
-            var clientTransaction  = this.sipProvider.getNewClientTransaction(jainSipByeRequest);
-            this.jainSipInvitedDialog.sendRequest(clientTransaction);
-            this.invitedState=this.INVITED_LOCAL_HANGINGUP_STATE;
-        }
-        catch(exception)
-        {
-            console.error("SimpleWebRtcSipPhone:bye(): catched exception:"+exception);
-            alert("SimpleWebRtcSipPhone:bye(): catched exception:"+exception); 
-            this.initPeerConnectionStateMachine();
-            this.initSipInvitedStateMachine();
-            hideByeButton();
-            showCallButton();
-            showUnRegisterButton();
-        }
-    }
-    else
-    {
-        alert("SimpleWebRtcSipPhone:bye(): bad state, action call unauthorized");     
-    }
-   
-}
-
 SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingResponseEvent =function(responseEvent){
     console.debug("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): this.invitingState="+this.invitingState);
     var jainSipResponse=responseEvent.getResponse(); 
@@ -726,21 +868,26 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingResponseEvent =function
         else if(statusCode==407)
         {
             this.invitingState=this.INVITING_407_STATE;
-            var num=new Number(this.jainSipInvitingSentRequest.getCSeq().getSeqNumber());
-            this.jainSipInvitingSentRequest.getCSeq().setSeqNumber(num+1);
-            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipInvitingSentRequest,this.sipPassword,this.sipLogin);
-            this.messageFactory.addHeader(this.jainSipInvitingSentRequest, jainSipAuthorizationHeader); 
-            this.jainSipInvitingSentRequest = this.messageFactory.setNewViaHeader(this.jainSipInvitingSentRequest);
-            var jainSipClientTransaction = this.sipProvider.getNewClientTransaction(this.jainSipInvitingSentRequest);
-            this.jainSipInvitingSentRequest.setTransaction(jainSipClientTransaction);
-            jainSipClientTransaction.sendRequest();
+            var num=new Number(this.jainSipInvitingRequest.getCSeq().getSeqNumber());
+            this.jainSipInvitingRequest.getCSeq().setSeqNumber(num+1);
+            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipInvitingRequest,this.sipPassword,this.sipLogin);
+            this.messageFactory.addHeader(this.jainSipInvitingRequest, jainSipAuthorizationHeader); 
+            this.jainSipInvitingRequest = this.messageFactory.setNewViaHeader(this.jainSipInvitingRequest);
+            this.jainSipInvitingTransaction = this.sipProvider.getNewClientTransaction(this.jainSipInvitingRequest);
+            this.jainSipInvitingRequest.setTransaction(this.jainSipInvitingTransaction);
+            this.jainSipInvitingTransaction.sendRequest();
         }
         else if(statusCode==200)
         {
             this.jainSipInvitingDialog=responseEvent.getOriginalTransaction().getDialog();
             this.invitingState=this.INVITING_ACCEPTED_STATE;
             showByeButton();
+            hideCancelButton();
             hideUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
+            hideCallButton();
             this.jainSipInvitingDialog.setRemoteTarget(jainSipResponse.getHeader("Contact"));
             var jainSipMessageACK = responseEvent.getOriginalTransaction().createAck();
             this.jainSipInvitingDialog.sendAck(jainSipMessageACK);
@@ -757,18 +904,72 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingResponseEvent =function
                 application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
             });
             
+        } 
+        else if(statusCode==480)
+        {
+            alert(this.callee+" is busy, call rejected");  
+            
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitingStateMachine();
+            
+            hideByeButton();
+            hideCancelButton();
+            showUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
+            showCallButton();
+            showUnRegisterButton();
         }
         else
         {
-            alert("SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine()) 
+            console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString())   
+            alert("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString()) 
+            
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();
-            showCallButton();
+            
             hideByeButton();
+            hideCancelButton();
             showUnRegisterButton();
-
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
+            showCallButton();
+            showUnRegisterButton();
         }     
-    } 
+    } else if(this.invitingState==this.INVITING_CANCELLING_STATE)
+{
+        if(statusCode==200)
+        {
+            hideByeButton();
+            hideCancelButton();
+            showUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
+            showCallButton();
+          
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitingStateMachine();
+        }
+        else
+        {
+            console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+            alert("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+            
+            hideByeButton();
+            hideCancelButton();
+            showUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
+            showCallButton();
+            
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitingStateMachine();
+        }    
+    }
     else if(this.invitingState==this.INVITING_407_STATE)
     {
         if(statusCode< 200)
@@ -780,28 +981,42 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingResponseEvent =function
             this.jainSipInvitingDialog=responseEvent.getOriginalTransaction().getDialog();
             this.invitingState=this.INVITING_ACCEPTED_STATE;
             showByeButton();
+            hideCancelButton();
             hideUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
+            hideCallButton();
             this.jainSipInvitingDialog.setRemoteTarget(jainSipResponse.getHeader("Contact"));
             var jainSipMessageACK = responseEvent.getOriginalTransaction().createAck();
             this.jainSipInvitingDialog.sendAck(jainSipMessageACK);
         }
         else
         {
-            alert("SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+            alert("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+            
             hideByeButton();
-            showCallButton();
+            hideCancelButton();
             showUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
+            showCallButton();
+            
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();
         }    
     } 
     else if(this.invitingState==this.INVITING_FAILED_STATE)
     {
-        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored");        
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored"); 
+        alert("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored");
     } 
     else if(this.invitingState==this.INVITING_ACCEPTED_STATE)
     {
-        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored");        
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored");
+        alert("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored");        
     } 
     else if(this.invitingState==this.INVITING_LOCAL_HANGINGUP_STATE)
     {
@@ -817,51 +1032,71 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingResponseEvent =function
         else if(statusCode==200)
         {
             hideByeButton();
+            hideCancelButton();
             showUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
             showCallButton();
-            document.getElementById("remoteVideo").pause();
-            document.getElementById("remoteVideo").src= null;
+
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
         }
         else
         {
-            alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+            alert("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
             hideByeButton();
+            hideCancelButton();
             showUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
             showCallButton();
-            document.getElementById("remoteVideo").pause();
-            document.getElementById("remoteVideo").src= null;
+
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
         }
     } 
     else if(this.invitingState==this.INVITING_LOCAL_HANGINGUP_407_STATE)
     {
-        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored"); 
         if(statusCode==200)
         {
             hideByeButton();
+            hideCancelButton();
             showUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
             showCallButton();
-            document.getElementById("remoteVideo").pause();
-            document.getElementById("remoteVideo").src= null;
+            
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
         }
         else
         {
-            alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+            alert("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+           
             hideByeButton();
+            hideCancelButton();
             showUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
             showCallButton();
-            document.getElementById("remoteVideo").pause();
-            document.getElementById("remoteVideo").src= null;
+
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
         }        
     } 
+    else
+    {
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored"); 
+        alert("SimpleWebRtcSipPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored");     
+    }
 }
+
 
 SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingRequestEvent =function(requestEvent){
     console.debug("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): this.invitingState="+this.invitingState);
@@ -870,15 +1105,18 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingRequestEvent =function(
     
     if(this.invitingState==this.INVITING_STATE)
     {
-        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");  
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
+        alert("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");  
     } 
     else if(this.invitingState==this.INVITING_407_STATE)
     {
-        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");  
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
+        alert("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");  
     } 
     else if(this.invitingState==this.INVITING_FAILED_STATE)
     {
-        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");        
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
+        alert("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");  
     } 
     else if(this.invitingState==this.INVITING_ACCEPTED_STATE)
     {
@@ -887,27 +1125,40 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitingRequestEvent =function(
             var jainSip200OKResponse=jainSipRequest.createResponse(200, "OK");
             jainSip200OKResponse.addHeader(this.jainSipContactHeader);
             requestEvent.getServerTransaction().sendResponse(jainSip200OKResponse);
+            
+            alert(this.callee+" has hangup"); 
+            
             hideByeButton();
+            hideCancelButton();
             showUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
             showCallButton();
-            document.getElementById("remoteVideo").pause();
-            document.getElementById("remoteVideo").src= null;
+
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
-            alert("Contact has hangup"); 
         }
         else
         {
-            console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
+            console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");
+            alert("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
         }
     } 
     else if(this.invitingState==this.INVITING_LOCAL_HANGINGUP_STATE)
     {
         console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");
+        alert("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
     } 
     else if(this.invitingState==this.INVITING_LOCAL_HANGINGUP_407_STATE)
     {
-        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");        
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
+        alert("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
+    } 
+    else
+    {
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
+        alert("SimpleWebRtcSipPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
     } 
 }
 
@@ -917,11 +1168,13 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitedResponseEvent =function(
     var statusCode = parseInt(jainSipResponse.getStatusCode()); 
     if(this.invitedState==this.INVITED_STATE)
     {
-        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored");    
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored"); 
+        alert("SimpleWebRtcSipPhone:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored"); 
     } 
     else if(this.invitedState==this.INVITED_ACCEPTED_STATE)
     {
-        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored");        
+        console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored");
+        alert("SimpleWebRtcSipPhone:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored");         
     } 
     else if(this.invitedState==this.INVITED_LOCAL_HANGINGUP_STATE)
     {
@@ -937,16 +1190,25 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitedResponseEvent =function(
         else if(statusCode==200)
         {
             hideByeButton();
+            hideCancelButton();
             showUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
             showCallButton();
             this.initPeerConnectionStateMachine();
             this.initSipInvitedStateMachine();
         }
         else
         {
-            alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedResponseEvent(): SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+            alert("SimpleWebRtcSipPhone:handleStateMachineInvitedResponseEvent(): SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
             hideByeButton();
+            hideCancelButton();
             showUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
             showCallButton();
             this.initPeerConnectionStateMachine();
             this.initSipInvitedStateMachine();
@@ -957,16 +1219,25 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitedResponseEvent =function(
         if(statusCode==200)
         {
             hideByeButton();
+            hideCancelButton();
             showUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
             showCallButton();
             this.initPeerConnectionStateMachine();
             this.initSipInvitedStateMachine();
         }
         else
         {
-            alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedResponseEvent(): SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+            alert("SimpleWebRtcSipPhone:handleStateMachineInvitedResponseEvent(): SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
             hideByeButton();
+            hideCancelButton();
             showUnRegisterButton();
+            hideRegisterButton();
+            hideAcceptButton();
+            hideRejectButton();
             showCallButton();
             this.initPeerConnectionStateMachine();
             this.initSipInvitedStateMachine();
@@ -981,105 +1252,104 @@ SimpleWebRtcSipPhone.prototype.handleStateMachineInvitedRequestEvent =function(r
     var headerFrom = jainSipRequest.getHeader("From");
     if(this.invitedState==this.INVITED_INITIAL_STATE)
     {
-        var jainSip180ORingingResponse=jainSipRequest.createResponse(180, "Ringing");
-        jainSip180ORingingResponse.addHeader(this.jainSipContactHeader);
-        jainSip180ORingingResponse.addHeader(this.jainSipUserAgentHeader);
-        requestEvent.getServerTransaction().sendResponse(jainSip180ORingingResponse);
-            
-        var sipUri = headerFrom.getAddress().getURI();
-        console.debug("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): sipUri.getUser()="+sipUri.getUser());
-        var result = confirm("Call from "+sipUri.getUser()+ ": Accept or Reject");
-        if (result==true)
+        if(requestMethod=="INVITE")  
         {
-            // Accepted 
-            try
-            {
-                this.jainSipInvitedReceivedRequest=jainSipRequest;
-                this.jainSipInvitedTransaction=requestEvent.getServerTransaction();
-                this.jainSipInvitedDialog=requestEvent.getServerTransaction().getDialog();
-                this.createPeerConnection();
-                this.peerConnection.addStream(this.localAudioVideoMediaStream, {
-                    has_audio: true, 
-                    has_video: true
-                });
-                this.lastReceivedSdpOfferString = jainSipRequest.getContent();
-                var sdpOffer = new RTCSessionDescription({
-                    type: 'offer',
-                    sdp: this.lastReceivedSdpOfferString
-                });
-                var application=this;
-                this.peerConnectionState = 'offer-received';
-                this.peerConnection.setRemoteDescription(sdpOffer, function() {
-                    application.onPeerConnectionSetRemoteDescriptionSuccessCallback();
-                }, function(error) {
-                    application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
-                });
-            }
-            catch(exception)
-            {
-                // Temporarily Unavailable
-                var jainSipResponse480=jainSipRequest.createResponse(480,"Temporarily Unavailable");
-                jainSipResponse480.addHeader(this.jainSipContactHeader);
-                jainSipResponse480.addHeader(this.jainSipUserAgentHeader);
-                requestEvent.getServerTransaction().sendResponse(jainSipResponse480);
-                hideByeButton();
-                showCallButton();
-                showUnRegisterButton(); 
-                this.initPeerConnectionStateMachine();
-                this.initSipInvitedStateMachine();
-                console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): catched exception:"+exception);
-                alert("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): catched exception:"+exception);  
-            }
+            // Store SIP context
+            this.jainSipInvitedRequest=jainSipRequest;
+            this.jainSipInvitedTransaction=requestEvent.getServerTransaction();
+            this.jainSipInvitedDialog=requestEvent.getServerTransaction().getDialog();
+        
+            // Ringing
+            var jainSip180ORingingResponse=jainSipRequest.createResponse(180, "Ringing");
+            jainSip180ORingingResponse.addHeader(this.jainSipContactHeader);
+            jainSip180ORingingResponse.addHeader(this.jainSipUserAgentHeader);
+            requestEvent.getServerTransaction().sendResponse(jainSip180ORingingResponse);
+            
+            this.caller = sipUri = headerFrom.getAddress().getURI().getUser();
+            console.debug("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent():  this.caller="+ this.caller);
+            alert("Call from "+ this.caller + ": Accept or Reject");
+            
+            hideByeButton();
+            hideRegisterButton();
+            hideUnRegisterButton();
+            hideCancelButton();
+            hideCallButton();
+            showAcceptButton();
+            showRejectButton();
+        } 
+        else if(requestMethod=="CANCEL")  
+        {
+            // Send 200OK CANCEL
+            var jainSip200OKResponse=jainSipRequest.createResponse(200, "OK");
+            jainSip200OKResponse.addHeader(this.jainSipContactHeader);
+            jainSip200OKResponse.addHeader(this.jainSipUserAgentHeader);
+            requestEvent.getServerTransaction().sendResponse(jainSip200OKResponse);
+            
+            // Send 487 (Request Cancelled) for the INVITE
+            var jainSipResponse487=this.jainSipInvitedRequest.createResponse(487,"(Request Cancelled)");
+            jainSipResponse487.addHeader(this.jainSipRegisterSentRequest.getHeader("User-Agent"));
+            this.jainSipInvitedTransaction.sendMessage(jainSipResponse487);
+            
+            alert(this.caller + "has cancel"); 
+            
+            hideByeButton();
+            hideRegisterButton();
+            showUnRegisterButton();
+            hideCancelButton();
+            showCallButton();
+            hideAcceptButton();
+            hideRejectButton();
+
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitedStateMachine(); 
         }
         else
         {
-            // Rejected 
-            // Temporarily Unavailable
-            var jainSipResponse480=jainSipRequest.createResponse(480,"Temporarily Unavailable");
-            jainSipResponse480.addHeader(this.jainSipContactHeader);
-            jainSipResponse480.addHeader(this.jainSipUserAgentHeader);
-            requestEvent.getServerTransaction().sendResponse(jainSipResponse480);
-            hideByeButton();
-            showCallButton();
-            showUnRegisterButton();
-            this.initPeerConnectionStateMachine();
-            this.initSipInvitedStateMachine();
-        }  
+            console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
+            alert("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
+        }
     } 
     else if(this.invitedState==this.INVITED_ACCEPTED_STATE)
     {
         if(requestMethod=="BYE")  
         {
-            showCallButton();
-            hideByeButton();
-            showUnRegisterButton(); 
+            // Send 200OK
             var jainSip200OKResponse=jainSipRequest.createResponse(200, "OK");
             jainSip200OKResponse.addHeader(this.jainSipContactHeader);
             jainSip200OKResponse.addHeader(this.jainSipUserAgentHeader);
             requestEvent.getServerTransaction().sendResponse(jainSip200OKResponse);
-            this.invitedState=this.INVITED_INITIAL_STATE;
-            this.jainSipInvitedReceivedRequest=null;
-            this.jainSipInvitedDialog=null;
-            document.getElementById("remoteVideo").pause();
-            document.getElementById("remoteVideo").src= null;
+            
+            alert(this.caller + "has hangup"); 
+            
+            hideByeButton();
+            hideRegisterButton();
+            showUnRegisterButton();
+            hideCancelButton();
+            showCallButton();
+            hideAcceptButton();
+            hideRejectButton();
+
             this.initPeerConnectionStateMachine();
-            this.initSipInvitingStateMachine();
-            alert("Contact has hangup"); 
+            this.initSipInvitedStateMachine();
+
         }
         else if(requestMethod=="ACK")  
         {         
             this.jainSipInvitedDialog=requestEvent.getServerTransaction().getDialog();
         }
         else {
+            alert("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
             console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
         }
     } 
     else if(this.invitedState==this.INVITED_LOCAL_HANGINGUP_STATE)
     {
+        alert("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
         console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored");
     } 
     else if(this.invitedState==this.INVITED_LOCAL_HANGINGUP_407_STATE)
     {
+        alert("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
         console.error("SimpleWebRtcSipPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored");        
     } 
 }
@@ -1232,6 +1502,12 @@ SimpleWebRtcSipPhone.prototype.onPeerConnectionIceCandidateCallback =function(rt
                 // Send 200 OK
                 this.send200OKSipResponse(this.peerConnection.localDescription.sdp)
                 this.peerConnectionState = 'established';
+                showByeButton();
+                hideAcceptButton();
+                hideRejectButton();
+                hideRegisterButton();
+                hideCallButton();
+                hideUnRegisterButton(); 
             }
             else if (this.peerConnectionState == 'established') 
             {

@@ -515,7 +515,7 @@ LexerCore.prototype.quotedString =function(){
         return null;
     }
     this.consume(1);
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.getNextChar();
         if (next == '\"') {
             break;
@@ -536,7 +536,7 @@ LexerCore.prototype.comment =function(){
         return null;
     }
     this.consume(1);
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.getNextChar();
         if (next == ')') {
             break;
@@ -561,7 +561,7 @@ LexerCore.prototype.comment =function(){
 LexerCore.prototype.byteStringNoSemicolon =function(){
     //if(logger!=undefined) logger.debug("LexerCore:byteStringNoSemicolon()");
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (next == '\0' || next == '\n' || next == ';' || next == ',') {
             break;
@@ -575,7 +575,7 @@ LexerCore.prototype.byteStringNoSemicolon =function(){
 
 LexerCore.prototype.byteStringNoWhiteSpace =function(){
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (next == '\0' || next == '\n' || next == ' ') {
             break;
@@ -590,7 +590,7 @@ LexerCore.prototype.byteStringNoWhiteSpace =function(){
 LexerCore.prototype.byteStringNoSlash =function(){
     //if(logger!=undefined) logger.debug("LexerCore:byteStringNoSlash()");
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (next == '\0' || next == '\n' || next == '/') {
             break;
@@ -605,7 +605,7 @@ LexerCore.prototype.byteStringNoSlash =function(){
 LexerCore.prototype.byteStringNoComma =function(){
     //if(logger!=undefined) logger.debug("LexerCore:byteStringNoComma()");
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (next == '\n' || next == ',') {
             break;
@@ -639,7 +639,7 @@ LexerCore.prototype.number =function(){
         throw "LexerCore:number(): Unexpected token at " + this.lookAhead(0);
     }
     this.consume(1);
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (this.isDigit(next)) {
             this.consume(1);
@@ -672,7 +672,7 @@ LexerCore.prototype.getRest =function(){
 LexerCore.prototype.getString =function(c){
     //if(logger!=undefined) logger.debug("LexerCore:getString():c:"+c);
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (next == '\0') {
            console.error(this.buffer + "LexerCore:getString(): unexpected EOL",this.ptr);

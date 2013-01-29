@@ -1462,7 +1462,7 @@ HostPort.prototype.equals =function(other){
     if (other == null) {
         return false;
     }
-    if (this.classname==other.classname) {
+    if (this.classname!=other.classname) {
         return false;
     }
     var that =  other;
@@ -1626,16 +1626,15 @@ Host.prototype.encodeBuffer =function(buffer){
      * @param obj Object to set
      * @return boolean
      */
-Host.prototype.equals =function(obj){
+Host.prototype.equals =function(otherHost){
     //if(logger!=undefined) logger.debug("Host:equals():obj="+obj);
-    if ( obj == null ) 
+    if ( otherHost == null ) 
     {
         return false;
     }
-    if (this.classname!=obj.classname) {
+    if (this.classname!=otherHost.classname) {
         return false;
     }
-    var otherHost = new Host();
     if(otherHost.hostname==this.hostname)
     {
         return true;
@@ -2619,7 +2618,7 @@ LexerCore.prototype.quotedString =function(){
         return null;
     }
     this.consume(1);
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.getNextChar();
         if (next == '\"') {
             break;
@@ -2640,7 +2639,7 @@ LexerCore.prototype.comment =function(){
         return null;
     }
     this.consume(1);
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.getNextChar();
         if (next == ')') {
             break;
@@ -2665,7 +2664,7 @@ LexerCore.prototype.comment =function(){
 LexerCore.prototype.byteStringNoSemicolon =function(){
     //if(logger!=undefined) logger.debug("LexerCore:byteStringNoSemicolon()");
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (next == '\0' || next == '\n' || next == ';' || next == ',') {
             break;
@@ -2679,7 +2678,7 @@ LexerCore.prototype.byteStringNoSemicolon =function(){
 
 LexerCore.prototype.byteStringNoWhiteSpace =function(){
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (next == '\0' || next == '\n' || next == ' ') {
             break;
@@ -2694,7 +2693,7 @@ LexerCore.prototype.byteStringNoWhiteSpace =function(){
 LexerCore.prototype.byteStringNoSlash =function(){
     //if(logger!=undefined) logger.debug("LexerCore:byteStringNoSlash()");
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (next == '\0' || next == '\n' || next == '/') {
             break;
@@ -2709,7 +2708,7 @@ LexerCore.prototype.byteStringNoSlash =function(){
 LexerCore.prototype.byteStringNoComma =function(){
     //if(logger!=undefined) logger.debug("LexerCore:byteStringNoComma()");
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (next == '\n' || next == ',') {
             break;
@@ -2743,7 +2742,7 @@ LexerCore.prototype.number =function(){
         throw "LexerCore:number(): Unexpected token at " + this.lookAhead(0);
     }
     this.consume(1);
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (this.isDigit(next)) {
             this.consume(1);
@@ -2776,7 +2775,7 @@ LexerCore.prototype.getRest =function(){
 LexerCore.prototype.getString =function(c){
     //if(logger!=undefined) logger.debug("LexerCore:getString():c:"+c);
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (next == '\0') {
            console.error(this.buffer + "LexerCore:getString(): unexpected EOL",this.ptr);
@@ -17337,7 +17336,7 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         authorization.setResponse(resp);
         authorization.setURI(request.getRequestURI());
         authorization.setAlgorithm("MD5");
-        authorization.setQop(qop);
+        if(qop!=null) authorization.setQop(qop);
         return authorization;
     }
     else if(response.hasHeader("proxy-authenticate"))
@@ -17351,7 +17350,7 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         proxyauthorization.setResponse(resp);
         proxyauthorization.setURI(request.getRequestURI());
         proxyauthorization.setAlgorithm("MD5");
-		proxyauthorization.setQop(qop);
+		if(qop!=null)  proxyauthorization.setQop(qop);
         return proxyauthorization;
     }
 }/*
@@ -21181,30 +21180,8 @@ ServerParser.prototype.parse =function(){
        console.error("ServerParser:parse(): empty header");
        throw "ServerParser:parse():  empty header";
     }
-    while (this.lexer.lookAhead(0) != '\n'
-        && this.lexer.lookAhead(0) != '\0') {
-        if (this.lexer.lookAhead(0) == '(') {
-            var comment = this.lexer.comment();
-            server.addProductToken('(' + comment + ')');
-        } else {
-            var tok;
-            var marker = 0;
-            try {
-                marker = this.lexer.markInputPosition();
-                tok = this.lexer.getString('/');
-                if (tok.charAt(tok.length() - 1) == '\n')
-                {
-                    tok = tok.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
-                }
-                server.addProductToken(tok);
-            } catch (ex) {
-                this.lexer.rewindInputPosition(marker);
-                tok = this.lexer.getRest().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
-                server.addProductToken(tok);
-                break;
-            }
-        }
-    }
+    tok = this.lexer.getRest().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
+    server.addProductToken(tok); 
     return server;
 }
 
@@ -30243,20 +30220,15 @@ SIPTransaction.prototype.doesCancelMatchTransaction =function(requestToTest){
             }
         }
         if (messageBranch != null && this.getBranch() != null) {
-            if (this.getBranch().toLowerCase()==messageBranch.toLowerCase()
-                && topViaHeader.getSentBy()==
-                this.getOriginalRequest().getViaHeaders().getFirst().getSentBy()) {
+            if ((this.getBranch().toLowerCase()==messageBranch.toLowerCase())
+                && (topViaHeader.getSentBy().equals(this.getOriginalRequest().getViaHeaders().getFirst().getSentBy()))) {
                 transactionMatches = true;
             }
         } else {
-            if (this.getOriginalRequest().getRequestURI()==
-                requestToTest.getRequestURI()
-                && this.getOriginalRequest().getTo()==
-                requestToTest.getTo()
-                && this.getOriginalRequest().getFrom()==
-                requestToTest.getFrom()
-                && this.getOriginalRequest().getCallId().getCallId()==
-                requestToTest.getCallId().getCallId()
+            if (this.getOriginalRequest().getRequestURI()==requestToTest.getRequestURI()
+                && this.getOriginalRequest().getTo()==requestToTest.getTo()
+                && this.getOriginalRequest().getFrom()==requestToTest.getFrom()
+                && this.getOriginalRequest().getCallId().getCallId()==requestToTest.getCallId().getCallId()
                 && this.getOriginalRequest().getCSeq().getSeqNumber() == requestToTest.getCSeq().getSeqNumber()
                 && topViaHeader==this.getOriginalRequest().getViaHeaders().getFirst()) {
                 transactionMatches = true;
@@ -30851,15 +30823,15 @@ SIPClientTransaction.prototype.sendRequest =function(){
                 throw "SIPClientTransaction:sendRequest(): cannot cancel non-invite requests RFC 3261 9.1";
             }
         } 
-        else if (this.getOriginalRequest().getMethod()==this.BYE
-            ||this.getOriginalRequest().getMethod()==this.NOTIFY) {
+        else if (this.getMethod()==this.BYE
+            ||this.getMethod()==this.NOTIFY) {
             var dialog = this.sipStack.getDialog(this.getOriginalRequest().getDialogId(false));
             if (this.getSipProvider().isAutomaticDialogSupportEnabled() && dialog != null) {
                 console.error("SIPClientTransaction:sendRequest(): Dialog is present and AutomaticDialogSupport is enabled for the provider -- Send the Request using the Dialog.sendRequest(transaction)");
                 throw "SIPClientTransaction:sendRequest(): Dialog is present and AutomaticDialogSupport is enabled for the provider -- Send the Request using the Dialog.sendRequest(transaction)";
             }
         }
-        if (this.getOriginalRequest().getMethod()==this.INVITE) {
+        if (this.getMethod()==this.INVITE) {
             dialog = this.getDefaultDialog();
         }
         this.isMapped = true;
@@ -31422,7 +31394,7 @@ SIPServerTransaction.prototype.processRequest =function(transactionRequest,sourc
         } 
         return;
     }
-    else if (transactionRequest.getMethod()==this.getOriginalRequest().getMethod()) {
+    else if (transactionRequest.getMethod()==this.getMethod()) {
         if ("PROCEEDING" == this.getRealState()|| "COMPLETED" == this.getRealState()) {
             if (this.lastResponse != null) {
                 SIPTransaction.prototype.sendMessage.call(this,this.lastResponse);
@@ -31437,7 +31409,7 @@ SIPServerTransaction.prototype.processRequest =function(transactionRequest,sourc
     }
     if ("COMPLETED" != this.getRealState()
         && "TERMINATED" != this.getRealState() && this.requestOf != null) {
-        if (this.getOriginalRequest().getMethod()==transactionRequest.getMethod()) {
+        if (this.getMethod()==transactionRequest.getMethod()) {
             if (toTu) {
                 this.requestOf.processRequest(transactionRequest, this);
             } 
@@ -31449,7 +31421,7 @@ SIPServerTransaction.prototype.processRequest =function(transactionRequest,sourc
         }
     }
     else {
-        if (this.getSIPStack().isDialogCreated(this.getOriginalRequest().getMethod())
+        if (this.getSIPStack().isDialogCreated(this.getMethod())
             && this.getRealState() == "TERMINATED"
             && transactionRequest.getMethod()=="ACK"
             && this.requestOf != null) {
@@ -31481,7 +31453,7 @@ SIPServerTransaction.prototype.sendMessage =function(messageToSend){
     if (!this.getOriginalRequest().getTopmostVia().hasPort()) {
         transactionResponse.getTopmostVia().removePort();
     }
-    if (!transactionResponse.getCSeq().getMethod()==this.getOriginalRequest().getMethod()) {
+    if (!transactionResponse.getCSeq().getMethod()==this.getMethod()) {
         this.sendResponseSRT(transactionResponse);
         return;
     }

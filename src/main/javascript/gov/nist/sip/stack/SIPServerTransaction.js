@@ -220,7 +220,7 @@ SIPServerTransaction.prototype.processRequest =function(transactionRequest,sourc
         } 
         return;
     }
-    else if (transactionRequest.getMethod()==this.getOriginalRequest().getMethod()) {
+    else if (transactionRequest.getMethod()==this.getMethod()) {
         if ("PROCEEDING" == this.getRealState()|| "COMPLETED" == this.getRealState()) {
             if (this.lastResponse != null) {
                 SIPTransaction.prototype.sendMessage.call(this,this.lastResponse);
@@ -235,7 +235,7 @@ SIPServerTransaction.prototype.processRequest =function(transactionRequest,sourc
     }
     if ("COMPLETED" != this.getRealState()
         && "TERMINATED" != this.getRealState() && this.requestOf != null) {
-        if (this.getOriginalRequest().getMethod()==transactionRequest.getMethod()) {
+        if (this.getMethod()==transactionRequest.getMethod()) {
             if (toTu) {
                 this.requestOf.processRequest(transactionRequest, this);
             } 
@@ -247,7 +247,7 @@ SIPServerTransaction.prototype.processRequest =function(transactionRequest,sourc
         }
     }
     else {
-        if (this.getSIPStack().isDialogCreated(this.getOriginalRequest().getMethod())
+        if (this.getSIPStack().isDialogCreated(this.getMethod())
             && this.getRealState() == "TERMINATED"
             && transactionRequest.getMethod()=="ACK"
             && this.requestOf != null) {
@@ -279,7 +279,7 @@ SIPServerTransaction.prototype.sendMessage =function(messageToSend){
     if (!this.getOriginalRequest().getTopmostVia().hasPort()) {
         transactionResponse.getTopmostVia().removePort();
     }
-    if (!transactionResponse.getCSeq().getMethod()==this.getOriginalRequest().getMethod()) {
+    if (!transactionResponse.getCSeq().getMethod()==this.getMethod()) {
         this.sendResponseSRT(transactionResponse);
         return;
     }

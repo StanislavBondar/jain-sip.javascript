@@ -454,20 +454,15 @@ SIPTransaction.prototype.doesCancelMatchTransaction =function(requestToTest){
             }
         }
         if (messageBranch != null && this.getBranch() != null) {
-            if (this.getBranch().toLowerCase()==messageBranch.toLowerCase()
-                && topViaHeader.getSentBy()==
-                this.getOriginalRequest().getViaHeaders().getFirst().getSentBy()) {
+            if ((this.getBranch().toLowerCase()==messageBranch.toLowerCase())
+                && (topViaHeader.getSentBy().equals(this.getOriginalRequest().getViaHeaders().getFirst().getSentBy()))) {
                 transactionMatches = true;
             }
         } else {
-            if (this.getOriginalRequest().getRequestURI()==
-                requestToTest.getRequestURI()
-                && this.getOriginalRequest().getTo()==
-                requestToTest.getTo()
-                && this.getOriginalRequest().getFrom()==
-                requestToTest.getFrom()
-                && this.getOriginalRequest().getCallId().getCallId()==
-                requestToTest.getCallId().getCallId()
+            if (this.getOriginalRequest().getRequestURI()==requestToTest.getRequestURI()
+                && this.getOriginalRequest().getTo()==requestToTest.getTo()
+                && this.getOriginalRequest().getFrom()==requestToTest.getFrom()
+                && this.getOriginalRequest().getCallId().getCallId()==requestToTest.getCallId().getCallId()
                 && this.getOriginalRequest().getCSeq().getSeqNumber() == requestToTest.getCSeq().getSeqNumber()
                 && topViaHeader==this.getOriginalRequest().getViaHeaders().getFirst()) {
                 transactionMatches = true;

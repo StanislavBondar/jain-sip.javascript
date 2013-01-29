@@ -505,15 +505,15 @@ SIPClientTransaction.prototype.sendRequest =function(){
                 throw "SIPClientTransaction:sendRequest(): cannot cancel non-invite requests RFC 3261 9.1";
             }
         } 
-        else if (this.getOriginalRequest().getMethod()==this.BYE
-            ||this.getOriginalRequest().getMethod()==this.NOTIFY) {
+        else if (this.getMethod()==this.BYE
+            ||this.getMethod()==this.NOTIFY) {
             var dialog = this.sipStack.getDialog(this.getOriginalRequest().getDialogId(false));
             if (this.getSipProvider().isAutomaticDialogSupportEnabled() && dialog != null) {
                 console.error("SIPClientTransaction:sendRequest(): Dialog is present and AutomaticDialogSupport is enabled for the provider -- Send the Request using the Dialog.sendRequest(transaction)");
                 throw "SIPClientTransaction:sendRequest(): Dialog is present and AutomaticDialogSupport is enabled for the provider -- Send the Request using the Dialog.sendRequest(transaction)";
             }
         }
-        if (this.getOriginalRequest().getMethod()==this.INVITE) {
+        if (this.getMethod()==this.INVITE) {
             dialog = this.getDefaultDialog();
         }
         this.isMapped = true;
