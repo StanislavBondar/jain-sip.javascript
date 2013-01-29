@@ -579,7 +579,7 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         authorization.setResponse(resp);
         authorization.setURI(request.getRequestURI());
         authorization.setAlgorithm("MD5");
-        authorization.setQop(qop);
+        if(qop!=null) authorization.setQop(qop);
         return authorization;
     }
     else if(response.hasHeader("proxy-authenticate"))
@@ -593,7 +593,7 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         proxyauthorization.setResponse(resp);
         proxyauthorization.setURI(request.getRequestURI());
         proxyauthorization.setAlgorithm("MD5");
-		proxyauthorization.setQop(qop);
+		if(qop!=null)  proxyauthorization.setQop(qop);
         return proxyauthorization;
     }
 }
