@@ -145,7 +145,7 @@ RepeatField.prototype.setOffsetArray =function(offsets) {
     if(logger!=undefined) logger.debug("RepeatField:setOffsetArray()");
     if(offsets instanceof Array) 
     {
-        for (vari = 0; i < this.offsets.length; i++) {
+        for (var i = 0; i < this.offsets.length; i++) {
             var typedTime = new TypedTime();
             typedTime.setTime(offsets[i]);
             this.addOffset(typedTime);

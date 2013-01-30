@@ -48,7 +48,7 @@ ContentType.prototype.SEMICOLON=";";
 
 ContentType.prototype.compareMediaRange =function(media){
     if(logger!=undefined) logger.debug("ContentType:compareMediaRange():media="+media);
-    var chaine1=(mediaRange.type + "/" + mediaRange.subtype).toLowerCase();
+    var chaine1=(this.mediaRange.type + "/" + this.mediaRange.subtype).toLowerCase();
     var chaine2=media.toLowerCase();
     var c=0;
     var length;

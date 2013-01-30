@@ -602,7 +602,7 @@ URLParser.prototype.qheader =function(){
         var la = this.lexer.lookAhead(0);
         if (la == '=') {
             break;
-        } else if (la == '\0') {
+        } else if (la == '') {
             console.error("URLParser:qheader(): EOL reached");
             throw "URLParser:qheader(): EOL reached";
         }

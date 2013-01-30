@@ -76,7 +76,7 @@ SDPField.prototype.setFieldName =function(fieldName) {
 SDPField.prototype.getTypeChar =function() {
     if(logger!=undefined) logger.debug("SDPField:getTypeChar()");
     if (this.fieldName == null)
-        return '\0';
+        return '';
     else
         return this.fieldName.charAt(0);
 }

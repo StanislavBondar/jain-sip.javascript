@@ -55,7 +55,7 @@ AddressParametersParser.prototype.parse =function(addressParametersHeader){
         addressParametersHeader.setAddress(addr);
         this.lexer.SPorHT();
         var la = this.lexer.lookAhead(0);
-        if (this.lexer.hasMoreChars() && la != '\0' && la != '\n' && this.lexer.startsId()) {
+        if (this.lexer.hasMoreChars() && la != '' && la != '\n' && this.lexer.startsId()) {
             ParametersParser.prototype.parseNameValueList.call(this,addressParametersHeader);
         } else {
             ParametersParser.prototype.parse.call(this,addressParametersHeader);

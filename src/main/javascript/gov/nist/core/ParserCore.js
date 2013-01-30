@@ -32,7 +32,7 @@ function ParserCore() {
     //if(logger!=undefined) logger.debug("ParserCore:ParserCore()");
     this.classname="ParserCore";
     this.nesting_level=null;
-    this.lexer=new LexerCore();
+    this.lexer=null;
 }
 
 ParserCore.prototype.nameValue =function(separator){

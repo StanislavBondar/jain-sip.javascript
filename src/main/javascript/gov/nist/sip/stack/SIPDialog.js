@@ -570,8 +570,6 @@ SIPDialog.prototype.sendAck =function(request){
     //this.dialogDeleteTask = null;
     }
     this.ackSeen = true;  
-    var encodedSipMessage = request.encode();
-    console.info("SIP message sent: "+encodedSipMessage); 
 }
 
 SIPDialog.prototype.getRemoteTag =function(){

@@ -71,7 +71,7 @@ ContactParser.prototype.parse =function(){
             this.lexer.match(',');
             this.lexer.SPorHT();
         } 
-        else if (la == '\n' || la == '\0')
+        else if (la == '\n' || la == '')
         {
             break;
         }
@@ -84,3 +84,34 @@ ContactParser.prototype.parse =function(){
     return retval;
 }
 
+ContactParser.prototype.nameValue =function(){
+    this.lexer.match(LexerCore.prototype.ID);
+    var name = this.lexer.getNextToken();
+    this.lexer.SPorHT();
+    try {
+        var quoted = false;
+        var la = this.lexer.lookAhead(0);
+        if (la == '=') {
+            this.lexer.consume(1);
+            this.lexer.SPorHT();
+            var str = null;
+            if (this.lexer.lookAhead(0) == '\"') {
+                str = this.lexer.quotedString();
+                quoted = true;
+            } else {
+                str = this.lexer.byteStringNoSemicolon();
+            }
+            var nv = new NameValue(name.getTokenValue().toLowerCase(), str);
+            if (quoted)
+            {
+                nv.setQuotedValue();
+            }
+            return nv;
+        } else {
+            return new NameValue(name.getTokenValue().toLowerCase(), null);
+        }
+    } catch (ex) {
+        console.error("ContactParser:nameValue(): catched exception:"+ex);
+        return new NameValue(name.getTokenValue(), null);
+    }
+}

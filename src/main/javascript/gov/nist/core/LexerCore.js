@@ -190,7 +190,7 @@ LexerCore.prototype.getNextToken =function(){
             {
                 break;
             } 
-            else if (la == '\0') 
+            else if (la == '') 
             {
                 console.error("LexerCore:getNextToken(): EOL reached");
                 throw "LexerCore:getNextToken(): EOL reached";
@@ -519,7 +519,7 @@ LexerCore.prototype.quotedString =function(){
         var next = this.getNextChar();
         if (next == '\"') {
             break;
-        } else if (next == '\0') {
+        } else if (next == '') {
             console.error("LexerCore:quotedString(): "+ this.buffer + " :unexpected EOL",this.ptr);
             throw "LexerCore:quotedString(): unexpected EOL";
         } else if (next == '\\') {
@@ -540,13 +540,13 @@ LexerCore.prototype.comment =function(){
         var next = this.getNextChar();
         if (next == ')') {
             break;
-        } else if (next == '\0') {
+        } else if (next == '') {
             console.error("LexerCore:comment(): "+ this.buffer + " :unexpected EOL",this.ptr);
             throw "LexerCore:comment(): unexpected EOL";
         } else if (next == '\\') {
             retval=retval+next;
             next = this.getNextChar();
-            if (next == '\0') {
+            if (next == '') {
                 console.error("LexerCore:comment(): "+ this.buffer + " :unexpected EOL",this.ptr);
                 throw "LexerCore:comment(): unexpected EOL";
             }
@@ -563,7 +563,7 @@ LexerCore.prototype.byteStringNoSemicolon =function(){
     var retval = "";
     while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
-        if (next == '\0' || next == '\n' || next == ';' || next == ',') {
+        if (next == '' || next == '\n' || next == ';' || next == ',') {
             break;
         } else {
             this.consume(1);
@@ -577,7 +577,7 @@ LexerCore.prototype.byteStringNoWhiteSpace =function(){
     var retval = "";
     while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
-        if (next == '\0' || next == '\n' || next == ' ') {
+        if (next == '' || next == '\n' || next == ' ') {
             break;
         } else {
             this.consume(1);
@@ -592,7 +592,7 @@ LexerCore.prototype.byteStringNoSlash =function(){
     var retval = "";
     while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
-        if (next == '\0' || next == '\n' || next == '/') {
+        if (next == '' || next == '\n' || next == '/') {
             break;
         } else {
             this.consume(1);
@@ -674,7 +674,7 @@ LexerCore.prototype.getString =function(c){
     var retval = "";
     while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
-        if (next == '\0') {
+        if (next == '') {
            console.error(this.buffer + "LexerCore:getString(): unexpected EOL",this.ptr);
            throw "LexerCore:getString(): unexpected EOL";
         } else if (next == c) {
@@ -683,7 +683,7 @@ LexerCore.prototype.getString =function(c){
         } else if (next == '\\') {
             this.consume(1);
             var nextchar = this.lookAhead(0);
-            if (nextchar == '\0') {
+            if (nextchar == '') {
                 console.error(this.buffer + "LexerCore:getString(): unexpected EOL",this.ptr);
                 throw "LexerCore:getString(): unexpected EOL";
             } else {

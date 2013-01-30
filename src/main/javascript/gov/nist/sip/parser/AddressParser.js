@@ -101,7 +101,7 @@ AddressParser.prototype.address =function(inclParams){
         {
             break;
         }
-        else if (la == '\0')
+        else if (la == '')
         {
            console.error("AddressParser:address(): unexpected EOL");
            throw "AddressParser:parse(): unexpected EOL";

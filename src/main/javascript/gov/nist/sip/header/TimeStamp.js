@@ -108,7 +108,7 @@ TimeStamp.prototype.hasDelay =function(){
 
 TimeStamp.prototype.removeDelay =function(){
     if(logger!=undefined) logger.debug("TimeStamp:removeDelay()");
-    delay = -1;
+    this.delay = -1;
 }
 
 TimeStamp.prototype.setTimeStamp =function(timeStamp){

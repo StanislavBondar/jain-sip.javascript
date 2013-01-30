@@ -624,11 +624,10 @@ NameValueList.prototype.equals =function(otherObject){
     }
     for (i=0;i<key.length;i++)
     {
-        k = key[i];
         var nv1 = new NameValue();
         var nv2 = new NameValue();
-        nv1 = this.getNameValue(k);
-        nv2 = other.getNameValue(k);
+        nv1 = this.getNameValue(key[i]);
+        nv2 = other.getNameValue(key[i]);
         if (nv2 == null)
         {
             return false;
@@ -732,7 +731,7 @@ NameValueList.prototype.iterator=function(){
 NameValueList.prototype.getNames=function(){
     var key=new Array();
     var c=0;
-    for (i=0;i<this.hmap.length;i++)
+    for (var i=0;i<this.hmap.length;i++)
     {    
         key[c]=this.hmap[i][0];
         c++;
@@ -821,7 +820,7 @@ NameValueList.prototype.get=function(key){
 NameValueList.prototype.keySet=function(){
     var key=new Array();
     var c=0;
-    for (i=0;i<this.hmap.length;i++)
+    for (var i=0;i<this.hmap.length;i++)
     {
         key[c]=this.hmap[i][0];
         c++;
@@ -888,7 +887,7 @@ NameValueList.prototype.remove=function(key){
 NameValueList.prototype.values=function(){
     var values=new Array();
     var c=0;
-    for (i=0;i<this.hmap.length;i++)
+    for (var i=0;i<this.hmap.length;i++)
     {
         values[c]=this.hmap[i][1];
         c++;
@@ -1951,7 +1950,7 @@ StringTokenizer.prototype.getNextToken =function(delim){
         {
             break;
         } 
-        else if (la == '\0') 
+        else if (la == '') 
         {
             console.error("StringTokenizer:getNextToken(): EOL reached");
             throw "StringTokenizer:getNextToken(): EOL reached";
@@ -2156,7 +2155,7 @@ LexerCore.prototype.getNextToken =function(){
             {
                 break;
             } 
-            else if (la == '\0') 
+            else if (la == '') 
             {
                 console.error("LexerCore:getNextToken(): EOL reached");
                 throw "LexerCore:getNextToken(): EOL reached";
@@ -2475,7 +2474,7 @@ LexerCore.prototype.quotedString =function(){
         var next = this.getNextChar();
         if (next == '\"') {
             break;
-        } else if (next == '\0') {
+        } else if (next == '') {
             console.error("LexerCore:quotedString(): "+ this.buffer + " :unexpected EOL",this.ptr);
             throw "LexerCore:quotedString(): unexpected EOL";
         } else if (next == '\\') {
@@ -2495,13 +2494,13 @@ LexerCore.prototype.comment =function(){
         var next = this.getNextChar();
         if (next == ')') {
             break;
-        } else if (next == '\0') {
+        } else if (next == '') {
             console.error("LexerCore:comment(): "+ this.buffer + " :unexpected EOL",this.ptr);
             throw "LexerCore:comment(): unexpected EOL";
         } else if (next == '\\') {
             retval=retval+next;
             next = this.getNextChar();
-            if (next == '\0') {
+            if (next == '') {
                 console.error("LexerCore:comment(): "+ this.buffer + " :unexpected EOL",this.ptr);
                 throw "LexerCore:comment(): unexpected EOL";
             }
@@ -2517,7 +2516,7 @@ LexerCore.prototype.byteStringNoSemicolon =function(){
     var retval = "";
     while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
-        if (next == '\0' || next == '\n' || next == ';' || next == ',') {
+        if (next == '' || next == '\n' || next == ';' || next == ',') {
             break;
         } else {
             this.consume(1);
@@ -2531,7 +2530,7 @@ LexerCore.prototype.byteStringNoWhiteSpace =function(){
     var retval = "";
     while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
-        if (next == '\0' || next == '\n' || next == ' ') {
+        if (next == '' || next == '\n' || next == ' ') {
             break;
         } else {
             this.consume(1);
@@ -2545,7 +2544,7 @@ LexerCore.prototype.byteStringNoSlash =function(){
     var retval = "";
     while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
-        if (next == '\0' || next == '\n' || next == '/') {
+        if (next == '' || next == '\n' || next == '/') {
             break;
         } else {
             this.consume(1);
@@ -2620,7 +2619,7 @@ LexerCore.prototype.getString =function(c){
     var retval = "";
     while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
-        if (next == '\0') {
+        if (next == '') {
            console.error(this.buffer + "LexerCore:getString(): unexpected EOL",this.ptr);
            throw "LexerCore:getString(): unexpected EOL";
         } else if (next == c) {
@@ -2629,7 +2628,7 @@ LexerCore.prototype.getString =function(c){
         } else if (next == '\\') {
             this.consume(1);
             var nextchar = this.lookAhead(0);
-            if (nextchar == '\0') {
+            if (nextchar == '') {
                 console.error(this.buffer + "LexerCore:getString(): unexpected EOL",this.ptr);
                 throw "LexerCore:getString(): unexpected EOL";
             } else {
@@ -2706,7 +2705,7 @@ LexerCore.prototype.put =function(table,name, value){
 function ParserCore() {
     this.classname="ParserCore";
     this.nesting_level=null;
-    this.lexer=new LexerCore();
+    this.lexer=null;
 }
 
 ParserCore.prototype.nameValue =function(separator){
@@ -3443,7 +3442,7 @@ SDPField.prototype.setFieldName =function(fieldName) {
  */
 SDPField.prototype.getTypeChar =function() {
     if (this.fieldName == null)
-        return '\0';
+        return '';
     else
         return this.fieldName.charAt(0);
 }/*
@@ -5543,7 +5542,7 @@ RepeatField.prototype.getOffsetArray =function() {
 RepeatField.prototype.setOffsetArray =function(offsets) {
     if(offsets instanceof Array) 
     {
-        for (vari = 0; i < this.offsets.length; i++) {
+        for (var i = 0; i < this.offsets.length; i++) {
             var typedTime = new TypedTime();
             typedTime.setTime(offsets[i]);
             this.addOffset(typedTime);
@@ -10419,7 +10418,7 @@ AddressImpl.prototype.removeDisplayName =function(){
 }
 
 AddressImpl.prototype.isSIPAddress =function(){
-    if(address instanceof SipUri)
+    if(this.address instanceof SipUri)
     {
         return true;
     }
@@ -14341,7 +14340,7 @@ ContentType.prototype.NAME="Content-Type";
 ContentType.prototype.SEMICOLON=";";
 
 ContentType.prototype.compareMediaRange =function(media){
-    var chaine1=(mediaRange.type + "/" + mediaRange.subtype).toLowerCase();
+    var chaine1=(this.mediaRange.type + "/" + this.mediaRange.subtype).toLowerCase();
     var chaine2=media.toLowerCase();
     var c=0;
     var length;
@@ -14553,7 +14552,7 @@ TimeStamp.prototype.hasDelay =function(){
 }
 
 TimeStamp.prototype.removeDelay =function(){
-    delay = -1;
+    this.delay = -1;
 }
 
 TimeStamp.prototype.setTimeStamp =function(timeStamp){
@@ -17778,7 +17777,7 @@ AddressParametersParser.prototype.parse =function(addressParametersHeader){
         addressParametersHeader.setAddress(addr);
         this.lexer.SPorHT();
         var la = this.lexer.lookAhead(0);
-        if (this.lexer.hasMoreChars() && la != '\0' && la != '\n' && this.lexer.startsId()) {
+        if (this.lexer.hasMoreChars() && la != '' && la != '\n' && this.lexer.startsId()) {
             ParametersParser.prototype.parseNameValueList.call(this,addressParametersHeader);
         } else {
             ParametersParser.prototype.parse.call(this,addressParametersHeader);
@@ -18433,7 +18432,7 @@ URLParser.prototype.qheader =function(){
         var la = this.lexer.lookAhead(0);
         if (la == '=') {
             break;
-        } else if (la == '\0') {
+        } else if (la == '') {
             console.error("URLParser:qheader(): EOL reached");
             throw "URLParser:qheader(): EOL reached";
         }
@@ -18639,7 +18638,7 @@ AddressParser.prototype.address =function(inclParams){
         {
             break;
         }
-        else if (la == '\0')
+        else if (la == '')
         {
            console.error("AddressParser:address(): unexpected EOL");
            throw "AddressParser:parse(): unexpected EOL";
@@ -19105,7 +19104,7 @@ ContactParser.prototype.parse =function(){
             this.lexer.match(',');
             this.lexer.SPorHT();
         } 
-        else if (la == '\n' || la == '\0')
+        else if (la == '\n' || la == '')
         {
             break;
         }
@@ -19118,6 +19117,37 @@ ContactParser.prototype.parse =function(){
     return retval;
 }
 
+ContactParser.prototype.nameValue =function(){
+    this.lexer.match(LexerCore.prototype.ID);
+    var name = this.lexer.getNextToken();
+    this.lexer.SPorHT();
+    try {
+        var quoted = false;
+        var la = this.lexer.lookAhead(0);
+        if (la == '=') {
+            this.lexer.consume(1);
+            this.lexer.SPorHT();
+            var str = null;
+            if (this.lexer.lookAhead(0) == '\"') {
+                str = this.lexer.quotedString();
+                quoted = true;
+            } else {
+                str = this.lexer.byteStringNoSemicolon();
+            }
+            var nv = new NameValue(name.getTokenValue().toLowerCase(), str);
+            if (quoted)
+            {
+                nv.setQuotedValue();
+            }
+            return nv;
+        } else {
+            return new NameValue(name.getTokenValue().toLowerCase(), null);
+        }
+    } catch (ex) {
+        console.error("ContactParser:nameValue(): catched exception:"+ex);
+        return new NameValue(name.getTokenValue(), null);
+    }
+}
 /*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
  * and individual contributors
@@ -19820,7 +19850,7 @@ UserAgentParser.prototype.parse =function(){
     }
 
     while (this.lexer.lookAhead(0) != '\n'
-        && this.lexer.lookAhead(0) != '\0') {
+        && this.lexer.lookAhead(0) != '') {
         if (this.lexer.lookAhead(0) == '(') {
             var comment = this.lexer.comment();
             userAgent.addProductToken('(' + comment + ')');
@@ -19983,8 +20013,7 @@ ServerParser.prototype.parse =function(){
        console.error("ServerParser:parse(): empty header");
        throw "ServerParser:parse():  empty header";
     }
-    tok = this.lexer.getRest().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
-    server.addProductToken(tok); 
+    server.addProductToken(this.lexer.getRest().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '')); 
     return server;
 }
 
@@ -26959,8 +26988,6 @@ SIPDialog.prototype.sendAck =function(request){
     //this.dialogDeleteTask = null;
     }
     this.ackSeen = true;  
-    var encodedSipMessage = request.encode();
-    console.info("SIP message sent: "+encodedSipMessage); 
 }
 
 SIPDialog.prototype.getRemoteTag =function(){

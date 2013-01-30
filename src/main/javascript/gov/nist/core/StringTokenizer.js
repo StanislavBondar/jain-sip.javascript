@@ -234,7 +234,7 @@ StringTokenizer.prototype.getNextToken =function(delim){
         {
             break;
         } 
-        else if (la == '\0') 
+        else if (la == '') 
         {
             console.error("StringTokenizer:getNextToken(): EOL reached");
             throw "StringTokenizer:getNextToken(): EOL reached";

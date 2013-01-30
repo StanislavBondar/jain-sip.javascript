@@ -56,30 +56,7 @@ ServerParser.prototype.parse =function(){
        console.error("ServerParser:parse(): empty header");
        throw "ServerParser:parse():  empty header";
     }
-    while (this.lexer.lookAhead(0) != '\n'
-        && this.lexer.lookAhead(0) != '\0') {
-        if (this.lexer.lookAhead(0) == '(') {
-            var comment = this.lexer.comment();
-            server.addProductToken('(' + comment + ')');
-        } else {
-            var tok;
-            var marker = 0;
-            try {
-                marker = this.lexer.markInputPosition();
-                tok = this.lexer.getString('/');
-                if (tok.charAt(tok.length() - 1) == '\n')
-                {
-                    tok = tok.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
-                }
-                server.addProductToken(tok);
-            } catch (ex) {
-                this.lexer.rewindInputPosition(marker);
-                tok = this.lexer.getRest().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
-                server.addProductToken(tok);
-                break;
-            }
-        }
-    }
+    server.addProductToken(this.lexer.getRest().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '')); 
     return server;
 }
 

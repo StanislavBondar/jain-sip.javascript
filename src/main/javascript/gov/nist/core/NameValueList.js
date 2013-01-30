@@ -148,11 +148,10 @@ NameValueList.prototype.equals =function(otherObject){
     }
     for (i=0;i<key.length;i++)
     {
-        k = key[i];
         var nv1 = new NameValue();
         var nv2 = new NameValue();
-        nv1 = this.getNameValue(k);
-        nv2 = other.getNameValue(k);
+        nv1 = this.getNameValue(key[i]);
+        nv2 = other.getNameValue(key[i]);
         if (nv2 == null)
         {
             return false;
@@ -264,7 +263,7 @@ NameValueList.prototype.getNames=function(){
     //if(logger!=undefined) logger.debug("NameValueList:getNames()");
     var key=new Array();
     var c=0;
-    for (i=0;i<this.hmap.length;i++)
+    for (var i=0;i<this.hmap.length;i++)
     {    
         key[c]=this.hmap[i][0];
         c++;
@@ -360,7 +359,7 @@ NameValueList.prototype.keySet=function(){
     //if(logger!=undefined) logger.debug("NameValueList:keySet()");
     var key=new Array();
     var c=0;
-    for (i=0;i<this.hmap.length;i++)
+    for (var i=0;i<this.hmap.length;i++)
     {
         key[c]=this.hmap[i][0];
         c++;
@@ -431,7 +430,7 @@ NameValueList.prototype.values=function(){
     //if(logger!=undefined) logger.debug("NameValueList:values()");
     var values=new Array();
     var c=0;
-    for (i=0;i<this.hmap.length;i++)
+    for (var i=0;i<this.hmap.length;i++)
     {
         values[c]=this.hmap[i][1];
         c++;

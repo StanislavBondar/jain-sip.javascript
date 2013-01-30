@@ -58,7 +58,7 @@ UserAgentParser.prototype.parse =function(){
     }
 
     while (this.lexer.lookAhead(0) != '\n'
-        && this.lexer.lookAhead(0) != '\0') {
+        && this.lexer.lookAhead(0) != '') {
         if (this.lexer.lookAhead(0) == '(') {
             var comment = this.lexer.comment();
             userAgent.addProductToken('(' + comment + ')');

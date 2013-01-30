@@ -269,7 +269,7 @@ AddressImpl.prototype.removeDisplayName =function(){
 
 AddressImpl.prototype.isSIPAddress =function(){
     if(logger!=undefined) logger.debug("AddressImpl:isSIPAddress()");
-    if(address instanceof SipUri)
+    if(this.address instanceof SipUri)
     {
         return true;
     }
