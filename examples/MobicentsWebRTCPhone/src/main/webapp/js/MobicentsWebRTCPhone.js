@@ -21,12 +21,75 @@
  */
 
 
-function MobicentsWebRTCPhone(sipWsUrl) {
-    console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): sipWsUrl="+sipWsUrl);
-    // SIP Stack config
-    this.sipWsUrl=sipWsUrl;
-    this.sipUserAgentName="MobicentsWebRTCPhone";
-    this.init();
+function MobicentsWebRTCPhone(configuration) {
+    console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): configuration.stunServer:"+configuration.stunServer);
+    console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): configuration.sipOutboundProxy:"+configuration.sipOutboundProxy);
+    console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): configuration.sipDomain:"+configuration.sipDomain);
+    console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): configuration.sipDisplayName:"+configuration.sipDisplayName);
+    console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): configuration.sipUserName:"+configuration.sipUserName);
+    console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): configuration.sipLogin:"+configuration.sipLogin);
+    console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): configuration.sipPassword: "+configuration.sipPassword);
+    console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): configuration.localAudioVideoMediaStream:"+configuration.localAudioVideoMediaStream);
+    console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): configuration.localAudioMediaStream:"+configuration.localAudioMediaStream);
+    console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): configuration.localVideoMediaStream:"+configuration.localVideoMediaStream);
+    console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): configuration.audioMediaFlag:"+configuration.audioMediaFlag);
+    console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone(): configuration.videoMediaFlag:"+configuration.videoMediaFlag);
+   
+    if(configuration.localAudioVideoMediaStream)
+    {
+        if(configuration.localAudioVideoMediaStream.getAudioTracks)
+        {
+            var audioMediaTracks  =  configuration.localAudioVideoMediaStream.getAudioTracks();
+            console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone():audioMediaTracks.length="+audioMediaTracks.length);
+            for(var i=0;i<audioMediaTracks.length;i++)
+            {
+                var audioTrack= audioMediaTracks[i];
+                audioTrack.enabled = configuration.audioMediaFlag;
+                console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone():audioTrack.kind="+audioTrack.kind);
+                console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone():audioTrack.id="+audioTrack.id); 
+                console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone():audioTrack.label="+audioTrack.label);
+                console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone():audioTrack.enabled="+audioTrack.enabled); 
+                console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone():audioTrack.readyState="+audioTrack.readyState); 
+            }
+        }
+        if(configuration.localAudioVideoMediaStream.getVideoTracks)
+        {
+            var videoMediaTracks  =  configuration.localAudioVideoMediaStream.getVideoTracks();
+            console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone():videoMediaTracks.length="+videoMediaTracks.length);
+            for(var i=0;i<videoMediaTracks.length;i++)
+            {
+                var videoTrack= videoMediaTracks[i];
+                videoTrack.enabled = configuration.videoMediaFlag;
+                console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone():videoTrack.kind="+videoTrack.kind);
+                console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone():videoTrack.id="+videoTrack.id); 
+                console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone():videoTrack.label="+videoTrack.label);
+                console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone():videoTrack.enabled="+videoTrack.enabled); 
+                console.debug("MobicentsWebRTCPhone:MobicentsWebRTCPhone():videoTrack.readyState="+videoTrack.readyState); 
+            }
+        }
+    }
+   
+    if(window.webkitRTCPeerConnection)
+    {
+        // Chrome user agent
+        RTCPeerConnection = webkitRTCPeerConnection;
+    }
+    else  if(window.mozRTCPeerConnection)
+    {
+        // Firefox user agent
+        RTCPeerConnection = mozRTCPeerConnection;
+    }
+    
+    if (typeof RTCPeerConnection == "undefined") {
+        modal_alert("RTCPeerConnection is not supported/enabled in this browser, cannot test!");
+    }
+    else
+    {
+        // SIP Stack config
+        this.configuration=configuration;
+        this.sipUserAgentName="MobicentsWebRTCPhone";
+        this.init();
+    }
 }
 
 // SIP listener heritage 
@@ -49,6 +112,7 @@ MobicentsWebRTCPhone.prototype.INVITING_407_STATE="INVITING_407_STATE";
 MobicentsWebRTCPhone.prototype.INVITING_ACCEPTED_STATE="INVITING_ACCEPTED_STATE";
 MobicentsWebRTCPhone.prototype.INVITING_LOCAL_HANGINGUP_STATE="INVITING_LOCAL_HANGINGUP_STATE";
 MobicentsWebRTCPhone.prototype.INVITING_LOCAL_HANGINGUP_407_STATE="INVITING_LOCAL_HANGINGUP_407_STATE";
+MobicentsWebRTCPhone.prototype.INVITING_CANCELLING_STATE="INVITING_CANCELLING_STATE";
 
 //  State of outgoing call peerConnectionState machine
 MobicentsWebRTCPhone.prototype.INVITED_INITIAL_STATE="INVITED_INITIAL_STATE";
@@ -57,11 +121,10 @@ MobicentsWebRTCPhone.prototype.INVITED_LOCAL_HANGINGUP_STATE="INVITED_LOCAL_HANG
 MobicentsWebRTCPhone.prototype.INVITED_LOCAL_HANGINGUP_407_STATE="INVITED_LOCAL_HANGINGUP_407_STATE";
 MobicentsWebRTCPhone.prototype.INVITED_HANGUP_STATE="INVITED_HANGUP_STATE";
 
+
 MobicentsWebRTCPhone.prototype.init =function(){
-    console.debug ("MobicentsWebRTCPhone:init()");  
-    
+    console.debug ("MobicentsWebRTCPhone:init()");   
     this.initGUI();
-    this.initSipAccount();
     this.initSipRegisterStateMachine();
     this.initSipInvitingStateMachine();
     this.initSipInvitedStateMachine();
@@ -77,16 +140,6 @@ MobicentsWebRTCPhone.prototype.initGUI=function(){
     hideByeButton();
 }
 
-MobicentsWebRTCPhone.prototype.initSipAccount=function(){
-    console.debug ("MobicentsWebRTCPhone:initSipAccount()");    
-    // SIP account config        
-    this.sipDomain=null;
-    this.sipDisplayName=null;
-    this.sipUserName=null;
-    this.sipLogin=null;
-    this.sipPassword=null;
-}
-
 MobicentsWebRTCPhone.prototype.initSipRegisterStateMachine=function(){
     console.debug ("MobicentsWebRTCPhone:initSipRegisterStateMachine()");  
     // SIP REGISTER machine 
@@ -97,25 +150,26 @@ MobicentsWebRTCPhone.prototype.initSipRegisterStateMachine=function(){
     this.refreshRegisterFlag=false;
     this.jainSipRegisterSentRequest=null;
     this.registeredFlag=false;
-    this.unregisterPendingFlag=false;
-    
+    this.unregisterPendingFlag=false;       
 }
+
 
 MobicentsWebRTCPhone.prototype.initSipInvitingStateMachine=function(){
     console.debug ("MobicentsWebRTCPhone:initSipInvitingStateMachine()");  
     // SIP ougoing call (INVITING) state machine 
     this.callee=null;
     this.invitingState=this.INVITING_INITIAL_STATE;
-    this.jainSipInvitingSentRequest=null;
+    this.jainSipInvitingRequest=null;
     this.jainSipInvitingDialog=null;
     this.jainSipInvitingTransaction=null;
 }
 
 MobicentsWebRTCPhone.prototype.initSipInvitedStateMachine=function(){
     console.debug ("MobicentsWebRTCPhone:initSipInvitedStateMachine()");  
-    // SIP ougoing call (INVITED) state machine 
+    // SIP incoming call (INVITED) state machine 
+    this.caller=null;
     this.invitedState=this.INVITED_INITIAL_STATE;
-    this.jainSipInvitedReceivedRequest=null;
+    this.jainSipInvitedRequest=null;
     this.jainSipInvitedDialog=null;
     this.jainSipInvitedTransaction=null;
 }
@@ -125,25 +179,21 @@ MobicentsWebRTCPhone.prototype.initJainSipStack=function(){
    
     // Create JAIN SIP main object
     this.sipFactory=new SipFactory();
-    this.sipStack=this.sipFactory.createSipStack(this.sipWsUrl,this.sipUserAgentName);
+    this.sipStack=this.sipFactory.createSipStack(this.configuration.sipOutboundProxy,this.sipUserAgentName);
     this.listeningPoint=this.sipStack.createListeningPoint();
     this.sipProvider=this.sipStack.createSipProvider(this.listeningPoint);
     this.sipProvider.addSipListener(this);
     this.headerFactory=this.sipFactory.createHeaderFactory();
     this.addressFactory=this.sipFactory.createAddressFactory();
     this.messageFactory=this.sipFactory.createMessageFactory(this.listeningPoint); 
+    this.jainSipContactHeader = this.listeningPoint.createContactHeader(this.configuration.sipUserName);
+    this.jainSipUserAgentHeader = this.headerFactory.createUserAgentHeader(this.listeningPoint.getUserAgent());
     this.sipStack.start();
 }
  
 MobicentsWebRTCPhone.prototype.initPeerConnectionStateMachine=function(){
     console.debug ("MobicentsWebRTCPhone:initPeerConnectionStateMachine()");     
     
-    // PeerConnection/Media call context
-    var stunServer=document.getElementById("stunServer").value;
-    if(stunServer!="")
-    {
-        this.peerConnectionStunServer = stunServer; 
-    }
     if(this.peerConnection)
     {
         console.debug ("MobicentsWebRTCPhone:initPeerConnectionStateMachine(): force peerConnection close");
@@ -152,7 +202,7 @@ MobicentsWebRTCPhone.prototype.initPeerConnectionStateMachine=function(){
         document.getElementById("remoteVideo").style.visibility = "hidden";
         this.peerConnection.close();
     }
-
+    
     this.peerConnection = null;
     this.peerConnectionMessage=null;
     this.peerConnectionActionNeeded = false;
@@ -161,10 +211,8 @@ MobicentsWebRTCPhone.prototype.initPeerConnectionStateMachine=function(){
     this.peerConnectionMoreIceComing = true;
     this.peerConnectionIceCandidateCount = 0;
     this.remoteAudioVideoMediaStream=null;
-    this.lastReceivedSdpOfferString=null;
 }
-  
-  
+   
 //SIPListener interface implementation
 MobicentsWebRTCPhone.prototype.processDialogTerminated =function(dialogTerminatedEvent){
     console.debug ("MobicentsWebRTCPhone:processDialogTerminated()");  
@@ -188,7 +236,6 @@ MobicentsWebRTCPhone.prototype.processTransactionTerminated =function(transactio
 MobicentsWebRTCPhone.prototype.processDisconnected =function(){   
     console.error("MobicentsWebRTCPhone:processDisconnected()"); 
     modal_alert("Disconnected with SIP server");
-
     show_desktop_notification("Disconnected with SIP server");
     this.initGUI();
 }
@@ -196,17 +243,14 @@ MobicentsWebRTCPhone.prototype.processDisconnected =function(){
 //SIPListener interface implementation
 MobicentsWebRTCPhone.prototype.processConnectionError =function(error){
     console.error("MobicentsWebRTCPhone:processConnectionError():error="+error); 
+    modal_alert("Connected with SIP server has failed");
+    this.initGUI();
 }
 
 //SIPListener interface implementation
 MobicentsWebRTCPhone.prototype.processConnected =function(){
     console.debug("MobicentsWebRTCPhone:processConnected()");
-    this.register(
-        document.getElementById("sipDomain").value,
-        document.getElementById("sipDisplayName").value,
-        document.getElementById("sipUserName").value,
-        document.getElementById("sipLogin").value,
-        document.getElementById("sipPassword").value);
+    this.register();
 }
 
 //SIPListener interface implementation
@@ -221,7 +265,7 @@ MobicentsWebRTCPhone.prototype.processResponse =function(responseEvent){
     else if(this.invitedState!=this.INVITED_INITIAL_STATE)  this.handleStateMachineInvitedResponseEvent(responseEvent);
     else
     {
-        console.debug("MobicentsWebRTCPhone:processResponse(): response ignored");      
+        console.warn("MobicentsWebRTCPhone:processResponse(): response ignored");      
     }
 }
 
@@ -230,18 +274,7 @@ MobicentsWebRTCPhone.prototype.processRequest =function(requestEvent){
     console.debug("MobicentsWebRTCPhone:processRequest()");
     var jainSipRequest=requestEvent.getRequest(); 
     var jainSipRequestMethod=jainSipRequest.getMethod();   
-    if((jainSipRequestMethod=="BYE")||(jainSipRequestMethod=="ACK")||(jainSipRequestMethod=="CANCEL"))
-    {
-        stopRinging();
-        // Subscequent request on ongoing dialog
-        if(this.invitingState!=this.INVITING_INITIAL_STATE) this.handleStateMachineInvitingRequestEvent(requestEvent); 
-        else if(this.invitedState!=this.INVITED_INITIAL_STATE)  this.handleStateMachineInvitedRequestEvent(requestEvent);
-        else
-        {
-            console.debug("MobicentsWebRTCPhone:processResponse(): request ignored");      
-        }
-    }
-    else if(jainSipRequestMethod=="INVITE")
+    if(jainSipRequestMethod=="INVITE")
     {
         // Incoming call 
         if(this.invitingState!=this.INVITING_INITIAL_STATE)
@@ -266,41 +299,40 @@ MobicentsWebRTCPhone.prototype.processRequest =function(requestEvent){
             this.handleStateMachineInvitedRequestEvent(requestEvent);
         }
     }
-    else
+    else  if((jainSipRequestMethod=="BYE")||(jainSipRequestMethod=="ACK"))
     {
-        console.debug("MobicentsWebRTCPhone:processResponse(): request ignored");      
+        // Subscequent request on ongoing dialog
+        if(this.invitingState!=this.INVITING_INITIAL_STATE) this.handleStateMachineInvitingRequestEvent(requestEvent); 
+        else if(this.invitedState!=this.INVITED_INITIAL_STATE)  this.handleStateMachineInvitedRequestEvent(requestEvent);
+        else
+        {
+            console.warn("MobicentsWebRTCPhone:processRequest(): request ignored");      
+        }
+    }
+    else if(jainSipRequestMethod=="CANCEL")
+    {
+        // Subscequent request on ongoing dialog
+        this.handleStateMachineInvitedRequestEvent(requestEvent);
+    }
+    else 
+    {
+        console.warn("MobicentsWebRTCPhone:processResponse(): request ignored");      
     }
 }
 
-
-
 MobicentsWebRTCPhone.prototype.register =function(sipDomain, sipDisplayName, sipUserName, sipLogin, sipPassword){
-    console.debug("MobicentsWebRTCPhone:register(): sipDomain="+sipDomain);
-    console.debug("MobicentsWebRTCPhone:register(): sipDisplayName="+sipDisplayName);
-    console.debug("MobicentsWebRTCPhone:register(): sipUserName="+sipUserName);
-    console.debug("MobicentsWebRTCPhone:register(): sipLogin="+sipLogin);
-    console.debug("MobicentsWebRTCPhone:register(): sipPassword="+sipPassword);
+    
     if(this.registerState==this.UNREGISTERED_STATE)
     {
         try
-        {
-            // Save SIP account profile
-            this.sipDomain=sipDomain;
-            this.sipDisplayName=sipDisplayName;
-            this.sipUserName=sipUserName;
-            this.sipLogin=sipLogin;
-            this.sipPassword=sipPassword;
-    
-            this.jainSipContactHeader = this.listeningPoint.createContactHeader(sipUserName);
-            this.jainSipUserAgentHeader = this.headerFactory.createUserAgentHeader(this.listeningPoint.getUserAgent());
-            
+        {   
             // Send SIP REGISTER request
-            var fromSipUriString=this.sipUserName+"@"+this.sipDomain;            
+            var fromSipUriString=this.configuration.sipUserName+"@"+this.configuration.sipDomain;            
             var jainSipCseqHeader=this.headerFactory.createCSeqHeader(1,"REGISTER");
             var jainSipCallIdHeader=this.headerFactory.createCallIdHeader();
             var jainSipExpiresHeader=this.headerFactory.createExpiresHeader(3600);
             var jainSipMaxForwardHeader=this.headerFactory.createMaxForwardsHeader(70);
-            var jainSipRequestUri=this.addressFactory.createSipURI_user_host(null,this.sipDomain);
+            var jainSipRequestUri=this.addressFactory.createSipURI_user_host(null,this.configuration.sipDomain);
             var jainSipAllowListHeader=this.headerFactory.createHeaders("Allow: INVITE,UPDATE,ACK,CANCEL,BYE,NOTIFY,OPTIONS,MESSAGE,REFER");
             var jainSipFromUri=this.addressFactory.createSipURI_user_host(null,fromSipUriString);
             var jainSipFromAddress=this.addressFactory.createAddress_name_uri(null,jainSipFromUri);
@@ -325,7 +357,7 @@ MobicentsWebRTCPhone.prototype.register =function(sipDomain, sipDisplayName, sip
             this.initSipRegisterStateMachine();
             console.error("MobicentsWebRTCPhone:register(): catched exception:"+exception);
             modal_alert("MobicentsWebRTCPhone:register(): catched exception:"+exception);  
-        }
+        }     
     }
     else
     {
@@ -335,9 +367,8 @@ MobicentsWebRTCPhone.prototype.register =function(sipDomain, sipDisplayName, sip
 
 
 MobicentsWebRTCPhone.prototype.keepAliveRegister =function(){
-    console.debug("MobicentsWebRTCPhone:keepAliveRegister()");
-    
-    if(this.registerState==this.REGISTERED_STATE)
+    console.debug("MobicentsWebRTCPhone:keepAliveRegister()");    
+    if( this.registeredFlag==true)
     {
         this.refreshRegisterTimer=null;
         this.registerState=this.REGISTER_REFRESHING_STATE;
@@ -350,7 +381,7 @@ MobicentsWebRTCPhone.prototype.keepAliveRegister =function(){
     }
     else
     {
-        throw "MobicentsWebRTCPhone:keepAliveRegister(): bad state, action keep alive register unauthorized";            
+        console.warn("MobicentsWebRTCPhone:keepAliveRegister(): bad state, action keep alive register unauthorized");            
     }
 }
 
@@ -374,6 +405,7 @@ MobicentsWebRTCPhone.prototype.unRegister =function(){
     }
     else if(this.registerState==this.UNREGISTERED_STATE)
     {
+        alert("MobicentsWebRTCPhone:unRegister(): bad state, action keep alive register unauthorized"); 
         console.warn("MobicentsWebRTCPhone:unRegister(): bad state, action keep alive register unauthorized");            
     }
     else
@@ -387,12 +419,12 @@ MobicentsWebRTCPhone.prototype.handleStateMachineRegisterResponseEvent =function
     var jainSipResponse=responseEvent.getResponse(); 
     var statusCode = parseInt(jainSipResponse.getStatusCode()); 
     if(this.registerState==this.UNREGISTERED_STATE)
-    {
+    {   
         console.error("MobicentsWebRTCPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");  
     }
     else if((this.registerState==this.REGISTERING_STATE) || (this.registerState==this.REGISTER_REFRESHING_STATE))
     {   
-        if(statusCode< 200)
+        if(statusCode < 200)
         {
             console.debug("MobicentsWebRTCPhone:handleStateMachineRegisterResponseEvent(): 1XX response ignored"); 
         }
@@ -402,7 +434,7 @@ MobicentsWebRTCPhone.prototype.handleStateMachineRegisterResponseEvent =function
             this.jainSipRegisterSentRequest.removeHeader("Authorization");
             var num=new Number(this.jainSipRegisterSentRequest.getCSeq().getSeqNumber());
             this.jainSipRegisterSentRequest.getCSeq().setSeqNumber(num+1);
-            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.sipPassword,this.sipLogin);
+            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.configuration.sipPassword,this.configuration.sipLogin);
             this.messageFactory.addHeader(this.jainSipRegisterSentRequest, jainSipAuthorizationHeader); 
             this.jainSipRegisterSentRequest = this.messageFactory.setNewViaHeader(this.jainSipRegisterSentRequest);
             var jainSipClientTransaction = this.sipProvider.getNewClientTransaction(this.jainSipRegisterSentRequest);
@@ -418,7 +450,7 @@ MobicentsWebRTCPhone.prototype.handleStateMachineRegisterResponseEvent =function
                 showCallButton();
                 showUnRegisterButton();
                 hideRegisterButton();
-                hideByeButton();		
+                hideByeButton();
             }
             
             if(this.unregisterPendingFlag==true) {
@@ -434,7 +466,10 @@ MobicentsWebRTCPhone.prototype.handleStateMachineRegisterResponseEvent =function
         }
         else
         {
-            modal_alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine())    
+            console.error("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+            modal_alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine()) ;
+            this.initGUI();
+            this.initSipRegisterStateMachine();        
         }
     }                     
     else if(this.registerState==this.REGISTERING_401_STATE)
@@ -469,8 +504,10 @@ MobicentsWebRTCPhone.prototype.handleStateMachineRegisterResponseEvent =function
         }
         else
         {
-            modal_alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
-            this.init();
+            console.error("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString()); 
+            modal_alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());  
+            this.initGUI();
+            this.initSipRegisterStateMachine();
         } 
     }
     else if(this.registerState==this.REGISTERED_STATE)
@@ -489,7 +526,7 @@ MobicentsWebRTCPhone.prototype.handleStateMachineRegisterResponseEvent =function
             this.jainSipRegisterSentRequest.removeHeader("Authorization");
             var num=new Number(this.jainSipRegisterSentRequest.getCSeq().getSeqNumber());
             this.jainSipRegisterSentRequest.getCSeq().setSeqNumber(num+1);
-            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.sipPassword,this.sipLogin);
+            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.configuration.sipPassword,this.configuration.sipLogin);
             this.messageFactory.addHeader(this.jainSipRegisterSentRequest, jainSipAuthorizationHeader); 
             this.jainSipRegisterSentRequest = this.messageFactory.setNewViaHeader(this.jainSipRegisterSentRequest);
             var jainSipClientTransaction = this.sipProvider.getNewClientTransaction(this.jainSipRegisterSentRequest);
@@ -502,16 +539,16 @@ MobicentsWebRTCPhone.prototype.handleStateMachineRegisterResponseEvent =function
             if(this.registeredFlag==true)
             {
                 console.debug("MobicentsWebRTCPhone:handleStateMachineRegisterResponseEvent(): this.registeredFlag=false"); 
-                hideCallButton();
-                hideUnRegisterButton();
-                showRegisterButton();
-                hideByeButton();
+                this.initGUI();
+                this.initSipRegisterStateMachine();
             }
         }
         else
         {
-            modal_alert("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());  
-            this.init();
+            console.error("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString()); 
+            modal_alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());  
+            this.initGUI();
+            this.initSipRegisterStateMachine();
         }
     }
     else if(this.registerState==this.UNREGISTERING_401_STATE)
@@ -527,16 +564,15 @@ MobicentsWebRTCPhone.prototype.handleStateMachineRegisterResponseEvent =function
             {
                 console.debug("MobicentsWebRTCPhone:handleStateMachineRegisterResponseEvent(): this.registeredFlag=false"); 
                 this.registeredFlag=false;
-                hideCallButton();
-                hideUnRegisterButton();
-                showRegisterButton();
-                hideByeButton();
+                this.initGUI();
+                this.initSipRegisterStateMachine();;
             }
         }
         else
         {
-            modal_alert("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
-            this.init();
+            console.error("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());  
+            this.initGUI();
+            this.initSipRegisterStateMachine();
         }
     }
     else if(this.registerState==this.UNREGISTERED_STATE)
@@ -545,13 +581,12 @@ MobicentsWebRTCPhone.prototype.handleStateMachineRegisterResponseEvent =function
     }
     else
     {
-        console.error("MobicentsWebRTCPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");    
+        console.error("MobicentsWebRTCPhone:handleStateMachineRegisterResponseEvent(): bad state, SIP response ignored");  
     }
-}
-
-
+}    
+    
+   
 MobicentsWebRTCPhone.prototype.call =function(to){
-    console.debug("MobicentsWebRTCPhone:call():to: "+to);
     if(this.registeredFlag==true)
     {
         if(this.invitingState==this.INVITING_INITIAL_STATE)
@@ -560,14 +595,39 @@ MobicentsWebRTCPhone.prototype.call =function(to){
             {
                 this.callee=to;
                 hideCallButton();
+                showByeButton();
+                hideRegisterButton();
+                hideUnRegisterButton();
                 this.createPeerConnection();
-                this.peerConnection.addStream(this.localAudioVideoMediaStream);
+                if(this.configuration.localAudioVideoMediaStream)
+                {
+                    this.peerConnection.addStream(this.configuration.localAudioVideoMediaStream);
+                }
+                if(this.configuration.localAudioMediaStream && this.configuration.audioMediaFlag) 
+                    this.peerConnection.addStream(this.configuration.localAudioMediaStream);
+                if(this.configuration.localVideoMediaStream && this.configuration.videoMediaFlag) 
+                    this.peerConnection.addStream(this.configuration.localVideoMediaStream);
                 var application=this;
-                this.peerConnection.createOffer(function(offer) {
-                    application.onPeerConnectionCreateOfferSuccessCallback(offer);
-                }, function(error) {
-                    application.onPeerConnectionCreateOfferErrorCallback(error);
-                });
+                if(window.webkitRTCPeerConnection)
+                {
+                    this.peerConnection.createOffer(function(offer) {
+                        application.onPeerConnectionCreateOfferSuccessCallback(offer);
+                    }, function(error) {
+                        application.onPeerConnectionCreateOfferErrorCallback(error);
+                    }); 
+                }
+                else if(window.mozRTCPeerConnection)
+                {
+                    this.peerConnection.createOffer(function(offer) {
+                        application.onPeerConnectionCreateOfferSuccessCallback(offer);
+                    }, function(error) {
+                        application.onPeerConnectionCreateOfferErrorCallback(error);
+                    },{
+                        "mandatory": {
+                            "MozDontOfferDataChannel": true
+                        }
+                    }); 
+                }  
             }
             catch(exception)
             {
@@ -575,25 +635,220 @@ MobicentsWebRTCPhone.prototype.call =function(to){
                 modal_alert("MobicentsWebRTCPhone:call(): catched exception:"+exception);  
                 this.initPeerConnectionStateMachine();
                 this.initSipInvitingStateMachine();
-                showCallButton(); 
-                stopRinging();
+                showCallButton();
             }
         }
         else
         {
-            modal_alert("MobicentsWebRTCPhone:call(): bad state, action call unauthorized");    
+            console.error("MobicentsWebRTCPhone:call(): bad state, action call unauthorized");
+            modal_alert("MobicentsWebRTCPhone:call(): catched exception:"+exception);  
+        }
+    }
+}
+
+MobicentsWebRTCPhone.prototype.cancelCall =function(){
+    console.debug("MobicentsWebRTCPhone:cancelCall()");
+    if(this.invitingState==this.INITIAL_INVITING_STATE)
+    {
+        this.initPeerConnectionStateMachine();
+        this.initSipInvitingStateMachine();
+        
+        stopRinging();
+        hideByeButton();
+        showCallButton(); 
+    }
+    if(this.invitingState==this.INVITING_STATE || this.invitingState==this.INVITING_407_STATE)
+    {
+        try
+        {
+            this.jainSipInvitingCancelRequest = this.jainSipInvitingTransaction.createCancel();
+            this.jainSipInvitingCancelRequest.addHeader(this.jainSipContactHeader);
+            this.jainSipInvitingCancelRequest.addHeader(this.jainSipUserAgentHeader);
+            this.jainSipInvitingCancelTransaction = this.sipProvider.getNewClientTransaction(this.jainSipInvitingCancelRequest);
+            this.jainSipInvitingCancelTransaction.sendRequest();
+            this.invitingState=this.INVITING_CANCELLING_STATE;
+        }
+        catch(exception)
+        {
+            console.error("MobicentsWebRTCPhone:cancelCall(): catched exception:"+exception);
+         
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitingStateMachine();
+            
+            stopRinging();
+            hideByeButton();
+            showCallButton();
         }
     }
     else
     {
-        modal_alert("MobicentsWebRTCPhone:call(): unregistered, action call unauthorized");           
+        modal_alert("MobicentsWebRTCPhone:cancelCall(): bad state, action call unauthorized");     
     }
 }
 
+MobicentsWebRTCPhone.prototype.acceptCall =function(){
+    console.debug("MobicentsWebRTCPhone:acceptCall()");
+   
+    if(this.invitedState==this.INVITED_INITIAL_STATE)
+    {
+        // Accepted 
+        try
+        {
+            stopRinging();
+            this.createPeerConnection();
+            if(this.configuration.localAudioVideoMediaStream)
+                this.peerConnection.addStream(this.configuration.localAudioVideoMediaStream);
+            if(this.configuration.localAudioMediaStream && this.configuration.audioMediaFlag) 
+                this.peerConnection.addStream(this.configuration.localAudioMediaStream);
+            if(this.configuration.localVideoMediaStream && this.configuration.videoMediaFlag) 
+                this.peerConnection.addStream(this.configuration.localVideoMediaStream);
+            var sdpOfferString = this.jainSipInvitedRequest.getContent();
+            if(window.webkitRTCPeerConnection)
+            {
+                var sdpOffer = new RTCSessionDescription({
+                    type: 'offer',
+                    sdp: sdpOfferString
+                });
+            }
+            else if(window.mozRTCPeerConnection)
+            {
+                var sdpOffer = {
+                    type: 'offer',
+                    sdp: sdpOfferString
+                };
+            }
+           
+            var application=this;
+            this.peerConnectionState = 'offer-received';
+            this.peerConnection.setRemoteDescription(sdpOffer, function() {
+                application.onPeerConnectionSetRemoteDescriptionSuccessCallback();
+            }, function(error) {
+                application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
+            });
+        }
+        catch(exception)
+        {
+            // Temporarily Unavailable
+            var jainSipResponse480=this.jainSipInvitedRequest.createResponse(480,"Temporarily Unavailable");
+            jainSipResponse480.addHeader(this.jainSipContactHeader);
+            jainSipResponse480.addHeader(this.jainSipUserAgentHeader);
+            this.jainSipInvitedTransaction.sendResponse(jainSipResponse480);
+            stopRinging();
+            hideByeButton();
+            hideRegisterButton();
+            showCallButton();
+            showUnRegisterButton(); 
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitedStateMachine();
+            modal_alert("MobicentsWebRTCPhone:acceptCall(): catched exception:"+exception);
+            console.error("MobicentsWebRTCPhone:acceptCall(): catched exception:"+exception);
+        }
+    } 
+    else
+    {
+        modal_alert("MobicentsWebRTCPhone:acceptCall(): bad state, action call unauthorized");   
+        console.error("MobicentsWebRTCPhone:acceptCall(): bad state, action call unauthorized");   
+    }
+}
+
+
+MobicentsWebRTCPhone.prototype.rejectCall =function(){
+    console.debug("MobicentsWebRTCPhone:rejectCall()");
+   
+    if(this.invitedState==this.INVITED_INITIAL_STATE)
+    {
+        // Rejected  Temporarily Unavailable
+        var jainSipResponse480= this.jainSipInvitedRequest.createResponse(480,"Temporarily Unavailable");
+        jainSipResponse480.addHeader(this.jainSipContactHeader);
+        jainSipResponse480.addHeader(this.jainSipUserAgentHeader);
+        this.jainSipInvitedTransaction.sendResponse(jainSipResponse480);
+        
+        stopRinging();
+        hideByeButton();
+        hideRegisterButton();
+        showUnRegisterButton();
+        showCallButton();
+        showUnRegisterButton(); 
+        this.initPeerConnectionStateMachine();
+        this.initSipInvitedStateMachine(); 
+    }
+    else
+    {
+        modal_alert("MobicentsWebRTCPhone:rejectCall(): bad state, action call unauthorized"); 
+        console.error("MobicentsWebRTCPhone:rejectCall(): bad state, action call unauthorized");
+    }
+}
+
+MobicentsWebRTCPhone.prototype.byeCall =function(){
+    console.debug("MobicentsWebRTCPhone:byeCall()");
+   
+    if(this.invitingState==this.INVITING_ACCEPTED_STATE)
+    {
+        try
+        {   
+            var jainSipByeRequest=this.jainSipInvitingRequest.createBYERequest(true);
+            jainSipByeRequest.removeHeader("Contact");
+            jainSipByeRequest.removeHeader("User-Agent");
+            jainSipByeRequest.addHeader(this.jainSipContactHeader);
+            jainSipByeRequest.addHeader(this.jainSipUserAgentHeader);
+            var clientTransaction  = this.sipProvider.getNewClientTransaction(jainSipByeRequest);
+            this.jainSipInvitingDialog.sendRequest(clientTransaction);
+            this.invitingState=this.INVITING_LOCAL_HANGINGUP_STATE;
+        }
+        catch(exception)
+        {
+            console.error("MobicentsWebRTCPhone:byeCall(): catched exception:"+exception);
+            modal_alert("MobicentsWebRTCPhone:byeCall(): catched exception:"+exception); 
+            
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitingStateMachine();
+            
+            stopRinging();
+            hideByeButton();
+            hideRegisterButton();
+            showUnRegisterButton();
+            showCallButton();
+        }
+    }
+    else if(this.invitedState==this.INVITED_ACCEPTED_STATE)
+    {
+        try
+        {
+            var jainSipByeRequest=this.jainSipInvitedRequest.createBYERequest(true);
+            jainSipByeRequest.removeHeader("Contact");
+            jainSipByeRequest.removeHeader("User-Agent");
+            jainSipByeRequest.addHeader(this.jainSipContactHeader);
+            jainSipByeRequest.addHeader(this.jainSipUserAgentHeader);
+            var clientTransaction  = this.sipProvider.getNewClientTransaction(jainSipByeRequest);
+            this.jainSipInvitedDialog.sendRequest(clientTransaction);
+            this.invitedState=this.INVITED_LOCAL_HANGINGUP_STATE;
+        }
+        catch(exception)
+        {
+            console.error("MobicentsWebRTCPhone:byeCall(): catched exception:"+exception);
+            modal_alert("MobicentsWebRTCPhone:byeCall(): catched exception:"+exception); 
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitedStateMachine();
+            
+            stopRinging();
+            hideByeButton();
+            hideRegisterButton();
+            showUnRegisterButton();
+            showCallButton();
+        }
+    }
+    else
+    {
+        this.cancelCall();     
+    }
+}
+
+
 MobicentsWebRTCPhone.prototype.sendInviteSipRequest =function(sdpOffer){
     console.debug("MobicentsWebRTCPhone:sendInviteSipRequest()"); 
+    console.debug("MobicentsWebRTCPhone:sendInviteSipRequest()"); 
     try{
-        var fromSipUriString=this.sipUserName+"@"+this.sipDomain;
+        var fromSipUriString=this.configuration.sipUserName+"@"+this.configuration.sipDomain;
         var toSipUriString= this.callee;
         var random=new Date();       
         var jainSipCseqHeader=this.headerFactory.createCSeqHeader(1,"INVITE");
@@ -609,7 +864,7 @@ MobicentsWebRTCPhone.prototype.sendInviteSipRequest =function(sdpOffer){
         var jainSipToAddress=this.addressFactory.createAddress_name_uri(null,jainSiptoUri);
         var jainSipToHeader=this.headerFactory.createToHeader(jainSipToAddress, null);           
         var jainSipContentTypeHeader=this.headerFactory.createContentTypeHeader("application","sdp");
-        this.jainSipInvitingSentRequest=this.messageFactory.createRequest(jainSipRequestUri,"INVITE",
+        this.jainSipInvitingRequest=this.messageFactory.createRequest(jainSipRequestUri,"INVITE",
             jainSipCallIdHeader,
             jainSipCseqHeader,
             jainSipFromHeader,
@@ -618,18 +873,17 @@ MobicentsWebRTCPhone.prototype.sendInviteSipRequest =function(sdpOffer){
             jainSipContentTypeHeader,
             sdpOffer); 
                       
-        this.messageFactory.addHeader( this.jainSipInvitingSentRequest, this.jainSipUserAgentHeader);
-        this.messageFactory.addHeader( this.jainSipInvitingSentRequest, jainSipAllowListHeader);
-        this.messageFactory.addHeader( this.jainSipInvitingSentRequest, this.jainSipContactHeader);   
+        this.messageFactory.addHeader( this.jainSipInvitingRequest, this.jainSipUserAgentHeader);
+        this.messageFactory.addHeader( this.jainSipInvitingRequest, jainSipAllowListHeader);
+        this.messageFactory.addHeader( this.jainSipInvitingRequest, this.jainSipContactHeader);   
         this.invitingState=this.INVITING_STATE;
-        this.jainSipInvitingTransaction = this.sipProvider.getNewClientTransaction(this.jainSipInvitingSentRequest);
-        this.jainSipInvitingSentRequest.setTransaction(this.jainSipInvitingTransaction);
+        this.jainSipInvitingTransaction = this.sipProvider.getNewClientTransaction(this.jainSipInvitingRequest);
+        this.jainSipInvitingRequest.setTransaction(this.jainSipInvitingTransaction);
         this.jainSipInvitingTransaction.sendRequest();
     }
     catch(exception)
     {
         console.error("MobicentsWebRTCPhone:sendInviteSipRequest(): catched exception:"+exception);
-        throw("MobicentsWebRTCPhone:sendInviteSipRequest(): catched exception:"+exception);  
         this.initPeerConnectionStateMachine();
         this.initSipInvitingStateMachine();
         showCallButton();   
@@ -640,9 +894,9 @@ MobicentsWebRTCPhone.prototype.send200OKSipResponse =function(sdpOffer){
     console.debug("MobicentsWebRTCPhone:send200OKSipResponse()"); 
     try{
         this.invitedState=this.INVITED_ACCEPTED_STATE;
-        var jainSip200OKResponse=this.jainSipInvitedReceivedRequest.createResponse(200, "OK");
+        var jainSip200OKResponse=this.jainSipInvitedRequest.createResponse(200, "OK");
         jainSip200OKResponse.addHeader(this.jainSipContactHeader);
-        jainSip200OKResponse.addHeader(this.jainSipUserAgentHeader);  
+        jainSip200OKResponse.addHeader(this.jainSipUserAgentHeader);
         jainSip200OKResponse.setMessageContent("application","sdp",sdpOffer);
         this.jainSipInvitedTransaction.sendResponse(jainSip200OKResponse);
         showByeButton();
@@ -654,74 +908,19 @@ MobicentsWebRTCPhone.prototype.send200OKSipResponse =function(sdpOffer){
         this.initPeerConnectionStateMachine();
         this.initSipInvitingStateMachine();
         showCallButton();
-        console.error("MobicentsWebRTCPhone:send200OKSipResponse(): catched exception:"+exception);
-        throw("MobicentsWebRTCPhone:send200OKSipResponse(): catched exception:"+exception);  
-   
+        console.error("MobicentsWebRTCPhone:send200OKSipResponse(): catched exception:"+exception); 
     }
 }
 
-
-
-MobicentsWebRTCPhone.prototype.bye =function(){
-    console.debug("MobicentsWebRTCPhone:bye()");
-   
-    if(this.invitingState==this.INVITING_ACCEPTED_STATE)
-    {
-        try
-        {
-            var jainSipByeRequest=this.jainSipInvitingDialog.createRequest("BYE");
-            jainSipByeRequest.addHeader(this.jainSipContactHeader);
-            jainSipByeRequest.addHeader(this.jainSipUserAgentHeader);
-            var clientTransaction  = this.sipProvider.getNewClientTransaction(jainSipByeRequest);
-            this.jainSipInvitingDialog.sendRequest(clientTransaction);
-            this.invitingState=this.INVITING_LOCAL_HANGINGUP_STATE;
-        }
-        catch(exception)
-        {
-            console.error("MobicentsWebRTCPhone:bye(): catched exception:"+exception);
-            modal_alert("MobicentsWebRTCPhone:bye(): catched exception:"+exception); 
-            this.initPeerConnectionStateMachine();
-            this.initSipInvitingStateMachine();
-            hideByeButton();
-            showCallButton();
-        }
-    }
-    else if(this.invitedState==this.INVITED_ACCEPTED_STATE)
-    {
-        try
-        {
-            var jainSipByeRequest=this.jainSipInvitedDialog.createRequest("BYE");
-            jainSipByeRequest.addHeader(this.jainSipContactHeader);
-            jainSipByeRequest.addHeader(this.jainSipUserAgentHeader);
-            var clientTransaction  = this.sipProvider.getNewClientTransaction(jainSipByeRequest);
-            this.jainSipInvitedDialog.sendRequest(clientTransaction);
-            this.invitedState=this.INVITED_LOCAL_HANGINGUP_STATE;
-        }
-        catch(exception)
-        {
-            console.error("MobicentsWebRTCPhone:bye(): catched exception:"+exception);
-            modal_alert("MobicentsWebRTCPhone:bye(): catched exception:"+exception); 
-            this.initPeerConnectionStateMachine();
-            this.initSipInvitedStateMachine();
-            hideByeButton();
-            showCallButton();
-            showUnRegisterButton();
-        }
-    }
-    else
-    {
-        modal_alert("MobicentsWebRTCPhone:bye(): bad state, action call unauthorized");     
-    }
-   
-}
 
 MobicentsWebRTCPhone.prototype.handleStateMachineInvitingResponseEvent =function(responseEvent){
     console.debug("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): this.invitingState="+this.invitingState);
+    
     var jainSipResponse=responseEvent.getResponse(); 
     var statusCode = parseInt(jainSipResponse.getStatusCode()); 
     if(this.invitingState==this.INVITING_STATE)
     {
-        if(statusCode < 200)
+        if(statusCode< 200)
         {
             startRinging();
             console.debug("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): 1XX response ignored"); 
@@ -729,49 +928,112 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitingResponseEvent =function
         else if(statusCode==407)
         {
             this.invitingState=this.INVITING_407_STATE;
-            var num=new Number(this.jainSipInvitingSentRequest.getCSeq().getSeqNumber());
-            this.jainSipInvitingSentRequest.getCSeq().setSeqNumber(num+1);
-            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipInvitingSentRequest,this.sipPassword,this.sipLogin);
-            this.messageFactory.addHeader(this.jainSipInvitingSentRequest, jainSipAuthorizationHeader); 
-            this.jainSipInvitingSentRequest = this.messageFactory.setNewViaHeader(this.jainSipInvitingSentRequest);
-            var jainSipClientTransaction = this.sipProvider.getNewClientTransaction(this.jainSipInvitingSentRequest);
-            this.jainSipInvitingSentRequest.setTransaction(jainSipClientTransaction);
-            jainSipClientTransaction.sendRequest();
+            var num=new Number(this.jainSipInvitingRequest.getCSeq().getSeqNumber());
+            this.jainSipInvitingRequest.getCSeq().setSeqNumber(num+1);
+            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipInvitingRequest,this.configuration.sipPassword,this.configuration.sipLogin);
+            this.messageFactory.addHeader(this.jainSipInvitingRequest, jainSipAuthorizationHeader); 
+            this.jainSipInvitingRequest = this.messageFactory.setNewViaHeader(this.jainSipInvitingRequest);
+            this.jainSipInvitingTransaction = this.sipProvider.getNewClientTransaction(this.jainSipInvitingRequest);
+            this.jainSipInvitingRequest.setTransaction(this.jainSipInvitingTransaction);
+            this.jainSipInvitingTransaction.sendRequest();
         }
         else if(statusCode==200)
         {
-            stopRinging();
-            this.jainSipInvitingDialog=responseEvent.getOriginalTransaction().getDialog();
+            this.jainSipInvitingDialog=responseEvent.getOriginalTransaction().getDialog();    
             this.invitingState=this.INVITING_ACCEPTED_STATE;
+            
+            stopRinging();
             showByeButton();
             hideUnRegisterButton();
+            hideRegisterButton();
+            hideCallButton();
+            
             this.jainSipInvitingDialog.setRemoteTarget(jainSipResponse.getHeader("Contact"));
-            var jainSipMessageACK = responseEvent.getOriginalTransaction().createAck();
+            var jainSipMessageACK = this.jainSipInvitingTransaction.createAck();
+            jainSipMessageACK.addHeader(this.jainSipContactHeader);
+            jainSipMessageACK.addHeader(this.jainSipUserAgentHeader);
             this.jainSipInvitingDialog.sendAck(jainSipMessageACK);
+            
             var sdpAnswerString = jainSipResponse.getContent();
-            var sdpAnswer = new RTCSessionDescription({
-                type: 'answer',
-                sdp: sdpAnswerString
-            });
+            if(window.webkitRTCPeerConnection)
+            {
+                var sdpAnswer = new RTCSessionDescription({
+                    type: 'answer',
+                    sdp: sdpAnswerString
+                });
+            }
+            else if(window.mozRTCPeerConnection)
+            {
+                var sdpAnswer = {
+                    type: 'answer',
+                    sdp: sdpAnswerString
+                };
+            }
+           
             var application=this;
             this.peerConnectionState = 'answer-received';
             this.peerConnection.setRemoteDescription(sdpAnswer, function() {
                 application.onPeerConnectionSetRemoteDescriptionSuccessCallback();
             }, function(error) {
                 application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
-            });  
+            });        
+        } 
+        else if(statusCode==480)
+        {
+            modal_alert(this.callee+" is busy, call rejected"); 
+            
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitingStateMachine();
+            
+            stopRinging();
+            hideByeButton();
+            showUnRegisterButton();
+            hideRegisterButton();
+            showCallButton();
         }
         else
         {
-            modal_alert("SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine()) 
+            
+            console.error("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString())   
+            modal_alert("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString()) 
+            
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();
-            showCallButton();
+            
+            stopRinging();
             hideByeButton();
             showUnRegisterButton();
-            stopRinging();
+            hideRegisterButton();
+            showCallButton();
         }     
-    } 
+    } else if(this.invitingState==this.INVITING_CANCELLING_STATE)
+{
+        if(statusCode==200)
+        {
+            stopRinging();
+            hideByeButton();
+            showUnRegisterButton();
+            hideRegisterButton();
+            showCallButton();
+            
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitingStateMachine();
+        }
+        else
+        {
+            console.error("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+            modal_alert("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+            
+            stopRinging();
+            hideByeButton();
+            showUnRegisterButton();
+            hideRegisterButton();
+            showCallButton();
+            
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitingStateMachine();
+        }    
+    }
     else if(this.invitingState==this.INVITING_407_STATE)
     {
         if(statusCode< 200)
@@ -779,45 +1041,67 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitingResponseEvent =function
             console.debug("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): 1XX response ignored"); 
         }
         else if(statusCode==200)
-        {
+        { 
             this.jainSipInvitingDialog=responseEvent.getOriginalTransaction().getDialog();
             this.invitingState=this.INVITING_ACCEPTED_STATE;
+            
+            stopRinging();
             showByeButton();
             hideUnRegisterButton();
+            hideRegisterButton();
+            hideCallButton();
+            
             this.jainSipInvitingDialog.setRemoteTarget(jainSipResponse.getHeader("Contact"));
-            var jainSipMessageACK = responseEvent.getOriginalTransaction().createAck();
+            var jainSipMessageACK = this.jainSipInvitingTransaction.createAck();
+            jainSipMessageACK.addHeader(this.jainSipContactHeader);
+            jainSipMessageACK.addHeader(this.jainSipUserAgentHeader);
             this.jainSipInvitingDialog.sendAck(jainSipMessageACK);
+            
             var sdpAnswerString = jainSipResponse.getContent();
-            var sdpAnswer = new RTCSessionDescription({
-                type: 'answer',
-                sdp: sdpAnswerString
-            });
+            if(window.webkitRTCPeerConnection)
+            {
+                var sdpAnswer = new RTCSessionDescription({
+                    type: 'answer',
+                    sdp: sdpAnswerString
+                });
+            }
+            else if(window.mozRTCPeerConnection)
+            {
+                var sdpAnswer = {
+                    type: 'answer',
+                    sdp: sdpAnswerString
+                };
+            }
             var application=this;
             this.peerConnectionState = 'answer-received';
             this.peerConnection.setRemoteDescription(sdpAnswer, function() {
                 application.onPeerConnectionSetRemoteDescriptionSuccessCallback();
             }, function(error) {
                 application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
-            });  
+            });
         }
         else
         {
-            modal_alert("SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            console.error("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+            modal_alert("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+            
+            stopRinging();
             hideByeButton();
-            showCallButton();
             showUnRegisterButton();
+            hideRegisterButton();
+            showCallButton();
+            
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();
-            stopRinging();
         }    
     } 
     else if(this.invitingState==this.INVITING_FAILED_STATE)
     {
-        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored");        
+        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored"); 
     } 
     else if(this.invitingState==this.INVITING_ACCEPTED_STATE)
     {
-        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored");        
+        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored");     
     } 
     else if(this.invitingState==this.INVITING_LOCAL_HANGINGUP_STATE)
     {
@@ -826,7 +1110,7 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitingResponseEvent =function
             this.invitingState=this.INVITING_HANGINGUP_407_STATE; 
             var jainSipByeRequest=this.jainSipInvitingDialog.createRequest("BYE");
             var clientTransaction  = this.sipProvider.getNewClientTransaction(jainSipByeRequest);
-            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,jainSipByeRequest,this.sipPassword,this.sipLogin);
+            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,jainSipByeRequest,this.configuration.sipPassword,this.configuration.sipLogin);
             this.messageFactory.addHeader(jainSipByeRequest, jainSipAuthorizationHeader); 
             this.jainSipInvitingDialog.sendRequest(clientTransaction);
         }
@@ -834,71 +1118,74 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitingResponseEvent =function
         {
             hideByeButton();
             showUnRegisterButton();
+            hideRegisterButton();
             showCallButton();
-            document.getElementById("remoteVideo").pause();
-            document.getElementById("remoteVideo").src= null;
-            document.getElementById("remoteVideo").style.visibility = "hidden";
+
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
         }
         else
         {
-            modal_alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            console.error("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
+           
             hideByeButton();
             showUnRegisterButton();
+            hideRegisterButton();
             showCallButton();
-            document.getElementById("remoteVideo").pause();
-            document.getElementById("remoteVideo").src= null;
-            document.getElementById("remoteVideo").style.visibility = "hidden";
+
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
         }
     } 
     else if(this.invitingState==this.INVITING_LOCAL_HANGINGUP_407_STATE)
     {
-        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored"); 
         if(statusCode==200)
         {
             hideByeButton();
             showUnRegisterButton();
+            hideRegisterButton();
             showCallButton();
-            document.getElementById("remoteVideo").pause();
-            document.getElementById("remoteVideo").src= null;
-            document.getElementById("remoteVideo").style.visibility = "hidden";
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
         }
         else
         {
-            modal_alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            console.error("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString()); 
+           
             hideByeButton();
             showUnRegisterButton();
+            hideRegisterButton();
             showCallButton();
-            document.getElementById("remoteVideo").pause();
-            document.getElementById("remoteVideo").src= null;
-            document.getElementById("remoteVideo").style.visibility = "hidden";
+            
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
         }        
     } 
-}
+    else
+    {
+        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingResponseEvent(): bad state, SIP response ignored"); 
+    }  
+} 
+
+
 
 MobicentsWebRTCPhone.prototype.handleStateMachineInvitingRequestEvent =function(requestEvent){
     console.debug("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): this.invitingState="+this.invitingState);
+    
     var jainSipRequest=requestEvent.getRequest();
     var requestMethod = jainSipRequest.getMethod();
     
     if(this.invitingState==this.INVITING_STATE)
     {
-        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");  
+        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
     } 
     else if(this.invitingState==this.INVITING_407_STATE)
     {
-        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");  
+        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");
     } 
     else if(this.invitingState==this.INVITING_FAILED_STATE)
     {
-        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");        
+        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
     } 
     else if(this.invitingState==this.INVITING_ACCEPTED_STATE)
     {
@@ -907,30 +1194,40 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitingRequestEvent =function(
             var jainSip200OKResponse=jainSipRequest.createResponse(200, "OK");
             jainSip200OKResponse.addHeader(this.jainSipContactHeader);
             requestEvent.getServerTransaction().sendResponse(jainSip200OKResponse);
+            
+            modal_alert(this.callee+" has hangup"); 
+            
             hideByeButton();
-            showUnRegisterButton();
+            if(this.configuration.sipRegisterMode==true) showUnRegisterButton();
+            hideRegisterButton();
             showCallButton();
-            document.getElementById("remoteVideo").pause();
-            document.getElementById("remoteVideo").src= null;
-            document.getElementById("remoteVideo").style.visibility = "hidden";
+
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
-            modal_alert("Contact has hangup"); 
         }
         else
         {
-            console.error("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
+            console.error("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");
+            alert("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
         }
     } 
     else if(this.invitingState==this.INVITING_LOCAL_HANGINGUP_STATE)
     {
         console.error("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");
+        alert("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
     } 
     else if(this.invitingState==this.INVITING_LOCAL_HANGINGUP_407_STATE)
     {
-        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored");        
+        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
+        alert("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
+    } 
+    else
+    {
+        console.error("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
+        alert("MobicentsWebRTCPhone:handleStateMachineInvitingRequestEvent(): bad state, SIP request ignored"); 
     } 
 }
+
 
 MobicentsWebRTCPhone.prototype.handleStateMachineInvitedResponseEvent =function(responseEvent){
     console.debug("MobicentsWebRTCPhone:handleStateMachineInvitedResponseEvent(): this.invitingState="+this.invitingState);
@@ -938,11 +1235,11 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitedResponseEvent =function(
     var statusCode = parseInt(jainSipResponse.getStatusCode()); 
     if(this.invitedState==this.INVITED_STATE)
     {
-        console.error("MobicentsWebRTCPhone:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored");    
+        console.error("MobicentsWebRTCPhone:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored"); 
     } 
     else if(this.invitedState==this.INVITED_ACCEPTED_STATE)
     {
-        console.error("MobicentsWebRTCPhone:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored");        
+        console.error("MobicentsWebRTCPhone:handleStateMachineInvitedResponseEvent(): bad state, SIP response ignored");      
     } 
     else if(this.invitedState==this.INVITED_LOCAL_HANGINGUP_STATE)
     {
@@ -951,7 +1248,7 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitedResponseEvent =function(
             this.invitedState=this.INVITED_HANGINGUP_407_STATE; 
             var jainSipByeRequest=this.jainSipInvitedDialog.createRequest("BYE");
             var clientTransaction  = this.sipProvider.getNewClientTransaction(jainSipByeRequest);
-            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,jainSipByeRequest,this.sipPassword,this.sipLogin);
+            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,jainSipByeRequest,this.configuration.sipPassword,this.configuration.sipLogin);
             this.messageFactory.addHeader(jainSipByeRequest, jainSipAuthorizationHeader); 
             this.jainSipInvitedDialog.sendRequest(clientTransaction);
         }
@@ -959,15 +1256,17 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitedResponseEvent =function(
         {
             hideByeButton();
             showUnRegisterButton();
+            hideRegisterButton();
             showCallButton();
             this.initPeerConnectionStateMachine();
             this.initSipInvitedStateMachine();
         }
         else
         {
-            modal_alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            console.error("MobicentsWebRTCPhone:handleStateMachineInvitedResponseEvent(): SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString());
             hideByeButton();
             showUnRegisterButton();
+            hideRegisterButton();
             showCallButton();
             this.initPeerConnectionStateMachine();
             this.initSipInvitedStateMachine();
@@ -979,21 +1278,26 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitedResponseEvent =function(
         {
             hideByeButton();
             showUnRegisterButton();
+            hideRegisterButton();
             showCallButton();
+            
             this.initPeerConnectionStateMachine();
             this.initSipInvitedStateMachine();
         }
         else
         {
-            modal_alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            console.error("MobicentsWebRTCPhone:handleStateMachineInvitedResponseEvent(): SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString()); 
             hideByeButton();
             showUnRegisterButton();
+            hideRegisterButton();
             showCallButton();
+            
             this.initPeerConnectionStateMachine();
             this.initSipInvitedStateMachine();
         }        
     } 
 }
+
 
 MobicentsWebRTCPhone.prototype.handleStateMachineInvitedRequestEvent =function(requestEvent){
     console.debug("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): this.invitedState="+this.invitedState);
@@ -1002,70 +1306,128 @@ MobicentsWebRTCPhone.prototype.handleStateMachineInvitedRequestEvent =function(r
     var headerFrom = jainSipRequest.getHeader("From");
     if(this.invitedState==this.INVITED_INITIAL_STATE)
     {
-        startRinging();
-        var jainSip180ORingingResponse=jainSipRequest.createResponse(180, "Ringing");
-        jainSip180ORingingResponse.addHeader(this.jainSipContactHeader);
-        jainSip180ORingingResponse.addHeader(this.jainSipUserAgentHeader);
-        requestEvent.getServerTransaction().sendResponse(jainSip180ORingingResponse);
-
-        this.jainSipInvitedReceivedRequest=jainSipRequest;
-        this.jainSipInvitedTransaction=requestEvent.getServerTransaction();
-        this.jainSipInvitedDialog=requestEvent.getServerTransaction().getDialog();
+        if(requestMethod=="INVITE")  
+        {
+            // Store SIP context
+            this.jainSipInvitedRequest=jainSipRequest;
+            this.jainSipInvitedTransaction=requestEvent.getServerTransaction();
+            this.jainSipInvitedDialog=requestEvent.getServerTransaction().getDialog();
+        
+            // Ringing
+            startRinging();
+            var jainSip180ORingingResponse=jainSipRequest.createResponse(180, "Ringing");
+            jainSip180ORingingResponse.addHeader(this.jainSipContactHeader);
+            jainSip180ORingingResponse.addHeader(this.jainSipUserAgentHeader);
+            requestEvent.getServerTransaction().sendResponse(jainSip180ORingingResponse);
+          
+            var sipUri = headerFrom.getAddress().getURI();
+            console.debug("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): sipUri.getUser()="+sipUri.getUser());
+            show_desktop_notification("Incoming Call from " + sipUri.getUser());
+            $("#call_message").html("<p>Incoming Call from " + sipUri.getUser() +"</p>");
+            $('#callModal').modal(); 
+           
+            hideByeButton();
+            hideRegisterButton();
+            hideUnRegisterButton();
+            hideCallButton();
+        } 
+        else if(requestMethod=="CANCEL")  
+        {
+            // Send 200OK CANCEL
+            var jainSip200OKResponse=jainSipRequest.createResponse(200, "OK");
+            jainSip200OKResponse.addHeader(this.jainSipContactHeader);
+            jainSip200OKResponse.addHeader(this.jainSipUserAgentHeader);
+            requestEvent.getServerTransaction().sendResponse(jainSip200OKResponse);
             
-        var sipUri = headerFrom.getAddress().getURI();
-        console.debug("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): sipUri.getUser()="+sipUri.getUser());
-        show_desktop_notification("Incoming Call from " + sipUri.getUser());
-        $("#call_message").html("<p>Incoming Call from " + sipUri.getUser() +"</p>");
-        $('#callModal').modal(); 
+            // Send 487 (Request Cancelled) for the INVITE
+            var jainSipResponse487=this.jainSipInvitedRequest.createResponse(487,"(Request Cancelled)");
+            jainSipResponse487.addHeader(this.jainSipRegisterSentRequest.getHeader("User-Agent"));
+            this.jainSipInvitedTransaction.sendMessage(jainSipResponse487);
+            
+            modal_alert(this.caller + "has cancel"); 
+            
+            hideByeButton();
+            hideRegisterButton();
+            showUnRegisterButton();
+            showCallButton();
+            
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitedStateMachine(); 
+        }
+        else
+        {
+            console.error("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
+            alert("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
+        }
     } 
     else if(this.invitedState==this.INVITED_ACCEPTED_STATE)
     {
         if(requestMethod=="BYE")  
         {
-            showCallButton();
-            hideByeButton();
-            showUnRegisterButton(); 
+            // Send 200OK
             var jainSip200OKResponse=jainSipRequest.createResponse(200, "OK");
             jainSip200OKResponse.addHeader(this.jainSipContactHeader);
             jainSip200OKResponse.addHeader(this.jainSipUserAgentHeader);
             requestEvent.getServerTransaction().sendResponse(jainSip200OKResponse);
-            this.invitedState=this.INVITED_INITIAL_STATE;
-            this.jainSipInvitedReceivedRequest=null;
-            this.jainSipInvitedDialog=null;
-            document.getElementById("remoteVideo").pause();
-            document.getElementById("remoteVideo").src= null;
-            document.getElementById("remoteVideo").style.visibility = "hidden";
+            
+            modal_alert(this.caller + "has hangup"); 
+            
+            hideByeButton();
+            hideRegisterButton();
+            showUnRegisterButton();
+            showCallButton();
+
             this.initPeerConnectionStateMachine();
-            this.initSipInvitingStateMachine();
-            modal_alert("Contact has hangup"); 
+            this.initSipInvitedStateMachine();
         }
         else if(requestMethod=="ACK")  
         {         
             this.jainSipInvitedDialog=requestEvent.getServerTransaction().getDialog();
         }
         else {
+            alert("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
             console.error("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
         }
     } 
     else if(this.invitedState==this.INVITED_LOCAL_HANGINGUP_STATE)
     {
+        alert("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
         console.error("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored");
     } 
     else if(this.invitedState==this.INVITED_LOCAL_HANGINGUP_407_STATE)
     {
+        alert("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored"); 
         console.error("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored");        
     } 
 }
 
 
- 
+
 // RTCPeerConnection  state machine
  
 MobicentsWebRTCPhone.prototype.createPeerConnection =function(){
     console.debug("MobicentsWebRTCPhone:createPeerConnection()");
+    var peerConnectionConfiguration = {
+        "iceServers": []
+    };
     var application = this;
-    this.peerConnection = new webkitRTCPeerConnection(null, null);	
-		
+    if(this.configuration.stunServer)
+    {
+        peerConnectionConfiguration = {
+            "iceServers": [{
+                "url":this.configuration.stunServer
+            }]
+        };
+    }
+    if(window.webkitRTCPeerConnection)
+    {
+        this.peerConnection = new RTCPeerConnection(peerConnectionConfiguration);
+    }
+    else if(window.mozRTCPeerConnection)
+    {
+        this.peerConnection = new RTCPeerConnection();
+    }
+   
     this.peerConnection.onaddstream = function(event) {
         application.onPeerConnectionOnAddStreamCallback(event);
     }  
@@ -1074,22 +1436,14 @@ MobicentsWebRTCPhone.prototype.createPeerConnection =function(){
         application.onPeerConnectionOnRemoveStreamCallback(event);
     }   
     
-    this.peerConnection.onopen= function(event) {
-        application.onPeerConnectionOnOpenCallback(event);
-    }
-    
     this.peerConnection.onstatechange= function(event) {
         application.onPeerConnectionStateChangeCallback(event);
     }
-    
+          
     this.peerConnection.onicecandidate= function(rtcIceCandidateEvent) {
         application.onPeerConnectionIceCandidateCallback(rtcIceCandidateEvent);
     }
-    
-    this.peerConnection.onnegotationneeded= function(event) {
-        application.onPeerConnectionIceNegotationNeededCallback(event);
-    }
-    
+     
     this.peerConnection.ongatheringchange= function(event) {
         application.onPeerConnectionGatheringChangeCallback(event);
     }
@@ -1098,23 +1452,35 @@ MobicentsWebRTCPhone.prototype.createPeerConnection =function(){
         application.onPeerConnectionIceChangeCallback(event);
     } 
     
-    this.peerConnection.onidentityresult= function(event) {
-        application.onPeerConnectionIdentityResultCallback(event);
+    if((window.webkitRTCPeerConnection))
+    {
+        this.peerConnection.onopen= function(event) {
+            application.onPeerConnectionOnOpenCallback(event);
+        }
+     
+        this.peerConnection.onidentityresult= function(event) {
+            application.onPeerConnectionIdentityResultCallback(event);
+        }
+    
+        this.peerConnection.onnegotationneeded= function(event) {
+            application.onPeerConnectionIceNegotationNeededCallback(event);
+        }
     }
 }
  
 
   
 MobicentsWebRTCPhone.prototype.onPeerConnectionOnAddStreamCallback =function(event){
-    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback(): event="+event); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback(): event="+event);   
+    var peerConnection = event.currentTarget;
+    if(typeof peerConnection=='undefined')  peerConnection=this.peerConnection; // Bug in firefox 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback(): peerConnection.readyState="+ peerConnection.readyState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback(): peerConnection.iceGatheringState="+peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback(): peerConnection.iceState="+peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback: this.peerConnectionState="+this.peerConnectionState);
     
-    if(this.peerConnection!=null)
+    if(window.webkitRTCPeerConnection)
     {
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback():this.peerConnection.readyState="+this.peerConnection.readyState); 
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback: this.peerConnectionState="+this.peerConnectionState);
-    
         this.remoteAudioVideoMediaStream = event.stream;
         var url = webkitURL.createObjectURL(this.remoteAudioVideoMediaStream);
         console.debug("MobicentsWebRTCPhone:onPeerConnectionOnAddStreamCallback():url="+url); 
@@ -1122,80 +1488,74 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionOnAddStreamCallback =function(eve
         document.getElementById("remoteVideo").play();
         document.getElementById("remoteVideo").style.visibility = "visible"; 
     }
-    else 
+    else if(window.mozRTCPeerConnection)
     {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionOnAddStreamCallback(): this.peerConnection is null, bug in state machine!, bug in state machine!");        
-    }
+        document.getElementById("remoteVideo").mozSrcObject=event.stream;
+        document.getElementById("remoteVideo").play();
+        document.getElementById("remoteVideo").style.visibility = "visible"; 
+    } 
 }
 
 MobicentsWebRTCPhone.prototype.onPeerConnectionOnRemoveStreamCallback =function(event){
-    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback(): event="+event);
-    if(this.peerConnection!=null)
-    {
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.readyState="+this.peerConnection.readyState); 
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback: this.peerConnectionState="+this.peerConnectionState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback(): event="+event); 
+    var peerConnection = event.currentTarget;
+    if(typeof peerConnection=='undefined')  peerConnection=this.peerConnection; // Bug in firefox 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback(): peerConnection.readyState="+peerConnection.readyState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback(): peerConnection.iceGatheringState="+peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback(): peerConnection.iceState="+peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnRemoveStreamCallback: this.peerConnectionState="+this.peerConnectionState);
     
-        this.remoteAudioVideoMediaStream = null;
-        document.getElementById("remoteVideo").pause();
-        document.getElementById("remoteVideo").src= null; 
-        document.getElementById("remoteVideo").style.visibility = "hidden";
-    }
-    else 
+    if(window.webkitRTCPeerConnection)
     {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionOnRemoveStreamCallback(): this.peerConnection is null, bug in state machine!");        
+        this.remoteAudioVideoMediaStream = null; 
+        document.getElementById("remoteVideo").src= null;
+        document.getElementById("remoteVideo").pause();
+        document.getElementById("remoteVideo").style.visibility = "hidden"; 
     }
+    else if(window.mozRTCPeerConnection)
+    {
+        document.getElementById("remoteVideo").mozSrcObject=null;
+        document.getElementById("remoteVideo").pause();
+        document.getElementById("remoteVideo").style.visibility = "hidden";
+    } 
 }
 
 
 MobicentsWebRTCPhone.prototype.onPeerConnectionOnOpenCallback =function(event){
-    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback(): event="+event);
-    
-    if(this.peerConnection!=null)
-    {
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback():this.peerConnection.readyState="+this.peerConnection.readyState);   
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback: this.peerConnectionState="+this.peerConnectionState);
-    }
-    else 
-    {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionOnOpenCallback(): this.peerConnection is null, bug in state machine!");        
-    }
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback(): event="+event); 
+    var peerConnection = event.currentTarget;
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback():this.peerConnection.readyState="+peerConnection.readyState);   
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback(): this.peerConnection.iceGatheringState="+peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback(): this.peerConnection.iceState="+peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionOnOpenCallback: this.peerConnectionState="+this.peerConnectionState);
 }
  
 MobicentsWebRTCPhone.prototype.onPeerConnectionStateChangeCallback =function(event){
-    console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback(): event="+event); 
-    if(this.peerConnection!=null)
-    {
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);   
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback: this.peerConnectionState="+this.peerConnectionState);
-    }
-    else 
-    {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionStateChangeCallback(): this.peerConnection is null, bug in state machine!");        
-    }
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback(): event="+event);
+    var peerConnection = event.currentTarget;
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback(): peerConnection.readyState="+peerConnection.readyState);   
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback(): peerConnection.iceGatheringState="+peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback(): peerConnection.iceState="+peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionStateChangeCallback: this.peerConnectionState="+this.peerConnectionState);
 }
 
 MobicentsWebRTCPhone.prototype.onPeerConnectionIceCandidateCallback =function(rtcIceCandidateEvent){
-    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): rtcIceCandidateEvent="+rtcIceCandidateEvent); 
-    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback: this.peerConnectionState="+this.peerConnectionState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): rtcIceCandidateEvent="+rtcIceCandidateEvent);
+    var peerConnection = rtcIceCandidateEvent.currentTarget;
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): peerConnection.readyState="+peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): peerConnection.iceGatheringState="+peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): peerConnection.iceState="+peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback:  this.peerConnectionState="+this.peerConnectionState);
     
-    if(this.peerConnection!=null)
+    if(rtcIceCandidateEvent.candidate!=null)
     {
-        if(rtcIceCandidateEvent.candidate!=null)
+        console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback: RTCIceCandidateEvent.candidate.candidate="+rtcIceCandidateEvent.candidate.candidate);
+    }
+    else
+    {
+        console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback: no anymore ICE candidate");
+        if(window.webkitRTCPeerConnection)
         {
-            console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback: RTCIceCandidateEvent.candidate.candidate="+rtcIceCandidateEvent.candidate.candidate);
-        }
-        else
-        {
-            console.debug("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback: no anymore ICE candidate");
             if(this.peerConnectionState == 'preparing-offer') 
             {
                 // Send INVITE
@@ -1207,6 +1567,10 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionIceCandidateCallback =function(rt
                 // Send 200 OK
                 this.send200OKSipResponse(this.peerConnection.localDescription.sdp)
                 this.peerConnectionState = 'established';
+                showByeButton();
+                hideRegisterButton();
+                hideCallButton();
+                hideUnRegisterButton(); 
             }
             else if (this.peerConnectionState == 'established') 
             {
@@ -1218,15 +1582,12 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionIceCandidateCallback =function(rt
             }
         }
     }
-    else 
-    {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionIceCandidateCallback(): this.peerConnection is null, bug in state machine!");        
-    }
 }
 
 
 MobicentsWebRTCPhone.prototype.onPeerConnectionCreateOfferSuccessCallback =function(offer){
-    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferSuccessCallback(): newOffer="+offer); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferSuccessCallback(): offer="+offer.prototype); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferSuccessCallback(): offer="+offer.sdp); 
     console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
     console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
     console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
@@ -1239,6 +1600,7 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionCreateOfferSuccessCallback =funct
             // Preparing offer.
             var application=this;
             this.peerConnectionState = 'preparing-offer';
+            this.peerConnectionLocalDescription=offer;
             this.peerConnection.setLocalDescription(offer, function() {
                 application.onPeerConnectionSetLocalDescriptionSuccessCallback();
             }, function(error) {
@@ -1252,13 +1614,13 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionCreateOfferSuccessCallback =funct
     }
     else 
     {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferSuccessCallback(): this.peerConnection is null, bug in state machine!");        
+        console.warn("MobicentsWebRTCPhone:onPeerConnectionCreateOfferSuccessCallback(): this.peerConnection is null, bug in state machine!");        
     }
 }
 
-
 MobicentsWebRTCPhone.prototype.onPeerConnectionCreateOfferErrorCallback =function(error){
     console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferErrorCallback():error="+error); 
+     
     if(this.peerConnection!=null)
     {
         console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
@@ -1269,7 +1631,7 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionCreateOfferErrorCallback =functio
     }
     else 
     {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection is null, bug in state machine!");        
+        console.warn("MobicentsWebRTCPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection is null, bug in state machine!");        
     }
     alert("error:"+error);
 }
@@ -1282,16 +1644,47 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionSetLocalDescriptionSuccessCallbac
         console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
         console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
         console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionSuccessCallback: this.peerConnectionState="+this.peerConnectionState);
-    // Nothing to do, just waiting end ICE resolution
+        if(window.mozRTCPeerConnection)
+        {
+            if(this.peerConnectionState == 'preparing-offer') 
+            {
+               
+                // Send INVITE
+                if(this.peerConnection.localDescription) this.sendInviteSipRequest(this.peerConnection.localDescription.sdp);
+                else  this.sendInviteSipRequest(this.peerConnectionLocalDescription.sdp);
+                this.peerConnectionState = 'offer-sent';
+            } 
+            else if (this.peerConnectionState == 'preparing-answer') 
+            {
+                // Send 200 OK
+                if(this.peerConnection.localDescription) this.send200OKSipResponse(this.peerConnection.localDescription.sdp);
+                else  this.send200OKSipResponse(this.peerConnectionLocalDescription.sdp);
+                this.peerConnectionState = 'established';
+                showByeButton();
+                hideRegisterButton();
+                hideCallButton();
+                hideUnRegisterButton(); 
+            }
+            else if (this.peerConnectionState == 'established') 
+            {
+            // Why this last ice candidate event
+            } 
+            else
+            {
+                console.log("MobicentsWebRTCPhone:onPeerConnectionIceCandidateCallback(): RTCPeerConnection bad state!");
+            }
+        }
     }
     else 
     {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionCreateOfferErrorCallback(): this.peerConnection is null, bug in state machine!");        
-    } 
+        console.warn("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionSuccessCallback(): this.peerConnection is null, bug in state machine!");        
+    }
+// Nothing to do, just waiting end ICE resolution
 }
 
 MobicentsWebRTCPhone.prototype.onPeerConnectionSetLocalDescriptionErrorCallback =function(error){
     console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionErrorCallback():error="+error); 
+     
     if(this.peerConnection!=null)
     {
         console.debug("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
@@ -1302,15 +1695,14 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionSetLocalDescriptionErrorCallback 
     }
     else 
     {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection is null, bug in state machine!");        
-    } 
+        console.warn("MobicentsWebRTCPhone:onPeerConnectionSetLocalDescriptionErrorCallback(): this.peerConnection is null, bug in state machine!");        
+    }
     alert("error:"+error);
 
 }
 
 MobicentsWebRTCPhone.prototype.onPeerConnectionCreateAnswerSuccessCallback =function(answer){
-    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerSuccessCallback():answer="+answer);
-    
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerSuccessCallback():answer="+answer.sdp); 
     if(this.peerConnection!=null)
     {
         console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
@@ -1323,6 +1715,7 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionCreateAnswerSuccessCallback =func
             // Prepare answer.
             var application=this;
             this.peerConnectionState = 'preparing-answer';
+            this.peerConnectionLocalDescription=answer;
             this.peerConnection.setLocalDescription(answer, function() {
                 application.onPeerConnectionSetLocalDescriptionSuccessCallback();
             }, function(error) {
@@ -1336,27 +1729,28 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionCreateAnswerSuccessCallback =func
     }
     else 
     {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection is null, bug in state machine!");        
-    } 
+        console.warn("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerSuccessCallback(): this.peerConnection is null, bug in state machine!");        
+    }
 }
 
 
 MobicentsWebRTCPhone.prototype.onPeerConnectionCreateAnswerErrorCallback =function(error){
     console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerErrorCallback():error="+error);
-    
+     
     if(this.peerConnection!=null)
     {
         console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
         console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
         console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
         console.debug("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerErrorCallback: this.peerConnectionState="+this.peerConnectionState);
-    // TODO Notify Error to INVITE state machin
+    // TODO Notify Error to INVITE state machine
     }
     else 
     {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection is null, bug in state machine!");        
-    } 
+        console.warn("MobicentsWebRTCPhone:onPeerConnectionCreateAnswerErrorCallback(): this.peerConnection is null, bug in state machine!");        
+    }
     alert("error:"+error);
+
 }
 
 
@@ -1377,11 +1771,26 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionSetRemoteDescriptionSuccessCallba
         else if (this.peerConnectionState == 'offer-received') 
         {            
             var application=this;
-            this.peerConnection.createAnswer(function(answer) {
-                application.onPeerConnectionCreateAnswerSuccessCallback(answer);
-            }, function(error) {
-                application.onPeerConnectionCreateAnswerErrorCallback(error);
-            }); 
+            if(window.webkitRTCPeerConnection)
+            {
+                this.peerConnection.createAnswer(function(answer) {
+                    application.onPeerConnectionCreateAnswerSuccessCallback(answer);
+                }, function(error) {
+                    application.onPeerConnectionCreateAnswerErrorCallback(error);
+                });  
+            }
+            else if(window.mozRTCPeerConnection)
+            {
+                this.peerConnection.createAnswer(function(answer) {
+                    application.onPeerConnectionCreateAnswerSuccessCallback(answer);
+                }, function(error) {
+                    application.onPeerConnectionCreateAnswerErrorCallback(error);
+                },{
+                    "mandatory": {
+                        "MozDontOfferDataChannel": true
+                    }
+                }); 
+            } 
         }
         else {
             console.log("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): RTCPeerConnection bad state!");
@@ -1389,13 +1798,14 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionSetRemoteDescriptionSuccessCallba
     }
     else 
     {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection is null, bug in state machine!");        
-    } 
+        console.warn("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionSuccessCallback(): this.peerConnection is null, bug in state machine!");        
+    }
 }
 
 
 MobicentsWebRTCPhone.prototype.onPeerConnectionSetRemoteDescriptionErrorCallback =function(error){
     console.debug("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionErrorCallback():error="+error);
+     
     if(this.peerConnection!=null)
     {
         console.debug("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
@@ -1406,126 +1816,59 @@ MobicentsWebRTCPhone.prototype.onPeerConnectionSetRemoteDescriptionErrorCallback
     }
     else 
     {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection is null, bug in state machine!");        
-    } 
-    alert("error:"+error);
-
+        console.warn("MobicentsWebRTCPhone:onPeerConnectionSetRemoteDescriptionErrorCallback(): this.peerConnection is null, bug in state machine!");        
+    }
 }
 
 
 MobicentsWebRTCPhone.prototype.onPeerConnectionIceNegotationNeededCallback =function(event){
     console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback():event="+event);
-    if(this.peerConnection!=null)
-    {
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback: this.peerConnectionState="+this.peerConnectionState);
-    }
-    else 
-    {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection is null, bug in state machine!");        
-    } 
+    var peerConnection = event.currentTarget;
+    
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.readyState="+peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.iceGatheringState="+peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback(): this.peerConnection.iceState="+peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceNegotationNeededCallback: this.peerConnectionState="+peerConnectionState);
 }
 
 MobicentsWebRTCPhone.prototype.onPeerConnectionGatheringChangeCallback =function(event){
     console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback():event="+event);
-    if(this.peerConnection!=null)
-    {
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback: this.peerConnectionState="+this.peerConnectionState);
-    }
-    else 
-    {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionGatheringChangeCallback(): this.peerConnection is null, bug in state machine!");        
-    } 
+    var peerConnection = event.currentTarget;
+    
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback(): peerConnection.readyState="+peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback(): peerConnection.iceGatheringState="+peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback(): peerConnection.iceState="+peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionGatheringChangeCallback: this.peerConnectionState="+this.peerConnectionState);
 }
 
 MobicentsWebRTCPhone.prototype.onPeerConnectionIceChangeCallback =function(event){
-    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback():event="+event);
-    if(this.peerConnection!=null)
-    {
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback: this.peerConnectionState="+this.peerConnectionState);
-    }
-    else 
-    {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionIceChangeCallback(): this.peerConnection is null, bug in state machine!");        
-    } 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback():event="+event); 
+    var peerConnection = event.currentTarget;
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback(): peerConnection.readyState="+peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback(): peerConnection.iceGatheringState="+peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback(): peerConnection.iceState="+peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIceChangeCallback: this.peerConnectionState="+this.peerConnectionState);
 }
 
 MobicentsWebRTCPhone.prototype.onPeerConnectionIdentityResultCallback =function(event){
     console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback():event="+event);
-    if(this.peerConnection!=null)
-    {
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.readyState="+this.peerConnection.readyState);
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection.iceState="+this.peerConnection.iceState); 
-        console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback: this.peerConnectionState="+this.peerConnectionState);
-    }
-    else 
-    {
-        console.warn("SimpleWebRtcSipPhone:onPeerConnectionIdentityResultCallback(): this.peerConnection is null, bug in state machine!");        
-    } 
+    var peerConnection = event.currentTarget; 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback(): peerConnection.readyState="+peerConnection.readyState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback(): peerConnection.iceGatheringState="+peerConnection.iceGatheringState);
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback(): peerConnection.iceState="+peerConnection.iceState); 
+    console.debug("MobicentsWebRTCPhone:onPeerConnectionIdentityResultCallback: this.peerConnectionState="+this.peerConnectionState);
 }
- 
+
 
 // Accept modal 
 $('#callModal .accept-btn').click(function() {
-    try
-    {
-        stopRinging();
-        mobicentsWebRTCPhone.createPeerConnection();
-        mobicentsWebRTCPhone.peerConnection.addStream(mobicentsWebRTCPhone.localAudioVideoMediaStream);
-        mobicentsWebRTCPhone.lastReceivedSdpOfferString = mobicentsWebRTCPhone.jainSipInvitedReceivedRequest.getContent();
-        var sdpOffer = new RTCSessionDescription({
-            type: 'offer',
-            sdp: mobicentsWebRTCPhone.lastReceivedSdpOfferString
-        });
-        var application=mobicentsWebRTCPhone;
-        mobicentsWebRTCPhone.peerConnectionState = 'offer-received';
-        mobicentsWebRTCPhone.peerConnection.setRemoteDescription(sdpOffer, function() {
-            application.onPeerConnectionSetRemoteDescriptionSuccessCallback();
-        }, function(error) {
-            application.onPeerConnectionSetRemoteDescriptionErrorCallback(error);
-        });
-    }
-    catch(exception)
-    {
-        // Temporarily Unavailable
-        var jainSipResponse480=mobicentsWebRTCPhone.jainSipInvitedReceivedRequest.createResponse(480,"Temporarily Unavailable");
-        jainSipResponse480.addHeader(mobicentsWebRTCPhone.jainSipContactHeader);
-        jainSipResponse480.addHeader(mobicentsWebRTCPhone.jainSipUserAgentHeader);
-        mobicentsWebRTCPhone.jainSipInvitedTransaction.sendResponse(jainSipResponse480);
-        hideByeButton();
-        showCallButton();
-        showUnRegisterButton(); 
-        stopRinging();
-        mobicentsWebRTCPhone.initPeerConnectionStateMachine();
-        mobicentsWebRTCPhone.initSipInvitedStateMachine();
-        console.error("MobicentsWebRTCPhone:handleStateMachineInvitedRequestEvent(): catched exception:"+exception);
-    }
-
+    mobicentsWebRTCPhone.acceptCall();
+ 
 });
 
 // Reject modal
-$('#callModal .reject-btn').click(function() {
-    // Rejected 
-    // Temporarily Unavailable
-    var jainSipResponse480=mobicentsWebRTCPhone.jainSipInvitedReceivedRequest.createResponse(480,"Temporarily Unavailable");
-    jainSipResponse480.addHeader(mobicentsWebRTCPhone.jainSipContactHeader);
-    jainSipResponse480.addHeader(mobicentsWebRTCPhone.jainSipUserAgentHeader);
-    mobicentsWebRTCPhone.jainSipInvitedTransaction.sendResponse(jainSipResponse480);
-    hideByeButton();
-    showCallButton();
-    showUnRegisterButton();
-    stopRinging();
-    mobicentsWebRTCPhone.initPeerConnectionStateMachine();
-    mobicentsWebRTCPhone.initSipInvitedStateMachine();
+$('#callModal .reject-btn').click(function() { 
+    mobicentsWebRTCPhone.rejectCall();
 });
 
 function modal_alert(message) {

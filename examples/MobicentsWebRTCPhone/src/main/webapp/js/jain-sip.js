@@ -624,11 +624,10 @@ NameValueList.prototype.equals =function(otherObject){
     }
     for (i=0;i<key.length;i++)
     {
-        k = key[i];
         var nv1 = new NameValue();
         var nv2 = new NameValue();
-        nv1 = this.getNameValue(k);
-        nv2 = other.getNameValue(k);
+        nv1 = this.getNameValue(key[i]);
+        nv2 = other.getNameValue(key[i]);
         if (nv2 == null)
         {
             return false;
@@ -732,7 +731,7 @@ NameValueList.prototype.iterator=function(){
 NameValueList.prototype.getNames=function(){
     var key=new Array();
     var c=0;
-    for (i=0;i<this.hmap.length;i++)
+    for (var i=0;i<this.hmap.length;i++)
     {    
         key[c]=this.hmap[i][0];
         c++;
@@ -821,7 +820,7 @@ NameValueList.prototype.get=function(key){
 NameValueList.prototype.keySet=function(){
     var key=new Array();
     var c=0;
-    for (i=0;i<this.hmap.length;i++)
+    for (var i=0;i<this.hmap.length;i++)
     {
         key[c]=this.hmap[i][0];
         c++;
@@ -888,7 +887,7 @@ NameValueList.prototype.remove=function(key){
 NameValueList.prototype.values=function(){
     var values=new Array();
     var c=0;
-    for (i=0;i<this.hmap.length;i++)
+    for (var i=0;i<this.hmap.length;i++)
     {
         values[c]=this.hmap[i][1];
         c++;
@@ -1380,7 +1379,7 @@ HostPort.prototype.equals =function(other){
     if (other == null) {
         return false;
     }
-    if (this.classname==other.classname) {
+    if (this.classname!=other.classname) {
         return false;
     }
     var that =  other;
@@ -1531,15 +1530,14 @@ Host.prototype.encodeBuffer =function(buffer){
      * @param obj Object to set
      * @return boolean
      */
-Host.prototype.equals =function(obj){
-    if ( obj == null ) 
+Host.prototype.equals =function(otherHost){
+    if ( otherHost == null ) 
     {
         return false;
     }
-    if (this.classname!=obj.classname) {
+    if (this.classname!=otherHost.classname) {
         return false;
     }
-    var otherHost = new Host();
     if(otherHost.hostname==this.hostname)
     {
         return true;
@@ -1952,7 +1950,7 @@ StringTokenizer.prototype.getNextToken =function(delim){
         {
             break;
         } 
-        else if (la == '\0') 
+        else if (la == '') 
         {
             console.error("StringTokenizer:getNextToken(): EOL reached");
             throw "StringTokenizer:getNextToken(): EOL reached";
@@ -2033,6 +2031,7 @@ LexerCore.prototype.START = 2048;
 LexerCore.prototype.END = LexerCore.prototype.START + 2048;
 LexerCore.prototype.ID = LexerCore.prototype.END - 1;
 LexerCore.prototype.SAFE = LexerCore.prototype.END - 2;
+LexerCore.prototype.ID_NO_WHITESPACE = LexerCore.prototype.END - 3;
 LexerCore.prototype.WHITESPACE = LexerCore.prototype.END + 1;
 LexerCore.prototype.DIGIT = LexerCore.prototype.END + 2;
 LexerCore.prototype.ALPHA = LexerCore.prototype.END + 3;
@@ -2150,13 +2149,13 @@ LexerCore.prototype.getNextToken =function(){
     {
         var delim=arguments[0];
         var startIdx = this.ptr;
-        while (true) {
+        while (this.hasMoreChars()) {
             var la = this.lookAhead(0);
             if (la == delim) 
             {
                 break;
             } 
-            else if (la == '\0') 
+            else if (la == '') 
             {
                 console.error("LexerCore:getNextToken(): EOL reached");
                 throw "LexerCore:getNextToken(): EOL reached";
@@ -2471,11 +2470,11 @@ LexerCore.prototype.quotedString =function(){
         return null;
     }
     this.consume(1);
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.getNextChar();
         if (next == '\"') {
             break;
-        } else if (next == '\0') {
+        } else if (next == '') {
             console.error("LexerCore:quotedString(): "+ this.buffer + " :unexpected EOL",this.ptr);
             throw "LexerCore:quotedString(): unexpected EOL";
         } else if (next == '\\') {
@@ -2491,17 +2490,17 @@ LexerCore.prototype.comment =function(){
         return null;
     }
     this.consume(1);
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.getNextChar();
         if (next == ')') {
             break;
-        } else if (next == '\0') {
+        } else if (next == '') {
             console.error("LexerCore:comment(): "+ this.buffer + " :unexpected EOL",this.ptr);
             throw "LexerCore:comment(): unexpected EOL";
         } else if (next == '\\') {
             retval=retval+next;
             next = this.getNextChar();
-            if (next == '\0') {
+            if (next == '') {
                 console.error("LexerCore:comment(): "+ this.buffer + " :unexpected EOL",this.ptr);
                 throw "LexerCore:comment(): unexpected EOL";
             }
@@ -2515,9 +2514,9 @@ LexerCore.prototype.comment =function(){
 
 LexerCore.prototype.byteStringNoSemicolon =function(){
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
-        if (next == '\0' || next == '\n' || next == ';' || next == ',') {
+        if (next == '' || next == '\n' || next == ';' || next == ',') {
             break;
         } else {
             this.consume(1);
@@ -2529,9 +2528,9 @@ LexerCore.prototype.byteStringNoSemicolon =function(){
 
 LexerCore.prototype.byteStringNoWhiteSpace =function(){
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
-        if (next == '\0' || next == '\n' || next == ' ') {
+        if (next == '' || next == '\n' || next == ' ') {
             break;
         } else {
             this.consume(1);
@@ -2543,9 +2542,9 @@ LexerCore.prototype.byteStringNoWhiteSpace =function(){
 
 LexerCore.prototype.byteStringNoSlash =function(){
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
-        if (next == '\0' || next == '\n' || next == '/') {
+        if (next == '' || next == '\n' || next == '/') {
             break;
         } else {
             this.consume(1);
@@ -2557,7 +2556,7 @@ LexerCore.prototype.byteStringNoSlash =function(){
 
 LexerCore.prototype.byteStringNoComma =function(){
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (next == '\n' || next == ',') {
             break;
@@ -2589,7 +2588,7 @@ LexerCore.prototype.number =function(){
         throw "LexerCore:number(): Unexpected token at " + this.lookAhead(0);
     }
     this.consume(1);
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
         if (this.isDigit(next)) {
             this.consume(1);
@@ -2618,9 +2617,9 @@ LexerCore.prototype.getRest =function(){
 
 LexerCore.prototype.getString =function(c){
     var retval = "";
-    while (true) {
+    while (this.hasMoreChars()) {
         var next = this.lookAhead(0);
-        if (next == '\0') {
+        if (next == '') {
            console.error(this.buffer + "LexerCore:getString(): unexpected EOL",this.ptr);
            throw "LexerCore:getString(): unexpected EOL";
         } else if (next == c) {
@@ -2629,7 +2628,7 @@ LexerCore.prototype.getString =function(c){
         } else if (next == '\\') {
             this.consume(1);
             var nextchar = this.lookAhead(0);
-            if (nextchar == '\0') {
+            if (nextchar == '') {
                 console.error(this.buffer + "LexerCore:getString(): unexpected EOL",this.ptr);
                 throw "LexerCore:getString(): unexpected EOL";
             } else {
@@ -2706,7 +2705,7 @@ LexerCore.prototype.put =function(table,name, value){
 function ParserCore() {
     this.classname="ParserCore";
     this.nesting_level=null;
-    this.lexer=new LexerCore();
+    this.lexer=null;
 }
 
 ParserCore.prototype.nameValue =function(separator){
@@ -2756,7 +2755,8 @@ ParserCore.prototype.nameValue =function(separator){
         }
     }
     return nv;
-}/*
+}
+/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
@@ -3192,6 +3192,5451 @@ MessageDigestAlgorithm.prototype.safe_add=function(x, y)
 MessageDigestAlgorithm.prototype.bit_rol=function(num, cnt)
 {
     return (num << cnt) | (num >>> (32 - cnt));
+}/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP Separators class.
+ *  @see  gov/nist/core/Separators.java 
+ *  @author Yuemin Qin (yuemin.qin@orange.com)
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+function Separators() {
+    this.classname="Separators";
+}
+
+Separators.prototype.SEMICOLON = ";";
+Separators.prototype.COLON = ":";
+Separators.prototype.COMMA = ",";
+Separators.prototype.SLASH = "/";
+Separators.prototype.SP = " ";
+Separators.prototype.EQUALS = "=";
+Separators.prototype.STAR = "*";
+Separators.prototype.NEWLINE = "\r\n";
+Separators.prototype.RETURN = "\n";
+Separators.prototype.LESS_THAN = "<";
+Separators.prototype.GREATER_THAN = ">";
+Separators.prototype.AT = "@";
+Separators.prototype.DOT = ".";
+Separators.prototype.QUESTION = "?";
+Separators.prototype.POUND = "#";
+Separators.prototype.AND = "&";
+Separators.prototype.LPAREN = "(";
+Separators.prototype.RPAREN = ")";
+Separators.prototype.DOUBLE_QUOTE = "\"";
+Separators.prototype.QUOTE = "\'";
+Separators.prototype.HT = "\t";
+Separators.prototype.PERCENT = "%";/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/**
+ *  SdpException
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+ 
+ 
+/**
+ * constructor
+ *
+ * @param message exception message
+ */
+function SdpException(message) {
+    this.classname="SdpException";
+    this.message="";
+    if(arguments.length==1)
+    {
+        if (typeof arguments[0] == 'string') {
+            this.message+=arguments[0];
+        }
+    }
+}
+
+SdpException.prototype.constructor=SdpException;
+
+SdpException.prototype.getMessage =function(){
+    return this.message;
+}/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP SDPObject .
+ *  @see  gov/nist/javax/sdp/fields/SDPObject.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function SDPObject() {
+    this.classname="SDPObject";
+    
+}
+ 
+SDPObject.prototype = new GenericObject();
+SDPObject.prototype.constructor=SDPObject; 
+
+SDPObject.prototype.encode =function() {
+    throw new SdpException("SDPObject:encode() not implemented");
+}
+
+SDPObject.prototype.toString =function() {
+    return this.encode();
+}
+
+SDPObject.prototype.equals =function(that) {
+    throw new SdpException("SDPObject:equals() not implemented");
+}
+
+SDPObject.prototype.match =function(other) {
+    throw new SdpException("SDPObject:other() not implemented");
+}
+
+SDPObject.prototype.clone =function(other) {
+     var objClone;
+    if (this.constructor == Object){
+        objClone = new this.constructor(); 
+    }else{
+        objClone = new this.constructor(this.valueOf()); 
+    }
+    for(var key in this){
+        if ( objClone[key] != this[key] ){ 
+            if ( typeof(this[key]) == 'object' ){ 
+                objClone[key] = this[key].clone();
+            }else{
+                objClone[key] = this[key];
+            }
+        }
+    }
+    objClone.toString = this.toString;
+    objClone.valueOf = this.valueOf;
+    return objClone; 
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP SDPField .
+ *  @see  gov/nist/javax/sdp/fields/SDPField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function SDPField() {
+    this.classname="SDPField";
+    this.fieldName=null;
+}
+ 
+SDPField.prototype = new SDPObject();
+SDPField.prototype.constructor=SDPField; 
+
+SDPField.prototype.SESSION_NAME_FIELD = "s=";
+SDPField.prototype.INFORMATION_FIELD = "i=";
+SDPField.prototype.EMAIL_FIELD = "e=";
+SDPField.prototype.PHONE_FIELD = "p=";
+SDPField.prototype.CONNECTION_FIELD = "c=";
+SDPField.prototype.BANDWIDTH_FIELD = "b=";
+SDPField.prototype.ORIGIN_FIELD = "o=";
+SDPField.prototype.TIME_FIELD = "t=";
+SDPField.prototype.KEY_FIELD = "k=";
+SDPField.prototype.ATTRIBUTE_FIELD = "a=";
+SDPField.prototype.VERSION_FIELD="v=";
+SDPField.prototype.URI_FIELD = "u=";
+SDPField.prototype.MEDIA_FIELD = "m=";
+SDPField.prototype.REPEAT_FIELD = "r=";
+SDPField.prototype.ZONE_FIELD = "z=";
+
+SDPField.prototype.BASE64="base64";
+SDPField.prototype.PROMPT="prompt";
+SDPField.prototype.CLEAR = "clear";
+SDPField.prototype.URI="URI";
+SDPField.prototype.IPV4="IP4";
+SDPField.prototype.IPV6="IP6";
+SDPField.prototype.IN="IN";
+
+SDPField.prototype.getFieldName =function() {
+    return this.fieldName;
+}
+
+SDPField.prototype.setFieldName =function(fieldName) {
+    this.fieldName=fieldName;
+}
+
+/** Returns the type character for the field.
+ * @return the type character for the field.
+ */
+SDPField.prototype.getTypeChar =function() {
+    if (this.fieldName == null)
+        return '';
+    else
+        return this.fieldName.charAt(0);
+}/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP AttributeField .
+ *  @see  gov/nist/javax/sdp/fields/AttributeField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function AttributeField() {
+    this.classname="AttributeField";
+    this.fieldName=this.ATTRIBUTE_FIELD;
+    this.attribute=null;
+}
+ 
+AttributeField.prototype = new SDPField();
+AttributeField.prototype.constructor=AttributeField; 
+
+/** Returns the name of this attribute
+ * @throws SdpParseException if the name is not well formatted.
+ * @return a String identity or null.
+ */
+AttributeField.prototype.getName =function() {
+    if (this.attribute == null) return null;
+    else  return this.attribute.getName();   
+}
+
+/** Sets the id of this attribute.
+ * @param name  the string name/id of the attribute.
+ * @throws SdpException if the name is null
+ */
+AttributeField.prototype.setName =function(name) {
+    if(typeof(name)=='string')
+    {
+        if (this.attribute == null) this.attribute = new NameValue();
+        this.attribute.setSeparator(Separators.prototype.COLON);
+        this.attribute.setName(name);
+    }
+    else throw new SdpException("AttributeField.setName() requires string object argument");  
+} 
+ 
+ 
+/** Determines if this attribute has an associated value.
+ * @throws SdpParseException if the value is not well formatted.
+ * @return true if the attribute has a value.
+ */
+AttributeField.prototype.hasValue =function() {
+    if (this.attribute == null)
+        return false;
+    else {
+        var value = this.attribute.getValueAsObject();
+        if (value == null)
+            return false;
+        else
+            return true;
+    }
+}
+
+/** Returns the value of this attribute.
+ * @throws SdpParseException if the value is not well formatted.
+ * @return the value; null if the attribute has no associated value.
+ */
+AttributeField.prototype.getValue =function() {
+    if (this.attribute == null)
+        return null;
+    else {
+        var value = this.attribute.getValueAsObject();
+        if (value == null)
+            return null;
+        else if (value instanceof String)
+            return value;
+        else
+            return value.toString();
+    }
+}
+
+/** Sets the value of this attribute.
+ * @param value the - attribute value
+ * @throws SdpException if the value is null.
+ */
+AttributeField.prototype.setValue =function(value) {
+    if (this.attribute == null)
+        this.attribute = new NameValue();
+    this.attribute.setValueAsObject(value);
+}
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+AttributeField.prototype.encode =function() {
+    if(this.attribute ==null) throw  new SdpException("AttributeField.encode() requires name/value");
+    var encoded_string = this.ATTRIBUTE_FIELD;
+    encoded_string += this.attribute.encode();
+    encoded_string += Separators.prototype.NEWLINE;
+    return encoded_string;
+}
+
+AttributeField.prototype.equals =function(that) {
+    if ( ! (that instanceof AttributeField)) return false;
+    var other = that;
+    return (other.attribute.getName().toLowerCase()==this.attribute.getName().toLowerCase()) &&
+    this.attribute.getValueAsObject().equals(other.attribute.getValueAsObject());
+}
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP VersionField .
+ *  @see  gov/nist/javax/sdp/fields/ProtoVersionField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function VersionField() {
+    this.classname="VersionField";
+    this.fieldName=this.VERSION_FIELD;
+    this.version=0;
+}
+ 
+VersionField.prototype = new SDPField();
+VersionField.prototype.constructor=VersionField; 
+
+VersionField.prototype.getVersion =function() {
+    return this.version;
+}
+
+/**
+ * Set the protoVersion member
+ */
+VersionField.prototype.setVersion =function(version) {
+    if(typeof version ==  'number')
+    {
+       if(version >= 0) this.version = version;
+       else throw new SdpException("VersionField.setVersion(): bad argument");
+    }
+    else throw new SdpException("VersionField.setVersion(): requires number type argument");  
+}
+   
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+VersionField.prototype.encode =function() {
+    return this.VERSION_FIELD + this.version + Separators.prototype.NEWLINE;
+}
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP OriginField .
+ *  @see  gov/nist/javax/sdp/fields/OriginField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function OriginField() {
+    this.classname="OriginField";
+    this.fieldName=this.ORIGIN_FIELD;
+    this.userName=null;
+    this.networkType=SDPField.prototype.IN; 
+    this.addressType=SDPField.prototype.IPV4;
+    this.host=null;
+    this.sessionId=null;
+    this.sessionVersion=null;  
+}
+ 
+OriginField.prototype = new SDPField();
+OriginField.prototype.constructor=OriginField; 
+
+
+/** Returns the name of the session originator.
+ * @throws SdpParseException
+ * @return the string username.
+ */
+OriginField.prototype.getUserName =function() {
+    return this.userName;
+}
+
+/**
+ * Get the sessionID member.
+ */
+OriginField.prototype.getSessionId =function() {
+    return new Number(this.sessionId);
+}
+
+/**
+ * Get the sessionVersion member.
+ */
+OriginField.prototype.getSessionVersion =function() {
+    return new Number(this.sessionVersion);
+}
+
+/**
+ * Get the netType member.
+ */
+OriginField.prototype.getNetworkType =function() {
+    return this.networkType;
+}
+
+/**
+ * Get the address type member.
+ */
+OriginField.prototype.getAddressType =function() {
+    return this.addressType;
+}
+
+/**
+ * Get the host member.
+ */
+OriginField.prototype.getHost =function() {
+    return this.host;
+}
+
+/** Returns the type of the network for this Connection.
+ * @throws SdpParseException
+ * @return the string network type.
+ */
+OriginField.prototype.getAddress =function() {
+    var host = this.getHost();
+    if (host == null)
+        return null;
+    else
+        return host.getAddress();
+}
+
+/**
+ * Set the sessId member
+ */
+OriginField.prototype.setSessionId =function(sessionId) {
+    if(typeof(sessionId)=='string' || typeof(sessionId)=='number')
+    {
+        this.sessionId="";
+        this.sessionId+=sessionId;
+    }
+    else throw new SdpException("OriginField.setSessionId() requires string or number object argument");
+}
+
+/**
+ * Set the sessVersion member
+ */
+OriginField.prototype.setSessionVersion =function(sessionVersion) {
+    if(typeof(sessionVersion)=='string' || typeof(sessionVersion)=='number')
+    {
+        this.sessionVersion="";
+        this.sessionVersion+=sessionVersion;
+    }
+    else throw new SdpException("OriginField.setSessionVersion() requires string or number argument");
+
+}
+
+/**
+ * Set the nettype member
+ */
+OriginField.prototype.setNetworkType =function(networkType) {
+    if(typeof(networkType)=='string')
+    {
+       this.networkType = networkType;
+    }
+    else throw new SdpException("OriginField.setNetworkType() requires string argument"); 
+
+}
+
+/**
+ * Set the addrtype member
+ */
+OriginField.prototype.setAddressType =function(addressType) {
+    if(typeof(addressType)=='string')
+    {   
+        this.addressType = addressType;
+    }
+    else throw new SdpException("OriginField.setAddressType() requires string argument"); 
+}
+
+
+/**
+ * Set the address member
+ */
+OriginField.prototype.setHost =function(host) {
+    if (host instanceof Host) {
+        this.host = host;
+    } 
+    else  throw new SdpException("OriginField.setHost() requires Host object argument");
+}
+
+
+/**
+ * Set the address member
+ */
+OriginField.prototype.setAddress =function(address) {
+    if (typeof(address) =='string' ) {
+        var host = this.getHost();
+        if (host == null) host = new Host();
+        host.setAddress(address);
+        this.setHost(host);
+    } 
+    else  throw new SdpException("OriginField.setAddress() requires string argument");
+}
+
+
+/** Sets the name of the session originator.
+ * @param user the string username.
+ * @throws SdpException if the parameter is null
+ */
+OriginField.prototype.setUserName =function(userName) {
+    if(typeof(userName)=='string')
+    {   
+        this.userName = userName;
+    }
+    else throw new SdpException("OriginField.setUserName() requires string argument"); 
+}
+
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+OriginField.prototype.encode =function() {
+    if(this.host == null) throw  new SdpException("OriginField.encode() requires host"); 
+    if(this.userName == null) throw  new SdpException("OriginField.encode() requires userName"); 
+    if(this.sessionId == null) throw  new SdpException("OriginField.encode() requires sessionId"); 
+    if(this.sessionVersion == null) throw  new SdpException("OriginField.encode() requires sessionVersion"); 
+    
+    var hostEncoding = "";
+    if (this.host != null){
+        hostEncoding = this.host.encode();
+        //it appears that SDP does not allow square brackets
+        //in the connection address (see RFC4566) so make sure
+        //we lose them
+        if(Host.prototype.isIPv6Address(hostEncoding))
+        {
+            //the isIPv6Reference == true means we have a minimum
+            //of 2 symbols, so substring bravely
+            hostEncoding = hostEncoding.substring(1, hostEncoding.length()-1);
+        }
+    }
+    var encodedString = this.ORIGIN_FIELD;
+    encodedString+= this.userName
+    encodedString+= Separators.prototype.SP
+    encodedString+= this.sessionId
+    encodedString+= Separators.prototype.SP
+    encodedString+= this.sessionVersion
+    encodedString+= Separators.prototype.SP
+    encodedString+= this.networkType
+    encodedString+= Separators.prototype.SP
+    encodedString+= this.addressType
+    encodedString+= Separators.prototype.SP
+    encodedString+= hostEncoding
+    encodedString+= Separators.prototype.NEWLINE;
+    return encodedString;
+}
+
+OriginField.prototype.clone =function() {
+    var retval = new OriginField();
+    retval.userName = this.userName;
+    retval.networkType = this.networkType; 
+    retval.addressType =  this.addressType; 
+    retval.sessionId = this.sessionId;
+    retval.sessionVersion =  this.sessionVersion;  
+    retval.host = new Host(this.host.getAddress());
+    return retval;
+}
+
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP SessionNameField .
+ *  @see  gov/nist/javax/sdp/fields/SessionNameField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function SessionNameField() {
+    this.classname="SessionNameField";
+    this.fieldName=this.SESSION_NAME_FIELD;
+    this.sessionName=null;
+}
+ 
+SessionNameField.prototype = new SDPField();
+SessionNameField.prototype.constructor=SessionNameField; 
+
+
+SessionNameField.prototype.getSessionName =function() {
+    return this.sessionName;
+}
+    
+/**
+ * Set the sessionName member
+ */
+SessionNameField.prototype.setSessionName =function(sessionName) {
+    if( typeof(sessionName)=='string')
+    {
+        this.sessionName = sessionName;
+    }
+    else throw new SdpException("SessionNameField.setSessionName() requires string object argument");
+}
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+SessionNameField.prototype.encode =function() {
+    return this.SESSION_NAME_FIELD + this.sessionName + Separators.prototype.NEWLINE;
+}/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP InformationField .
+ *  @see  gov/nist/javax/sdp/fields/InformationField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function InformationField() {
+    this.classname="InformationField";
+    this.fieldName=this.INFORMATION_FIELD;
+    this.information="";
+}
+ 
+InformationField.prototype = new SDPField();
+InformationField.prototype.constructor=InformationField; 
+
+
+InformationField.prototype.getInformation =function() {
+    return this.information;
+}
+
+InformationField.prototype.setInformation =function(info) {
+    if(typeof(info) ==  'string')
+    {
+        this.information = info;
+    }
+    else throw new SdpException("InformationField.setInformation() requires string type argument");    
+}
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+InformationField.prototype.encode =function() {
+    if(this.information == null) throw  new SdpException("InformationField.encode() requires information"); 
+    return this.INFORMATION_FIELD + this.information + Separators.prototype.NEWLINE;
+}
+
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP URIField .
+ *  @see  gov/nist/javax/sdp/fields/URIField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function URIField() {
+    this.classname="URIField";
+    this.fieldName=this.URI_FIELD;
+    this.uri="";
+}
+ 
+URIField.prototype = new SDPField();
+URIField.prototype.constructor=URIField; 
+
+URIField.prototype.getURI =function() {
+    return this.uri;
+}
+
+URIField.prototype.setURI =function(uri) {
+    if(typeof uri == "string")
+    {
+        this.uri = uri;
+    } 
+    else throw new SdpException("URIField.setURI() requires string object argument");
+}
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+URIField.prototype.encode =function() {
+    if(this.uri == null) throw  new SdpException("URIField.encode() requires uri"); 
+    return this.URI_FIELD + this.uri + Separators.prototype.NEWLINE;
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP EmailField .
+ *  @see  gov/nist/javax/sdp/fields/EmailField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function EmailField() {
+    this.classname="EmailField";
+    this.fieldName=this.EMAIL_FIELD;
+    this.displayName=null;
+    this.email=null;
+}
+ 
+EmailField.prototype = new SDPField();
+EmailField.prototype.constructor=EmailField; 
+
+EmailField.prototype.getEmail =function() {
+    return this.email;
+}
+
+EmailField.prototype.getDisplayName =function() {
+    return this.displayName;
+}
+
+/**
+ * Set the displayName member
+ */
+EmailField.prototype.setDisplayName =function(displayName) {
+    if( typeof(displayName)=='string')
+    {
+        this.displayName = displayName;
+    }
+    else throw new SdpException("EmailField.setDisplayName() requires string object argument");
+}
+
+/**
+ * Set the email member
+ */
+EmailField.prototype.setEmail =function(email) {
+    if(typeof(email)=='string')
+    {
+        this.email = email;
+    }
+    else throw new SdpException("EmailField.setEmail() requires string object argument");
+}
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+EmailField.prototype.encode =function() {
+    if(this.email==null) throw  new SdpException("PhoneField.encode() requires email");
+    var encodedString=this.EMAIL_FIELD;
+    if (this.displayName != null) encodedString = this.displayName + Separators.prototype.LESS_THAN;
+    else  encodedString = "";
+    encodedString += this.email;
+    if (this.displayName != null) encodedString += Separators.prototype.GREATER_THAN; 
+    encodedString += Separators.prototype.NEWLINE;
+    return encodedString 
+}
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP PhoneField .
+ *  @see  gov/nist/javax/sdp/fields/PhoneField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function PhoneField() {
+    this.classname="PhoneField";
+    this.fieldName=this.VERSION_FIELD;
+    this.name=null;
+    this.phoneNumber=null; 
+}
+ 
+PhoneField.prototype = new SDPField();
+PhoneField.prototype.constructor=PhoneField; 
+
+OriginField.prototype.getName =function() {
+    return this.name;
+}
+
+PhoneField.prototype.getPhoneNumber =function() {
+    return this.phoneNumber;
+}
+
+/**
+ * Set the name member
+ *
+ *@param name - the name to set.
+ */
+PhoneField.prototype.setName =function(name) {
+    if(typeof name ==  'string')
+    {
+       this.name = name;
+    }
+    else throw new SdpException("PhoneField.setName(): requires number type argument");  
+}
+
+/**
+ * Set the phoneNumber member
+ *@param phoneNumber - phone number to set.
+ */
+PhoneField.prototype.setPhoneNumber =function(phoneNumber) {
+    if(typeof phoneNumber ==  'string')
+    {
+       this.phoneNumber = phoneNumber;
+    }
+    else throw new SdpException("PhoneField.setPhoneNumber(): requires number type argument");  
+}
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ * Here, we implement only the "name <phoneNumber>" form
+ * and not the "phoneNumber (name)" form
+ */
+PhoneField.prototype.encode =function() {
+    if(this.phoneNumber==null) throw  new SdpException("PhoneField.encode() requires phoneNumber");
+    var encodedString=this.PHONE_FIELD;
+    if(this.name!=null) encodedString += this.name;
+    encodedString += Separators.prototype.LESS_THAN;
+    encodedString += this.phoneNumber;
+    encodedString += Separators.prototype.GREATER_THAN;
+    encodedString += Separators.prototype.NEWLINE;
+    return encodedString;
+}
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP SessionNameField .
+ *  @see  gov/nist/javax/sdp/fields/SessionNameField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function TimeField() {
+    this.classname="TimeField";
+    this.fieldName=this.TIME_FIELD;
+    this.startTime=0;
+    this.stopTime=0;
+}
+ 
+TimeField.prototype = new SDPField();
+TimeField.prototype.constructor=TimeField; 
+
+TimeField.prototype.getStartTime =function() {
+    return this.startTime;
+}
+
+TimeField.prototype.getStopTime =function() {
+    return this.stopTime;
+}
+
+/**
+ * Set the startTime member
+ */
+TimeField.prototype.setStartTime =function(startTime) {
+    if(typeof(startTime) == 'number') 
+    {
+        this.startTime=startTime;
+    }
+    else throw new SdpException("TimeField.setStartTime() requires string type argument");
+}
+
+/**
+ * Set the stopTime member
+ */
+TimeField.prototype.setStopTime =function(stopTime) {
+     if(typeof(stopTime) == 'number') 
+    {
+        this.startTime=stopTime;
+    }
+    else throw new SdpException("TimeField.setStopTime() requires string type argument");
+}
+
+
+/** Returns whether the field will be output as a typed time
+ * or a integer value.
+ *
+ *     Typed time is formatted as an integer followed by a unit character.
+ * The unit indicates an appropriate multiplier for
+ *     the integer.
+ *
+ *     The following unit types are allowed.
+ *          d - days (86400 seconds)
+ *          h - hours (3600 seconds)
+ *          m - minutes (60 seconds)
+ *          s - seconds ( 1 seconds)
+ * @return true, if the field will be output as a
+ * typed time; false, if as an integer value.
+ */
+TimeField.prototype.getTypedTime =function() {
+    return false;
+}
+
+/** Sets whether the field will be output as a typed time or a integer value.
+ *
+ *     Typed time is formatted as an integer followed by a unit character.
+ * The unit indicates an appropriate multiplier for
+ *     the integer.
+ *
+ *     The following unit types are allowed.
+ *          d - days (86400 seconds)
+ *          h - hours (3600 seconds)
+ *          m - minutes (60 seconds)
+ *          s - seconds ( 1 seconds)
+ * @param typedTime typedTime - if set true, the start and stop times will
+ * be output in an optimal typed time format; if false, the
+ *          times will be output as integers.
+ */
+TimeField.prototype.setTypedTime =function(typedTime) {
+}
+
+
+/** Returns whether the start and stop times were set to zero (in NTP).
+ * @return boolean
+ */
+TimeField.prototype.isZero =function() {
+    return (this.getStartTime()==0 && this.getStopTime()==0);
+}
+
+/** Sets the start and stop times to zero (in NTP).
+ */
+TimeField.prototype.setZero =function() {
+    this.setStopTime(0);
+    this.setStartTime(0);
+}
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+TimeField.prototype.encode =function() {
+    var encodedString=this.TIME_FIELD;
+    encodedString+=this.startTime;
+    encodedString+=Separators.prototype.SP;
+    encodedString+=this.stopTime;
+    encodedString+=Separators.prototype.NEWLINE;
+    return encodedString; 
+}
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP ConnectionAddress .
+ *  @see  gov/nist/javax/sdp/fields/ConnectionAddress.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function ConnectionAddress() {
+    this.classname="ConnectionAddress";
+    this.host =null;
+    this.ttl=0;
+    this.port=0;
+}
+ 
+ConnectionAddress.prototype = new SDPObject();
+ConnectionAddress.prototype.constructor=ConnectionAddress; 
+
+
+ConnectionAddress.prototype.getHost =function() {
+    return this.host;
+}
+ 
+ConnectionAddress.prototype.getTtl =function() {
+    return this.ttl;
+}
+
+ConnectionAddress.prototype.getPort =function() {
+    return this.port;
+}
+
+/**
+ * Set the address member
+ */
+ConnectionAddress.prototype.setHost =function(host) {
+    if(host instanceof Host)
+    {
+        this.host = host;
+    } 
+    else throw new SdpException("ConnectionAddress.setHost() requires  Host object argument");    
+}
+
+/**
+ * Set the ttl member
+ */
+ConnectionAddress.prototype.setTtl =function(ttl) {
+    if(typeof(ttl)=='number')
+    {
+        this.ttl = ttl;
+    }
+    else throw new SdpException("ConnectionAddress.setTtl() requires  number object argument");  
+}
+
+
+/**
+ * Set the port member
+ */
+ConnectionAddress.prototype.setPort =function(port) {
+    if(typeof(port)=='number')
+    {  
+        this.port = port;
+    }
+    else throw new SdpException("ConnectionAddress.setPort() requires  number object argument");  
+
+}
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+ConnectionAddress.prototype.encode =function() {
+    if(this.host==null) throw  new SdpException("ConnectionAddress.encode() requires host"); 
+    var encodedString = this.host.encode();
+    //it appears that SDP does not allow square brackets
+    //in the connection address (see RFC4566) so make sure
+    //we lose them 
+    if(Host.prototype.isIPv6Address(encodedString))
+    {
+        //the isIPv6Reference == true means we have a minimum
+        //of 2 symbols, so substring bravely
+        encodedString += encodedString.substring(1, encodedString.length()-1);
+    }
+
+    if (this.ttl != 0 && this.port != 0) {
+        encodedString += Separators.prototype.SLASH + this.ttl + Separators.prototype.SLASH + this.port;
+    } else if (this.ttl != 0) {
+        encodedString += Separators.prototype.SLASH + this.ttl;
+    }
+    return encodedString;
+}
+
+
+ConnectionAddress.prototype.clone =function() {
+    var  retval = new ConnectionAddress();
+    if (this.address != null)
+        retval.address = this.address.clone();
+    retval.ttl = this.ttl;
+    retval.port = this.port;
+    return retval;
+}
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP ConnectionField .
+ *  @see  gov/nist/javax/sdp/fields/ConnectionField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function ConnectionField() {
+    this.classname="ConnectionField";
+    this.fieldName=this.CONNECTION_FIELD;
+    this.networkType=SDPField.prototype.IN;
+    this.addressType=SDPField.prototype.IPV4;
+    this.address=null;
+}
+ 
+ConnectionField.prototype = new SDPField();
+ConnectionField.prototype.constructor=ConnectionField; 
+
+
+ConnectionField.prototype.getNetworkType =function() {
+    return this.networkType;
+}
+
+ConnectionField.prototype.getAddressType =function() {
+    return this.addressType;
+}
+
+ConnectionField.prototype.getAddress =function() {
+    if (this.address == null)
+        return null;
+    else {
+        var host = this.address.getAddress();
+        if (host == null)
+            return null;
+        else
+            return host.getAddress();
+    }
+} 
+
+/**
+ * Set the nettype member
+ */
+ConnectionField.prototype.setNetworkType =function(networkType) {
+    if(typeof networkType ==  'string')
+    {
+        this.networkType = networkType;
+    }
+    else throw new SdpException("ConnectionField.setNetworkType() requires string type argument");  
+}
+
+/**
+ * Set the addrtype member
+ */
+ConnectionField.prototype.setAddressType =function(addressType) {
+    if(typeof addressType ==  'string')
+    {
+        this.addressType = addressType;
+    }
+    else throw new SdpException("ConnectionField.setAddressType() requires string type argument");  
+}
+
+
+/**
+ * Set the address member
+ */
+ConnectionField.prototype.setAddress =function(address) {
+    if(address instanceof ConnectionAddress)
+    {
+        this.address = address;
+    }
+    else if(typeof address == 'string')
+    {
+        if (this.address == null) {
+            this.address = new ConnectionAddress();
+            var host = new Host(address);
+            this.address.setHost(host);
+        } else {
+            var host = this.address.getHost();
+            if (host == null) {
+                host = new Host(address);
+                this.address.setAddress(host);
+            } else
+                host.setAddress(address);
+        }
+    }
+    else throw new SdpException("ConnectionField.setAddress() requires ConnectionAddress object or string argument");  
+}
+
+
+/**
+ * Get the string encoded version of this object
+ * @since v1.0
+ */
+ConnectionField.prototype.encode =function() {
+    if(this.address == null) throw  new SdpException("ConnectionField.encode() requires address"); 
+    var encoded_string = this.CONNECTION_FIELD;
+    encoded_string += this.networkType;
+    encoded_string += Separators.prototype.SP;
+    encoded_string += this.addressType;
+    encoded_string += Separators.prototype.SP;
+    encoded_string += this.address.encode();
+    encoded_string += Separators.prototype.NEWLINE;
+    return encoded_string; 
+}
+
+
+ConnectionField.prototype.clone =function() {
+    var retval = new ConnectionField();
+    if (this.address != null)
+        retval.address = this.address.clone();
+    retval.networkType=this.networkType;
+    retval.addressType=this.addressType;
+    return retval;
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP ConnectionField .
+ *  @see  gov/nist/javax/sdp/fields/ConnectionField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function ConnectionField() {
+    this.classname="ConnectionField";
+    this.fieldName=this.CONNECTION_FIELD;
+    this.networkType=SDPField.prototype.IN;
+    this.addressType=SDPField.prototype.IPV4;
+    this.address=null;
+}
+ 
+ConnectionField.prototype = new SDPField();
+ConnectionField.prototype.constructor=ConnectionField; 
+
+
+ConnectionField.prototype.getNetworkType =function() {
+    return this.networkType;
+}
+
+ConnectionField.prototype.getAddressType =function() {
+    return this.addressType;
+}
+
+ConnectionField.prototype.getAddress =function() {
+    if (this.address == null)
+        return null;
+    else {
+        var host = this.address.getAddress();
+        if (host == null)
+            return null;
+        else
+            return host.getAddress();
+    }
+} 
+
+/**
+ * Set the nettype member
+ */
+ConnectionField.prototype.setNetworkType =function(networkType) {
+    if(typeof networkType ==  'string')
+    {
+        this.networkType = networkType;
+    }
+    else throw new SdpException("ConnectionField.setNetworkType() requires string type argument");  
+}
+
+/**
+ * Set the addrtype member
+ */
+ConnectionField.prototype.setAddressType =function(addressType) {
+    if(typeof addressType ==  'string')
+    {
+        this.addressType = addressType;
+    }
+    else throw new SdpException("ConnectionField.setAddressType() requires string type argument");  
+}
+
+
+/**
+ * Set the address member
+ */
+ConnectionField.prototype.setAddress =function(address) {
+    if(address instanceof ConnectionAddress)
+    {
+        this.address = address;
+    }
+    else if(typeof address == 'string')
+    {
+        if (this.address == null) {
+            this.address = new ConnectionAddress();
+            var host = new Host(address);
+            this.address.setHost(host);
+        } else {
+            var host = this.address.getHost();
+            if (host == null) {
+                host = new Host(address);
+                this.address.setAddress(host);
+            } else
+                host.setAddress(address);
+        }
+    }
+    else throw new SdpException("ConnectionField.setAddress() requires ConnectionAddress object or string argument");  
+}
+
+
+/**
+ * Get the string encoded version of this object
+ * @since v1.0
+ */
+ConnectionField.prototype.encode =function() {
+    if(this.address == null) throw  new SdpException("ConnectionField.encode() requires address"); 
+    var encoded_string = this.CONNECTION_FIELD;
+    encoded_string += this.networkType;
+    encoded_string += Separators.prototype.SP;
+    encoded_string += this.addressType;
+    encoded_string += Separators.prototype.SP;
+    encoded_string += this.address.encode();
+    encoded_string += Separators.prototype.NEWLINE;
+    return encoded_string; 
+}
+
+
+ConnectionField.prototype.clone =function() {
+    var retval = new ConnectionField();
+    if (this.address != null)
+        retval.address = this.address.clone();
+    retval.networkType=this.networkType;
+    retval.addressType=this.addressType;
+    return retval;
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP KeyField .
+ *  @see  gov/nist/javax/sdp/fields/KeyField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function KeyField() {
+    this.classname="KeyField";
+    this.fieldName=this.KEY_FIELD;
+    this.method=null;
+    this.key=null;
+    
+}
+ 
+KeyField.prototype = new SDPField();
+KeyField.prototype.constructor=KeyField; 
+
+KeyField.prototype.getMethod =function() {
+    return this.method;
+}
+
+KeyField.prototype.getKey =function() {
+    return this.key;
+}
+
+/**
+ * Set the type member
+ */
+KeyField.prototype.setMethod =function(method) {
+    if(typeof method == "string")
+    {
+        this.method = method;
+    } 
+    else throw new SdpException("KeyField.setMethod() requires string object argument");
+}
+   
+/**
+ * Set the keyData member
+ */
+KeyField.prototype.setKey =function(key) {
+     if(typeof key == "string")
+    {
+        this.key = key;
+    } 
+    else throw new SdpException("KeyField.setKey() requires string object argument");
+}
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+KeyField.prototype.encode =function() {
+    if(this.method==null) throw  new SdpException("KeyField.encode() requires method");
+    if(this.key==null) throw  new SdpException("KeyField.encode() requires key");
+    var encodedString=this.KEY_FIELD;
+    encodedString += this.method;
+    encodedString += Separators.prototype.COLON;
+    encodedString += this.key;
+    encodedString += Separators.prototype.NEWLINE;
+    return encodedString;
+}
+
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP MediaField .
+ *  @see  gov/nist/javax/sdp/fields/MediaField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function MediaField() {
+    this.classname="MediaField";
+    this.fieldName=this.MEDIA_FIELD;
+    this.type=null;
+    this.port=-1;
+    this.nports=0;
+    this.protocol=null;
+    this.formatArray=new Array();
+}
+ 
+MediaField.prototype = new SDPField();
+MediaField.prototype.constructor=MediaField; 
+
+/** Returns the type (audio,video etc) of the
+ * media defined by this description.
+ * @throws SdpParseException
+ * @return the string media type.
+ */
+MediaField.prototype.getType =function() {
+    return this.type;
+}
+
+/** Returns the protocol over which this media should be transmitted.
+ * @throws SdpParseException
+ * @return the String protocol, e.g. RTP/AVP.
+ */
+MediaField.prototype.getPort =function() {
+    return this.port;
+}
+
+
+/** Returns the number of ports associated with this media description
+ * @throws SdpParseException
+ * @return the integer port count.
+ */
+MediaField.prototype.getNports =function() {
+    return this.nports;
+}
+
+MediaField.prototype.getProtocol =function() {
+    return this.protocol;
+}
+
+MediaField.prototype.getFormats =function() {
+    return this.formatArray;
+}
+
+/**
+ * Set the media member
+ */
+MediaField.prototype.setType =function(type) {
+    if(typeof(type)=='string')
+    {
+        this.type=type.toLowerCase();
+    }
+    else throw new SdpException("MediaField.setMedia() requires string object argument");
+}
+
+
+/**
+ * Set the port member
+ */
+MediaField.prototype.setPort =function(port) {
+    if(typeof(port)=='number')
+    {
+        if(port<0) throw new SdpException("MediaField.setPort() requires number > 0 object argument");
+        this.port=port;
+    }
+    else throw new SdpException("MediaField.setPort() requires number object argument");
+}
+
+/**
+ * Set the nports member
+ */
+MediaField.prototype.setNports =function(nports) {
+    if(typeof(nports)=='number')
+    {      
+        if(nports<0) throw new SdpException("MediaField.setNports() requires number > 0 object argument");
+        this.nports=nports;
+    }
+    else throw new SdpException("MediaField.setNports() requires number object argument"); 
+}
+
+/**
+ * Set the proto member
+ */
+MediaField.prototype.setProtocol =function(protocol) {
+    if(typeof(protocol)=='string')
+    {
+        this.protocol=protocol;
+    }
+    else throw new SdpException("MediaField.setProtocol() requires string object argument");
+}
+
+/**
+ * Set the fmt member
+ */
+MediaField.prototype.setFormats =function(formatArray) {
+    if(formatArray instanceof Array)
+    {
+        this.formatArray=formatArray;
+    }
+    else throw new SdpException("MediaField.setFormats() requires Array object argument");
+}
+
+
+/** Returns an Vector of the media formats supported by this description.
+ * Each element in this Vector will be an String value which matches one of
+ * the a=rtpmap: attribute fields of the media description.
+ * @param create to set
+ * @throws SdpException
+ * @return the Vector.
+ */
+MediaField.prototype.getFormats =function(create) {
+    if(typeof(create)=='boolean')
+    {
+        if (create && this.formatArray==null) this.formatArray = new Array();
+        return this.formatArray;
+    }
+    else throw new SdpException("MediaField.getFormats() requires boolean object argument");
+}
+
+
+MediaField.prototype.encodeFormats =function() {
+    var encodedString = "";
+    for (var i = 0; i < this.formatArray.length; i++) {
+        encodedString+=this.formatArray[i];
+        if (i < (this.formatArray.length - 1))
+            encodedString+=Separators.prototype.SP;
+    }
+    return encodedString;
+}
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+MediaField.prototype.encode =function() {
+    if(this.type==null) throw  new SdpException("MediaField.encode() requires type");
+    if(this.protocol==null) throw  new SdpException("MediaField.encode() requires protocol");
+    if(this.formatArray==null) throw  new SdpException("MediaField.encode() requires format");
+    var encodedString=this.MEDIA_FIELD;
+    encodedString += this.type + Separators.prototype.SP + this.port;
+    // Workaround for Microsoft Messenger contributed by Emil Ivov
+    // Leave out the nports parameter as this confuses the messenger.
+    if (this.nports > 1)
+        encodedString += Separators.prototype.SLASH + this.nports;
+    encodedString += Separators.prototype.SP + this.protocol;
+    encodedString += Separators.prototype.SP + this.encodeFormats();
+    encodedString += Separators.prototype.NEWLINE;
+    return encodedString;
+}
+
+MediaField.prototype.clone =function() {
+    var retval = new MediaField();
+    retval.media = this.type;
+    retval.port = this.port;
+    retval.nports = this.nports;
+    retval.proto = this.protocol;
+    retval.formats=new Array();
+    if (this.formatArray != null)
+    {
+        for(var i=0;i<this.formatArray.length;i++)
+        {
+            retval.formats[i]=this.formatArray[i];      
+        }
+    }
+    return retval;
+}
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP KeyField .
+ *  @see  gov/nist/javax/sdp/fields/KeyField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function KeyField() {
+    this.classname="KeyField";
+    this.fieldName=this.KEY_FIELD;
+    this.method=null;
+    this.key=null;
+    
+}
+ 
+KeyField.prototype = new SDPField();
+KeyField.prototype.constructor=KeyField; 
+
+KeyField.prototype.getMethod =function() {
+    return this.method;
+}
+
+KeyField.prototype.getKey =function() {
+    return this.key;
+}
+
+/**
+ * Set the type member
+ */
+KeyField.prototype.setMethod =function(method) {
+    if(typeof method == "string")
+    {
+        this.method = method;
+    } 
+    else throw new SdpException("KeyField.setMethod() requires string object argument");
+}
+   
+/**
+ * Set the keyData member
+ */
+KeyField.prototype.setKey =function(key) {
+     if(typeof key == "string")
+    {
+        this.key = key;
+    } 
+    else throw new SdpException("KeyField.setKey() requires string object argument");
+}
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+KeyField.prototype.encode =function() {
+    if(this.method==null) throw  new SdpException("KeyField.encode() requires method");
+    if(this.key==null) throw  new SdpException("KeyField.encode() requires key");
+    var encodedString=this.KEY_FIELD;
+    encodedString += this.method;
+    encodedString += Separators.prototype.COLON;
+    encodedString += this.key;
+    encodedString += Separators.prototype.NEWLINE;
+    return encodedString;
+}
+
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP AttributeField .
+ *  @see  gov/nist/javax/sdp/fields/AttributeField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function AttributeField() {
+    this.classname="AttributeField";
+    this.fieldName=this.ATTRIBUTE_FIELD;
+    this.attribute=null;
+}
+ 
+AttributeField.prototype = new SDPField();
+AttributeField.prototype.constructor=AttributeField; 
+
+/** Returns the name of this attribute
+ * @throws SdpParseException if the name is not well formatted.
+ * @return a String identity or null.
+ */
+AttributeField.prototype.getName =function() {
+    if (this.attribute == null) return null;
+    else  return this.attribute.getName();   
+}
+
+/** Sets the id of this attribute.
+ * @param name  the string name/id of the attribute.
+ * @throws SdpException if the name is null
+ */
+AttributeField.prototype.setName =function(name) {
+    if(typeof(name)=='string')
+    {
+        if (this.attribute == null) this.attribute = new NameValue();
+        this.attribute.setSeparator(Separators.prototype.COLON);
+        this.attribute.setName(name);
+    }
+    else throw new SdpException("AttributeField.setName() requires string object argument");  
+} 
+ 
+ 
+/** Determines if this attribute has an associated value.
+ * @throws SdpParseException if the value is not well formatted.
+ * @return true if the attribute has a value.
+ */
+AttributeField.prototype.hasValue =function() {
+    if (this.attribute == null)
+        return false;
+    else {
+        var value = this.attribute.getValueAsObject();
+        if (value == null)
+            return false;
+        else
+            return true;
+    }
+}
+
+/** Returns the value of this attribute.
+ * @throws SdpParseException if the value is not well formatted.
+ * @return the value; null if the attribute has no associated value.
+ */
+AttributeField.prototype.getValue =function() {
+    if (this.attribute == null)
+        return null;
+    else {
+        var value = this.attribute.getValueAsObject();
+        if (value == null)
+            return null;
+        else if (value instanceof String)
+            return value;
+        else
+            return value.toString();
+    }
+}
+
+/** Sets the value of this attribute.
+ * @param value the - attribute value
+ * @throws SdpException if the value is null.
+ */
+AttributeField.prototype.setValue =function(value) {
+    if (this.attribute == null)
+        this.attribute = new NameValue();
+    this.attribute.setValueAsObject(value);
+}
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+AttributeField.prototype.encode =function() {
+    if(this.attribute ==null) throw  new SdpException("AttributeField.encode() requires name/value");
+    var encoded_string = this.ATTRIBUTE_FIELD;
+    encoded_string += this.attribute.encode();
+    encoded_string += Separators.prototype.NEWLINE;
+    return encoded_string;
+}
+
+AttributeField.prototype.equals =function(that) {
+    if ( ! (that instanceof AttributeField)) return false;
+    var other = that;
+    return (other.attribute.getName().toLowerCase()==this.attribute.getName().toLowerCase()) &&
+    this.attribute.getValueAsObject().equals(other.attribute.getValueAsObject());
+}
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP BandwidthField .
+ *  @see  gov/nist/javax/sdp/fields/BandwidthField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function BandwidthField() {
+    this.classname="BandwidthField";
+    this.fieldName=this.BANDWDTH_FIELD;
+    this.type="AS"; // AS as default
+    this.bandwidth=null;
+}
+ 
+BandwidthField.prototype = new SDPField();
+BandwidthField.prototype.constructor=BandwidthField; 
+
+BandwidthField.prototype.getType =function() {
+    return this.type;
+}
+
+BandwidthField.prototype.getBandwidth =function() {
+    return this.bandwidth;
+}
+
+/**
+ * Set the bwtype member
+ */
+BandwidthField.prototype.setType =function(type) {
+    if( typeof(type)=='string')
+    {
+        this.type = type;
+    }
+    else throw new SdpException("BandwidthField.setType() requires string object argument")
+}
+
+/**
+ * Set the bandwidth member
+ */
+BandwidthField.prototype.setBandwidth =function(bandwidth) {
+     if(typeof(bandwidth)=='number')
+    {
+        this.bandwidth = bandwidth;
+    }
+    else throw new SdpException("BandwidthField.setBandwidth() requires number object argument")
+}
+
+/**
+ *  Get the string encoded version of this object
+ * @since v1.0
+ */
+BandwidthField.prototype.encode =function() {
+    if(this.bandwidth==null) throw  new SdpException("BandwidthField.encode() requires valid bandwidth value");
+    var encodedString = this.BANDWIDTH_FIELD;
+    encodedString += this.type;
+    encodedString += Separators.prototype.COLON;
+    encodedString += this.bandwidth;
+    encodedString += Separators.prototype.NEWLINE;
+    return encodedString;
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP TypedTime .
+ *  @see  gov/nist/javax/sdp/fields/TypedTime.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function TypedTime() {
+    this.classname="TypedTime";
+    this.unit="";
+    this.time=0;
+}
+ 
+TypedTime.prototype = new SDPObject();
+TypedTime.prototype.constructor=TypedTime; 
+
+TypedTime.prototype.setTime =function(time) {
+    if(typeof(time) == 'number') this.time=time;
+    else throw new SdpException("TypedTime.prototype.setTime() requires a number argument");
+}
+
+TypedTime.prototype.getTime =function() {
+    return this.time;
+}
+
+TypedTime.prototype.setUnit =function(unit) {
+    if(typeof(unit) == 'string') this.unit=unit;
+    else throw new SdpException("TypedTime.prototype.setUnit() requires string argument ");
+}
+
+TypedTime.prototype.getUnit =function() {
+    return this.unit;
+}
+
+TypedTime.prototype.encode =function() {
+    var encodedString = "";
+    encodedString += this.time;
+    if (this.unit != null)
+        encodedString += this.unit;
+    return encodedString;
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP RepeatField .
+ *  @see  gov/nist/javax/sdp/fields/RepeatField.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function RepeatField() {
+    this.classname="RepeatField";
+    this.fieldName=this.REPEAT_FIELD;
+    this.repeatInterval=null;
+    this.activeDuration=null;
+    this.offsets= new Array();
+}
+ 
+RepeatField.prototype = new SDPField();
+RepeatField.prototype.constructor=RepeatField; 
+
+RepeatField.prototype.setRepeatInterval =function(repeatInterval) {
+    if(repeatInterval instanceof TypedTime) 
+    {
+        this.repeatInterval = repeatInterval;
+    }
+    else if(typeof(repeatInterval)=='number') 
+    {
+        if (repeatInterval < 0)
+            throw new SdpException("RepeatField.setRepeatInterval() requires positive number object argument");
+        else {
+            if (this.repeatInterval == null)
+                this.repeatInterval = new TypedTime();
+            this.repeatInterval.setTime(repeatInterval);
+        }
+    }
+    else throw SdpException("RepeatField.setRepeatInterval() requires number or TypedTime object argument")  
+}
+
+RepeatField.prototype.setActiveDuration =function(activeDuration) {
+    if(activeDuration instanceof TypedTime)
+    {
+        this.activeDuration = activeDuration;
+    }
+    else  if(typeof(activeDuration)=='number') 
+    {
+        if (activeDuration < 0)
+            throw new SdpException("RepeatField.setActiveDuration() requires positive number object argument");
+        else {
+            if (this.activeDuration == null)
+                this.activeDuration = new TypedTime();
+            this.activeDuration.setTime(activeDuration);
+        }
+    }
+    else throw SdpException("RepeatField.setActiveDuration() requires number or TypedTime object argument");  
+}
+
+RepeatField.prototype.addOffset =function(offset) {
+    if(offset instanceof TypedTime) 
+    {
+        this.offsets.push(offset);
+    }
+    else throw SdpException("RepeatField.addOffset() requires TypedTime object argument")
+}
+
+RepeatField.prototype.getOffsets =function() {
+    return this.offsets;
+}
+
+/** Returns the "repeat interval" in seconds.
+ * @throws SdpParseException
+ * @return the "repeat interval" in seconds.
+ */
+RepeatField.prototype.getRepeatInterval =function() {
+    if (this.repeatInterval == null)
+        return -1;
+    else {
+        return this.repeatInterval.getTime();
+    }
+}
+
+/** Returns the "active duration" in seconds.
+ * @throws SdpParseException
+ * @return the "active duration" in seconds.
+ */
+RepeatField.prototype.getActiveDuration =function() {
+    if (this.activeDuration == null)
+        return -1;
+    else {
+        return this.activeDuration.getTime();
+    }
+}
+
+/** Returns the list of offsets. These are relative to the start-time given
+     * in the Time object (t=
+     *     field) with which this RepeatTime is associated.
+     * @throws SdpParseException
+     * @return the list of offsets
+     */
+RepeatField.prototype.getOffsetArray =function() {
+    var result = new Array()
+    for (var i = 0; i < this.offsets.length; i++) {
+        var typedTime = this.offsets[i];
+        result[i] = typedTime.getTime();
+    }
+    return result;
+}
+
+/** Set the list of offsets. These are relative to the start-time given in the
+     * Time object (t=
+     *     field) with which this RepeatTime is associated.
+     * @param offsets array of repeat time offsets
+     * @throws SdpException
+     */
+RepeatField.prototype.setOffsetArray =function(offsets) {
+    if(offsets instanceof Array) 
+    {
+        for (var i = 0; i < this.offsets.length; i++) {
+            var typedTime = new TypedTime();
+            typedTime.setTime(offsets[i]);
+            this.addOffset(typedTime);
+        }
+    }
+    else throw SdpException("RepeatField.setOffsetArray() requires Array object argument")
+}
+
+/** Returns whether the field will be output as a typed time or a integer value.
+     *
+     *     Typed time is formatted as an integer followed by a unit character. The unit indicates an
+     *     appropriate multiplier for the integer.
+     *
+     *     The following unit types are allowed.
+     *          d - days (86400 seconds)
+     *          h - hours (3600 seconds)
+     *          m - minutes (60 seconds)
+     *          s - seconds ( 1 seconds)
+     * @throws SdpParseException
+     * @return true, if the field will be output as a typed time; false, if as an integer value.
+     */
+RepeatField.prototype.getTypedTime =function() {
+    return true;
+}
+
+/** Sets whether the field will be output as a typed time or a integer value.
+     *
+     *     Typed time is formatted as an integer followed by a unit character. The unit indicates an
+     *     appropriate multiplier for the integer.
+     *
+     *     The following unit types are allowed.
+     *          d - days (86400 seconds)
+     *          h - hours (3600 seconds)
+     *          m - minutes (60 seconds)
+     *          s - seconds ( 1 seconds)
+     * @param typedTime typedTime - if set true, the start and stop times will be output in an optimal typed
+     *          time format; if false, the times will be output as integers.
+     */
+RepeatField.prototype.setTypedTime =function(typedTime) {
+}
+
+RepeatField.prototype.encode =function(typedTime) {
+    var encodedString =this.REPEAT_FIELD;
+    encodedString += this.repeatInterval.encode();
+    encodedString += Separators.prototype.SP
+    encodedString +=this.activeDuration.encode();
+    
+    for (var i = 0; i < this.offsets.length; i++) {
+        var offset = this.offsets[i];
+        encodedString+=Separators.prototype.SP
+        encodedString+=offset.encode();
+    }
+    encodedString+=Separators.prototype.NEWLINE;
+    return encodedString;
+}
+
+RepeatField.prototype.clone =function() {
+    var retval = new RepeatField();
+    if (this.repeatInterval != null)
+        retval.repeatInterval = this.repeatInterval.clone();
+    if (this.activeDuration != null)
+        retval.activeDuration =  this.activeDuration.clone();
+    if (this.offsets != null)
+        retval.offsets = this.offsets.clone();
+    return retval;
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP MediaDescriptionImpl.
+ *  @see  gov/nist/javax/sdp/MediaDescriptionImpl.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function MediaDescription() {
+    this.classname="MediaDescription";
+    this.mediaField=null;
+    this.informationField=null;
+    this.connectionField=null;
+    this.keyField=null;
+    this.bandwidthFieldArray=new Array();
+    this.attributeFieldArray=new Array();
+}
+
+MediaDescription.prototype.constructor=MediaDescription; 
+
+/**
+ * Encode to a canonical form.
+ *
+ * @since v1.0
+ */
+MediaDescription.prototype.encode =function() {
+    var encodedString = "";
+    if (this.mediaField != null)
+        encodedString+=this.mediaField.encode();
+    if (this.informationField != null)
+        encodedString+=this.informationField.encode();
+    if (this.connectionField != null)
+        encodedString+=this.connectionField.encode();
+    if (this.bandwidthFieldArray != null) {
+        for (var i = 0; i < this.bandwidthFieldArray.length; i++) {
+            // issued by Miguel Freitas (IT) PTInovacao
+            encodedString+=this.bandwidthFieldArray[i].encode();
+        }
+    }
+    if (this.keyField != null)
+        encodedString+=this.keyField.encode();
+    if (this.attributeFieldArray!= null) {
+        for (var i = 0; i < this.attributeFieldArray.length; i++)
+            encodedString+=this.attributeFieldArray[i].encode();
+    }
+    return encodedString;
+}
+
+
+/**
+ * Retun string representation.
+ * @public
+ * @return string
+ */
+MediaDescription.prototype.toString=function() {
+    return this.encode();
+}
+
+/**
+ * Return media field.
+ * @public
+ * @return MediaField
+ */
+MediaDescription.prototype.getMedia=function() {
+    return this.mediaField;
+}
+
+/**
+ * Return information field.
+ * @public
+ * @return InformationField
+ */
+MediaDescription.prototype.getInfo=function() {
+    return this.informationField;
+}
+
+/**
+ * Return connection field.
+ * @public
+ * @return ConnectionField
+ */
+MediaDescription.prototype.getConnection=function() {
+    return this.connectionField;
+}
+
+/**
+ * Return key field.
+ * @public
+ * @return KeyField
+ */
+MediaDescription.prototype.getKey=function() {
+    return this.keyField;
+}
+
+/**
+ * Return attribut fields.
+ * @public
+ * @return AttributeFields
+ */
+MediaDescription.prototype.getAttributes=function() {
+    return this.attributeFields;
+}
+
+
+/**
+ * Returns the value of the specified attribute.
+ *
+ * @param name the name of the attribute.
+ * @throws SdpParseException
+ * @return the value of the named attribute
+ */
+MediaDescription.prototype.getAttribute=function(name) {
+    if(typeof name == 'string')
+    {
+        for (var i = 0; i < this.attributeFields.length; i++) {
+            if (name == this.attributeFields[i].getAttribute().getName())
+                return this.attributeFields[i].getAttribute().getValueAsObject();
+        }
+        return null;
+    }
+    else throw new SdpException("MediaDescription.getAttribute() requires string object argument");
+}
+
+/**
+ * Set the mediaField member
+ */
+MediaDescription.prototype.setMedia=function(mediaField) {
+    if(mediaField instanceof MediaField) 
+    {
+        this.mediaField = mediaField;
+    }
+    else throw new SdpException("MediaDescription.setMedia() requires Mediafield object argument")
+}
+
+/**
+ * Set the informationField member
+ */
+MediaDescription.prototype.setInfo=function(informationField) {
+    if(informationField instanceof InformationField)
+    {
+        this.informationField = informationField;
+    }
+    else throw new SdpException("MediaDescription.setInfo() requires InformationField object argument")
+}
+
+/**
+ * Set the connectionField member
+ */
+MediaDescription.prototype.setConnection=function(connectionField) {
+    if(connectionField instanceof ConnectionField) 
+    {
+        this.connectionField = connectionField;
+    }
+    else throw new SdpException("MediaDescription.setConnection() requires ConnectionField object argument")
+}
+
+/**
+ * Set the bandwidthField member
+ */
+MediaDescription.prototype.addBandwidth=function(bandwidthField) {  
+    if(bandwidthField instanceof BandwidthField) 
+    { 
+        this.bandwidthFieldArray.push(bandwidthField);
+    }
+    else throw new SdpException("MediaDescription.addBandwidth() requires BandwidthField object argument") 
+}
+
+/**
+ * Set the keyField member
+ */
+MediaDescription.prototype.setKey=function(keyField) {
+    if(keyField instanceof KeyField) 
+    {
+        this.keyField=keyField;
+    }
+    else throw new SdpException("MediaDescription.setKey() requires KeyField object argument")
+}
+
+/**
+ * Set the attributeFields member
+ */
+MediaDescription.prototype.setAttributes=function(attributeFieldArray) {
+    if(attributeFieldArray instanceof Array) 
+    {
+        for (var i = 0; i < attributeFieldArray.length; i++) {
+            var attributeField = attributeFieldArray[i];
+            if (! (attributeField instanceof AttributeField)) {
+                throw new SdpException("MediaDescription.setAttributes() requires Array of AttributeField object argument");
+            }
+        }
+        this.attributeFieldArray= attributeFieldArray;
+    }
+    else throw new SdpException("MediaDescription.setAttributes() requires Array object argument"); 
+}
+
+
+// issued by Miguel Freitas //
+MediaDescription.prototype.addAttribute=function(attributField) {
+    if(attributField instanceof AttributeField)
+    {
+        this.attributeFieldArray.push(attributField);
+    }
+    else throw new SdpException("MediaDescription.addAttribute()requires AttributeField object argument");  
+}
+
+MediaDescription.prototype.hasAttribute=function(name) {
+    if(typeof name == 'string')
+    {
+        for (var i = 0; i < this.attributeFieldArray.length; i++) {
+            if (this.attributeFieldArray[i].getName()==name)
+                return true;
+        }
+        return false;
+    }
+    else throw new SdpException("MediaDescription.hasAttribute()requires string object name argument");  
+}
+
+/**
+ * Sets the value of the specified attribute
+ *
+ * @param name
+ *            the name of the attribute.
+ * @param value
+ *            the value of the named attribute.
+ * @throws SdpException
+ *             if the parameters are null
+ */
+MediaDescription.prototype.setAttribute=function(name,value) {
+    if(typeof name == 'string')
+    { 
+        var newAttributeField = new AttributeField();
+        newAttributeField.setName(name);
+        newAttributeField.setValue(value);
+        // Bug fix by Emil Ivov.
+        this.attributeFieldArray.push(newAttributeField);
+    } else  throw new SdpException("MediaDescription.setAttribute()requires string object name argument"); 
+}
+
+
+/**
+ * Returns the integer value of the specified bandwidth name.
+ *
+ * @param name the name of the bandwidth type.
+ * @throws SdpParseException
+ * @return the value of the named bandwidth
+ */
+MediaDescription.prototype.getBandwidth=function(name)  {
+    if(typeof name == 'string')
+    {
+        if (this.bandwidthFieldArray == null) return -1;
+        else {
+            for (var i = 0; i < this.bandwidthFieldArray.length; i++) {
+                if (this.bandwidthFieldArray[i].getType()==name)
+                    return this.bandwidthFieldArray.getBandwidth();
+            }
+            return -1;
+        }
+    }
+    else throw new SdpException("MediaDescription.getBandwidth() requires string object name argument");
+}
+
+/**
+ * Sets the value of the specified bandwidth type.
+ *
+ * @param name
+ *            the name of the bandwidth type.
+ * @param value
+ *            the value of the named bandwidth type.
+ * @throws SdpException
+ *             if the name is null
+ */
+MediaDescription.prototype.setBandwidth=function(name, value) {
+    if(typeof name == 'string')
+    {
+        if(typeof value == 'number')
+        {
+            for (var i = 0; i < this.bandwidthFieldArray.length; i++) {
+                if ( this.bandwidthFieldArray[i].getType()==name) {
+                    this.bandwidthFieldArray[i].setBandwidth(value);
+                    return; // issued by Miguel Freitas (IT) PTInovacao
+                }
+            }
+            var newBandwidthField = new BandwidthField();
+            newBandwidthField.setType(name);
+            newBandwidthField.setBandwidth(value);
+            this.bandwidthFieldArray.push(newBandwidthField);
+        }
+        else throw new SdpException("MediaDescription.setBandwidth() requires number object value argument");
+    }
+    else throw new SdpException("MediaDescription.setBandwidth() requires string object name argument");
+}
+
+/**
+ * Removes the specified bandwidth type.
+ *
+ * @param name the name of the bandwidth type.
+ * @throws NullPointerException
+ */
+MediaDescription.prototype.removeBandwidth=function(name) {
+    if(typeof(name) == 'string')
+    {
+        if(this.bandwidthFieldArray != null) {
+            for (var i = 0; i < this.bandwidthFieldArray.length; i++) {
+                if (this.bandwidthFieldArray[i].getType() == name) {
+                    this.bandwidthFieldArray.splice(i,1);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+MediaDescription.prototype.getDuplexity=function() {
+    for (var i = 0; i < this.attributeFieldArray.length; i++) {
+        var afvlc = this.attributeFieldArray[i].getAttribute().getName().toLowerCase();
+        if ((afvlc=="sendrecv") ||(afvlc=="recvonly") ||(afvlc=="sendonly") ||(afvlc=="inactive")) {
+            return afvlc;
+        }
+    }
+    return null;
+         
+}
+    
+    
+MediaDescription.prototype.setDuplexity=function(duplexity) {
+    if(typeof duplexity == 'string')
+    {
+        for (var i = 0; i < this.attributeFieldArray.length; i++) {
+            var afvlc = this.attributeFieldArray[i].getName().toLowerCase();
+            if ((afvlc=="sendrecv") ||(afvlc=="recvonly") ||(afvlc=="sendonly") ||(afvlc=="inactive")) {
+                return;
+            }
+        }
+        var newAttributeField = new AttributeField();
+        newAttributeField.setName(duplexity);
+        newAttributeField.setValue(null);
+        this.attributeFieldArray.push(newAttributeField);
+    }
+    else throw new SdpException("MediaDescription.setDuplexity() requires string object duplexity argument");
+}
+
+/**
+ * Removes the attribute specified by the value parameter.
+ *
+ * @param name
+ *            the name of the attribute.
+ */
+MediaDescription.prototype.removeAttribute=function(name) {
+     if(typeof(name)=='string')
+    {
+        if (this.attributeFieldArray != null) 
+        {
+            for (var i = 0; i < this.attributeFieldArray.length; i++) {
+                if (this.attributeFieldArray[i].getName()==name) {
+                    this.attributeFieldArray.slice(i,1);
+                    break;
+                }
+            } 
+        }
+    }
+    else throw new SdpException("MediaDescription.removeAttribute() requires string object argument");
+}
+
+
+/**
+ * Returns a Vector containing a string indicating the MIME type for each of
+ * the codecs in this description.
+ *
+ * A MIME value is computed for each codec in the media description.
+ *
+ * The MIME type is computed in the following fashion: The type is the
+ * mediaType from the media field. The subType is determined by the
+ * protocol.
+ *
+ * The result is computed as the string of the form:
+ *
+ * type + '/' + subType
+ *
+ * The subType portion is computed in the following fashion. RTP/AVP the
+ * subType is returned as the codec name. This will either be extracted from
+ * the rtpmap attribute or computed. other the protocol is returned as the
+ * subType.
+ *
+ * If the protocol is RTP/AVP and the rtpmap attribute for a codec is
+ * absent, then the codec name will be computed in the following fashion.
+ * String indexed in table SdpConstants.avpTypeNames if the value is an int
+ * greater than or equal to 0 and less than AVP_DEFINED_STATIC_MAX, and has
+ * been assigned a value. SdpConstant.RESERVED if the value is an int
+ * greater than or equal to 0 and less than AVP_DEFINED_STATIC_MAX, and has
+ * not been assigned a value. SdpConstant.UNASSIGNED An int greater than or
+ * equal to AVP_DEFINED_STATIC_MAX and less than AVP_DYNAMIC_MIN - currently
+ * unassigned. SdpConstant.DYNAMIC Any int less than 0 or greater than or
+ * equal to AVP_DYNAMIC_MIN
+ *
+ * @throws SdpException
+ *             if there is a problem extracting the parameters.
+ * @return a Vector containing a string indicating the MIME type for each of
+ *         the codecs in this description
+ */
+MediaDescription.prototype.getMimeTypes=function()  {
+    var mediaField = this.getMedia();
+    if(mediaField!=null)
+    {
+        var type = mediaField.getMediaType();
+        var protocol = mediaField.getProtocol();
+        var formats = mediaField.getMediaFormats(false);
+        var resultArray = new Array();
+        for (var i = 0; i < formats.length; i++) {
+            var result = null;
+            if (protocol=="RTP/AVP") {
+                if (this.getAttribute(SdpConstants.RTPMAP) != null)
+                    result = type + "/" + protocol;
+                else {
+                }
+            } else
+                result = type + "/" + protocol;
+            resultArray.push(result);
+        }
+        return resultArray;
+    }
+    else return null;
+}
+
+/**
+ * Returns a Vector containing a string of parameters for each of the codecs
+ * in this description.
+ *
+ * A parameter string is computed for each codec.
+ *
+ * The parameter string is computed in the following fashion.
+ *
+ * The rate is extracted from the rtpmap or static data.
+ *
+ * The number of channels is extracted from the rtpmap or static data.
+ *
+ * The ptime is extracted from the ptime attribute.
+ *
+ * The maxptime is extracted from the maxptime attribute.
+ *
+ * Any additional parameters are extracted from the ftmp attribute.
+ *
+ * @throws SdpException
+ *             if there is a problem extracting the parameters.
+ * @return a Vector containing a string of parameters for each of the codecs
+ *         in this description.
+ */
+MediaDescription.prototype.getMimeParameters=function() {
+    var result = new Array();
+    var rate = this.getAttribute("rate");
+    if(rate!=null) result.push(rate);
+    var ptime = this.getAttribute("ptime");
+    if(ptime!=null) result.push(ptime);
+    var maxptime = this.getAttribute("maxptime");
+    if(maxptime!=null) result.push(maxptime);
+    var ftmp = this.getAttribute("ftmp");
+    if(ftmp!=null) result.push(ftmp);
+    return result;
+}
+
+/**
+ * Adds dynamic media types to the description.
+ *
+ * @param payloadNames
+ *            a Vector of String - each one the name of a dynamic payload to
+ *            be added (usually an integer larger than
+ *            SdpConstants.AVP_DYNAMIC_MIN).
+ * @param payloadValues
+ *            a Vector of String - each contains the value describing the
+ *            correlated dynamic payloads to be added
+ * @throws SdpException
+ *             if either vector is null or empty. if the vector sizes are
+ *             unequal.
+ */
+MediaDescription.prototype.addDynamicPayloads=function(payloadNames, payloadValues){
+    if(payloadNames instanceof Array && payloadValues instanceof Array) 
+    {
+        if ((payloadNames.length==0) || (payloadValues.length==0))
+            throw new SdpException("MediaDescription:addDynamicPayloads(): no dynamic payload");
+        else {
+            if (payloadNames.length != payloadValues.length)
+                throw new SdpException("MediaDescription:addDynamicPayloads(): missing payload parameters");
+            else {
+                for (var i = 0; i < payloadNames.length; i++) {
+                    var name = payloadNames[i];
+                    var  value = payloadValues[i];
+                    this.setAttribute(name, value);
+                }
+            }
+        }
+    }
+    else throw new SdpException("MediaDescription.addDynamicPayloads() requires Array object arguments");
+}
+
+// /////////////////////////////////////////////////////////////////
+// Precondition Mechanism
+// based in 3GPP TS 24.229 and precondition mechanism (RFC 3312)
+// issued by Miguel Freitas (IT) PTinovacao
+// /////////////////////////////////////////////////////////////////
+/**
+ * <p>
+ * Set the Media Description's Precondition Fields
+ * </p>
+ * <p>
+ * issued by Miguel Freitas (IT) PTInovacao
+ * </p>
+ *
+ * @param precondition
+ *            Vector containing PreconditionFields
+ * @throws SdpException
+ */
+MediaDescription.prototype.setPreconditionFields=function(precondition) {
+    this.preconditionFields.setPreconditions(precondition);
+}
+
+/**
+ * <p>
+ * Set the Media Description's Precondition Fields
+ * </p>
+ * <p>
+ * issued by Miguel Freitas (IT) PTInovacao
+ * </p>
+ *
+ * @param precondition
+ *            PreconditionFields parameter
+ */
+MediaDescription.prototype.setPreconditions=function(precondition) {
+    this.preconditionFields = precondition;
+}
+
+/**
+ * <p>
+ * Get attribute fields of segmented precondition
+ * </p>
+ * <p>
+ * issued by Miguel Freitas (IT) PTInovacao
+ * </p>
+ *
+ * @return Vector of attribute fields (segmented precondition)
+ */
+MediaDescription.prototype.getPreconditionFields=function() {
+    return this.preconditionFields.getPreconditions();
+}
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP  TimeDescription.
+ *  @see  gov/nist/javax/sdp/TimeDescriptionImpl.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+ 
+ 
+/**
+ * constructor
+ *
+ * @param timeField (optional)  time field to create this descrition from
+ */
+function TimeDescription() {
+    this.classname="TimeDescription";
+    if(arguments.length==1)
+    {
+        if (arguments[0] instanceof TimeField) {
+            this.timeField=arguments[0];
+        } else throw new SdpException("TimeDescription():TimeDescription() requires TimeField object in argument");
+
+    }
+    else this.timeField=new TimeField();
+    this.repeatList=new Array();
+}
+
+/**
+ * Returns the Time field.
+ *
+ * @return Time
+ */
+TimeDescription.prototype.getTime =function(){
+    return this.timeField;
+}
+
+/**
+ * Sets the Time field.
+ *
+ * @public
+ * @param timeField Time to set
+ * @throws SdpException if the time is null
+ */
+TimeDescription.prototype.setTime =function(timeField) {
+    if(timeField instanceof TimeField) 
+    {
+        this.timeField= timeField;
+    }
+    else throw new SdpException("TimeDescription.setTime() requires TimeField object argument") 
+}
+
+
+/**
+ * Returns the list of repeat times (r= fields) specified in the
+ * SessionDescription.
+ *
+ * @public
+ * @param create boolean to set
+ * @return Vector
+ */
+TimeDescription.prototype.getRepeatTimes=function(create) {
+    if(create) this.repeatList=new Array();
+    return this.repeatList;
+}
+
+/**
+ * Returns the list of repeat times (r= fields) specified in the
+ * SessionDescription.
+ *
+ * @public
+ * @param repeatTimes Vector to set
+ * @throws SdpExceptionif the parameter is null
+ */
+TimeDescription.prototype.setRepeatTimes=function(repeatTimes) {
+    this.repeatList = repeatTimes;
+}
+
+/**
+ * Add a repeat field.
+ *
+ * @public
+ * @param repeatField -- repeat field to add.
+ */
+TimeDescription.prototype.addRepeat=function(repeatField) {
+    if(repeatField instanceof RepeatField) 
+    {
+        this.repeatList.push(repeatField);
+    }
+    else throw new SdpException("TimeDescription.addRepeat() requires RepeatField object argument") 
+}
+
+/**
+ * Retun string representation.
+ * @public
+ * @return string
+ */
+TimeDescription.prototype.encode=function() {
+    var retval = this.timeField.encode();
+    for (var i = 0; i < this.repeatList.length; i++) {
+        var repeatField = this.repeatList[i];
+        retval += repeatField.encode();
+    }
+    return retval;
+}
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP  SessionDescription.
+ *  @see  gov/nist/javax/sdp/SessionDescriptionImpl.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+function SessionDescription() {
+    this.classname="SessionDescription";
+    this.currentTimeDescription=null;
+    this.currentMediaDescription=null;
+    this.versionField=null;
+    this.originField=null;
+    this.sessionNameField=null;
+    this.informationField=null;
+    this.uriField=null;
+    this.connectionField=null;
+    this.keyField=null;
+    this.timeFieldArray=null;
+    this.mediaDescriptionArray=null;
+    this.zoneAdjustments=null;
+    this.emailFieldArray=null;
+    this.phoneFieldArray=null;
+    this.bandwidthFieldArray=null;
+    this.attributeFieldArray=null;
+    if(arguments.length==1)
+    {
+        if (arguments[0] instanceof SessionDescription) {
+            this.copy(arguments[0])
+        } else throw new SdpException("SessionDescription.SessionDescription() requires SessionDescription object arguments");
+    }
+        
+    Array.prototype.remove = function(from, to) {
+        var rest = this.slice((to || from) + 1 || this.length);
+        this.length = from < 0 ? this.length + from : from;
+        return this.push.apply(this, rest);
+    };
+            
+    if(!String.prototype.trim) {
+        String.prototype.trim = function () {
+            return this.replace(/^\s+|\s+$/g,'');
+        };
+    }
+            
+    if(!String.prototype.endsWith) {
+        String.prototype.endsWith = function(suffix) {
+            return this.indexOf(suffix, this.length - suffix.length) !== -1;
+        };
+    }
+}
+
+SessionDescription.prototype = new SDPObject();
+SessionDescription.prototype.constructor=SessionDescription; 
+
+
+/**
+ * Copy constructor, creates a deep copy of another SessionDescription.
+ *
+ * @param otherSessionDescription - the SessionDescription to copy from.
+ * @throws SdpException - if there is a problem constructing the SessionDescription.
+ */
+SessionDescription.prototype.copy=function(otherSessionDescription)
+{
+    
+    // If the other session description is null there's nothing to initialize
+    if (otherSessionDescription == null) return;
+
+    // OK to clone the version field, no deep copy required
+    var otherVersion = otherSessionDescription.getVersion();
+    if (otherVersion != null) {
+        this.setVersion(otherVersion.clone());
+    }
+
+    // OK to clone the origin field, class already does a deep copy
+    var otherOrigin = otherSessionDescription.getOrigin();
+    if (otherOrigin != null) {
+        this.setOrigin(otherOrigin.clone());
+    }
+
+    // OK to clone the session name, no deep copy required
+    var otherSessionName = otherSessionDescription.getSessionName();
+    if (otherSessionName != null) {
+        this.setSessionName(otherSessionName.clone());
+    }
+
+    // OK to clone the information field, just a string, no deep copy required
+    var otherInfo = otherSessionDescription.getInfo();
+    if (otherInfo != null) {
+        this.setInfo(otherInfo.clone());
+    }
+
+    // URI field requires deep copy
+    var otherUriField = otherSessionDescription.getURI();
+    if (otherUriField != null) {
+        var newUF = new URIField();
+        newUF.setURI(otherUriField.toString());
+        this.setURI(newUF);
+    }
+
+    // OK to clone the connection field, class already does a deep copy
+    var otherConnection = otherSessionDescription.getConnection();
+    if (otherConnection != null) {
+        this.setConnection(otherConnection.clone());
+    }
+
+    // OK to clone the key field, just a couple of strings
+    var otherKey = otherSessionDescription.getKey();
+    if (otherKey != null) {
+        this.setKey(otherKey.clone());
+    }
+
+    // Deep copy each vector, starting with time descriptions
+    var otherTimeDescriptions = otherSessionDescription.getTimeDescriptions(false);
+    if (otherTimeDescriptions != null) {
+        var newTDs = new Array();
+        for (var i = 0; i <  otherTimeDescriptions.length; i++) {
+            var otherTimeDescription = otherTimeDescriptions[i];
+            var otherTimeField = otherTimeDescription.getTime().clone();
+            var newTD = new TimeDescription(otherTimeField);
+            var otherRepeatTimes = otherTimeDescription.getRepeatTimes(false);
+            if (otherRepeatTimes != null) {
+                for (var j = 0; j <  otherRepeatTimes.length; j++) {
+                    var otherRepeatField = otherRepeatTimes[j];
+                    // RepeatField clone is a deep copy
+                    var  newRF = otherRepeatField.clone();
+                    newTD.addRepeatField(newRF);
+                }
+            }
+            newTDs.push(newTD);
+        }
+        this.setTimes(newTDs);
+    }
+
+    // Deep copy the email list
+    var otherEmails = otherSessionDescription.getEmails(false);
+    if (otherEmails != null) {
+        var newEmails = new Array();
+        for (var i = 0; i <  otherEmails.length; i++) 
+        {
+            var otherEmailField = otherEmails[i];
+            // Email field clone is a deep copy
+            var newEF = otherEmailField.clone();
+            newEmails.push(newEF);
+        }
+        this.setEmails(newEmails);
+    }
+
+
+    // Deep copy the phone list
+    var otherPhones = otherSessionDescription.getPhones(false);
+    if (otherPhones != null) {
+        var  newPhones = new Array();
+        for (var i = 0; i <  otherPhones.length; i++) 
+        {
+            var otherPhoneField = otherPhones[i];
+            // Phone field clone is a deep copy
+            var newPF = otherPhoneField.clone();
+            newPhones.push(newPF);
+        }
+        this.setPhones(newPhones);
+    }
+
+
+    // Deep copy the zone adjustments list
+    var otherZAs = otherSessionDescription.getZoneAdjustments(false);
+    if (otherZAs != null) {
+        var newZAs = new Array();
+        for (var i = 0; i <  newZAs.length; i++) 
+        {
+            var otherZoneField = newZAs[i];
+            // Zone field clone is a deep copy
+            var newZF = otherZoneField.clone();
+            newZAs.push(newZF);
+        }
+        this.setZoneAdjustments(newZAs);
+    }
+
+    // Deep copy the bandwidth list
+    var otherBandwidths = otherSessionDescription.getBandwidths(false);
+    if (otherBandwidths != null) {
+        var newBandwidths = new Array();
+        for (var i = 0; i <  otherBandwidths.length; i++) 
+        {
+            var  otherBandwidthField = otherBandwidths[i];
+            // Bandwidth field clone() is a shallow copy but object is not deep
+            var newBF = otherBandwidthField.clone();
+            newBandwidths.push(newBF);
+        }
+        this.setBandwidths(newBandwidths);
+    }
+
+    // Deep copy the attribute list
+    var otherAttributes = otherSessionDescription.getAttributes(false);
+    if (otherAttributes != null) {
+        var newAttributes = new Array();
+        for (var i = 0; i <  otherAttributes.length; i++) 
+        {
+            var otherAttributeField =  otherAttributes[i];
+            // Attribute field clone() makes a deep copy but be careful: it may use reflection to copy one of its members
+            var newBF = otherAttributeField.clone();
+            newAttributes.push(newBF);
+        }
+        this.setAttributes(newAttributes);
+    }
+
+    // Deep copy the media descriptions
+    var otherMediaDescriptions = otherSessionDescription.getMediaDescriptions(false);
+    if (otherMediaDescriptions != null) {
+        var newMDs = new Array();
+        for (var i = 0; i <  otherMediaDescriptions.length; i++) 
+        {
+            var otherMediaDescription = otherMediaDescriptions[i];
+            var  newMD = new MediaDescription();
+
+            // Copy the media field
+            var otherMediaField = otherMediaDescription.getMedia();
+            if (otherMediaField != null) {
+                // Media field clone() makes a shallow copy, so don't use clone()
+                var newMF = new MediaField();
+                newMF.setMedia(otherMediaField.getMedia());
+                newMF.setPort(otherMediaField.getPort());
+                newMF.setNports(otherMediaField.getNports());
+                newMF.setProto(otherMediaField.getProto());
+                var otherFormats = otherMediaField.getFormats();
+                if (otherFormats != null) {
+                    var newFormats = new Array();
+                    for (var j = 0; j <  otherFormats.length; j++) 
+                    {
+                        var otherFormat = otherFormats[j];
+                        // Convert all format objects to strings in order to avoid reflection
+                        newFormats.push(String.valueOf(otherFormat));
+                    }
+                    newMF.setFormats(newFormats);
+                }
+                newMD.setMedia(newMF);
+            }
+
+            // Copy the information field (it's a shallow object, ok to clone)
+            var otherInfoField = otherMediaDescription.getInformation();
+            if (otherInfoField != null) {
+                newMD.setInformation(otherInfoField.clone());
+            }
+
+            // Copy the connection field. OK to use clone(), already does a deep copy.
+            var otherConnectionField = otherMediaDescription.getConnection();
+            if (otherConnectionField != null) {
+                newMD.setConnection(otherConnectionField.clone());
+            }
+
+            // Copy the bandwidth fields
+            var otherBFs = otherMediaDescription.getBandwidths(false);
+            if (otherBFs != null) {
+                var newBFs = new Array();
+                for (var j = 0; j <  otherBFs.length; j++) 
+                {
+                    var otherBF = otherBFs[j];
+                    // BandwidthField is a shallow object, ok to use clone
+                    newBFs.push(otherBF.clone());
+                }
+                newMD.setBandwidths(newBFs);
+            }
+
+            // Copy the key field (shallow object)
+            var otherKeyField = otherMediaDescription.getKey();
+            if (otherKeyField != null) {
+                newMD.setKey(otherKeyField.clone());
+            }
+
+            // Copy the attributes
+            var otherAFs = otherMediaDescription.getAttributeFields();
+            if (otherAFs != null) {
+                var newAFs = new Array();
+                for (var j = 0; j <  otherAFs.length; j++) 
+                {
+                    var otherAF = otherAFs[j];
+                    // AttributeField clone() already makes a deep copy, but be careful. It will use reflection
+                    // unless the attribute is a String or any other immutable object.
+                    newAFs.push(otherAF.clone());
+                }
+                newMD.setAttribute(newAFs);
+            }
+            newMDs.push(newMD);
+        }
+        this.setMediaDescriptions(newMDs);
+    }
+}
+
+
+SessionDescription.prototype.addField=function(sdpField){
+    if(sdpField!=null && SDPField.prototype.isPrototypeOf(sdpField)==true)
+    {
+        if (sdpField instanceof VersionField) {
+            this.versionField = sdpField;
+        } else if (sdpField instanceof OriginField) {
+            this.originField = sdpField;
+        } else if (sdpField instanceof SessionNameField) {
+            this.sessionNameField =  sdpField;
+        } else if (sdpField instanceof InformationField) {
+            if (this.currentMediaDescription != null)
+                this.currentMediaDescription.setInformation(sdpField);
+            else
+                this.informationField = sdpField;
+        } else if (sdpField instanceof URIField) {
+            this.uriField = sdpField;
+        } else if (sdpField instanceof ConnectionField) {
+            if (this.currentMediaDescription != null)
+                this.currentMediaDescription.setConnection(sdpField);
+            else
+                this.connectionField = sdpField;
+        } else if (sdpField instanceof KeyField) {
+            if (this.currentMediaDescription != null)
+                this.currentMediaDescription.setKey(sdpField);
+            else
+                this.keyField = sdpField;
+        } else if (sdpField instanceof EmailField) {
+            this.getEmails(true).push(sdpField);
+        } else if (sdpField instanceof PhoneField) {
+            this.getPhones(true).push(sdpField);
+        } else if (sdpField instanceof TimeField) {
+            this.currentTimeDescription = new TimeDescription(sdpField);
+            this.getTimeDescriptions(true).push(this.currentTimeDescription);
+        } else if (sdpField instanceof RepeatField) {
+            if (this.currentTimeDescription == null) {
+                throw new new SdpException("SessionDescription.addField(): parsing error, no time atttribut specified"); 
+            } else {
+                this.currentTimeDescription.addRepeat(sdpField);
+            }
+        } else if (sdpField instanceof BandwidthField) {
+            if (this.currentMediaDescription != null)
+                this.currentMediaDescription.addBandwidth(sdpField);
+            else
+                this.getBandwidths(true).push(sdpField);
+        } else if (sdpField instanceof AttributeField) {
+            if (this.currentMediaDescription != null) {
+                var af = sdpField;
+                var s = af.getName();
+                // Bug report from Andreas Bystrom
+                this.currentMediaDescription.addAttribute(sdpField);
+            } else {
+                this.getAttributes(true).push(sdpField);
+            }
+
+        } else if (sdpField instanceof MediaField) {
+            this.currentMediaDescription = new MediaDescription();
+            this.getMediaDescriptions(true).push(this.currentMediaDescription);
+            // Bug report from Andreas Bystrom
+            this.currentMediaDescription.setMedia(sdpField);
+        }
+    }
+    else throw new SdpException("SessionDescription.addField() requires SDPField object arguments");
+}
+
+/**
+ * Creates and returns a deep copy of this object
+ *
+ * @return     a clone of this instance.
+ * @exception  CloneNotSupportedException  if this instance cannot be cloned.
+ */
+SessionDescription.prototype.clone=function() {
+    try {
+        return new SessionDescription(this);
+    } catch (exception) {
+        // throw this exception to indicate that this instance cannot be cloned
+        throw new CloneNotSupportedException();
+    }
+}
+
+/**
+ * Returns the version of SDP in use. This corresponds to the v= field of
+ * the SDP data.
+ *
+ * @return the integer version (-1 if not set).
+ */
+SessionDescription.prototype.getVersion=function() {
+    return this.versionField;
+}
+
+/**
+ * Sets the version of SDP in use. This corresponds to the v= field of the
+ * SDP data.
+ *
+ * @param versionField version - the integer version.
+ * @throws SdpException if the version is null
+ */
+SessionDescription.prototype.setVersion=function(versionField) {
+    if(versionField instanceof VersionField)
+    {
+        this.versionField = versionField;
+    } else
+        throw new SdpException("SessionDescription.setVersion() requires VersionField object argument");
+}
+
+/**
+ * Returns information about the originator of the session. This corresponds
+ * to the o= field of the SDP data.
+ *
+ * @return the originator data.
+ */
+SessionDescription.prototype.getOrigin=function() {
+    return this.originField;
+}
+
+/**
+ * Sets information about the originator of the session. This corresponds to
+ * the o= field of the SDP data.
+ *
+ * @param originField origin - the originator data.
+ * @throws SdpException if the origin is null
+ */
+SessionDescription.prototype.setOrigin=function(originField){
+    if(originField instanceof OriginField)
+    {
+        this.originField = originField;
+    } else
+        throw new SdpException("SessionDescription.setOrigin() requires OriginField object argument");
+}
+
+
+/**
+ * Returns the name of the session. This corresponds to the s= field of the
+ * SDP data.
+ *
+ * @return the session name.
+ */
+SessionDescription.prototype.getSessionName=function() {
+    return this.sessionNameField;
+}
+
+/**
+ * Sets the name of the session. This corresponds to the s= field of the SDP
+ * data.
+ *
+ * @param sessionNameField name - the session name.
+ * @throws SdpException if the sessionName is null
+ */
+SessionDescription.prototype.setSessionName=function(sessionNameField){
+    if(sessionNameField instanceof SessionNameField)
+    {
+        this.sessionNameField = sessionNameField;
+    } else
+        throw new SdpException("SessionDescription.setSessionName() requires SessionNameField object argument");
+}
+
+/**
+ * Returns value of the info field (i=) of this object.
+ *
+ * @return info
+ */
+SessionDescription.prototype.getInfo=function() {
+    return this.informationField;
+}
+
+/**
+ * Sets the i= field of this object.
+ *
+ * @param informationField s - new i= value; if null removes the field
+ * @throws SdpException if the info is null
+ */
+SessionDescription.prototype.setInfo=function(informationField) {
+    if(informationField instanceof InformationField)
+    {
+        this.informationField = informationField;
+    } else
+        throw new SdpException("SessionDescription.setInfo() requires InformationField object argument");
+}
+
+/**
+ * Returns a uri to the location of more details about the session. This
+ * corresponds to the u= field of the SDP data.
+ *
+ * @return the uri.
+ */
+SessionDescription.prototype.getURI=function() {
+    return this.uriField;
+}
+
+/**
+ * Sets the uri to the location of more details about the session. This
+ * corresponds to the u= field of the SDP data.
+ *
+ * @param uriField uri - the uri.
+ * @throws SdpException
+ *             if the uri is null
+ */
+SessionDescription.prototype.setURI=function(uriField)  {
+    if(uriField instanceof URIField)
+    {
+        this.uriField = uriField;
+    } else
+        throw new SdpException("SessionDescription.setURI() requires URIField object argument");
+}
+
+
+/**
+ * Returns an email address to contact for further information about the
+ * session. This corresponds to the e= field of the SDP data.
+ *
+ * @param create
+ *            boolean to set
+ * @throws SdpParseException
+ * @return the email address.
+ */
+SessionDescription.prototype.getEmails=function(create)  {
+    if (this.emailFieldArray == null && create) {
+        this.emailFieldArray = new Array();
+    }
+    return this.emailFieldArray;
+}
+
+/**
+ * Sets a an email address to contact for further information about the
+ * session. This corresponds to the e= field of the SDP data.
+ *
+ * @param emailFieldArray email - the email address.
+ * @throws SdpException
+ *             if the vector is null
+ */
+SessionDescription.prototype.setEmails=function(emailFieldArray){
+    if(emailFieldArray instanceof Array)
+    {
+        for (var i = 0; i < emailFieldArray.length; i++) {
+            var emailField = emailFieldArray[i];
+            if (! (emailField instanceof EmailField)) {
+                throw new SdpException("SessionDescription.setEmails() requires Array of EmailField object argument");
+            }
+        }
+        this.emailFieldArray = emailFieldArray;
+    } else throw new SdpException("SessionDescription.setEmails() requires Array object argument");
+}
+
+/**
+ * Returns a phone number to contact for further information about the
+ * session. This corresponds to the p= field of the SDP data.
+ *
+ * @param create
+ *            boolean to set
+ * @throws SdpException
+ * @return the phone number.
+ */
+SessionDescription.prototype.getPhones=function(create) {
+    if (this.phoneFieldArray == null) {
+        if (create) this.phoneFieldArray = new Array();
+    }
+    return this.phoneFieldArray;
+}
+
+/**
+ * Sets a phone number to contact for further information about the session.
+ * This corresponds to the p= field of the SDP data.
+ *
+ * @param phoneFieldArray phone - the phone number.
+ * @throws SdpException
+ *             if the vector is null
+ */
+SessionDescription.prototype.setPhones=function(phoneFieldArray)  {
+    if(phoneFieldArray instanceof Array)
+    {
+        for (var i = 0; i < phoneFieldArray.length; i++) {
+            var phoneField = phoneFieldArray[i];
+            if (! (phoneField instanceof PhoneField)) {
+                throw new SdpException("SessionDescription.setPhones() requires Array of PhoneField object argument");
+            }
+        }
+        this.phoneFieldArray = phoneFieldArray;
+    } else throw new SdpException("SessionDescription.setPhones() requires Array object argument");
+}
+
+/**
+ * Returns a TimeField indicating the start, stop, repetition and time zone
+ * information of the session. This corresponds to the t= field of the SDP
+ * data.
+ *
+ * @param create
+ *            boolean to set
+ * @throws SdpException
+ * @return the Time Field.
+ */
+SessionDescription.prototype.getTimeDescriptions=function(create) {
+    if (this.timeFieldArray == null) {
+        if (create) this.timeFieldArray = new Array();
+    }
+    return this.timeFieldArray;
+}
+
+/**
+ * Sets a TimeField indicating the start, stop, repetition and time zone
+ * information of the session. This corresponds to the t= field of the SDP
+ * data.
+ *
+ * @param timeFieldArray time - the TimeField.
+ * @throws SdpException
+ *             if the vector is null
+ */
+SessionDescription.prototype.setTimes=function(timeFieldArray) {
+    if(timeFieldArray instanceof Array)
+    {
+        for (var i = 0; i < timeFieldArray.length; i++) {
+            var timeField = timeFieldArray[i];
+            if (! (timeField instanceof TimeField)) {
+                throw new SdpException("SessionDescription.setTimes() requires Array of TimeField object argument");
+            }
+        }
+       this.timeFieldArray = timeFieldArray;
+    } else throw new SdpException("SessionDescription.setTimes() requires Array object argument");
+}
+
+/**
+ * Returns the time zone adjustments for the Session
+ *
+ * @param create
+ *            boolean to set
+ * @throws SdpException
+ * @return a Hashtable containing the zone adjustments, where the key is the
+ *         Adjusted Time Zone and the value is the offset.
+ */
+SessionDescription.prototype.getZoneAdjustments=function(create) {
+    if (this.zoneAdjustments == null) {
+        if (create) this.zoneAdjustments = new Array();
+    }
+    return this.zoneAdjustments;
+}
+
+/**
+ * Sets the time zone adjustment for the TimeField.
+ *
+ * @param zoneAdjustmentFieldArray
+ *            zoneAdjustments - a Hashtable containing the zone adjustments,
+ *            where the key is the Adjusted Time Zone and the value is the
+ *            offset.
+ * @throws SdpException
+ *             if the vector is null
+ */
+SessionDescription.prototype.setZoneAdjustments=function(zoneAdjustmentFieldArray) {
+    if(zoneAdjustmentFieldArray instanceof Array)
+    {
+        for (var i = 0; i < zoneAdjustmentFieldArray.length; i++) {
+            var zoneAdjustmentField = zoneAdjustmentFieldArray[i];
+            if (! (zoneAdjustmentField instanceof ZoneAdjustmentField)) {
+                throw new SdpException("SessionDescription.setZoneAdjustments() requires Array of ZoneAdjustmentField object argument");
+            }
+        }
+        this.zoneAdjustments = zoneAdjustmentFieldArray;
+    }
+    else throw new SdpException("SessionDescription.setZoneAdjustments() requires Array object argument");
+}
+
+
+/**
+ * Returns the connection information associated with this object. This may
+ * be null for SessionDescriptions if all Media objects have a connection
+ * object and may be null for Media objects if the corresponding session
+ * connection is non-null.
+ *
+ * @return connection
+ */
+SessionDescription.prototype.getConnection=function() {
+    return this.connectionField;
+}
+
+/**
+ * Set the connection data for this entity.
+ *
+ * @param connectionField to set
+ * @throws SdpException if the parameter is null
+ */
+SessionDescription.prototype.setConnection=function(connectionField){
+    if(connectionField instanceof ConnectionField)
+    {
+        this.connectionField = connectionField;
+    }
+    else throw new SdpException("SessionDescription.setConnection() requires ConnectionField object argument");
+}
+
+/**
+ * Returns the Bandwidth of the specified type.
+ *
+ * @param create
+ *            type - type of the Bandwidth to return
+ * @return the Bandwidth or null if undefined
+ */
+SessionDescription.prototype.getBandwidths=function(create) {
+    if (this.bandwidthFieldArray == null) {
+        if (create) this.bandwidthFieldArray = new Array();
+    }
+    return this.bandwidthFieldArray;
+}
+
+/**
+ * set the value of the Bandwidth with the specified type.
+ *
+ * @param bandwidthFieldArray
+ *            to set
+ * @throws SdpException
+ *             if the vector is null
+ */
+SessionDescription.prototype.setBandwidths=function(bandwidthFieldArray) {
+    if(bandwidthFieldArray instanceof Array)
+    {
+        for (var i = 0; i < bandwidthFieldArray.length; i++) {
+            var bandwidthField = bandwidthFieldArray[i];
+            if (! (bandwidthField instanceof BandwidthField)) {
+                throw new SdpException("SessionDescription.setBandwidths() requires Array of BandwidthField object argument");
+            }
+        }
+        this.bandwidthFieldArray = bandwidthFieldArray;
+    }
+    else throw new SdpException("SessionDescription.setBandwidths() requires Array object argument");
+}
+
+
+/**
+ * Returns the integer value of the specified bandwidth name.
+ *
+ * @param name
+ *            name - the name of the bandwidth type
+ * @throws SdpParseException
+ * @return the value of the named bandwidth
+ */
+SessionDescription.prototype.getBandwidth=function(name){
+    if(typeof(name) == 'string')
+    {
+        if( this.bandwidthFieldArray != null)
+            for (var i = 0; i < this.bandwidthFieldArray.length; i++) {
+                if (this.bandwidthFieldArray[i].getType() == name) {
+                    return this.bandwidthFieldArray[i].getValue();
+                }
+            }
+    } else throw new SdpException("SessionDescription.getBandwidth() requires string object argument");
+    return -1;
+}
+
+
+/**
+ * Sets the value of the specified bandwidth type.
+ *
+ * @param name  name - the name of the bandwidth type.
+ * @param value value - the value of the named bandwidth type.
+ * @throws SdpException
+ *             if the name is null
+ */
+SessionDescription.prototype.setBandwidth=function(name, value) {
+    if((typeof(name) == 'string') && (typeof(value) == 'number'))
+    {
+        if (this.bandwidthFieldArray != null) {
+            for (var i = 0; i < this.bandwidthFieldArray.length; i++) {
+                if (this.bandwidthFieldArray[i].getType() == name) {
+                    this.bandwidthFieldArray[i].setBandwidth(value);
+                    return;
+                }
+            }
+        } else this.bandwidthFieldArray= new Array();
+        var bandwidthField = new BandwidthField();
+        bandwidthField.setType(name);
+        bandwidthField.setBandwidth(value);
+        this.bandwidthFieldArray.push(bandwidthField);
+    } else throw new SdpException("SessionDescription:setBandwidth() requires string and number arguments");
+}
+
+/**
+ * Removes the specified bandwidth type.
+ *
+ * @param name: the name of the bandwidth type
+ */
+SessionDescription.prototype.removeBandwidth=function(name) {
+    if(typeof(name) == 'string')
+    {
+        if(this.bandwidthFieldArray != null) {
+            for (var i = 0; i < this.bandwidthFieldArray.length; i++) {
+                if (this.bandwidthFieldArray[i].getType() == name) {
+                    this.bandwidthFieldArray.splice(i,1);
+                    break;
+                }
+            }
+        }
+    }
+    else throw new SdpException("SessionDescription:setBandwidth() removeBandwidth require string argument");
+}
+
+
+/**
+ * Returns the key data.
+ *
+ * @return key
+ */
+SessionDescription.prototype.getKey=function() {
+    return this.keyField;
+}
+
+/**
+ * Sets encryption key information. This consists of a method and an
+ * encryption key included inline.
+ *
+ * @param keyField
+ *            key - the encryption key data; depending on method may be null
+ * @throws SdpException
+ *             if the parameter is null
+ */
+SessionDescription.prototype.setKey=function(keyField) {
+    if(keyField instanceof KeyField)
+    {
+        this.keyField = keyField;
+    }
+    else throw new SdpException("SessionDescription.setKey() requires KeyField object argument");
+}
+
+
+/**
+ * Returns the value of the specified attribute.
+ *
+ * @param name
+ *            name - the name of the attribute
+ * @throws SdpParseException
+ * @return the value of the named attribute
+ */
+SessionDescription.prototype.getAttribute=function(name) {
+    if(typeof(name)=='string')
+    {
+        if(this.attributeFieldArray == null) return null;
+        for (var i = 0; i < this.attributeFieldArray.length; i++) {
+            if (this.attributeFieldArray[i].getName()==name) {
+                return this.attributeFieldArray[i].getValue();
+            }
+        }
+        return null;
+    }
+    else throw new SdpException("SessionDescription.getAttribute() requires string object argument");
+}
+
+
+/**
+ * Returns the set of attributes for this Description as a Vector of
+ * Attribute objects in the order they were parsed.
+ *
+ * @param create
+ *            create - specifies whether to return null or a new empty
+ *            Vector in case no attributes exists for this Description
+ * @return attributes for this Description
+ */
+SessionDescription.prototype.getAttributes=function(create) {
+    if (this.attributeFieldArray == null) {
+        if (create)  this.attributeFieldArray = new Array();
+    }
+    return this.attributeFieldArray;
+}
+
+
+/**
+ * Removes the attribute specified by the value parameter.
+ *
+ * @param name
+ *            name - the name of the attribute
+ */
+SessionDescription.prototype.removeAttribute=function(name) {
+    if(typeof(name)=='string')
+    {
+        if (this.attributeFieldArray != null) 
+        {
+            for (var i = 0; i < this.attributeFieldArray.length; i++) {
+                if (this.attributeFieldArray[i].getName()==name) {
+                    this.attributeFieldArray.slice(i,1);
+                    break;
+                }
+            } 
+        }
+    }
+    else throw new SdpException("SessionDescription.removeAttribute() requires string object argument");
+}
+
+/**
+ * Sets the value of the specified attribute.
+ *
+ * @param name
+ *            name - the name of the attribute.
+ * @param value
+ *            value - the value of the named attribute.
+ * @throws SdpException
+ *             if the name or the value is null
+ */
+SessionDescription.prototype.setAttribute=function(name, value)  {
+    if(typeof(name)=='string') 
+    {
+        if(value==null) throw new SdpException("SessionDescription.setAttribute() requires not null value object argument");
+        if(this.attributeFieldArray == null) this.attributeFieldArray= new Array();
+        for (var i = 0; i < this.attributeFieldArray.length; i++) {
+            if (this.attributeFieldArray[i].getName()==name) {
+            {
+                this.attributeFieldArray[i].setValue(value);
+                return;
+            }
+            }
+        }
+        var newAttributeField = new AttributeField();
+        newAttributeField.setName(name);
+        newAttributeField.setValue(value);
+        this.attributeFieldArray.push(newAttributeField);
+    }
+    else throw new SdpException("SessionDescription.setAttribute() requires string argument for name");     
+}
+
+/**
+ * Adds the specified Attribute to this Description object.
+ *
+ * @param attributesFieldArray - the attribute to add
+ * @throws SdpException
+ *             if the vector is null
+ */
+SessionDescription.prototype.setAttributes=function(attributeFieldArray) {
+    if(attributeFieldArray instanceof Array)
+    {
+        for (var i = 0; i < attributeFieldArray.length; i++) {
+            var attributeField = attributeFieldArray[i];
+            if (! (attributeField instanceof AttributeField)) {
+                throw new SdpException("SessionDescription.setAttributes() requires Array of AttributeField object argument");
+            }
+        }
+        this.attributeFieldArray = attributeFieldArray;
+    }
+    else throw new SdpException("SessionDescription.setAttributes() requires Array object argument");
+}
+
+/**
+ * Adds a MediaDescription to the session description. These correspond to
+ * the m= fields of the SDP data.
+ *
+ * @param create
+ *            boolean to set
+ * @throws SdpException
+ * @return media - the field to add.
+ */
+SessionDescription.prototype.getMediaDescriptions=function(create) {
+    if (this.mediaDescriptionArray == null) {
+        if (create) this.mediaDescriptionArray = new Array();
+    }
+    return this.mediaDescriptionArray;
+}
+
+/**
+ * Removes all MediaDescriptions from the session description.
+ *
+ * @param mediaDescriptionArray
+ *            to set
+ * @throws SdpException
+ *             if the parameter is null
+ */
+SessionDescription.prototype.setMediaDescriptions=function(mediaDescriptionArray) {
+    if(mediaDescriptionArray instanceof Array)
+    {
+        for (var i = 0; i < mediaDescriptionArray.length; i++) {
+            var attributeField = mediaDescriptionArray[i];
+            if (! (attributeField instanceof MediaDescription)) {
+                throw new SdpException("SessionDescription.setMediaDescriptions() requires Array of MediaDescription object argument");
+            }
+        }
+        this.mediaDescriptionArray = mediaDescriptionArray;
+    }
+    else throw new SdpException("SessionDescription.setAttributes() requires Array of MediaDescription object argument");
+}
+
+
+SessionDescription.prototype.encodeSDPFieldArray=function(array) {
+    var encBuff = "";
+    for (var i = 0; i < array.length; i++) encBuff+=array[i].encode();
+    return encBuff;
+}
+
+/**
+ * Returns the canonical string representation of the current
+ * SessionDescrption. Acknowledgement - this code was contributed by Emil
+ * Ivov.
+ *
+ * @return Returns the canonical string representation of the current SessionDescrption.
+ */
+
+SessionDescription.prototype.encode=function() {
+    var encodedString = "";
+    encodedString+=this.versionField == null ? "" : this.versionField.encode();
+    encodedString+=(this.originField == null) ? "" : this.originField.encode();
+    encodedString+=this.sessionNameField == null ? "" : this.sessionNameField.encode();
+    encodedString+=this.informationField == null ? "" : this.informationField.encode();
+    encodedString+=this.uriField == null ? "" : this.uriField.encode();
+    encodedString+=this.emailFieldArray == null ? "": this.encodeSDPFieldArray(this.emailFieldArray);
+    encodedString+=this.phoneFieldArray == null ? "": this.encodeSDPFieldArray(this.phoneFieldArray);
+    encodedString+=this.connectionField == null ? "" : this.connectionField.encode();
+    encodedString+=this.bandwidthFieldArray == null ? "": this.encodeSDPFieldArray(this.bandwidthFieldArray);
+    encodedString+=this.timeFieldArray == null ? "": this.encodeSDPFieldArray(this.timeFieldArray);
+    encodedString+=this.zoneAdjustments == null ? "": this.encodeSDPFieldArray(this.zoneAdjustments);
+    encodedString+=this.keyField == null ? "" : this.keyField.encode();
+    encodedString+=this.attributeFieldArray == null ? "": this.encodeSDPFieldArray(this.attributeFieldArray);
+    encodedString+=this.mediaDescriptionArray == null ? "": this.encodeSDPFieldArray(this.mediaDescriptionArray);
+    return encodedString;
+}
+
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP SDPParser .
+ *  @see  gov/nist/javax/sdp/parser/SDPParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function SDPParser() {
+    this.classname="SDPParser";
+}
+
+SDPParser.prototype.constructor=SDPParser; 
+
+SDPParser.prototype.parse =function(sdpString) {
+    if(typeof sdpString == 'string')
+    {
+        var sessionDescription = new SessionDescription();
+        var start = 0;
+        var line = null;
+        // Return trivially if there is no sdp announce message
+        // to be parsed. Bruno Konik noticed this bug.
+        // Strip off leading and trailing junk.
+        var trimedSdpString = sdpString.trim() + "\r\n";
+        // Bug fix by Andreas Bystrom.
+        while (start < trimedSdpString.length) {
+            // Major re-write by Ricardo Borba.
+            var lfPos = trimedSdpString.indexOf("\n", start);
+            var crPos = trimedSdpString.indexOf("\r", start);
+            if (lfPos > 0 && crPos < 0) {
+                // there are only "\n" separators
+                line = trimedSdpString.substring(start, lfPos);
+                start = lfPos + 1;
+            } else if (lfPos < 0 && crPos > 0) {
+                //bug fix: there are only "\r" separators
+                line = trimedSdpString.substring(start, crPos);
+                start = crPos + 1;
+            } else if (lfPos > 0 && crPos > 0) {
+                // there are "\r\n" or "\n\r" (if exists) separators
+                if (lfPos > crPos) {
+                    // assume "\r\n" for now
+                    line = trimedSdpString.substring(start, crPos);
+                    // Check if the "\r" and "\n" are close together
+                    if (lfPos == crPos + 1) {
+                        start = lfPos + 1; // "\r\n"
+                    } else {
+                        start = crPos + 1; // "\r" followed by the next record and a "\n" further away
+                    }
+                } else {
+                    // assume "\n\r" for now
+                    line = trimedSdpString.substring(start, lfPos);
+                    // Check if the "\n" and "\r" are close together
+                    if (crPos == lfPos + 1) {
+                        start = crPos + 1; // "\n\r"
+                    } else {
+                        start = lfPos + 1; // "\n" followed by the next record and a "\r" further away
+                    }
+                }
+            } else if (lfPos < 0 && crPos < 0) { // end
+                break;
+            }
+                       
+            var sdpFieldParser = SDPParserFactory.prototype.createParser(line);
+            var sdpField = sdpFieldParser.parse(line);
+            sessionDescription.addField(sdpField);
+        }
+        return sessionDescription;
+    }
+    else throw new SdpException("SDPParser.parse() requires string object argument");
+}
+
+
+SDPParser.prototype.parseNameValue =function(separator){ 
+    if(separator==null)
+    {
+        var nameValue=this.parseNameValue("=")
+        return nameValue;
+    }
+    else
+    {
+        this.lexer.match(LexerCore.prototype.ID);
+        var name = this.lexer.getNextToken();
+        this.lexer.SPorHT();
+        try {
+            var quoted = false;
+            var la = this.lexer.lookAhead(0);
+            if (la == separator) {
+                this.lexer.consume(1);
+                this.lexer.SPorHT();
+                var str = null;
+                var isFlag = false;
+                if (this.lexer.lookAhead(0) == '\"') {
+                    str = this.lexer.quotedString();
+                    quoted = true;
+                } else {
+                    this.lexer.match(LexerCore.prototype.ID);
+                    var value = this.lexer.getNextToken();
+                    str = value.tokenValue;
+                    if (str == null) {
+                        str = "";
+                        isFlag = true;
+                    }
+                }
+                var nameValue = new NameValue(name.tokenValue, str, isFlag);
+                if (quoted) {
+                    nameValue.setQuotedValue();
+                }
+                return nameValue;
+            } else {
+                nameValue=new NameValue(name.tokenValue, "", true);
+                return nameValue;
+            }
+        } catch(exception) {    
+            console.error("SDPParser:parseNameValue(): catched exception:"+exception);
+            nameValue=new NameValue(name.tokenValue, null, false);
+            return nameValue;
+        }
+    }
+    return nameValue;
+}
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP VersionFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/VersionFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function VersionFieldParser() {
+    this.classname="VersionFieldParser";
+}
+
+VersionFieldParser.prototype = new SDPParser();
+VersionFieldParser.prototype.constructor=VersionFieldParser; 
+
+VersionFieldParser.prototype.parse =function(versionFieldString) {
+    if(typeof versionFieldString == 'string')
+    {
+        try {
+            this.lexer = new LexerCore("charLexer", versionFieldString);
+            this.lexer.match('v');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+
+            var versionField = new VersionField();
+            this.lexer.match(LexerCore.prototype.ID);
+            var version = this.lexer.getNextToken();
+            versionField.setVersion(parseInt(version.getTokenValue()));
+            this.lexer.SPorHT();
+            return versionField;
+        } catch(exception) { 
+            throw new SdpException("VersionFieldParser.parse(): parsing exception:"+this.lexer.getBuffer() + "at " + this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("VersionFieldParser.parse() requires string object argument");
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP SessionNameFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/SessionNameFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function SessionNameFieldParser() {
+    this.classname="SessionNameFieldParser";
+}
+
+SessionNameFieldParser.prototype = new SDPParser();
+SessionNameFieldParser.prototype.constructor=SessionNameFieldParser; 
+
+SessionNameFieldParser.prototype.parse =function(sessionNameFieldString) {
+    if(typeof sessionNameFieldString == 'string')
+    {
+        try {
+            this.lexer = new LexerCore("charLexer", sessionNameFieldString);
+            this.lexer.match('s');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+            var sessionNameField = new SessionNameField();
+            var rest = this.lexer.getRest();
+            // Some endpoints may send us a blank session name ("s=") -- [rborba]
+            sessionNameField.setSessionName(rest == null ? "" : rest.trim());
+            return sessionNameField;
+        } catch(exception) { 
+            throw new SdpException("SessionNameFieldParser.parse(): parsing exception:"+this.lexer.getBuffer() + "at " + this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("SessionNameFieldParser.parse() requires string object argument");
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP AttributeFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/AttributeFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function AttributeFieldParser() {
+    this.classname="AttributeFieldParser";
+}
+
+AttributeFieldParser.prototype = new SDPParser();
+AttributeFieldParser.prototype.constructor=AttributeFieldParser; 
+
+AttributeFieldParser.prototype.parse =function(attributeFieldString) {
+    if(typeof attributeFieldString == 'string')
+    {
+        this.lexer = new LexerCore("charLexer", attributeFieldString);
+        try {
+            var attributeField = new AttributeField();
+            this.lexer.match('a');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+            var ptr = this.lexer.markInputPosition();
+            try {
+                var name = this.lexer.getNextToken(':');
+                this.lexer.consume(1);
+                var value = this.lexer.getRest();
+                if(value!=null) value.trim();
+                attributeField.setName(name);
+                attributeField.setValue(value)
+            } catch (exception) {
+                this.lexer.rewindInputPosition(ptr);
+                var name = this.lexer.getRest();
+                if (name == null) throw new ParseException(this.lexer.getBuffer(),this.lexer.getPtr());
+                attributeField.setName(name);
+                attributeField.setValue(null)
+            };
+            this.lexer.SPorHT();
+            return attributeField;
+        } catch(exception) { 
+            throw new SdpException("AttributeFieldParser.parse(): parsing exception:"+this.lexer.getBuffer(), this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("AttributeFieldParser.parse() requires string object argument");
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP BandwidthFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/BandwidthFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function BandwidthFieldParser() {
+      this.classname="BandwidthFieldParser";
+}
+
+BandwidthFieldParser.prototype = new SDPParser();
+BandwidthFieldParser.prototype.constructor=BandwidthFieldParser; 
+
+BandwidthFieldParser.prototype.parse =function(bandwidthFieldString) {
+    if(typeof bandwidthFieldString == 'string')
+    {
+        this.lexer = new LexerCore("charLexer", bandwidthFieldString);
+        try {
+            this.lexer.match('b');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+            var bandwidthField = new BandwidthField();
+            var nameValue = this.parseNameValue(':');
+            bandwidthField.setBandwidth(parseInt(nameValue.getValueAsObject()));
+            bandwidthField.setType(nameValue.getName());
+            this.lexer.SPorHT();
+            return bandwidthField;
+        } catch(exception) { 
+            throw new SdpException("BandwidthFieldParser.parse(): parsing exception:"+this.lexer.getBuffer(), this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("BandwidthFieldParser.parse() requires string object argument");
+}
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP ConnectionFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/ConnectionFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function ConnectionFieldParser() {
+      this.classname="ConnectionFieldParser";
+}
+
+ConnectionFieldParser.prototype = new SDPParser();
+ConnectionFieldParser.prototype.constructor=ConnectionFieldParser; 
+
+ConnectionFieldParser.prototype.parse =function(connectionFieldString) {
+    if(typeof connectionFieldString == 'string')
+    {
+        this.lexer = new LexerCore("charLexer", connectionFieldString);
+        try {
+            this.lexer.match('c');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+            var connectionField = new ConnectionField();
+            this.lexer.match(LexerCore.prototype.ID);
+            this.lexer.SPorHT();
+            var token = this.lexer.getNextToken();
+            connectionField.setNetworkType(token.getTokenValue());
+            this.lexer.match(LexerCore.prototype.ID);
+            this.lexer.SPorHT();
+            token = this.lexer.getNextToken();
+            connectionField.setAddressType(token.getTokenValue());
+            this.lexer.SPorHT();
+            var rest = this.lexer.getRest();
+            var connectionAddress = this.parseConnectionAddress(rest.trim());
+            connectionField.setAddress(connectionAddress);
+            return connectionField;
+        } catch(exception) { 
+            throw new SdpException("ConnectionFieldParser.parse(): parsing exception:"+this.lexer.getBuffer(), this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("ConnectionFieldParser.parse() requires string object argument");
+}
+
+
+ConnectionFieldParser.prototype.parseConnectionAddress =function(connectionAddressString) {
+        var  connectionAddress = new ConnectionAddress();
+        var begin = connectionAddressString.indexOf("/");
+        if (begin != -1) {
+            connectionAddress.setAddress(new Host(connectionAddressString.substring(0, begin)));
+            var middle = connectionAddressString.indexOf("/", begin + 1);
+            if (middle != -1) {
+                var ttl = connectionAddressString.substring(begin + 1, middle);
+                connectionAddress.setTtl(parseInt(ttl.trim()));
+                var addressNumber = connectionAddressString.substring(middle + 1);
+                connectionAddress.setPort(parseInt(addressNumber.trim()));
+            } else {
+                var ttl = connectionAddressString.substring(begin + 1);
+                connectionAddress.setTtl(Integer.parseInt(ttl.trim()));
+            }
+        } else
+            connectionAddress.setHost(new Host(connectionAddressString));
+        return connectionAddress;
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP EmailFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/EmailFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function EmailFieldParser() {
+    this.classname="EmailFieldParser";
+}
+
+EmailFieldParser.prototype = new SDPParser();
+EmailFieldParser.prototype.constructor=EmailFieldParser; 
+
+EmailFieldParser.prototype.parse =function(emailFieldString) {
+    if(typeof emailFieldString == 'string')
+    {
+        try {
+            this.lexer = new LexerCore("charLexer", emailFieldString);
+            this.lexer.match('e');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+
+            var emailField = new EmailField();
+            var rest = this.lexer.getRest();
+            var displayName = this.parseDisplayName(rest.trim());
+            if(displayName!=null) emailField.setDisplayName(displayName);
+            emailField.setEmail(this.parseEmail(rest));
+            return emailField;
+        } catch(exception) { 
+            throw new SdpException("EmailFieldParser.parse(): parsing exception:"+this.lexer.getBuffer(), this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("EmailFieldParser.parse() requires string object argument");
+}
+
+EmailFieldParser.prototype.parseDisplayName =function(displayNameString) {
+    var begin = displayNameString.indexOf("(");
+    if(begin != -1) {
+        var  end = displayNameString.indexOf(")");
+        // e=mjh@isi.edu (Mark Handley)
+        return displayNameString.substring(begin + 1, end);
+    } else {
+        // The alternative RFC822 name quoting convention
+        // is also allowed for
+        // email addresses. ex: e=Mark Handley <mjh@isi.edu>
+        var ind = displayNameString.indexOf("<");
+        if (ind != -1) {
+            return displayNameString.substring(0, ind);
+        } else {
+        // There is no display name !!!
+        }
+    }
+    return null;
+}
+
+
+EmailFieldParser.prototype.parseEmail =function(emailString) {
+    var begin = emailString.indexOf("(");
+    if (begin != -1) {
+        // e=mjh@isi.edu (Mark Handley)
+        return  emailString.substring(0, begin);
+    } else {
+        // The alternative RFC822 name quoting convention is
+        // also allowed for
+        // email addresses. ex: e=Mark Handley <mjh@isi.edu>
+        var ind = emailString.indexOf("<");
+        if (ind != -1) {
+            var end = emailString.indexOf(">");
+            return emailString.substring(ind + 1, end);
+        } else {
+            var i = emailString.indexOf("\n");
+            if (i != -1) {
+                return emailString.substring(0, i);
+            } else {
+               // Pb: the email is not well formatted
+            }
+        }
+    }
+    return null;
+}
+
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP InformationFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/InformationFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function InformationFieldParser() {
+    this.classname="InformationFieldParser";
+}
+
+InformationFieldParser.prototype = new SDPParser();
+InformationFieldParser.prototype.constructor=InformationFieldParser; 
+
+InformationFieldParser.prototype.parse =function(informationFieldString) {
+    if(typeof informationFieldString == 'string')
+    {
+        try {
+            this.lexer = new LexerCore("charLexer", informationFieldString);
+            this.lexer.match('i');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+            var informationField = new InformationField();
+            informationField.setInformation(this.lexer.getRest().trim());
+            return informationField;
+        } catch(exception) { 
+            throw new SdpException("InformationFieldParser.parse(): parsing exception:"+this.lexer.getBuffer(), this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("InformationFieldParser.parse() requires string object argument");
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP KeyFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/KeyFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function KeyFieldParser() {
+    this.classname="KeyFieldParser";
+}
+
+KeyFieldParser.prototype = new SDPParser();
+KeyFieldParser.prototype.constructor=KeyFieldParser; 
+
+KeyFieldParser.prototype.parse =function(keyFieldString) {
+    if(typeof keyFieldString == 'string')
+    {
+        try {
+            this.lexer = new LexerCore("charLexer", keyFieldString);
+            this.lexer.match('k');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+            var keyField = new KeyField();
+            //Espen: Stealing the approach from AttributeFieldParser from from here...
+            var nameValue = new NameValue();
+            var ptr = this.lexer.markInputPosition();
+            try {
+                var name = this.lexer.getNextToken(':');
+                this.lexer.consume(1);
+                var value = this.lexer.getRest();
+                nameValue = new NameValue(name.trim(), value.trim());
+            } catch (exception) {
+                this.lexer.rewindInputPosition(ptr);
+                var rest = this.lexer.getRest();
+                if (rest == null) throw SdpException("KeyFieldParser.parse(): parsing exception:"+this.lexer.getBuffer() + "at " +this.lexer.getPtr());
+                nameValue = new NameValue(rest.trim(), null);
+            }
+            keyField.setMethod(nameValue.getName());
+            keyField.setKey(nameValue.getValueAsObject());
+            this.lexer.SPorHT();
+            return keyField;
+        } catch(exception) { 
+            throw new SdpException("KeyFieldParser.parse(): parsing exception:"+this.lexer.getBuffer() + "at " + this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("KeyFieldParser.parse() requires string object argument");
+}/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP OriginFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/OriginFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function OriginFieldParser() {
+    this.classname="OriginFieldParser";
+}
+
+OriginFieldParser.prototype = new SDPParser();
+OriginFieldParser.prototype.constructor=OriginFieldParser; 
+
+OriginFieldParser.prototype.parse =function(originFieldString) {
+    if(typeof originFieldString == 'string')
+    {
+        try {
+            this.lexer = new LexerCore("charLexer", originFieldString);
+            var originField = new OriginField();
+            this.lexer.match('o');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+            var userName = this.lexer.getNextToken(' ');
+            originField.setUserName(userName);
+            this.lexer.SPorHT();
+            this.lexer.match(LexerCore.prototype.ID);
+            //lexer.ttokenSafe();
+            var  sessionId = this.lexer.getNextToken();
+            // guard against very long session IDs
+            var sessId = sessionId.getTokenValue();
+            if (sessId.length > 18) sessId = sessId.substring(sessId.length - 18);
+            originField.setSessionId(sessId);
+            this.lexer.SPorHT();
+            this.lexer.match(LexerCore.prototype.ID);
+            var sessionVersion = this.lexer.getNextToken();
+            // guard against very long session Verion
+            var  sessVer = sessionVersion.getTokenValue();
+            if (sessVer.length > 18) sessVer = sessVer.substring(sessVer.length - 18);
+            originField.setSessionVersion(sessVer);
+            this.lexer.SPorHT();
+            this.lexer.match(LexerCore.prototype.ID);
+            var networkType = this.lexer.getNextToken();
+            originField.setNetworkType(networkType.getTokenValue());
+            this.lexer.SPorHT();
+            this.lexer.match(LexerCore.prototype.ID);
+            var  addressType = this.lexer.getNextToken();
+            originField.setAddressType(addressType.getTokenValue());
+            this.lexer.SPorHT();
+            var  hostString = this.lexer.getRest();
+            var hostNameParser = new HostNameParser(hostString);
+            var host = hostNameParser.host();
+            originField.setHost(host);
+            return originField;
+        } catch(exception) { 
+            throw new SdpException("OriginFieldParser.parse(): parsing exception:"+this.lexer.getBuffer() + "at " + this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("OriginFieldParser.parse() requires string object argument");
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP PhoneFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/PhoneFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function PhoneFieldParser() {
+    this.classname="PhoneFieldParser";
+}
+
+PhoneFieldParser.prototype = new SDPParser();
+PhoneFieldParser.prototype.constructor=PhoneFieldParser; 
+
+PhoneFieldParser.prototype.parse =function(emailFieldString) {
+    if(typeof emailFieldString == 'string')
+    {
+        try {
+            this.lexer = new LexerCore("charLexer", emailFieldString);
+            this.lexer.match('p');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+            var  phoneField = new PhoneField();
+            var rest = this.lexer.getRest();
+            var displayName = this.parseDisplayName(rest.trim())
+            if(displayName!=null) phoneField.setName(displayName);
+            phoneField.setPhoneNumber(this.parsePhoneNumber(rest));
+            return phoneField;
+        } catch(exception) { 
+            throw new SdpException("PhoneFieldParser.parse(): parsing exception:"+this.lexer.getBuffer() + "at " + this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("PhoneFieldParser.parse() requires string object argument");
+}
+
+
+PhoneFieldParser.prototype.parseDisplayName =function(displayNamedString) {
+    var begin = displayNamedString.indexOf("(");
+    if (begin != -1) {
+        var  end = displayNamedString.indexOf(")");
+        // p=+44-171-380-7777 (Mark Handley)
+        return displayNamedString.substring(begin + 1, end);
+    } else {
+        // The alternative RFC822 name quoting convention is
+        // also allowed for
+        // email addresses. ex: p=Mark Handley <+44-171-380-7777>
+        var ind = displayNamedString.indexOf("<");
+        if (ind != -1) {
+            return displayNamedString.substring(0, ind);
+        } else {
+            // There is no display name !!!
+            return null
+        }
+    }
+}
+
+PhoneFieldParser.prototype.parsePhoneNumber =function(phoneNumberString) {
+    var begin = phoneNumberString.indexOf("(");
+    if (begin != -1) {
+        // p=+44-171-380-7777 (Mark Handley)
+        return phoneNumberString.substring(0, begin).trim();
+    } else {
+        // The alternative RFC822 name quoting convention is also allowed for
+        // email addresses. ex: p=Mark Handley <+44-171-380-7777>
+        var ind = phoneNumberString.indexOf("<");
+        if (ind != -1) {
+            var end = phoneNumberString.indexOf(">");
+            return phoneNumberString.substring(ind + 1, end);
+        } else {
+            // p=+44-171-380-7777
+            return phoneNumberString.trim();
+        }
+    }
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP URIFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/URIFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function URIFieldParser() {
+    this.classname="URIFieldParser";
+}
+
+URIFieldParser.prototype = new SDPParser();
+URIFieldParser.prototype.constructor=URIFieldParser; 
+
+URIFieldParser.prototype.parse =function(uriFieldString) {
+    if(typeof uriFieldString == 'string')
+    {
+        try {
+            this.lexer = new LexerCore("charLexer", uriFieldString);
+            this.lexer.match('u');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+            var uriField = new URIField();
+            uriField.setURI(this.lexer.getRest().trim());
+            return uriField;
+        } catch(exception) { 
+            throw new SdpException("URIFieldParser.parse(): parsing exception:"+this.lexer.getBuffer() + "at " + this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("URIFieldParser.parse() requires string object argument");
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP TimeFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/TimeFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function TimeFieldParser() {
+    this.classname="TimeFieldParser";
+}
+
+TimeFieldParser.prototype = new SDPParser();
+TimeFieldParser.prototype.constructor=TimeFieldParser; 
+
+TimeFieldParser.prototype.parse =function(timeFieldString) {
+    if(typeof timeFieldString == 'string')
+    {
+        try {
+            this.lexer = new LexerCore("charLexer", timeFieldString);
+            this.lexer.match('t');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+            var timeField = new TimeField();
+            timeField.setStartTime(this.parseTime());
+            this.lexer.SPorHT();
+            timeField.setStopTime(this.parseTime());
+            return timeField;
+        } catch(exception) { 
+            throw new SdpException("TimeFieldParser.parse(): parsing exception:"+this.lexer.getBuffer() + "at " + this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("TimeFieldParser.parse() requires string object argument");
+}
+
+
+TimeFieldParser.prototype.parseTime =function() {
+        var time = this.lexer.number();
+        if ( time.length > 18)
+            time = time.substring( time.length - 18);
+        return parseInt(time);
+} 
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP RepeatFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/RepeatFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function RepeatFieldParser() {
+    this.classname="RepeatFieldParser";
+}
+
+RepeatFieldParser.prototype = new SDPParser();
+RepeatFieldParser.prototype.constructor=RepeatFieldParser; 
+
+RepeatFieldParser.prototype.parse =function(repeatFieldString) {
+    if(typeof repeatFieldString == 'string')
+    {
+        try {
+            this.lexer = new LexerCore("charLexer", repeatFieldString);
+            this.lexer.match('r');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+
+            var repeatField = new RepeatField();
+            this.lexer.match(LexerCore.prototype.ID);
+            var repeatInterval = this.lexer.getNextToken();
+            this.lexer.SPorHT();
+            var typedTime = this.parseTypedTime(repeatInterval.getTokenValue());
+            repeatField.setRepeatInterval(typedTime);
+            this.lexer.match(LexerCore.prototype.ID);
+            var activeDuration = this.lexer.getNextToken();
+            this.lexer.SPorHT();
+            typedTime = this.parseTypedTime(activeDuration.getTokenValue());
+            repeatField.setActiveDuration(typedTime);
+
+            // The offsets list:
+            /*Patch 117 */
+            while (this.lexer.hasMoreChars()) {
+                var la = this.lexer.lookAhead(0);
+                if (la == '\n' || la == '\r')
+                    break;
+                this.lexer.match(LexerCore.prototype.ID);
+                var offsets = this.lexer.getNextToken();
+                this.lexer.SPorHT();
+                typedTime = this.parseTypedTime(offsets.getTokenValue());
+                repeatField.addOffset(typedTime);
+            }
+            return repeatField;
+        } catch(exception) { 
+            throw new SdpException("RepeatFieldParser.parse(): parsing exception:"+this.lexer.getBuffer() + "at " + this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("RepeatFieldParser.parse() requires string object argument");
+}
+
+
+/** Get the typed time.
+     *
+     * @param  tokenValue to convert into a typed time.
+     * @return the typed time
+     */
+RepeatFieldParser.prototype.parseTypedTime =function(typedTimeString) {
+    var typedTime = new TypedTime();
+    if (typedTimeString.endsWith("d")) {
+        typedTime.setUnit("d");
+        var t = typedTimeString.replace('d', ' ');
+        typedTime.setTime(parseInt(t.trim()));
+    } else if (typedTimeString.endsWith("h")) {
+        typedTime.setUnit("h");
+        var t = typedTimeString.replace('h', ' ');
+        typedTime.setTime(parseInt(t.trim()));
+    } else if (typedTimeString.endsWith("m")) {
+        typedTime.setUnit("m");
+        var t = typedTimeString.replace('m', ' ');
+        typedTime.setTime(parseInt(t.trim()));
+    } else {
+        typedTime.setUnit("s");
+        if (typedTimeString.endsWith("s")) {
+            var t = typedTimeString.replace('s', ' ');
+            typedTime.setTime(parseInt(t.trim()));
+        } else
+            typedTime.setTime(parseInt(typedTimeString.trim()));
+    }
+    return typedTime;
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP MediaFieldParser .
+ *  @see  gov/nist/javax/sdp/parser/MediaFieldParser.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function MediaFieldParser() {
+    this.classname="MediaFieldParser";
+}
+
+MediaFieldParser.prototype = new SDPParser();
+MediaFieldParser.prototype.constructor=MediaFieldParser; 
+
+MediaFieldParser.prototype.parse =function(mediaFieldString) {
+    if(typeof mediaFieldString == 'string')
+    {
+        try {
+            this.lexer = new LexerCore("charLexer", mediaFieldString);
+            var mediaField = new MediaField();
+            this.lexer.match('m');
+            this.lexer.SPorHT();
+            this.lexer.match('=');
+            this.lexer.SPorHT();
+            this.lexer.match(LexerCore.prototype.ID);
+            var media = this.lexer.getNextToken();
+            mediaField.setType(media.getTokenValue());
+            this.lexer.SPorHT();
+            this.lexer.match(LexerCore.prototype.ID);
+            var port = this.lexer.getNextToken();
+            mediaField.setPort(parseInt(port.getTokenValue()));
+            this.lexer.SPorHT();
+            // Some strange media formatting from Sun Ray systems with media
+            // reported by Emil Ivov and Iain Macdonnell at Sun
+            if (this.lexer.hasMoreChars() && this.lexer.lookAhead(1) == '\n')
+                return mediaField;
+            if (this.lexer.lookAhead(0) == '/') {
+                // The number of ports is present:
+                this.lexer.consume(1);
+                this.lexer.match(LexerCore.prototype.ID);
+                var portsNumber = this.lexer.getNextToken();
+                mediaField.setNports(parseInt(portsNumber.getTokenValue()));
+                this.lexer.SPorHT();
+            }
+            // proto = token *("/" token)
+            this.lexer.match(LexerCore.prototype.ID);
+            var token = this.lexer.getNextToken();
+            var transport = token.getTokenValue();
+            while (this.lexer.lookAhead(0) == '/') {
+                this.lexer.consume(1);
+                this.lexer.match(LexerCore.prototype.ID);
+                var transportTemp = this.lexer.getNextToken();
+                transport = transport + "/" + transportTemp.getTokenValue();
+            }
+            mediaField.setProtocol(transport);
+            this.lexer.SPorHT();
+
+            // The formats list:
+            var formatList = new Array();
+            while (this.lexer.hasMoreChars()) {
+                var la = this.lexer.lookAhead(0);
+                if (la == '\n' || la == '\r')
+                    break;
+                this.lexer.SPorHT();
+                //while(lexer.lookAhead(0) == ' ') lexer.consume(1);
+                this.lexer.match(LexerCore.prototype.ID);
+                var tok = this.lexer.getNextToken();
+                this.lexer.SPorHT();
+                var format = tok.getTokenValue().trim();
+                if(!format=="")
+                    formatList.push(format);
+            }
+            mediaField.setFormats(formatList);
+            return mediaField;
+        } catch(exception) { 
+            throw new SdpException("MediaFieldParser.parse(): parsing exception:"+this.lexer.getBuffer() + "at " + this.lexer.getPtr());
+        }
+    }
+    else throw new SdpException("MediaFieldParser.parse() requires string object argument");
+}
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+/*
+ *  Implementation of the JAIN-SIP SDPParserFactory .
+ *  @see  gov/nist/javax/sdp/ParserFactory.java 
+ *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @version 1.0 
+ */
+
+/**
+ * constructor
+ */
+function SDPParserFactory() {
+    this.classname="SDPParserFactory";
+}
+
+SDPParserFactory.prototype.constructor=SDPParserFactory; 
+SDPParserFactory.prototype.parserTable= new Array();
+SDPParserFactory.prototype.parserTable['a']= AttributeFieldParser.prototype.constructor;
+SDPParserFactory.prototype.parserTable['b']= BandwidthFieldParser.prototype.constructor;
+SDPParserFactory.prototype.parserTable['c']= ConnectionFieldParser.prototype.constructor;
+SDPParserFactory.prototype.parserTable['e']= EmailFieldParser.prototype.constructor;
+SDPParserFactory.prototype.parserTable['i']= InformationFieldParser.prototype.constructor;
+SDPParserFactory.prototype.parserTable['k']= KeyFieldParser.prototype.constructor;
+SDPParserFactory.prototype.parserTable['m']= MediaFieldParser.prototype.constructor;
+SDPParserFactory.prototype.parserTable['o']= OriginFieldParser.prototype.constructor;
+SDPParserFactory.prototype.parserTable['p']= PhoneFieldParser.prototype.constructor;
+SDPParserFactory.prototype.parserTable['v']= VersionFieldParser.prototype.constructor;
+SDPParserFactory.prototype.parserTable['r']= RepeatFieldParser.prototype.constructor;
+SDPParserFactory.prototype.parserTable['s']= SessionNameFieldParser.prototype.constructor;
+SDPParserFactory.prototype.parserTable['t']= TimeFieldParser.prototype.constructor;
+SDPParserFactory.prototype.parserTable['u']= SDPParserFactory.prototype.constructor;
+
+SDPParserFactory.prototype.createParser =function(fieldString) {
+    if(typeof fieldString == 'string')
+    {
+        try {
+            var i = fieldString.indexOf(Separators.prototype.EQUALS);
+            if(i == -1) throw new SdpException("SDPParserFactory.createParser(): parsing exception");
+            else var fieldName = fieldString.substring(0, i).trim(); 
+            if(this.parserTable[fieldName[0]]!=null)
+            {
+                return new  this.parserTable[fieldName[0]];
+            }
+            else throw new SdpException("SDPParserFactory.createParse(): could not find parser for " + fieldName)
+        } catch(exception) {   
+            throw new SdpException("SDPParserFactory.createParse(): could not find parser for " + fieldName)
+        }
+    }
+    else throw new SdpException("SDPParserFactory.createParser() requires string object argument");
 }/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
  * and individual contributors
@@ -4973,7 +10418,7 @@ AddressImpl.prototype.removeDisplayName =function(){
 }
 
 AddressImpl.prototype.isSIPAddress =function(){
-    if(address instanceof SipUri)
+    if(this.address instanceof SipUri)
     {
         return true;
     }
@@ -8895,7 +14340,7 @@ ContentType.prototype.NAME="Content-Type";
 ContentType.prototype.SEMICOLON=";";
 
 ContentType.prototype.compareMediaRange =function(media){
-    var chaine1=(mediaRange.type + "/" + mediaRange.subtype).toLowerCase();
+    var chaine1=(this.mediaRange.type + "/" + this.mediaRange.subtype).toLowerCase();
     var chaine2=media.toLowerCase();
     var c=0;
     var length;
@@ -9107,7 +14552,7 @@ TimeStamp.prototype.hasDelay =function(){
 }
 
 TimeStamp.prototype.removeDelay =function(){
-    delay = -1;
+    this.delay = -1;
 }
 
 TimeStamp.prototype.setTimeStamp =function(timeStamp){
@@ -10812,7 +16257,7 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         authorization.setResponse(resp);
         authorization.setURI(request.getRequestURI());
         authorization.setAlgorithm("MD5");
-        authorization.setQop(qop);
+        if(qop!=null) authorization.setQop(qop);
         return authorization;
     }
     else if(response.hasHeader("proxy-authenticate"))
@@ -10826,7 +16271,7 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         proxyauthorization.setResponse(resp);
         proxyauthorization.setURI(request.getRequestURI());
         proxyauthorization.setAlgorithm("MD5");
-                proxyauthorization.setQop(qop);
+                if(qop!=null)  proxyauthorization.setQop(qop);
         return proxyauthorization;
     }
 }/*
@@ -11469,7 +16914,7 @@ HeaderParser.prototype.time =function(calendar){
 HeaderParser.prototype.parse =function(){
     var name = this.lexer.getNextToken(':');
     this.lexer.consume(1);
-    var body = this.lexer.getLine().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
+    var body = this.lexer.getLine().replace(/^(\s)+|(\s)+$/g, '');
     var retval = new ExtensionHeaderImpl(name);
     retval.setValue(body);
     return retval;
@@ -12332,7 +17777,7 @@ AddressParametersParser.prototype.parse =function(addressParametersHeader){
         addressParametersHeader.setAddress(addr);
         this.lexer.SPorHT();
         var la = this.lexer.lookAhead(0);
-        if (this.lexer.hasMoreChars() && la != '\0' && la != '\n' && this.lexer.startsId()) {
+        if (this.lexer.hasMoreChars() && la != '' && la != '\n' && this.lexer.startsId()) {
             ParametersParser.prototype.parseNameValueList.call(this,addressParametersHeader);
         } else {
             ParametersParser.prototype.parse.call(this,addressParametersHeader);
@@ -12987,7 +18432,7 @@ URLParser.prototype.qheader =function(){
         var la = this.lexer.lookAhead(0);
         if (la == '=') {
             break;
-        } else if (la == '\0') {
+        } else if (la == '') {
             console.error("URLParser:qheader(): EOL reached");
             throw "URLParser:qheader(): EOL reached";
         }
@@ -13193,7 +18638,7 @@ AddressParser.prototype.address =function(inclParams){
         {
             break;
         }
-        else if (la == '\0')
+        else if (la == '')
         {
            console.error("AddressParser:address(): unexpected EOL");
            throw "AddressParser:parse(): unexpected EOL";
@@ -13659,7 +19104,7 @@ ContactParser.prototype.parse =function(){
             this.lexer.match(',');
             this.lexer.SPorHT();
         } 
-        else if (la == '\n' || la == '\0')
+        else if (la == '\n' || la == '')
         {
             break;
         }
@@ -13672,6 +19117,37 @@ ContactParser.prototype.parse =function(){
     return retval;
 }
 
+ContactParser.prototype.nameValue =function(){
+    this.lexer.match(LexerCore.prototype.ID);
+    var name = this.lexer.getNextToken();
+    this.lexer.SPorHT();
+    try {
+        var quoted = false;
+        var la = this.lexer.lookAhead(0);
+        if (la == '=') {
+            this.lexer.consume(1);
+            this.lexer.SPorHT();
+            var str = null;
+            if (this.lexer.lookAhead(0) == '\"') {
+                str = this.lexer.quotedString();
+                quoted = true;
+            } else {
+                str = this.lexer.byteStringNoSemicolon();
+            }
+            var nv = new NameValue(name.getTokenValue().toLowerCase(), str);
+            if (quoted)
+            {
+                nv.setQuotedValue();
+            }
+            return nv;
+        } else {
+            return new NameValue(name.getTokenValue().toLowerCase(), null);
+        }
+    } catch (ex) {
+        console.error("ContactParser:nameValue(): catched exception:"+ex);
+        return new NameValue(name.getTokenValue(), null);
+    }
+}
 /*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
  * and individual contributors
@@ -14374,7 +19850,7 @@ UserAgentParser.prototype.parse =function(){
     }
 
     while (this.lexer.lookAhead(0) != '\n'
-        && this.lexer.lookAhead(0) != '\0') {
+        && this.lexer.lookAhead(0) != '') {
         if (this.lexer.lookAhead(0) == '(') {
             var comment = this.lexer.comment();
             userAgent.addProductToken('(' + comment + ')');
@@ -14537,30 +20013,7 @@ ServerParser.prototype.parse =function(){
        console.error("ServerParser:parse(): empty header");
        throw "ServerParser:parse():  empty header";
     }
-    while (this.lexer.lookAhead(0) != '\n'
-        && this.lexer.lookAhead(0) != '\0') {
-        if (this.lexer.lookAhead(0) == '(') {
-            var comment = this.lexer.comment();
-            server.addProductToken('(' + comment + ')');
-        } else {
-            var tok;
-            var marker = 0;
-            try {
-                marker = this.lexer.markInputPosition();
-                tok = this.lexer.getString('/');
-                if (tok.charAt(tok.length() - 1) == '\n')
-                {
-                    tok = tok.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
-                }
-                server.addProductToken(tok);
-            } catch (ex) {
-                this.lexer.rewindInputPosition(marker);
-                tok = this.lexer.getRest().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
-                server.addProductToken(tok);
-                break;
-            }
-        }
-    }
+    server.addProductToken(this.lexer.getRest().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '')); 
     return server;
 }
 
@@ -21535,8 +26988,6 @@ SIPDialog.prototype.sendAck =function(request){
     //this.dialogDeleteTask = null;
     }
     this.ackSeen = true;  
-    var encodedSipMessage = request.encode();
-    console.info("SIP message sent: "+encodedSipMessage); 
 }
 
 SIPDialog.prototype.getRemoteTag =function(){
@@ -22975,7 +28426,7 @@ SIPTransaction.prototype.doesCancelMatchTransaction =function(requestToTest){
     var topViaHeader;
     var messageBranch;
     var transactionMatches = false;
-    if (this.getOriginalRequest() == null || this.getOriginalRequest().getMethod()=="CANCEL")
+    if (this.getOriginalRequest() == null || this.getMethod()=="CANCEL")
     {
         return false;
     }
@@ -22990,20 +28441,15 @@ SIPTransaction.prototype.doesCancelMatchTransaction =function(requestToTest){
             }
         }
         if (messageBranch != null && this.getBranch() != null) {
-            if (this.getBranch().toLowerCase()==messageBranch.toLowerCase()
-                && topViaHeader.getSentBy()==
-                this.getOriginalRequest().getViaHeaders().getFirst().getSentBy()) {
+            if ((this.getBranch().toLowerCase()==messageBranch.toLowerCase())
+                && (topViaHeader.getSentBy().equals(this.getOriginalRequest().getViaHeaders().getFirst().getSentBy()))) {
                 transactionMatches = true;
             }
         } else {
-            if (this.getOriginalRequest().getRequestURI()==
-                requestToTest.getRequestURI()
-                && this.getOriginalRequest().getTo()==
-                requestToTest.getTo()
-                && this.getOriginalRequest().getFrom()==
-                requestToTest.getFrom()
-                && this.getOriginalRequest().getCallId().getCallId()==
-                requestToTest.getCallId().getCallId()
+            if (this.getOriginalRequest().getRequestURI()==requestToTest.getRequestURI()
+                && this.getOriginalRequest().getTo()==requestToTest.getTo()
+                && this.getOriginalRequest().getFrom()==requestToTest.getFrom()
+                && this.getOriginalRequest().getCallId().getCallId()==requestToTest.getCallId().getCallId()
                 && this.getOriginalRequest().getCSeq().getSeqNumber() == requestToTest.getCSeq().getSeqNumber()
                 && topViaHeader==this.getOriginalRequest().getViaHeaders().getFirst()) {
                 transactionMatches = true;
@@ -23549,7 +28995,7 @@ SIPClientTransaction.prototype.sendRequest =function(){
         throw "SIPClientTransaction:sendRequest(): "+ex;
     }
     try {
-        if (this.getOriginalRequest().getMethod()==this.CANCEL
+        if (this.getMethod()==this.CANCEL
             && this.sipStack.isCancelClientTransactionChecked()) {
             var ct = this.sipStack.findCancelTransaction(this.getOriginalRequest(), false);
             if (ct == null) {
@@ -23565,15 +29011,15 @@ SIPClientTransaction.prototype.sendRequest =function(){
                 throw "SIPClientTransaction:sendRequest(): cannot cancel non-invite requests RFC 3261 9.1";
             }
         } 
-        else if (this.getOriginalRequest().getMethod()==this.BYE
-            ||this.getOriginalRequest().getMethod()==this.NOTIFY) {
+        else if (this.getMethod()==this.BYE
+            ||this.getMethod()==this.NOTIFY) {
             var dialog = this.sipStack.getDialog(this.getOriginalRequest().getDialogId(false));
             if (this.getSipProvider().isAutomaticDialogSupportEnabled() && dialog != null) {
                 console.error("SIPClientTransaction:sendRequest(): Dialog is present and AutomaticDialogSupport is enabled for the provider -- Send the Request using the Dialog.sendRequest(transaction)");
                 throw "SIPClientTransaction:sendRequest(): Dialog is present and AutomaticDialogSupport is enabled for the provider -- Send the Request using the Dialog.sendRequest(transaction)";
             }
         }
-        if (this.getOriginalRequest().getMethod()==this.INVITE) {
+        if (this.getMethod()==this.INVITE) {
             dialog = this.getDefaultDialog();
         }
         this.isMapped = true;
@@ -24106,7 +29552,7 @@ SIPServerTransaction.prototype.processRequest =function(transactionRequest,sourc
         } 
         return;
     }
-    else if (transactionRequest.getMethod()==this.getOriginalRequest().getMethod()) {
+    else if (transactionRequest.getMethod()==this.getMethod()) {
         if ("PROCEEDING" == this.getRealState()|| "COMPLETED" == this.getRealState()) {
             if (this.lastResponse != null) {
                 SIPTransaction.prototype.sendMessage.call(this,this.lastResponse);
@@ -24121,7 +29567,7 @@ SIPServerTransaction.prototype.processRequest =function(transactionRequest,sourc
     }
     if ("COMPLETED" != this.getRealState()
         && "TERMINATED" != this.getRealState() && this.requestOf != null) {
-        if (this.getOriginalRequest().getMethod()==transactionRequest.getMethod()) {
+        if (this.getMethod()==transactionRequest.getMethod()) {
             if (toTu) {
                 this.requestOf.processRequest(transactionRequest, this);
             } 
@@ -24133,7 +29579,7 @@ SIPServerTransaction.prototype.processRequest =function(transactionRequest,sourc
         }
     }
     else {
-        if (this.getSIPStack().isDialogCreated(this.getOriginalRequest().getMethod())
+        if (this.getSIPStack().isDialogCreated(this.getMethod())
             && this.getRealState() == "TERMINATED"
             && transactionRequest.getMethod()=="ACK"
             && this.requestOf != null) {
@@ -24164,7 +29610,7 @@ SIPServerTransaction.prototype.sendMessage =function(messageToSend){
     if (!this.getOriginalRequest().getTopmostVia().hasPort()) {
         transactionResponse.getTopmostVia().removePort();
     }
-    if (!transactionResponse.getCSeq().getMethod()==this.getOriginalRequest().getMethod()) {
+    if (!transactionResponse.getCSeq().getMethod()==this.getMethod()) {
         this.sendResponseSRT(transactionResponse);
         return;
     }

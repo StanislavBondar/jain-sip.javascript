@@ -79,9 +79,9 @@
                                                 <label class="control-label" for="stunServer"><a style="color:#555555" href="#" rel="tooltip" title="Specify the IP Address and Port of a Stun Server" data-placement="top" data-delay: { show: 10, hide: 100 }>STUN server</a>:</label>
                                                 <input id="stunServer"  type="text" size="30"> 
                                             </div>
-                                            <div class="control-group" id='sipWsUrlDiv'>
+                                            <div class="control-group" id='sipOutboundProxyDiv'>
                                                 <label class="control-label"><a style="color:#555555" href="#" rel="tooltip" title="Specify the IP Address and Port of a WebSocket Server" data-placement="top" data-delay: { show: 10, hide: 100 }>Outbound Proxy</a> :</label>
-                                                <input  id="sipWsUrl"  type="text" size="30"> 
+                                                <input  id="sipOutboundProxy"  type="text" size="30"> 
                                             </div>							
                                         </div>
                                     </div>					    
@@ -100,10 +100,10 @@
                         <div>
                             <div class="nav-header">Communicate</div>		    				      
                             <p class="lead"> 
-                            <div id='sipContactPhoneNumberDiv'>
+                            <div id='sipContactUriDiv'>
                                 <div id='input'>
-                                    Contact To Call: <input id="sipContactPhoneNumber" type="text" size="60" class="input-xlarge focused" >					
-                                    &nbsp;<input id='Call' class="btn btn-primary" type='submit' name='Call' value='Call' disabled="disabled" onclick = "call(document.getElementById('sipContactPhoneNumber').value);"/>
+                                    Contact To Call: <input id="sipContactUri" type="text" size="60" class="input-xlarge focused" >					
+                                    &nbsp;<input id='Call' class="btn btn-primary" type='submit' name='Call' value='Call' disabled="disabled" onclick = "call(document.getElementById('sipContactUri').value);"/>
                                     &nbsp;<input id='Bye' class="btn btn-primary" type='submit' name='Bye' value='Bye' disabled="disabled" onclick = "bye();"/>
                                     <div id='media'>
                                         <div id='over'>
@@ -153,38 +153,69 @@
         <script src="js/jain-sip.js" type="text/javascript"></script>
         <script src="js/MobicentsWebRTCPhone.js" type="text/javascript" ></script>
         <script type='text/javascript'>	
-            var mobicentsWebRTCPhone=null;         
-            var defaultSipWsUrl="ws://10.193.31.142:5082"
+            
+            var mobicentsWebRTCPhone=null; 
+            var localAudioVideoMediaStream=null; // use when Google Chrome agent is detected
+            var localAudioMediaStream=null; // use when Mozilla Firefox agent is detected
+            var localVideoMediaStream=null; // use when Mozilla Firefox agent is detected
+            
+            // Default SIP profile    
+            var sipOutboundProxy="ws://localhost:5082"
             var defaultStunServer="";
-            var defaultSipDomain="mobicents.com";
-            var defaultSipDisplayName="TeleStax";
-            var defaultSipUserName="telestax";
-            var defaultSipLogin="telestax@mobicents.com";
-            var defaultSipPassword="mobicents";
-            var defaultSipContactPhoneNumber="telestax@mobicents.com";
-            var localAudioVideoMediaStream=null;
-            var localAudioMediaStream=null;
-            var localVideoMediaStream=null;
+            var sipDomain="test.com";
+            var sipDisplayName="Alice";
+            var sipUserName="alice";
+            var sipLogin=sipUserName+"@test.com";
+            var sipPassword="1234";
+            var sipContactUri="bob@test.com";
+                       
+            // retrieve SIP profile is provided in service URL
+            if(location.search.length>0)
+            {
+                var argumentsString = location.search.substring(1);
+                var arguments = argumentsString.split('&');
+                if(arguments.length==0) arguments = [argumentsString];
+                for(var i=0;i<arguments.length;i++)
+                {   
+                    var argument = arguments[i].split("=");
+                    if("sipUserName"==argument[0])
+                    {
+                        sipUserName =argument[1];
+                    } else if("sipDomain"==argument[0])
+                    {
+                        sipDomain =argument[1];
+                    } else if("sipDisplayName"==argument[0])
+                    {
+                        sipDisplayName =argument[1];
+                    } else if("sipPassword"==argument[0])
+                    {
+                        sipPassword =argument[1];
+                    } else if("sipLogin"==argument[0])
+                    {
+                        sipLogin =argument[1];
+                    }  else if("sipContactUri"==argument[0])
+                    {
+                        sipContactUri =argument[1];
+                    }
+                }
+            }
             
             function onLoad()
             {
                 console.debug("onLoad");
                 document.getElementById("stunServer").value=defaultStunServer;
-                document.getElementById("sipWsUrl").value=defaultSipWsUrl;
-                document.getElementById("sipDomain").value=defaultSipDomain;
-                document.getElementById("sipDisplayName").value=defaultSipDisplayName;
-                document.getElementById("sipUserName").value=defaultSipUserName;
-                document.getElementById("sipLogin").value=defaultSipLogin;
-                document.getElementById("sipPassword").value=defaultSipPassword;
-                document.getElementById("sipContactPhoneNumber").value=defaultSipContactPhoneNumber;
-                if(navigator.mozGetUserMedia)
+                document.getElementById("sipOutboundProxy").value=sipOutboundProxy;
+                document.getElementById("sipDomain").value=sipDomain;
+                document.getElementById("sipDisplayName").value=sipDisplayName;
+                document.getElementById("sipUserName").value=sipUserName;
+                document.getElementById("sipLogin").value=sipLogin;
+                document.getElementById("sipPassword").value=sipPassword;
+                document.getElementById("sipContactUri").value=sipContactUri;
+                if(navigator.webkitGetUserMedia)
+                    navigator.webkitGetUserMedia({audio:true, video:true},webkitGetUserMediaSuccess, webkitGetUserMediaError);
+                else if(navigator.mozGetUserMedia)
                 {
-                    navigator.mozGetUserMedia({video:true},gotLocalVideoStream, gotLocalVideoFailed);
-                    navigator.mozGetUserMedia({audio:true, fake:true},gotLocalAudioStream, gotLocalAudioFailed);
-                }
-                else if(navigator.webkitGetUserMedia)
-                {
-                    navigator.webkitGetUserMedia({audio:true, video:true},gotLocalAudioVideoStream, gotLocalAudioVideoFailed);
+                    navigator.mozGetUserMedia({audio:true},mozGetUserAudioMediaSuccess, mozGetUserMediaError);
                 }
             }
 
@@ -196,68 +227,81 @@
                     console.log("OnBeforeUnLoad()");  
                 }     
             }
-                  
-            function gotLocalAudioStream (localStream) {
-                console.debug("gotLocalAudioStream");
-                localAudioMediaStream=localStream;
-            }
-
-            function  gotLocalAudioFailed(error) 
-            {
-                console.debug("gotLocalAudioFailed");
-                alert("Failed to get access to local audio media. Error code was " + error.code + ".");
-            }	
-            
-            function gotLocalVideoStream (localStream) {
-                console.debug("gotLocalVideoStream");
-                localVideoMediaStream=localStream;
-                var video = document.getElementById("localVideoPreview");
-                if (navigator.mozGetUserMedia)
+                 
+            function webkitGetUserMediaSuccess (localStream) {
+                try
                 {
-                    video.mozSrcObject = localVideoMediaStream;
-                    video.play();
+                    console.debug("webkitGetUserMediaSuccess localStream.id="+localStream.id);
+                    if(localStream.getAudioTracks) console.debug("webkitGetUserMediaSuccess localStream.getAudioTracks()="+localStream.getAudioTracks());
+                    else console.info("MediaStream:getAudioTracks() not supported")
+                    if(localStream.getVideoTracks) console.debug("webkitGetUserMediaSuccess localStream.getVideoTracks()="+localStream.getVideoTracks());
+                    else console.info("MediaStream:getVideoTracks() not supported")
+                    localAudioVideoMediaStream=localStream;
+                    document.getElementById("localVideoPreview").src=webkitURL.createObjectURL(localStream);
+                    document.getElementById("localVideoPreview").play();
+                    showRegisterButton();
+                   
                 }
-               showRegisterButton();
-            }
-
-            function  gotLocalVideoFailed(error) 
-            {
-                console.debug("gotLocalVideoFailed");
-                alert("Failed to get access to local video media. Error code was " + error.code + ".");
+                catch(exception)
+                {
+                    console.debug("mozGetUserMediaSuccess: catched exception: "+exception);
+                    hideRegisterButton();
+                }
             }
             
-            function gotLocalAudioVideoStream (localStream) {
-                console.debug("gotLocalAudioVideoStream");
-                localAudioVideoMediaStream=localStream;
-                var video = document.getElementById("localVideoPreview");
-                if (window.webkitURL) 
-                {
-                    video.src = window.webkitURL.createObjectURL(localAudioVideoMediaStream);
-                    video.play();
-                }
-                else if (video.mozSrcObject !== undefined)
-                {
-                    video.mozSrcObject = localAudioVideoMediaStream;
-                    video.play();
-                }
-                else if (navigator.mozGetUserMedia)
-                {
-                    video.src = localAudioVideoMediaStream;
-                    video.play();
-                }
-                else if (window.URL)
-                {
-                    video.src = window.URL.createObjectURL(localAudioVideoMediaStream);
-                    video.play();
-                }
-                showRegisterButton();
-            }
-
-            function  gotLocalAudioVideoFailed(error) 
+            
+            function  webkitGetUserMediaError(code) 
             {
-                alert("Failed to get access to local media. Error code was " + error.code + ".");
-                hideRegisterButton();
+                console.debug("webkitGetUserMediaError");
+                alert("Failed to get access to local media. Error code was " + code + ".");
             }	
+    
+            function mozGetUserVideoMediaSuccess (localStream) {
+                try
+                {
+                    console.debug("mozGetUserVideoMediaSuccess localStream.id="+localStream.id);
+                    if(localStream.getAudioTracks) console.debug("mozGetUserMediaSuccess: localStream.getAudioTracks()="+localStream.getAudioTracks());
+                    else console.info("MediaStream:getAudioTracks() not supported")
+                    if(localStream.getVideoTracks) console.debug("mozGetUserMediaSuccess: localStream.getVideoTracks()="+localStream.getVideoTracks());
+                    else console.info("MediaStream:getVideoTracks() not supported")
+                    localVideoMediaStream=localStream;
+                    document.getElementById("localVideoPreview").mozSrcObject=localVideoMediaStream;
+                    document.getElementById("localVideoPreview").play();
+                    showRegisterButton();
+                }
+                catch(exception)
+                {
+                    console.debug("mozGetUserVideoMediaSuccess catched exception: "+exception);
+                    hideRegisterButton();
+                }
+            }
+            
+            function mozGetUserAudioMediaSuccess (localStream) {
+                try
+                {
+                    console.debug("mozGetUserAudioMediaSuccess localStream.id="+localStream.id);
+                    if(localStream.getAudioTracks) console.debug("mozGetUserMediaSuccess: localStream.getAudioTracks()="+localStream.getAudioTracks());
+                    else console.info("MediaStream:getAudioTracks() not supported")
+                    if(localStream.getVideoTracks) console.debug("mozGetUserMediaSuccess: localStream.getVideoTracks()="+localStream.getVideoTracks());
+                    else console.info("MediaStream:getVideoTracks() not supported")
+                    localAudioMediaStream=localStream;
+                    navigator.mozGetUserMedia({video:true},mozGetUserVideoMediaSuccess, mozGetUserMediaError);
+                }
+                catch(exception)
+                {
+                    console.debug("mozGetUserAudioMediaSuccess catched exception: "+exception);
+                    hideRegisterButton();
+                }
+            }
+                    
+
+            function  mozGetUserMediaError(code) 
+            {
+                console.debug("mozGetUserMediaError");
+                alert("Failed to get access to local media. Error code was " + code + ".");
+            }	
+           
+    
     
             function register()
             {
@@ -265,8 +309,22 @@
                 if (window.webkitNotifications) {
                     window.webkitNotifications.requestPermission();
                 }
-                mobicentsWebRTCPhone=new MobicentsWebRTCPhone(document.getElementById("sipWsUrl").value);
-                mobicentsWebRTCPhone.localAudioVideoMediaStream=localAudioVideoMediaStream;
+                
+                var configuration = {
+                    stunServer:document.getElementById("stunServer").value,
+                    sipOutboundProxy:document.getElementById("sipOutboundProxy").value,
+                    sipDomain: document.getElementById("sipDomain").value,
+                    sipDisplayName: document.getElementById("sipDisplayName").value,
+                    sipUserName: document.getElementById("sipUserName").value,
+                    sipLogin: document.getElementById("sipLogin").value,
+                    sipPassword: document.getElementById("sipPassword").value,
+                    localAudioVideoMediaStream:localAudioVideoMediaStream,
+                    localAudioMediaStream:localAudioMediaStream,
+                    localVideoMediaStream:localVideoMediaStream,
+                    audioMediaFlag:true,
+                    videoMediaFlag:true
+                }
+                mobicentsWebRTCPhone=new MobicentsWebRTCPhone(configuration);
             }
 
             function unRegister()
@@ -279,13 +337,19 @@
 
             function call(from,to)
             {   
-                mobicentsWebRTCPhone.call(from,to);
+                if(mobicentsWebRTCPhone!=null)
+                {
+                    mobicentsWebRTCPhone.call(from,to);
+                }
             }
 
 
             function bye()
             {
-                mobicentsWebRTCPhone.bye();
+                if(mobicentsWebRTCPhone!=null)
+                {
+                    mobicentsWebRTCPhone.byeCall();
+                }
             }
                 
                 
