@@ -8,8 +8,8 @@
             
             // Test domain 
             var simpleWebRtcSipPhone=null;
-            //var sipWsUrl="ws://10.193.7.209:5082/";
-            var sipWsUrl="ws://10.193.7.209:8090/WebRtcSipSignalingGateway-1.0-SNAPSHOT/WS/WebSocketConnector";
+            var sipWsUrl="ws://localhost:5082/";
+                   
             // test URL http://localhost:8080/SimpleTestWebApp/?sipDomain=sipasf.fr&sipLogin=1111@sipasf.fr&sipPassword=1234&sipUserName=1111&sipDisplayName=lolo&sipContactUserName=2222
             
             // SIP profile
@@ -49,250 +49,305 @@
                         sipContactUserName =argument[1];
                     }
                 }
-        }
+            }
            
-        var defaultStunServer="";         
-        var localAudioVideoMediaStream=null;
-        var localAudioMediaStream=null;
-        var localVideoMediaStream=null;
+            var defaultStunServer="";         
+            var localAudioVideoMediaStream=null;
+            var localAudioMediaStream=null;
+            var localVideoMediaStream=null;
             
-        function onLoad()
-        {
-            console.debug("onLoad");
+            function onLoad()
+            {
+                console.debug("onLoad");
                         
-            hideRejectButton();
-            hideAcceptButton();
-            hideCallButton();
-            hideByeButton();
-            hideCancelButton();
-            hideUnRegisterButton();
-            hideRegisterButton();
+                hideRejectButton();
+                hideAcceptButton();
+                hideCallButton();
+                hideByeButton();
+                hideCancelButton();
+                hideUnRegisterButton();
+                hideRegisterButton();
             
-            document.getElementById("stunServer").value=defaultStunServer;
-            document.getElementById("sipWsUrl").value=sipWsUrl;
-            document.getElementById("sipDomain").value=sipDomain;
-            document.getElementById("sipDisplayName").value=sipDisplayName;
-            document.getElementById("sipUserName").value=sipUserName;
-            document.getElementById("sipLogin").value=sipLogin;
-            document.getElementById("sipPassword").value=sipPassword;
-            document.getElementById("sipContactPhoneNumber").value=sipContactUserName;
-            if(navigator.webkitGetUserMedia)
-                navigator.webkitGetUserMedia({audio:true, video:true},webkitGetUserMediaSuccess, webkitGetUserMediaError);
-            else if(navigator.mozGetUserMedia)
-            {
-                navigator.mozGetUserMedia({audio:true},mozGetUserAudioMediaSuccess, mozGetUserMediaError);
+                document.getElementById("stunServer").value=defaultStunServer;
+                document.getElementById("sipWsUrl").value=sipWsUrl;
+                document.getElementById("sipDomain").value=sipDomain;
+                document.getElementById("sipDisplayName").value=sipDisplayName;
+                document.getElementById("sipUserName").value=sipUserName;
+                document.getElementById("sipLogin").value=sipLogin;
+                document.getElementById("sipPassword").value=sipPassword;
+                document.getElementById("sipContactPhoneNumber").value=sipContactUserName;
+                if(navigator.webkitGetUserMedia)
+                    navigator.webkitGetUserMedia({audio:true, video:true},webkitGetUserMediaSuccess, webkitGetUserMediaError);
+                else if(navigator.mozGetUserMedia)
+                {
+                    navigator.mozGetUserMedia({audio:true},mozGetUserAudioMediaSuccess, mozGetUserMediaError);
+                }
+
             }
 
-        }
-
-        function onBeforeUnload()
-        {
-            unRegister();
-            for(var i=0;i<5000;i++)
+            function onBeforeUnload()
             {
-                console.log("OnBeforeUnLoad()");  
-            }     
-        }
+                unRegister();
+                for(var i=0;i<5000;i++)
+                {
+                    console.log("OnBeforeUnLoad()");  
+                }     
+            }
             
-        function webkitGetUserMediaSuccess (localStream) {
-            try
-            {
-                console.debug("webkitGetUserMediaSuccess localStream.id="+localStream.id);
-                if(localStream.getAudioTracks) console.debug("webkitGetUserMediaSuccess localStream.getAudioTracks()="+localStream.getAudioTracks());
-                else console.info("MediaStream:getAudioTracks() not supported")
-                if(localStream.getVideoTracks) console.debug("webkitGetUserMediaSuccess localStream.getVideoTracks()="+localStream.getVideoTracks());
-                else console.info("MediaStream:getVideoTracks() not supported")
-                localAudioVideoMediaStream=localStream;
-                document.getElementById("localVideoPreview").src=webkitURL.createObjectURL(localStream);
-                document.getElementById("localVideoPreview").play();
-                showRegisterButton();
+            function webkitGetUserMediaSuccess (localStream) {
+                try
+                {
+                    console.debug("webkitGetUserMediaSuccess localStream.id="+localStream.id);
+                    if(localStream.getAudioTracks) console.debug("webkitGetUserMediaSuccess localStream.getAudioTracks()="+localStream.getAudioTracks());
+                    else console.info("MediaStream:getAudioTracks() not supported")
+                    if(localStream.getVideoTracks) console.debug("webkitGetUserMediaSuccess localStream.getVideoTracks()="+localStream.getVideoTracks());
+                    else console.info("MediaStream:getVideoTracks() not supported")
+                    localAudioVideoMediaStream=localStream;
+                    document.getElementById("localVideoPreview").src=webkitURL.createObjectURL(localStream);
+                    document.getElementById("localVideoPreview").play();
+                    showRegisterButton();
                    
+                }
+                catch(exception)
+                {
+                    console.debug("mozGetUserMediaSuccess: catched exception: "+exception);
+                    hideRegisterButton();
+                }
             }
-            catch(exception)
+            
+            
+            function  webkitGetUserMediaError(code) 
             {
-                console.debug("mozGetUserMediaSuccess: catched exception: "+exception);
-                hideRegisterButton();
-            }
-        }
-            
-            
-        function  webkitGetUserMediaError(code) 
-        {
-            console.debug("webkitGetUserMediaError");
-            alert("Failed to get access to local media. Error code was " + code + ".");
-        }	
+                console.debug("webkitGetUserMediaError");
+                alert("Failed to get access to local media. Error code was " + code + ".");
+            }	
     
-        function mozGetUserVideoMediaSuccess (localStream) {
-            try
-            {
-                console.debug("mozGetUserVideoMediaSuccess localStream.id="+localStream.id);
-                if(localStream.getAudioTracks) console.debug("mozGetUserMediaSuccess: localStream.getAudioTracks()="+localStream.getAudioTracks());
-                else console.info("MediaStream:getAudioTracks() not supported")
-                if(localStream.getVideoTracks) console.debug("mozGetUserMediaSuccess: localStream.getVideoTracks()="+localStream.getVideoTracks());
-                else console.info("MediaStream:getVideoTracks() not supported")
-                localVideoMediaStream=localStream;
-                document.getElementById("localVideoPreview").mozSrcObject=localVideoMediaStream;
-                document.getElementById("localVideoPreview").play();
-                showRegisterButton();
+            function mozGetUserVideoMediaSuccess (localStream) {
+                try
+                {
+                    console.debug("mozGetUserVideoMediaSuccess localStream.id="+localStream.id);
+                    if(localStream.getAudioTracks) console.debug("mozGetUserMediaSuccess: localStream.getAudioTracks()="+localStream.getAudioTracks());
+                    else console.info("MediaStream:getAudioTracks() not supported")
+                    if(localStream.getVideoTracks) console.debug("mozGetUserMediaSuccess: localStream.getVideoTracks()="+localStream.getVideoTracks());
+                    else console.info("MediaStream:getVideoTracks() not supported")
+                    localVideoMediaStream=localStream;
+                    document.getElementById("localVideoPreview").mozSrcObject=localVideoMediaStream;
+                    document.getElementById("localVideoPreview").play();
+                    showRegisterButton();
+                }
+                catch(exception)
+                {
+                    console.debug("mozGetUserVideoMediaSuccess catched exception: "+exception);
+                    hideRegisterButton();
+                }
             }
-            catch(exception)
-            {
-                console.debug("mozGetUserVideoMediaSuccess catched exception: "+exception);
-                hideRegisterButton();
-            }
-        }
             
-        function mozGetUserAudioMediaSuccess (localStream) {
-            try
-            {
-                console.debug("mozGetUserAudioMediaSuccess localStream.id="+localStream.id);
-                if(localStream.getAudioTracks) console.debug("mozGetUserMediaSuccess: localStream.getAudioTracks()="+localStream.getAudioTracks());
-                else console.info("MediaStream:getAudioTracks() not supported")
-                if(localStream.getVideoTracks) console.debug("mozGetUserMediaSuccess: localStream.getVideoTracks()="+localStream.getVideoTracks());
-                else console.info("MediaStream:getVideoTracks() not supported")
-                localAudioMediaStream=localStream;
-                navigator.mozGetUserMedia({video:true},mozGetUserVideoMediaSuccess, mozGetUserMediaError);
+            function mozGetUserAudioMediaSuccess (localStream) {
+                try
+                {
+                    console.debug("mozGetUserAudioMediaSuccess localStream.id="+localStream.id);
+                    if(localStream.getAudioTracks) console.debug("mozGetUserMediaSuccess: localStream.getAudioTracks()="+localStream.getAudioTracks());
+                    else console.info("MediaStream:getAudioTracks() not supported")
+                    if(localStream.getVideoTracks) console.debug("mozGetUserMediaSuccess: localStream.getVideoTracks()="+localStream.getVideoTracks());
+                    else console.info("MediaStream:getVideoTracks() not supported")
+                    localAudioMediaStream=localStream;
+                    navigator.mozGetUserMedia({video:true},mozGetUserVideoMediaSuccess, mozGetUserMediaError);
+                }
+                catch(exception)
+                {
+                    console.debug("mozGetUserAudioMediaSuccess catched exception: "+exception);
+                    hideRegisterButton();
+                }
             }
-            catch(exception)
-            {
-                console.debug("mozGetUserAudioMediaSuccess catched exception: "+exception);
-                hideRegisterButton();
-            }
-        }
                     
 
-        function  mozGetUserMediaError(code) 
-        {
-            console.debug("mozGetUserMediaError");
-            alert("Failed to get access to local media. Error code was " + code + ".");
-        }	
+            function  mozGetUserMediaError(code) 
+            {
+                console.debug("mozGetUserMediaError");
+                alert("Failed to get access to local media. Error code was " + code + ".");
+            }	
             
     
-        function register()
-        {
-            
-            var configuration = {
-                stunServer:document.getElementById("stunServer").value,
-                sipOutboundProxy:document.getElementById("sipWsUrl").value,
-                sipDomain: document.getElementById("sipDomain").value,
-                sipDisplayName: document.getElementById("sipDisplayName").value,
-                sipUserName: document.getElementById("sipUserName").value,
-                sipLogin: document.getElementById("sipLogin").value,
-                sipPassword: document.getElementById("sipPassword").value,
-                localAudioVideoMediaStream:localAudioVideoMediaStream,
-                localAudioMediaStream:localAudioMediaStream,
-                localVideoMediaStream:localVideoMediaStream
+            function register()
+            {   
+                var configuration = {
+                    stunServer:document.getElementById("stunServer").value,
+                    sipOutboundProxy:document.getElementById("sipWsUrl").value,
+                    sipDomain: document.getElementById("sipDomain").value,
+                    sipDisplayName: document.getElementById("sipDisplayName").value,
+                    sipUserName: document.getElementById("sipUserName").value,
+                    sipLogin: document.getElementById("sipLogin").value,
+                    sipPassword: document.getElementById("sipPassword").value,
+                    sipRegisterMode:document.getElementById("sipRegistrationCkeckBox").checked,
+                    localAudioVideoMediaStream:localAudioVideoMediaStream,
+                    localAudioMediaStream:localAudioMediaStream,
+                    localVideoMediaStream:localVideoMediaStream,
+                    audioMediaFlag:document.getElementById("audioMediaCkeckBox").checked,
+                    videoMediaFlag:document.getElementById("videoMediaCkeckBox").checked
+                }
+                simpleWebRtcSipPhone=new SimpleWebRtcSipPhone(configuration);
             }
-            simpleWebRtcSipPhone=new SimpleWebRtcSipPhone(configuration);
-        }
 
-        function unRegister()
-        {
-            if(simpleWebRtcSipPhone!=null)
+            function unRegister()
             {
-                simpleWebRtcSipPhone.unRegister();   
+                if(simpleWebRtcSipPhone!=null)
+                {
+                    simpleWebRtcSipPhone.unRegister();   
+                }
             }
-        }
 
-        function call(from,to)
-        {   
-            simpleWebRtcSipPhone.call(from,to);
-        }
+            function call(to)
+            {   
+                if(simpleWebRtcSipPhone==null) 
+                {
+                    var configuration = {
+                        stunServer:document.getElementById("stunServer").value,
+                        sipOutboundProxy:document.getElementById("sipWsUrl").value,
+                        sipDomain: document.getElementById("sipDomain").value,
+                        sipDisplayName: document.getElementById("sipDisplayName").value,
+                        sipUserName: document.getElementById("sipUserName").value,
+                        sipLogin: document.getElementById("sipLogin").value,
+                        sipPassword: document.getElementById("sipPassword").value,
+                        sipRegisterMode:document.getElementById("sipRegistrationCkeckBox").checked,
+                        localAudioVideoMediaStream:localAudioVideoMediaStream,
+                        localAudioMediaStream:localAudioMediaStream,
+                        localVideoMediaStream:localVideoMediaStream,
+                        audioMediaFlag:document.getElementById("audioMediaCkeckBox").checked,
+                        videoMediaFlag:document.getElementById("videoMediaCkeckBox").checked
+                    }
+                    simpleWebRtcSipPhone=new SimpleWebRtcSipPhone(configuration);
+                }
+                else simpleWebRtcSipPhone.call(to);
+            }
 
 
-        function acceptCall()
-        {
-            simpleWebRtcSipPhone.acceptCall();
-        }
+            function acceptCall()
+            {
+                simpleWebRtcSipPhone.acceptCall();
+            }
                 
 
-        function rejectCall()
-        {
-            simpleWebRtcSipPhone.rejectCall();
-        }
+            function rejectCall()
+            {
+                simpleWebRtcSipPhone.rejectCall();
+            }
                 
-        function cancelCall()
-        {
-            simpleWebRtcSipPhone.cancelCall();
-        }
+            function cancelCall()
+            {
+                simpleWebRtcSipPhone.cancelCall();
+            }
                 
-        function byeCall()
-        {
-            simpleWebRtcSipPhone.byeCall();
-        }
-                
+            function byeCall()
+            {
+                simpleWebRtcSipPhone.byeCall();
+            }
+       
+            function changeSipRegisterMode()
+            {
+                if(document.getElementById("sipRegistrationCkeckBox").checked==false)
+                {
+                    hideRejectButton();
+                    hideAcceptButton();
+                    showCallButton();
+                    hideByeButton();
+                    hideCancelButton();
+                    hideUnRegisterButton();
+                    hideRegisterButton();
+                }
+                else
+                {
+                    hideRejectButton();
+                    hideAcceptButton();
+                    hideCallButton();
+                    hideByeButton();
+                    hideCancelButton();
+                    hideUnRegisterButton();
+                    showRegisterButton();     
+                }
+            }
          
-        function showCallButton()
-        {
-            document.getElementById("CallButton").disabled=false;
-        }
+            function showCallButton()
+            {
+                document.getElementById("CallButton").disabled=false;
+            }
             
-        function showByeButton()
-        {
-            document.getElementById("ByeButton").disabled=false;
-        }
+            function showByeButton()
+            {
+                document.getElementById("ByeButton").disabled=false;
+            }
             
-        function showCancelButton()
-        {
-            document.getElementById("CancelButton").disabled=false;
-        }
+            function showCancelButton()
+            {
+                document.getElementById("CancelButton").disabled=false;
+            }
             
-        function showAcceptButton()
-        {
-            document.getElementById("AcceptButton").disabled=false;
-        }
+            function showAcceptButton()
+            {
+                document.getElementById("AcceptButton").disabled=false;
+            }
             
-        function showRejectButton()
-        {
-            document.getElementById("RejectButton").disabled=false;
-        }
+            function showRejectButton()
+            {
+                document.getElementById("RejectButton").disabled=false;
+            }
             
-        function showUnRegisterButton()
-        {
-            document.getElementById("UnRegisterButton").disabled=false;
-        }
+            function showUnRegisterButton()
+            {
+                document.getElementById("UnRegisterButton").disabled=false;
+                hideSipRegisterModeButton();
+            }
             
-        function showRegisterButton()
-        {
-            document.getElementById("RegisterButton").disabled=false;
-        }
+            function showRegisterButton()
+            {
+                document.getElementById("RegisterButton").disabled=false;
+                document.getElementById("sipRegistrationCkeckBox").disabled=true;
+                showSipRegisterModeButton();
+            }
             
-        function hideUnRegisterButton()
-        {
-            document.getElementById("UnRegisterButton").disabled=true;
-        }
+            function showSipRegisterModeButton()
+            {
+                document.getElementById("sipRegistrationCkeckBox").disabled=false;
+            }
             
-        function hideRegisterButton()
-        {
-            document.getElementById("RegisterButton").disabled=true;
-        }
+            function hideUnRegisterButton()
+            {
+                document.getElementById("UnRegisterButton").disabled=true;
+            }
+            
+            function hideRegisterButton()
+            {
+                document.getElementById("RegisterButton").disabled=true;
+            }
                    
-        function hideCallButton()
-        {
-            document.getElementById("CallButton").disabled=true;
-        }
+            function hideCallButton()
+            {
+                document.getElementById("CallButton").disabled=true;
+            }
            
-        function hideByeButton()
-        {
-            document.getElementById("ByeButton").disabled=true;
-        }
+            function hideByeButton()
+            {
+                document.getElementById("ByeButton").disabled=true;
+            }
             
-        function hideCancelButton()
-        {
-            document.getElementById("CancelButton").disabled=true;
-        }
+            function hideCancelButton()
+            {
+                document.getElementById("CancelButton").disabled=true;
+            }
             
-        function hideAcceptButton()
-        {
-            document.getElementById("AcceptButton").disabled=true;
-        }
+            function hideAcceptButton()
+            {
+                document.getElementById("AcceptButton").disabled=true;
+            }
             
-        function hideRejectButton()
-        {
-            document.getElementById("RejectButton").disabled=true;
-        }
+            function hideRejectButton()
+            {
+                document.getElementById("RejectButton").disabled=true;
+            }
             
-            
+            function hideSipRegisterModeButton()
+            {
+                document.getElementById("sipRegistrationCkeckBox").disabled=true;
+            }
            
         </script>
         <style type='text/css'>
@@ -354,6 +409,18 @@
             <div id='sipContactPhoneNumberDiv'>
                 <label>SIP Contact phone number:</label>
                 <input id="sipContactPhoneNumber"  type="text" size="30" > 
+            </div>
+            <div id='sipRegisterModeDiv'>
+                <label>SIP REGISTER required:</label>
+                <input  id='sipRegistrationCkeckBox' type="checkbox" checked name="sipRegistrationCkeckBox" onclick ="changeSipRegisterMode();">
+            </div>
+            <div id='audioMediaDiv'>
+                <label>Audio media:</label>
+                <input  id='audioMediaCkeckBox' type="checkbox" checked name="audioMediaCkeckBox">
+            </div>
+            <div id='audioMediaDiv'>
+                <label>Video media:</label>
+                <input  id='videoMediaCkeckBox' type="checkbox" checked name="videoMediaCheckBox" >
             </div>
         </div>
         <div id='input'>
