@@ -20845,9 +20845,8 @@ ParserFactory.prototype.put =function(table,name, value){
  *  @version 1.0 
  *   
  */
-function WSMsgParser(sipstack,data) {
+function WSMsgParser(sipstack) {
     this.classname="WSMsgParser"; 
-    this.data=data;
     this.peerProtocol=null;
     this.messageProcessor = null;
     this.sipStack=sipstack;
@@ -20856,10 +20855,10 @@ function WSMsgParser(sipstack,data) {
 WSMsgParser.prototype.RPORT="rport";
 WSMsgParser.prototype.RECEIVED="received";
 
-WSMsgParser.prototype.parsermessage =function(requestsent){
+WSMsgParser.prototype.parsermessage =function(sipMessage){
     var smp = new StringMsgParser();
-    var sipMessage = smp.parseSIPMessage(this.data);
-    var cl =  sipMessage.getContentLength();
+    var parsedSipMessage = smp.parseSIPMessage(sipMessage);
+    var cl =  parsedSipMessage.getContentLength();
     var contentLength = 0;
     if (cl != null) {
         contentLength = cl.getContentLength();
@@ -20868,22 +20867,22 @@ WSMsgParser.prototype.parsermessage =function(requestsent){
         contentLength = 0;
     }
     if (contentLength == 0) {
-        sipMessage.removeContent();
+        parsedSipMessage.removeContent();
     } 
-    console.info("SIP message received: "+sipMessage.encode());
-    this.processMessage(sipMessage,requestsent);
+    console.info("SIP message received: "+parsedSipMessage.encode());
+    this.processMessage(parsedSipMessage);
 }
 
-WSMsgParser.prototype.processMessage =function(sipMessage,requestSent){
-    if (sipMessage.getFrom() == null
-        ||  sipMessage.getTo() == null || sipMessage.getCallId() == null
-        || sipMessage.getCSeq() == null || sipMessage.getViaHeaders() == null) {
+WSMsgParser.prototype.processMessage =function(parsedSipMessage){
+    if (parsedSipMessage.getFrom() == null
+        ||  parsedSipMessage.getTo() == null || parsedSipMessage.getCallId() == null
+        || parsedSipMessage.getCSeq() == null || parsedSipMessage.getViaHeaders() == null) {
         return;
     }
     var channel=this.getSIPStack().getChannel();
-    if (sipMessage instanceof SIPRequest) {
+    if (parsedSipMessage instanceof SIPRequest) {
         this.peerProtocol = "WS";
-        var sipRequest =  sipMessage;
+        var sipRequest =  parsedSipMessage;
         var sipServerRequest = this.sipStack.newSIPServerRequest(sipRequest, channel);
         if (sipServerRequest != null) 
         {
@@ -20891,7 +20890,7 @@ WSMsgParser.prototype.processMessage =function(sipMessage,requestSent){
         }//i delete all parts of logger 
     } 
     else {
-        var sipResponse = sipMessage;
+        var sipResponse = parsedSipMessage;
         try {
             sipResponse.checkHeaders();
         } catch (ex) {
@@ -26040,7 +26039,6 @@ DefaultRouter.prototype.getNextHops =function(request){
  */
 function WSMessageChannel() {
     this.classname="WSMessageChannel"; 
-    this.myParser=null;
     this.key=null;
     this.isCached=null;
     this.isRunning=null;
@@ -26062,6 +26060,7 @@ function WSMessageChannel() {
         this.wsurl=this.messageProcessor.getURLWS();
         this.websocket=this.createWebSocket(this.wsurl);
     }
+    this.wsMsgParser=new WSMsgParser(this.sipStack);
 }
 
 WSMessageChannel.prototype.isReliable =function(){
@@ -26070,32 +26069,43 @@ WSMessageChannel.prototype.isReliable =function(){
 
 WSMessageChannel.prototype.createWebSocket =function(wsurl){
     this.websocket=new WebSocket(wsurl,"sip");
-    var wsmc=this;
+    this.websocket.binaryType='arraybuffer'
+    var that=this;
     this.websocket.onclose=function()
     {
         console.warn("WSMessageChannel:createWebSocket(): the websocket is closed, reconnecting...");
-        wsmc.sipStack.sipListener.processDisconnected();
-        wsmc.websocket=null;
+        that.sipStack.sipListener.processDisconnected();
+        that.websocket=null;
         this.alive=false;
     }
     
     this.websocket.onopen=function()
     {
         console.info("WSMessageChannel:createWebSocket(): the websocket is opened");
-        wsmc.sipStack.sipListener.processConnected();
+        that.sipStack.sipListener.processConnected();
     }
     
     this.websocket.onerror=function(error)
     {
         console.error("WSMessageChannel:createWebSocket(): websocket connection has failed:"+error);
-        wsmc.sipStack.sipListener.processConnectionError(error);
+        that.sipStack.sipListener.processConnectionError(error);
     }
     
     this.websocket.onmessage=function(event)
     {
-        var data=event.data;
-        wsmc.myParser=new WSMsgParser(wsmc.sipStack,data);
-        wsmc.myParser.parsermessage(wsmc.requestsent); 
+        if(event.data instanceof ArrayBuffer)
+        {
+            var sipMessage = String.fromCharCode.apply(null,new Uint8Array(event.data))
+            that.wsMsgParser.parsermessage(sipMessage);
+        } 
+        else if(typeof(event.data) == 'string')
+        {
+            that.wsMsgParser.parsermessage(event.data);
+        }
+        else 
+        {
+           console.error("WSMessageChannel:onmessage(): bad data object type, event ignored");     
+        }
     }
     return this.websocket;
 }

@@ -30,7 +30,6 @@
 function WSMessageChannel() {
     if(logger!=undefined) logger.debug("WSMessageChannel:WSMessageChannel()");
     this.classname="WSMessageChannel"; 
-    this.myParser=null;
     this.key=null;
     this.isCached=null;
     this.isRunning=null;
@@ -52,6 +51,7 @@ function WSMessageChannel() {
         this.wsurl=this.messageProcessor.getURLWS();
         this.websocket=this.createWebSocket(this.wsurl);
     }
+    this.wsMsgParser=new WSMsgParser(this.sipStack);
 }
 
 WSMessageChannel.prototype.isReliable =function(){
@@ -62,32 +62,43 @@ WSMessageChannel.prototype.isReliable =function(){
 WSMessageChannel.prototype.createWebSocket =function(wsurl){
     if(logger!=undefined) logger.debug("WSMessageChannel:createWebSocket():wsurl="+wsurl);
     this.websocket=new WebSocket(wsurl,"sip");
-    var wsmc=this;
+    this.websocket.binaryType='arraybuffer'
+    var that=this;
     this.websocket.onclose=function()
     {
         console.warn("WSMessageChannel:createWebSocket(): the websocket is closed, reconnecting...");
-        wsmc.sipStack.sipListener.processDisconnected();
-        wsmc.websocket=null;
+        that.sipStack.sipListener.processDisconnected();
+        that.websocket=null;
         this.alive=false;
     }
     
     this.websocket.onopen=function()
     {
         console.info("WSMessageChannel:createWebSocket(): the websocket is opened");
-        wsmc.sipStack.sipListener.processConnected();
+        that.sipStack.sipListener.processConnected();
     }
     
     this.websocket.onerror=function(error)
     {
         console.error("WSMessageChannel:createWebSocket(): websocket connection has failed:"+error);
-        wsmc.sipStack.sipListener.processConnectionError(error);
+        that.sipStack.sipListener.processConnectionError(error);
     }
     
     this.websocket.onmessage=function(event)
     {
-        var data=event.data;
-        wsmc.myParser=new WSMsgParser(wsmc.sipStack,data);
-        wsmc.myParser.parsermessage(wsmc.requestsent); 
+        if(event.data instanceof ArrayBuffer)
+        {
+            var sipMessage = String.fromCharCode.apply(null,new Uint8Array(event.data))
+            that.wsMsgParser.parsermessage(sipMessage);
+        } 
+        else if(typeof(event.data) == 'string')
+        {
+            that.wsMsgParser.parsermessage(event.data);
+        }
+        else 
+        {
+           console.error("WSMessageChannel:onmessage(): bad data object type, event ignored");     
+        }
     }
     return this.websocket;
 }

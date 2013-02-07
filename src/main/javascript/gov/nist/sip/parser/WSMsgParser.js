@@ -27,10 +27,9 @@
  *  @version 1.0 
  *   
  */
-function WSMsgParser(sipstack,data) {
+function WSMsgParser(sipstack) {
     if(logger!=undefined) logger.debug("WSMsgParser:WSMsgParser()");
     this.classname="WSMsgParser"; 
-    this.data=data;
     this.peerProtocol=null;
     this.messageProcessor = null;
     this.sipStack=sipstack;
@@ -39,11 +38,11 @@ function WSMsgParser(sipstack,data) {
 WSMsgParser.prototype.RPORT="rport";
 WSMsgParser.prototype.RECEIVED="received";
 
-WSMsgParser.prototype.parsermessage =function(requestsent){
-    if(logger!=undefined) logger.debug("WSMsgParser:parsermessage():requestsent="+requestsent);
+WSMsgParser.prototype.parsermessage =function(sipMessage){
+    if(logger!=undefined) logger.debug("WSMsgParser:parsermessage()");
     var smp = new StringMsgParser();
-    var sipMessage = smp.parseSIPMessage(this.data);
-    var cl =  sipMessage.getContentLength();
+    var parsedSipMessage = smp.parseSIPMessage(sipMessage);
+    var cl =  parsedSipMessage.getContentLength();
     var contentLength = 0;
     if (cl != null) {
         contentLength = cl.getContentLength();
@@ -52,23 +51,23 @@ WSMsgParser.prototype.parsermessage =function(requestsent){
         contentLength = 0;
     }
     if (contentLength == 0) {
-        sipMessage.removeContent();
+        parsedSipMessage.removeContent();
     } 
-    console.info("SIP message received: "+sipMessage.encode());
-    this.processMessage(sipMessage,requestsent);
+    console.info("SIP message received: "+parsedSipMessage.encode());
+    this.processMessage(parsedSipMessage);
 }
 
-WSMsgParser.prototype.processMessage =function(sipMessage,requestSent){
-    if(logger!=undefined) logger.debug("WSMsgParser:processMessage():sipMessage="+sipMessage+", requestsent:"+requestSent);
-    if (sipMessage.getFrom() == null
-        ||  sipMessage.getTo() == null || sipMessage.getCallId() == null
-        || sipMessage.getCSeq() == null || sipMessage.getViaHeaders() == null) {
+WSMsgParser.prototype.processMessage =function(parsedSipMessage){
+    if(logger!=undefined) logger.debug("WSMsgParser:processMessage():parsedSipMessage="+parsedSipMessage);
+    if (parsedSipMessage.getFrom() == null
+        ||  parsedSipMessage.getTo() == null || parsedSipMessage.getCallId() == null
+        || parsedSipMessage.getCSeq() == null || parsedSipMessage.getViaHeaders() == null) {
         return;
     }
     var channel=this.getSIPStack().getChannel();
-    if (sipMessage instanceof SIPRequest) {
+    if (parsedSipMessage instanceof SIPRequest) {
         this.peerProtocol = "WS";
-        var sipRequest =  sipMessage;
+        var sipRequest =  parsedSipMessage;
         var sipServerRequest = this.sipStack.newSIPServerRequest(sipRequest, channel);
         if (sipServerRequest != null) 
         {
@@ -76,7 +75,7 @@ WSMsgParser.prototype.processMessage =function(sipMessage,requestSent){
         }//i delete all parts of logger 
     } 
     else {
-        var sipResponse = sipMessage;
+        var sipResponse = parsedSipMessage;
         try {
             sipResponse.checkHeaders();
         } catch (ex) {
