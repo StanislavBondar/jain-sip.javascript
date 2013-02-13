@@ -1,0 +1,405 @@
+<html>
+    <head>
+        <title>WebRtcCommTestWebApp</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script src="./jain-sip.js" type="text/javascript"></script> 
+        <script src="./WebRtcComm.js" type="text/javascript"></script>     
+        <script src="./WebRtcCommTestWebAppController.js" type="text/javascript" ></script>
+        <script type='text/javascript'>	 
+            webRtcCommTestWebAppController=new WebRtcCommTestWebAppController(this);
+
+            function enableConnectButton() 
+            {
+                document.getElementById("connectButton").disabled=false;
+            }
+    
+            function disableConnectButton() 
+            {
+                document.getElementById("connectButton").disabled=true;
+            }
+
+            function enableDisconnectButton() 
+            {
+                document.getElementById("disconnectButton").disabled=false;
+            }
+    
+            function disableDisconnectButton() 
+            {
+                document.getElementById("disconnectButton").disabled=true;
+            }
+ 
+            function  enableCallButton() 
+            {
+                document.getElementById("callButton").disabled=false;
+            }
+    
+            function disableCallButton() 
+            {
+                document.getElementById("callButton").disabled=true;
+            }
+
+            function enableEndCallButton() 
+            {
+                document.getElementById("endCallButton").disabled=false;
+            }
+    
+            function disableEndCallButton() 
+            {
+                document.getElementById("endCallButton").disabled=true;
+            }
+
+            function enableAcceptCallButton() 
+            {
+                document.getElementById("acceptCallButton").disabled=false;
+            }
+    
+            function disableAcceptCallButton() 
+            {
+                document.getElementById("acceptCallButton").disabled=true;
+            }
+
+            function enableRejectCallButton() 
+            {
+                document.getElementById("rejectCallButton").disabled=false;
+            }
+    
+            function disableRejectCallButton() 
+            {
+                document.getElementById("rejectCallButton").disabled=true;
+            }
+
+            function enableCancelCallButton() 
+            {
+                document.getElementById("cancelCallButton").disabled=false;
+            }
+    
+            function disableCancelCallButton() 
+            {
+                document.getElementById("cancelCallButton").disabled=true;
+            }
+
+            function showLocalVideo() 
+            {
+                document.getElementById("localVideo").disabled=true;
+            }
+
+            function hideLocalVideo() 
+            {
+                document.getElementById("localVideo").disabled=true;
+            }
+
+            function showRemoteVideo() 
+            {
+                document.getElementById("remoteVideo").style.visibility = "visible";
+            }
+
+            function hideRemoteVideo()
+            {
+                document.getElementById("remoteVideo").style.visibility = "hidden";
+            }
+
+            function playLocalVideo(localMediaStream) 
+            {
+                if(typeof navigator.webkitGetUserMedia != undefined)
+                {     
+                    document.getElementById("localVideo").src=webkitURL.createObjectURL(localMediaStream);
+                }
+                else if(typeof navigator.mozGetUserMedia != undefined)
+                {
+                    document.getElementById("localVideo").mozSrcObject=localMediaStream;
+                }
+                document.getElementById("localVideo").play();
+            }
+
+
+            function stopLocalVideo() 
+            {
+                document.getElementById("localVideo").pause();
+                if(typeof navigator.webkitGetUserMedia != undefined)
+                {     
+                    document.getElementById("localVideo").src=null;
+                }
+                else if(typeof navigator.mozGetUserMedia != undefined)
+                {
+                    document.getElementById("localVideo").mozSrcObject=null;
+                }
+            }
+
+            function playRemoteVideo(remoteMediaStream) 
+            {
+                if(typeof navigator.webkitGetUserMedia != undefined)
+                {     
+                    document.getElementById("remoteVideo").src=webkitURL.createObjectURL(remoteMediaStream);
+                }
+                else if(typeof navigator.mozGetUserMedia != undefined)
+                {
+                    document.getElementById("remoteVideo").mozSrcObject=remoteMediaStream;
+                }
+                document.getElementById("remoteVideo").play();
+            }
+
+
+            function stopRemoteVideo() 
+            {
+                document.getElementById("remoteVideo").pause();
+                if(typeof navigator.webkitGetUserMedia != undefined)
+                {     
+                    document.getElementById("remoteVideo").src=undefined;
+                }
+                else if(typeof navigator.mozGetUserMedia != undefined)
+                {
+                    document.getElementById("remoteVideo").mozSrcObject=undefined;
+                }
+            }
+
+            function playRinging(remoteMediaStream) 
+            {
+                document.getElementById("ringing").play();
+            }
+
+
+            function stopRinging() 
+            {
+                document.getElementById("ringing").pause();
+            }
+            
+            function uncheckSipRegisterMode() 
+            {
+                document.getElementById("sipRegistrationCkeckBox").checked=false;
+            }
+
+            function checkSipRegisterMode() 
+            {
+                document.getElementById("sipRegistrationCkeckBox").checked=true;
+            }
+
+            function uncheckAudioMediaFlag() 
+            {
+                document.getElementById("audioMediaCkeckBox").checked=false;
+            }
+
+            function checkAudioMediaFlag() 
+            {
+                document.getElementById("audioMediaCkeckBox").checked=true;
+            }
+
+            function uncheckVideoMediaFlag() 
+            {
+                document.getElementById("videoMediaCkeckBox").checked=false;
+            }
+
+            function checkVideoMediaFlag() 
+            {
+                document.getElementById("videoMediaCkeckBox").checked=true;
+            }
+
+            function setStunServerTextInputValue(value) 
+            {
+                document.getElementById("stunServer").value=value;
+            }
+
+            function setSipOutboundProxyTextInputValue(value) 
+            {
+                document.getElementById("sipOutboundProxy").value=value;
+            }
+
+            function setSipDomainTextInputValue(value) 
+            {
+                document.getElementById("sipDomain").value=value;
+            }
+
+            function setSipDisplayNameTextInputValue(value) 
+            {
+                document.getElementById("sipDisplayName").value=value;
+            }
+
+            function setSipUserNameTextInputValue(value) 
+            {
+                document.getElementById("sipUserName").value=value;
+            }
+
+            function setSipLoginTextInputValue(value) 
+            {
+                document.getElementById("sipLogin").value=value;
+            }
+
+            function setSipPasswordTextInputValue(value) 
+            {
+                document.getElementById("sipPassword").value=value;
+            }
+
+            function setSipContactTextInputValue(value) 
+            {
+                document.getElementById("sipContact").value=value;
+            }
+            function setStunServerTextInputValue(value) 
+            {
+                document.getElementById("stunServer").value=value;
+            }
+
+            function setSipOutboundProxyTextInputValue(value) 
+            {
+                document.getElementById("sipOutboundProxy").value=value;
+            }
+
+            function setSipDomainTextInputValue(value) 
+            {
+                document.getElementById("sipDomain").value=value;
+            }
+
+            function setSipDisplayNameTextInputValue(value) 
+            {
+                document.getElementById("sipDisplayName").value=value;
+            }
+
+            function setSipUserNameTextInputValue(value) 
+            {
+                document.getElementById("sipUserName").value=value;
+            }
+
+            function setSipLoginTextInputValue(value) 
+            {
+                document.getElementById("sipLogin").value=value;
+            }
+
+            function setSipPasswordTextInputValue(value) 
+            {
+                document.getElementById("sipPassword").value=value;
+            }
+
+            function setSipContactTextInputValue(value) 
+            {
+                document.getElementById("sipContact").value=value;
+            }
+
+            function getStunServerTextInputValue() 
+            {
+                return  document.getElementById("stunServer").value;
+            }
+
+            function getSipOutboundProxyTextInputValue() 
+            {
+                return document.getElementById("sipOutboundProxy").value;
+            }
+
+            function getSipDomainTextInputValue() 
+            {
+                return document.getElementById("sipDomain").value;
+            }
+
+            function getSipDisplayNameTextInputValue() 
+            {
+                return document.getElementById("sipDisplayName").value;
+            }
+
+            function getSipUserNameTextInputValue() 
+            {
+                return document.getElementById("sipUserName").value;
+            }
+
+            function getSipLoginTextInputValue() 
+            {
+                return document.getElementById("sipLogin").value;
+            }
+
+            function getSipPasswordTextInputValue() 
+            {
+                return document.getElementById("sipPassword").value;
+            }
+
+            function getSipContactTextInputValue() 
+            {
+                return document.getElementById("sipContact").value;
+            }
+            
+            function getSipRegisterModeValue() 
+            {
+                return document.getElementById("sipRegistrationCkeckBox").checked;
+            }
+            
+            function getAudioMediaValue() 
+            {
+                return document.getElementById("audioMediaCkeckBox").checked;
+            }
+            
+            function getVideoMediaValue() 
+            {
+                return document.getElementById("videoMediaCkeckBox").checked;
+            }
+            
+        </script>
+
+    </head>
+    <body onload='webRtcCommTestWebAppController.onLoadViewEventHandler();' onunload='webRtcCommTestWebAppController.onUnloadViewEventHandler();'>
+        <div style=" color: red">With Firefox, don't forget to set your about:config preferences! </div>
+        <a href="http://localhost:8080/WebRtcCommTestWebApp/?sipDomain=sipasf.fr&sipLogin=1111@sipasf.fr&sipPassword=1234&sipUserName=1111&sipDisplayName=lolo&sipContactUserName=2222">
+            http://localhost:8080/WebRtcCommTestWebApp/?sipDomain=sipasf.fr&sipLogin=1111@sipasf.fr&sipPassword=1234&sipUserName=1111&sipDisplayName=lolo&sipContactUserName=2222
+        </a>
+        <div id="sipAccountSettings" >
+            <div id='stunServerDiv'>
+                <label>STUN server:</label>
+                <input  id="stunServer"  type="text" size="40" > 
+            </div>
+            <div id='sipWsUrlDiv'>
+                <label>SIP outbound proxy WS URL:</label>
+                <input  id="sipOutboundProxy"  type="text" size="40"> 
+            </div>
+            <div id='sipDomainDiv'>
+                <label>SIP Domain:</label>
+                <input id="sipDomain"  type="text" size="30"> 
+            </div>           
+            <div id='sipDisplayNameDiv'>
+                <label>SIP Display Name:</label>
+                <input id="sipDisplayName"  type="text" size="30" > 
+            </div>
+            <div id='sipUserNameDiv'>
+                <label>SIP User Name:</label>
+                <input id="sipUserName"  type="text" size="30"> 
+            </div>
+            <div id='sipLoginDiv'>
+                <label>SIP Login:</label>
+                <input id="sipLogin"   type="text" size="30"> 
+            </div>
+            <div id='sipPasswordDiv'>
+                <label>SIP Password:</label>
+                <input id="sipPassword"   type="password" size="30"> 
+            </div>
+            <div id='sipContactPhoneNumberDiv'>
+                <label>SIP Contact phone number:</label>
+                <input id="sipContact"  type="text" size="30" > 
+            </div>
+            <div id='sipRegisterModeDiv'>
+                <label>SIP REGISTER required:</label>
+                <input  id='sipRegistrationCkeckBox' type="checkbox" checked name="sipRegistrationCkeckBox">
+            </div>
+            <div id='audioMediaDiv'>
+                <label>Audio media:</label>
+                <input  id='audioMediaCkeckBox' type="checkbox" checked name="audioMediaCkeckBox">
+            </div>
+            <div id='videoMediaDiv'>
+                <label>Video media:</label>
+                <input  id='videoMediaCkeckBox' type="checkbox" checked name="videoMediaCheckBox" >
+            </div>
+            <audio id="ringing" loop src="audio/ringing.wav" />
+        </div>
+        <div id='input'>
+            <div>
+                <input id='connectButton'  type='submit' name='connectButton' disabled value='Connect' onclick = "webRtcCommTestWebAppController.onClickConnectButtonViewEventHandler();"/>
+                <input id='disconnectButton'  type='submit' name='disconnectButton'  value='Disconnect' disabled onclick = "webRtcCommTestWebAppController.onClickDisconnectButtonViewEventHandler();"/>
+                <input id='callButton'  type='submit' name='callButton' value='Call' disabled onclick = "webRtcCommTestWebAppController.onClickCallButtonViewEventHandler(getSipContactTextInputValue());"/>
+                <input id='cancelCallButton'  type='submit' name='cancelCallButton' value='Cancel Call' disabled onclick = "webRtcCommTestWebAppController.onClickCancelCallButtonViewEventHandler();"/>
+                <input id='acceptCallButton'  type='submit' name='acceptCallButton' value='Accept Call' disabled onclick = "webRtcCommTestWebAppController.onClickAcceptCallButtonViewEventHandler();"/>
+                <input id='rejectCallButton'  type='submit' name='rejectCallButton' value='Reject Call' disabled onclick = "webRtcCommTestWebAppController.onClickRejectCallButtonViewEventHandler();"/>
+                <input id='endCallButton'  type='submit' name='endCallButton' value='End Call' disabled onclick = "webRtcCommTestWebAppController.onClickEndCallButtonViewEventHandler();"/>
+            </div>
+        </div>
+        <div id='media'>
+            <div>
+                <video id="localVideo" style="height:100px; width:100px"></video>  
+            </div>
+            <div>
+                <video id="remoteVideo" style="height:100px; width:100px"></video>  
+            </div>
+        </div>
+    </body>
+</html>
