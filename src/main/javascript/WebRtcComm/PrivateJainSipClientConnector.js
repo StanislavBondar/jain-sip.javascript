@@ -2,7 +2,7 @@
  * @class PrivateJainSipClientConnector
  * @classdesc Private framework class handling  SIP client/user agent control 
  * @constructor 
- * @public
+ * @private
  * @param {WebRtcCommClient} webRtcCommClient "connected" WebRtcCommClient object 
  * @throw {String} Exception "bad argument"
  * @author Laurent STRULLU (laurent.strullu@orange.com) 

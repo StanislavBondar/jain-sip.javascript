@@ -30,7 +30,7 @@
  * telephony infrastructure.<br> 
  * 
  * A simple test web application of the WebRtcComm Framework can be found 
- * <a src="http://code.google.com/p/jain-sip/source/browse/?repo=javascript#git%2Fsrc%2Ftest%2FWebRtcCommTestWebApp">here</a>
+ * <a href="http://code.google.com/p/jain-sip/source/browse/?repo=javascript#git%2Fsrc%2Ftest%2FWebRtcCommTestWebApp">here</a>
  * 
  * @module WebRtcComm 
  * @author Laurent STRULLU (laurent.strullu@orange.com) 
@@ -38,7 +38,7 @@
 
 /**
  * @class PrivateJainSipCallConnector
- * @public
+ * @private
  * @classdesc Private framework class handling  SIP client/user call control: ringing, ringing back, accept, reject, cancel, bye 
  * @constructor
  * @param {WebRtcCommCall} webRtcCommCall WebRtcCommCall "connected" object
