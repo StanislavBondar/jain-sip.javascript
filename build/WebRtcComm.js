@@ -20,18 +20,32 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-/*
-* Class PrivateJainSipCallConnector
-* Package  WebRtcComm
-* @author Laurent STRULLU (laurent.strullu@orange.com) 
-*/
+/** 
+ * The JavaScript Framework WebRtcComm allow Web Application developers to easily 
+ * integrate multimedia communication service (e.g. VoIP) in their web site, thanks 
+ * to the W3C WebRTC API. The WebRTCComm Framework provides a high level communication 
+ * API on top of the opensource JAIN SIP JavaScript Stack (implementing transport of SIP over WebSocket). 
+ * By using a convergent HTTP/SIP Application Server (e.g. Mobicents MSS) or directly access a 
+ * SIP server (e.g. Asterisk), the web developer can rapidly and easily link his web site to a 
+ * telephony infrastructure. 
+ * 
+ * A simple test web application of the WebRtcComm Framework can be found 
+ * <a src="http://code.google.com/p/jain-sip/source/browse/?repo=javascript#git%2Fsrc%2Ftest%2FWebRtcCommTestWebApp">here<a>
+ * 
+ * @module WebRtcComm 
+ * @author Laurent STRULLU (laurent.strullu@orange.com) 
+ */
 
 /**
-* Contructor
-* @public
-* @param  webRtcCommCall webRtcCommCall owner object
-* @param  sipCallId 
-*/ 
+ * @class PrivateJainSipCallConnector
+ * @public
+ * @classdesc Private framework class handling  SIP client/user call control: ringing, ringing back, accept, reject, cancel, bye 
+ * @constructor
+ * @param {WebRtcCommCall} webRtcCommCall WebRtcCommCall "connected" object
+ * @param {string} sipCallId   SIP Call ID
+ * @throw {String} Exception "bad argument"
+ * @author Laurent STRULLU (laurent.strullu@orange.com) 
+ */ 
 PrivateJainSipCallConnector = function(webRtcCommCall,sipCallId)
 {
     if(webRtcCommCall instanceof WebRtcCommCall)
@@ -41,13 +55,7 @@ PrivateJainSipCallConnector = function(webRtcCommCall,sipCallId)
         this.webRtcCommCall=webRtcCommCall;
         this.webRtcCommCall.id=this.sipCallId;
         this.configuration=undefined;
-        this.sipCallState=undefined;
-        this.jainSipInvitingSentRequest=undefined;
-        this.jainSipInvitingDialog=undefined;
-        this.jainSipInvitingTransaction=undefined;
-        this.jainSipInvitedReceivedRequest=undefined;
-        this.jainSipInvitedDialog=undefined;
-        this.jainSipInvitedTransaction=undefined;   
+        this.resetSipContext();  
     }
     else 
     {
@@ -55,8 +63,11 @@ PrivateJainSipCallConnector = function(webRtcCommCall,sipCallId)
     }
 };
 
-PrivateJainSipCallConnector.prototype.constructor=PrivateJainSipCallConnector;
- 
+/**
+ * SIP Call Control state machine constant
+ * @private
+ * @constant
+ */ 
 PrivateJainSipCallConnector.prototype.SIP_INVITING_INITIAL_STATE="INVITING_INITIAL_STATE";
 PrivateJainSipCallConnector.prototype.SIP_INVITING_STATE="INVITING_STATE";
 PrivateJainSipCallConnector.prototype.SIP_INVITING_407_STATE="INVITING_407_STATE";
@@ -67,7 +78,6 @@ PrivateJainSipCallConnector.prototype.SIP_INVITING_CANCELLING_STATE="INVITING_CA
 PrivateJainSipCallConnector.prototype.SIP_INVITING_ERROR_STATE="INVITING_ERROR_STATE";
 PrivateJainSipCallConnector.prototype.SIP_INVITING_HANGUP_STATE="INVITING_HANGUP_STATE";
 PrivateJainSipCallConnector.prototype.SIP_INVITING_CANCELLED_STATE="SIP_INVITING_CANCELLED_STATE";
-
 PrivateJainSipCallConnector.prototype.SIP_INVITED_INITIAL_STATE="INVITED_INITIAL_STATE";
 PrivateJainSipCallConnector.prototype.SIP_INVITED_ACCEPTED_STATE="INVITED_ACCEPTED_STATE";
 PrivateJainSipCallConnector.prototype.SIP_INVITED_LOCAL_HANGINGUP_STATE="INVITED_LOCAL_HANGINGUP_STATE";
@@ -77,30 +87,42 @@ PrivateJainSipCallConnector.prototype.SIP_INVITED_ERROR_STATE="INVITED_ERROR_STA
 PrivateJainSipCallConnector.prototype.SIP_INVITED_CANCELLED_STATE="INVITING_HANGUP_STATE";
 
 /**
- * Check if opened
+ * Get SIP communication opened/closed status 
  * @public
- * @return true is opened, false otherise
+ * @returns {boolean} true if opened, false if closed
  */
 PrivateJainSipCallConnector.prototype.isOpened=function(){
     return ((this.sipCallState==this.SIP_INVITING_ACCEPTED_STATE) || (this.sipCallState==this.SIP_INVITED_ACCEPTED_STATE));   
 }
 
 /**
- * Get call ID
+ * Get SIP call ID
  * @public
- * @return id  string
+ * @returns {string} SIP Call ID  
  */ 
 PrivateJainSipCallConnector.prototype.getId= function() {
     return this.sipCallId;
 }
 
 /**
- /**
-* Open SIP dialog
-* @public 
-* @asynchrounous, requires implementation of PrivateJainSipCallConnector listener interface 
-* @throw String Exception "bad configuration, missing parameter"
-* @throw String Exception "bad state, unauthorized action"
+ * Open JAIN SIP call/communication, asynchronous action,  opened or error event is notified to WebRtcClientCall eventListener
+ * @public 
+ * @param {object} configuration  WebRTC communication client configuration 
+ *     configuration sample:<br> 
+ *     { 
+ *           sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br>
+ *           sipOutboundProxy:this.DEFAULT_SIP_OUTBOUND_PROXY,<br>
+ *           sipDomain:this.DEFAULT_SIP_DOMAIN,<br>
+ *           sipUserName:this.DEFAULT_SIP_USER_NAME,<br>
+ *           sipLogin:this.DEFAULT_SIP_LOGIN,<br>
+ *           sipPassword:this.DEFAULT_SIP_PASSWORD,<br>
+ *           sipApplicationProfile:this.DEFAULT_SIP_APPLICATION_PROFILE,<br>
+ *           sipRegisterMode:this.DEFAULT_SIP_REGISTER_MODE<br>
+ 
+ *      }<br>
+* @public  
+* @throw {String} Exception "bad configuration, missing parameter"
+* @throw {String} Exception "bad state, unauthorized action"
 */ 
 PrivateJainSipCallConnector.prototype.open=function(configuration){
     console.debug("PrivateJainSipCallConnector:open()");
@@ -109,9 +131,9 @@ PrivateJainSipCallConnector.prototype.open=function(configuration){
         if(typeof(configuration) == 'object')  
         {
             // Calling
-            this.sipCallState=this.SIP_INVITING_INITIAL_STATE;
             if(this.checkConfiguration(configuration)==true)
             {
+                this.sipCallState=this.SIP_INVITING_INITIAL_STATE;
                 this.configuration=configuration;     
             } 
             else
@@ -134,30 +156,26 @@ PrivateJainSipCallConnector.prototype.open=function(configuration){
 }  
 
 /**
- * close SIP dialog
+ * Close JAIN SIP communication, asynchronous action, closed event are notified to the WebRtcCommClient eventListener
  * @public 
- * @asynchrounous, requires implementation of PrivateJainSipCallConnector listener interface 
- * @throw String Exception "bad state, unauthorized action"
- * @throw String Exception "internal error,check console logs"
+ * @throw {String} Exception "bad state, unauthorized action"
+ * @throw {String} Exception "internal error,check console logs"
  */ 
 PrivateJainSipCallConnector.prototype.close =function(){
     console.debug("PrivateJainSipCallConnector:close(): this.sipCallState="+this.sipCallState);
     if(this.sipCallState!=undefined)
     {
-        if(this.sipCallState==this.SIP_INITIAL_INVITING_STATE)
+        try
         {
-            // SIP INVITE has not been sent yet.
-            this.sipCallState=undefined;
-            this.webRtcCommCall.webRtcCommClient.connector.removeWebRtcCommCall(this.sipCallId);
-            // Notify asynchronously the error event
-            var that=this;
-            setTimeout(function(){
-                that.webRtcCommCall.onPrivateCallConnectorCallClosedEvent();
-            },1);
-        }
-        else if(this.sipCallState==this.SIP_INVITING_STATE || this.sipCallState==this.SIP_INVITING_407_STATE)
-        {
-            try
+            if(this.sipCallState==this.SIP_INITIAL_INVITING_STATE)
+            {
+                // SIP INVITE has not been sent yet.
+                this.resetSipContext();
+                this.webRtcCommCall.webRtcCommClient.connector.removeCallConnector(this.sipCallId);
+                // Notify closed event
+                this.webRtcCommCall.onPrivateCallConnectorCallClosedEvent();
+            }
+            else if(this.sipCallState==this.SIP_INVITING_STATE || this.sipCallState==this.SIP_INVITING_407_STATE)
             {
                 // SIP INIVTE has been sent, need to cancel it
                 this.jainSipInvitingCancelRequest = this.jainSipInvitingTransaction.createCancel();
@@ -166,24 +184,8 @@ PrivateJainSipCallConnector.prototype.close =function(){
                 this.jainSipInvitingCancelTransaction = this.webRtcCommCall.webRtcCommClient.connector.sipProvider.getNewClientTransaction(this.jainSipInvitingCancelRequest);
                 this.jainSipInvitingCancelTransaction.sendRequest();
                 this.sipCallState=this.SIP_INVITING_CANCELLING_STATE;
-            }
-            catch(exception){
-                console.error("PrivateJainSipCallConnector:close(): catched exception:"+exception);
-                // Incoherent state, reset call
-                this.sipCallState=undefined;
-                this.jainSipInvitingSentRequest=undefined;
-                this.jainSipInvitingDialog=undefined;
-                this.jainSipInvitingTransaction=undefined;
-                // Notify asynchronously the closed event
-                var that=this;
-                setTimeout(function(){
-                    that.webRtcCommCall.onPrivateCallConnectorCallClosedEvent();
-                },1);
             } 
-        } 
-        else if(this.sipCallState==this.SIP_INVITING_ACCEPTED_STATE)
-        {
-            try
+            else if(this.sipCallState==this.SIP_INVITING_ACCEPTED_STATE)
             {
                 // Sent SIP BYE
                 var jainSipByeRequest=this.jainSipInvitingRequest.createBYERequest(true);
@@ -194,55 +196,20 @@ PrivateJainSipCallConnector.prototype.close =function(){
                 var clientTransaction  = this.webRtcCommCall.webRtcCommClient.connector.sipProvider.getNewClientTransaction(jainSipByeRequest);
                 this.jainSipInvitingDialog.sendRequest(clientTransaction);
                 this.sipCallState=this.SIP_INVITING_LOCAL_HANGINGUP_STATE;
-                // Notify asynchronously the closed event
-                var that=this;
-                setTimeout(function(){
-                    that.webRtcCommCall.onPrivateCallConnectorCallClosedEvent();
-                },1);
+                // Notify closed event
+                this.webRtcCommCall.onPrivateCallConnectorCallClosedEvent();
             }
-            catch(exception)
+            else if(this.sipCallState==this.SIP_INVITED_INITIAL_STATE)
             {
-                console.error("PrivateJainSipCallConnector:close(): catched exception:"+exception);
-                // Reset call context
-                this.sipCallState=undefined;
-                this.jainSipInvitingSentRequest=undefined;
-                this.jainSipInvitingDialog=undefined;
-                this.jainSipInvitingTransaction=undefined;
-                // Notify asynchronously the closed event
-                var that=this;
-                setTimeout(function(){
-                    that.webRtcCommCall.onPrivateCallConnectorCallClosedEvent();
-                },1);
+                // Rejected  480 Temporarily Unavailable
+                var jainSipResponse480= this.jainSipInvitedRequest.createResponse(480,"Temporarily Unavailable");
+                jainSipResponse480.addHeader(this.webRtcCommCall.webRtcCommClient.connector.jainSipContactHeader);
+                jainSipResponse480.addHeader(this.webRtcCommCall.webRtcCommClient.connector.jainSipUserAgentHeader);
+                this.jainSipInvitedTransaction.sendResponse(jainSipResponse480);
+                this.resetSipContext();
+                this.webRtcCommCall.webRtcCommClient.connector.removeCallConnector(this.sipCallId);
             }
-        }
-        else if(this.sipCallState==this.SIP_INVITED_INITIAL_STATE)
-        {
-            try
-            {
-             // Rejected  480 Temporarily Unavailable
-            var jainSipResponse480= this.jainSipInvitedRequest.createResponse(480,"Temporarily Unavailable");
-            jainSipResponse480.addHeader(this.webRtcCommCall.webRtcCommClient.connector.jainSipContactHeader);
-            jainSipResponse480.addHeader(this.webRtcCommCall.webRtcCommClient.connector.jainSipUserAgentHeader);
-            this.jainSipInvitedTransaction.sendResponse(jainSipResponse480);
-            }
-            catch(exception)
-            {
-                console.error("PrivateJainSipCallConnector:close(): catched exception:"+exception);
-                // Reset call context
-                this.sipCallState=undefined;
-                this.jainSipInvitedSentRequest=undefined;
-                this.jainSipInvitedDialog=undefined;
-                this.jainSipInvitedTransaction=undefined;
-                // Notify asynchronously the closed event
-                var that=this;
-                setTimeout(function(){
-                    that.webRtcCommCall.onPrivateCallConnectorCallClosedEvent();
-                },1);
-            }
-        }
-        else if(this.sipCallState==this.SIP_INVITED_ACCEPTED_STATE)
-        {
-            try
+            else if(this.sipCallState==this.SIP_INVITED_ACCEPTED_STATE)
             {
                 // Sent SIP BYE
                 var jainSipByeRequest=this.jainSipInvitedRequest.createBYERequest(true);
@@ -252,50 +219,35 @@ PrivateJainSipCallConnector.prototype.close =function(){
                 jainSipByeRequest.addHeader(this.webRtcCommCall.webRtcCommClient.connector.jainSipUserAgentHeader);
                 var clientTransaction  = this.webRtcCommCall.webRtcCommClient.connector.sipProvider.getNewClientTransaction(jainSipByeRequest);
                 this.jainSipInvitedDialog.sendRequest(clientTransaction);
-                this.sipCallState=this.SIP_INVITED_LOCAL_HANGINGUP_STATE;
+                this.sipCallState=this.SIP_INVITED_LOCAL_HANGINGUP_STATE;    
             }
-            catch(exception)
+            else 
             {
-                console.error("PrivateJainSipCallConnector:byeCall(): catched exception:"+exception);
-                this.sipCallState=undefined;
-                this.jainSipInvitedSentRequest=undefined;
-                this.jainSipInvitedDialog=undefined;
-                this.jainSipInvitedTransaction=undefined;
-                // Notify asynchronously the closed event
-                var that=this;
-                setTimeout(function(){
-                    that.webRtcCommCall.onPrivateCallConnectorCallClosedEvent();
-                },1); 
+                this.resetSipContext();
+                this.webRtcCommCall.webRtcCommClient.connector.removeCallConnector(this.sipCallId);
+                // Notify closed event
+                this.webRtcCommCall.onPrivateCallConnectorCallClosedEvent();   
             }
         }
-        else 
+        catch(exception)
         {
-            // Reset call context
-            this.sipCallState=undefined;
-            this.jainSipInvitingSentRequest=undefined;
-            this.jainSipInvitingDialog=undefined;
-            this.jainSipInvitingTransaction=undefined;
-            this.jainSipInvitedSentRequest=undefined;
-            this.jainSipInvitedDialog=undefined;
-            this.jainSipInvitedTransaction=undefined;
-            // Notify asynchronously the closed event
-            var that=this;
-            setTimeout(function(){
-                that.webRtcCommCall.onPrivateCallConnectorCallClosedEvent();
-            },1);     
+            console.error("PrivateJainSipCallConnector:byeCall(): catched exception:"+exception);
+            this.resetSipContext();
+            this.webRtcCommCall.webRtcCommClient.connector.removeCallConnector(this.sipCallId);
+            // Notify closed event
+            this.webRtcCommCall.onPrivateCallConnectorCallClosedEvent();
         }
     }
 }
 
-
 /**
- * reject/refuse SIP incomin communication
+ * Process reject of the SIP incoming communication
  * @public 
- * @throw String Exception "bad state, unauthorized action"
- * @throw String Exception "internal error,check console logs"
+ * @throw {String} Exception "bad state, unauthorized action"
+ * @throw {String} Exception "internal error,check console logs"
  */ 
 PrivateJainSipCallConnector.prototype.reject =function(){
-    console.debug("PrivateJainSipCallConnector:rejectCall()");
+    console.debug("PrivateJainSipCallConnector:reject()");
     if(this.sipCallState==this.SIP_INVITED_INITIAL_STATE)
     {
         try
@@ -308,14 +260,14 @@ PrivateJainSipCallConnector.prototype.reject =function(){
         }
         catch(exception)
         {       
-            console.error("PrivateJainSipCallConnector:acceptOpen(): catched exception:"+exception);
+            console.error("PrivateJainSipCallConnector:reject(): catched exception:"+exception);
         }       
         this.close();
     }
     else
     {
-        console.error("PrivateJainSipCallConnector:acceptOpen(): bad state, unauthorized action");
-        throw "PrivateJainSipCallConnector:acceptOpen(): bad state, unauthorized action";        
+        console.error("PrivateJainSipCallConnector:reject(): bad state, unauthorized action");
+        throw "PrivateJainSipCallConnector:reject(): bad state, unauthorized action";        
     }
 }
 
@@ -332,16 +284,27 @@ PrivateJainSipCallConnector.prototype.checkConfiguration=function(configuration)
 }
 
 /**
- *  WebRtcCommCall interface implementation
- */
-
-/**
- * Handle RTC PeerConnection local SDP offring  
- * @private 
- * @param sdpOfferString 
+ * Reset SIP context 
+ * @private
  */ 
-PrivateJainSipCallConnector.prototype.onWebRtcCommCallLocalSdpOfferEvent=function(sdpOfferString){
-    console.debug("PrivateJainSipCallConnector:onWebRtcCommCallLocalSdpOfferEvent()");
+PrivateJainSipCallConnector.prototype.resetSipContext=function(){
+    console.debug("PrivateJainSipCallConnector:resetSipContext()");      
+    this.sipCallState=undefined;
+    this.jainSipInvitingSentRequest=undefined;
+    this.jainSipInvitingDialog=undefined;
+    this.jainSipInvitingTransaction=undefined;
+    this.jainSipInvitedReceivedRequest=undefined;
+    this.jainSipInvitedDialog=undefined;
+    this.jainSipInvitedTransaction=undefined; 
+}
+       
+/**
+ * Process invitation of outgoing SIP communication 
+ * @public 
+ * @param {String} sdpOffer SDP offer received from RTCPeerConenction
+ */ 
+PrivateJainSipCallConnector.prototype.invite=function(sdpOffer){
+    console.debug("PrivateJainSipCallConnector:invite()");
     // Send INVITE    
     var fromSipUriString=this.webRtcCommCall.webRtcCommClient.connector.configuration.sipUserName+"@"+this.webRtcCommCall.webRtcCommClient.connector.configuration.sipDomain;
     var toSipUriString= this.webRtcCommCall.calleePhoneNumber+"@"+this.webRtcCommCall.webRtcCommClient.connector.configuration.sipDomain;
@@ -366,7 +329,7 @@ PrivateJainSipCallConnector.prototype.onWebRtcCommCallLocalSdpOfferEvent=functio
         jainSipToHeader,
         jainSipMaxForwardHeader,
         jainSipContentTypeHeader,
-        sdpOfferString); 
+        sdpOffer); 
                       
     this.webRtcCommCall.webRtcCommClient.connector.messageFactory.addHeader( this.jainSipInvitingRequest, this.webRtcCommCall.webRtcCommClient.connector.jainSipUserAgentHeader);
     this.webRtcCommCall.webRtcCommClient.connector.messageFactory.addHeader( this.jainSipInvitingRequest, jainSipAllowListHeader);
@@ -382,31 +345,26 @@ PrivateJainSipCallConnector.prototype.onWebRtcCommCallLocalSdpOfferEvent=functio
 
 
 /**
- * Process 
- * @private 
- * @param sdpAnswerString
+ * Process acceptation of incoming SIP communication
+ * @public 
+ * @param {string} sdpAnswer SDP answer received from RTCPeerConnection
  */ 
-PrivateJainSipCallConnector.prototype.onWebRtcCommCallLocalSdpAnswerEvent=function(sdpAnswerString){
-    console.debug("PrivateJainSipCallConnector:onWebRtcCommCallLocalSdpAnswerEvent()");        
+PrivateJainSipCallConnector.prototype.accept=function(sdpAnswer){
+    console.debug("PrivateJainSipCallConnector:accept()");        
     // Send 200 OK
     var jainSip200OKResponse=this.jainSipInvitedRequest.createResponse(200, "OK");
     jainSip200OKResponse.addHeader(this.webRtcCommCall.webRtcCommClient.connector.jainSipContactHeader);
     jainSip200OKResponse.addHeader(this.webRtcCommCall.webRtcCommClient.connector.jainSipUserAgentHeader);
-    jainSip200OKResponse.setMessageContent("application","sdp",sdpAnswerString);
+    jainSip200OKResponse.setMessageContent("application","sdp",sdpAnswer);
     this.jainSipInvitedTransaction.sendResponse(jainSip200OKResponse);
-    
     this.sipCallState=this.SIP_INVITED_ACCEPTED_STATE;
 }  
 
 
 /**
- *  PrivateJainSipClientConnector interface implementation
- */
-
-/**
- * Handle SIP Request event
- * @private 
- * @param requestEvent RequestEvent
+ * PrivateJainSipClientConnector interface implementation: handle SIP Request event
+ * @public 
+ * @param {RequestEvent} requestEvent 
  */ 
 PrivateJainSipCallConnector.prototype.onJainSipClientConnectorSipRequestEvent=function(requestEvent){
     console.debug("PrivateJainSipCallConnector:onJainSipClientConnectorSipRequestEvent()");        
@@ -421,36 +379,38 @@ PrivateJainSipCallConnector.prototype.onJainSipClientConnectorSipRequestEvent=fu
 }  
 
 /**
- * Handle SIP response event
- * @private 
- * @param responseEvent ResponseEvent
+ * PrivateJainSipClientConnector interface implementation: handle SIP response event
+ * @public 
+ * @param {ResponseEvent} responseEvent 
  */ 
 PrivateJainSipCallConnector.prototype.onJainSipClientConnectorSipResponseEvent=function(responseEvent){
-    console.debug("PrivateJainSipCallConnector:processSipResponse()");   
+    console.debug("PrivateJainSipCallConnector:onJainSipClientConnectorSipResponseEvent()");   
     if(this.jainSipInvitingDialog!=undefined) 
         this.processInvitingSipResponseEvent(responseEvent); 
     else  if(this.jainSipInvitedDialog!=undefined) 
-        this.processInvitedSipResponse(responseEvent); 
+        this.processInvitedSipResponseEvent(responseEvent); 
     else
     {
-        console.warn("PrivateJainSipCallConnector:processSipResponse(): response ignored");      
+        console.warn("PrivateJainSipCallConnector:onJainSipClientConnectorSipResponseEvent(): response ignored");      
     }
 }
 
 /**
- * Handle SIP timeout event
- * @private 
+ * PrivateJainSipClientConnector interface implementation: handle SIP timeout event
+ * @public 
+ * @param {TimeoutEvent} timeoutEvent
  */ 
-PrivateJainSipCallConnector.prototype.onJainSipClientConnectorSipTimeoutEvent=function(){
-    console.debug("PrivateJainSipCallConnector:onJainSipClientConnectorSipTimeoutEvent()"); 
+PrivateJainSipCallConnector.prototype.onJainSipClientConnectorSipTimeoutEvent=function(timeoutEvent){
+    console.debug("PrivateJainSipCallConnector:onJainSipClientConnectorSipTimeoutEvent()");   
     // For the time being force close of the call 
     this.close();
 }
 
+
 /**
  * Handle SIP request event for inviting call
  * @private 
- * @param responseEvent ResponseEvent
+ * @param {RequestEvent} requestEvent 
  */ 
 PrivateJainSipCallConnector.prototype.processInvitingSipRequestEvent =function(requestEvent){
     console.debug("PrivateJainSipCallConnector:processInvitingSipRequestEvent(): this.sipCallState="+this.sipCallState);
@@ -490,11 +450,8 @@ PrivateJainSipCallConnector.prototype.processInvitingSipRequestEvent =function(r
                 console.error("PrivateJainSipCallConnector:processInvitingSipRequestEvent(): catched exception exception:"+exception);  
             }
             
-            // Notify asynchronously the hangup event
-            var that=this;
-            setTimeout(function(){
-                that.webRtcCommCall.onPrivateCallConnectorCallHangupEvent();
-            },1);  
+            // Notify the hangup event
+            this.webRtcCommCall.onPrivateCallConnectorCallHangupEvent();
             
             // Close the call
             this.close();
@@ -514,7 +471,7 @@ PrivateJainSipCallConnector.prototype.processInvitingSipRequestEvent =function(r
 /**
  * Handle SIP response event for inviting call
  * @private 
- * @param responseEvent response event
+ * @param {ResponseEvent} responseEvent 
  */ 
 PrivateJainSipCallConnector.prototype.processInvitingSipResponseEvent =function(responseEvent){
     console.debug("PrivateJainSipCallConnector:processInvitingSipResponseEvent(): this.sipCallState="+this.sipCallState);
@@ -526,19 +483,13 @@ PrivateJainSipCallConnector.prototype.processInvitingSipResponseEvent =function(
         {
             if(statusCode== 180)
             {
-                // Notify asynchronously the ringing back event
-                var that=this;
-                setTimeout(function(){
-                    that.webRtcCommCall.onPrivateCallConnectorCallRingingBackEvent();
-                },1);      
+                // Notify the ringing back event
+                this.webRtcCommCall.onPrivateCallConnectorCallRingingBackEvent();     
             } 
             else if(statusCode== 183)
             {
                 // Notify asynchronously the in progress event
-                var that=this;
-                setTimeout(function(){
-                    that.webRtcCommCall.onPrivateCallConnectorCallInProgressEvent();
-                },1);      
+                this.webRtcCommCall.onPrivateCallConnectorCallInProgressEvent();     
             }   
             console.debug("PrivateJainSipCallConnector:processInvitingSipResponseEvent(): 1XX response ignored"); 
         }
@@ -584,11 +535,8 @@ PrivateJainSipCallConnector.prototype.processInvitingSipResponseEvent =function(
             {
                 console.error("PrivateJainSipCallConnector:processInvitingSipRequestEvent(): catched exception, exception:"+exception);
                 
-                // Notify asynchronously the error event
-                var that=this;
-                setTimeout(function(){
-                    that.webRtcCommCall.onPrivateCallConnectorCallOpenErrorEvent(exception);
-                },1);
+                // Notify the error event
+                this.webRtcCommCall.onPrivateCallConnectorCallOpenErrorEvent(exception);
                 
                 // Close the call
                 this.close();
@@ -596,14 +544,11 @@ PrivateJainSipCallConnector.prototype.processInvitingSipResponseEvent =function(
         } 
         else 
         {
-            console.error("PrivateJainSipCallConnector:processInvitingSipResponseEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString())   
+            console.error("PrivateJainSipCallConnector:processInvitingSipRequestEvent(): SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine().toString())   
             // Update SIP call state    
             this.sipCallState=this.SIP_INVITING_ERROR_STATE;
             // Notify asynchronously the error event
-            var that=this;
-            setTimeout(function(){
-                that.webRtcCommCall.onPrivateCallConnectorCallOpenErrorEvent(jainSipResponse.getStatusLine().getReasonPhrase());
-            },1); 
+            this.webRtcCommCall.onPrivateCallConnectorCallOpenErrorEvent(jainSipResponse.getStatusLine().getReasonPhrase());
             
             this.close();
         }
@@ -650,11 +595,8 @@ PrivateJainSipCallConnector.prototype.processInvitingSipResponseEvent =function(
             {
                 console.error("PrivateJainSipCallConnector:processInvitingSipRequestEvent(): catched exception, exception:"+exception);
                 
-                // Notify asynchronously the error event
-                var that=this;
-                setTimeout(function(){
-                    that.webRtcCommCall.onPrivateCallConnectorCallOpenErrorEvent(exception);
-                },1);
+                // Notify the error event
+                this.webRtcCommCall.onPrivateCallConnectorCallOpenErrorEvent(exception);
                 
                 // Close the call
                 this.close();
@@ -665,11 +607,8 @@ PrivateJainSipCallConnector.prototype.processInvitingSipResponseEvent =function(
             // Update SIP call state
             this.sipCallState=this.SIP_INVITING_ERROR_STATE;
             
-            // Notify asynchronously the error event
-            var that=this;
-            setTimeout(function(){
-                that.webRtcCommCall.onPrivateCallConnectorCallOpenErrorEvent(jainSipResponse.getStatusLine().getReasonPhrase());
-            },1); 
+            // Notify the error event
+            this.webRtcCommCall.onPrivateCallConnectorCallOpenErrorEvent(jainSipResponse.getStatusLine().getReasonPhrase());
             
             // Close the call
             this.close();
@@ -724,7 +663,7 @@ PrivateJainSipCallConnector.prototype.processInvitingSipResponseEvent =function(
 /**
  * Handle SIP request event for invited call
  * @private 
- * @param requestEvent request event
+ * @param {RequestEvent} requestEvent request event
  */ 
 PrivateJainSipCallConnector.prototype.processInvitedSipRequestEvent =function(requestEvent){
     console.debug("PrivateJainSipCallConnector:processInvitedSipRequestEvent(): this.sipCallState="+this.sipCallState);
@@ -759,10 +698,7 @@ PrivateJainSipCallConnector.prototype.processInvitedSipRequestEvent =function(re
             // Notify incoming communication
             var that=this;
             var callerPhoneNumber = headerFrom.getAddress().getURI().getUser();
-            setTimeout(function(){
-                that.webRtcCommCall.onPrivateCallConnectorCallRingingEvent(callerPhoneNumber);
-            },1);
-            
+            this.webRtcCommCall.onPrivateCallConnectorCallRingingEvent(callerPhoneNumber);    
         } 
         else if(requestMethod=="CANCEL")  
         {
@@ -784,14 +720,11 @@ PrivateJainSipCallConnector.prototype.processInvitedSipRequestEvent =function(re
             }
             catch(exception)
             {
-                console.error("PrivateJainSipCallConnector:processInvitingSipRequestEvent(): catched exception, exception:"+exception);  
+                console.error("PrivateJainSipCallConnector:processInvitedSipRequestEvent(): catched exception, exception:"+exception);  
             }
             
             // Notify asynchronously the hangup event
-            var that=this;
-            setTimeout(function(){
-                that.webRtcCommCall.onPrivateCallConnectorCallHangupEvent();
-            },1);  
+            this.webRtcCommCall.onPrivateCallConnectorCallHangupEvent();
             
             // Close the call
             this.close();
@@ -818,14 +751,11 @@ PrivateJainSipCallConnector.prototype.processInvitedSipRequestEvent =function(re
             }
             catch(exception)
             {
-                console.error("PrivateJainSipCallConnector:processInvitingSipRequestEvent(): catched exception exception:"+exception);  
+                console.error("PrivateJainSipCallConnector:processInvitedSipRequestEvent(): catched exception exception:"+exception);  
             }
             
             // Notify asynchronously the hangup event
-            var that=this;
-            setTimeout(function(){
-                that.webRtcCommCall.onPrivateCallConnectorCallHangupEvent();
-            },1);  
+            this.webRtcCommCall.onPrivateCallConnectorCallHangupEvent(); 
             
             // Close the call
             this.close();
@@ -852,7 +782,7 @@ PrivateJainSipCallConnector.prototype.processInvitedSipRequestEvent =function(re
 /**
  * Handle SIP response event for invited call
  * @private 
- * @param responseEvent response event
+ * @param {ResponseEvent} responseEvent response event
  */ 
 PrivateJainSipCallConnector.prototype.processInvitedSipResponseEvent =function(responseEvent){
     console.debug("PrivateJainSipCallConnector:processInvitedSipResponseEvent(): this.invitingState="+this.invitingState);
@@ -887,13 +817,13 @@ PrivateJainSipCallConnector.prototype.processInvitedSipResponseEvent =function(r
             }
             catch(exception)
             {
-                console.error("PrivateJainSipCallConnector:processInvitingSipRequestEvent(): catched exception, exception:"+exception);  
+                console.error("PrivateJainSipCallConnector:processInvitedSipResponseEvent(): catched exception, exception:"+exception);  
                 this.close();
             }
         }
         else
         {
-           this.close();
+            this.close();
         }
     } 
     else if(this.sipCallState==this.SIP_INVITED_LOCAL_HANGINGUP_407_STATE)
@@ -903,40 +833,24 @@ PrivateJainSipCallConnector.prototype.processInvitedSipResponseEvent =function(r
     } 
     else
     {
-        console.error("PrivateJainSipCallConnector:processInvitingSipRequestEvent(): bad state, SIP request ignored");  
+        console.error("PrivateJainSipCallConnector:processInvitedSipResponseEvent(): bad state, SIP request ignored");  
     } 
-}/*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
+}
 
-/*
- * Class PrivateJainSipClientConnector
- * Package  WebRtcComm
- * @author Laurent STRULLU (laurent.strullu@orange.com) 
- */
+
+
+
+
+
 
 /**
- * Contructor
+ * @class PrivateJainSipClientConnector
+ * @classdesc Private framework class handling  SIP client/user agent control 
+ * @constructor 
  * @public
- * @param  webRtcCommClient PrivateJainSipClientConnector object
+ * @param {WebRtcCommClient} webRtcCommClient "connected" WebRtcCommClient object 
+ * @throw {String} Exception "bad argument"
+ * @author Laurent STRULLU (laurent.strullu@orange.com) 
  */ 
 PrivateJainSipClientConnector = function(webRtcCommClient)
 {
@@ -952,8 +866,6 @@ PrivateJainSipClientConnector = function(webRtcCommClient)
     }
 } 
 
-PrivateJainSipClientConnector.prototype.constructor=PrivateJainSipClientConnector;
-
 // Private webRtc class variable
 PrivateJainSipClientConnector.prototype.SIP_ALLOW_HEADER="Allow: INVITE,ACK,CANCEL,BYE, OPTIONS";
 
@@ -967,23 +879,34 @@ PrivateJainSipClientConnector.prototype.SIP_UNREGISTERING_401_STATE="SIP_UNREGIS
 PrivateJainSipClientConnector.prototype.SIP_UNREGISTERING_STATE="SIP_UNREGISTERING_STATE";
 
 /**
- * Get opened status
- * @private
- * @return true is opened, false otherise
+ * Get SIP client/user agent opened/closed status 
+ * @public
+ * @returns {boolean} true if opened, false if closed
  */
 PrivateJainSipClientConnector.prototype.isOpened=function(){
     return this.openedFlag;   
 }
 
 /**
- * Open 
+ * Open SIP client/user agent, asynchronous action, opened or error event is notified to WebRtcClientComm
  * @public 
- * @asynchronous: require PrivateJainSipClientConnector event listener implementation
- * @param configuration JSON object
- * @throw String Exception "bad argument, check API documentation"
- * @throw String Exception "bad configuration, missing parameter"
- * @throw String Exception "bad state, unauthorized action"
- * @throw String Exception "internal error,check console logs"
+ * @param {object} configuration   SIP client/user agent configuration <br>
+ * <p> Client configuration sample: <br>
+ * { <br>
+ * <span style="margin-left: 30px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
+ * <span style="margin-left: 30px">sipOutboundProxy:"ws://localhost:5082",<br></span>
+ * <span style="margin-left: 30px">sipDomain:"sip.net",<br></span>
+ * <span style="margin-left: 30px">sipUserName:"alice",<br></span>
+ * <span style="margin-left: 30px">sipLogin:"alice@sip.net,<br></span>
+ * <span style="margin-left: 30px">sipPassword:"1234567890",<br></span>
+ * <span style="margin-left: 30px">sipApplicationProfile,<br></span>
+ * <span style="margin-left: 30px">sipRegisterMode:true,<br></span>
+ * }<br>
+ *  </p>
+ * @throw {String} Exception "bad argument"
+ * @throw {String} Exception "bad configuration, missing parameter"
+ * @throw {String} Exception "bad state, unauthorized action"
+ * @throw {String} Exception [internal error]
  */ 
 PrivateJainSipClientConnector.prototype.open=function(configuration){
     console.debug("PrivateJainSipClientConnector:open()");
@@ -1040,13 +963,11 @@ PrivateJainSipClientConnector.prototype.open=function(configuration){
 }
 
 /**
- * Close 
+ * Close SIP client/User Agent, asynchronous action,closed event is notified to WebRtcClientComm
+ * Open SIP Call/communication are closed
  * @public 
- * @asynchronous: require PrivateJainSipClientConnector event listener implementation
- * @throw String Exception "bad argument, check API documentation"
- * @throw String Exception "bad configuration, missing parameter"
- * @throw String Exception "bad state, unauthorized action"
- * @throw String Exception "internal error,check console logs"
+ * @throw {String} Exception "bad state, unauthorized action"
+ * @throw {String} Exception [internal error]
  */ 
 PrivateJainSipClientConnector.prototype.close=function(){
     console.debug("PrivateJainSipClientConnector:close()");
@@ -1090,10 +1011,7 @@ PrivateJainSipClientConnector.prototype.close=function(){
             else
             {
                 this.reset();
-                var that=this;
-                setTimeout(function(){
-                    that.webRtcCommClient.onClientConnectorClosedEvent();
-                },1);
+                this.webRtcCommClient.onPrivateClientConnectorClosedEvent();
             }
         }
         else
@@ -1111,15 +1029,14 @@ PrivateJainSipClientConnector.prototype.close=function(){
 /**
  * Create new CallConnector object
  * @public 
- * @param webRtcCommCall WebRtcCommCall
- * @param sipCallId  String SIP 
- * @throw String Exception "bad argument, check API documentation"
- * @throw String Exception "bad configuration, missing parameter"
- * @throw String Exception "bad state, unauthorized action"
- * @throw String Exception "internal error,check console logs"
+ * @param {WebRtcCommCall} webRtcCommCall connected "object"
+ * @param {string} sipCallId  SIP call ID 
+ * @throw {String} Exception "bad argument, check API documentation"
+ * @throw {String} Exception "bad state, unauthorized action"
+ * @throw {String} Exception [internal error]
  */ 
-PrivateJainSipClientConnector.prototype.createCallConnector=function(webRtcCommCall, sipCallId){
-    console.debug("PrivateJainSipClientConnector:createCallConnector()");
+PrivateJainSipClientConnector.prototype.createPrivateCallConnector=function(webRtcCommCall, sipCallId){
+    console.debug("PrivateJainSipClientConnector:createPrivateCallConnector()");
     try
     {
         if(webRtcCommCall instanceof WebRtcCommCall)
@@ -1132,27 +1049,28 @@ PrivateJainSipClientConnector.prototype.createCallConnector=function(webRtcCommC
             }
             else
             {   
-                console.error("PrivateJainSipClientConnector:createCallConnector(): bad state, unauthorized action");
-                throw "PrivateJainSipClientConnector:createCallConnector(): bad state, unauthorized action";    
+                console.error("PrivateJainSipClientConnector:createPrivateCallConnector(): bad state, unauthorized action");
+                throw "PrivateJainSipClientConnector:createPrivateCallConnector(): bad state, unauthorized action";    
             }
         }
         else
         {   
-            console.error("PrivateJainSipClientConnector:createCallConnector(): bad argument, check API documentation");
-            throw "PrivateJainSipClientConnector:createCallConnector(): bad argument, check API documentation"    
+            console.error("PrivateJainSipClientConnector:createPrivateCallConnector(): bad argument, check API documentation");
+            throw "PrivateJainSipClientConnector:createPrivateCallConnector(): bad argument, check API documentation"    
         }
     }
     catch(exception){
-        console.error("PrivateJainSipClientConnector:createCallConnector(): catched exception:"+exception);
+        console.error("PrivateJainSipClientConnector:createPrivateCallConnector(): catched exception:"+exception);
         throw exception;  
     }   
 }
 
+
 /**
- * Find a WebRtcCommCall from its SIP call ID in the call table
+ * Find a PrivateJainSipClientConnector object from its SIP call ID in the call table
  * @private
- * @param sipCallId String
- * @return WebRtcCommCall
+ * @param {string} sipCallId SIP call ID 
+ * @return PrivateJainSipClientConnector object or undefined if not found
  */ 
 PrivateJainSipClientConnector.prototype.findCallConnector=function(sipCallId){  
     console.debug("PrivateJainSipClientConnector:findCallConnector(): sipCallId="+sipCallId);
@@ -1160,16 +1078,14 @@ PrivateJainSipClientConnector.prototype.findCallConnector=function(sipCallId){
 }
 
 /**
- * Find a WebRtcCommCall from its SIP call ID in the call table
+ * Remove a PrivateJainSipClientConnector object  in the call table
  * @private
- * @param SIP callId String
- * @return WebRtcCommCall
+ * @param {string} sipCallId SIP SIP call ID
  */ 
 PrivateJainSipClientConnector.prototype.removeCallConnector=function(sipCallId){  
     console.debug("PrivateJainSipClientConnector:removeCallConnector(): sipCallId="+sipCallId);
     delete this.callConnectors.sipCallId;
 }
-
 
 
 /**
@@ -1202,7 +1118,19 @@ PrivateJainSipClientConnector.prototype.resetSipRegisterContext=function(){
 /**
  * Check configuration 
  * @private
- * @param configuration JSON object
+ * @param {object} configuration SIP user agent configuration
+ * * <p> Client configuration sample: <br>
+ * { <br>
+ * <span style="margin-left: 30px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
+ * <span style="margin-left: 30px">sipOutboundProxy:"ws://localhost:5082",<br></span>
+ * <span style="margin-left: 30px">sipDomain:"sip.net",<br></span>
+ * <span style="margin-left: 30px">sipUserName:"alice",<br></span>
+ * <span style="margin-left: 30px">sipLogin:"alice@sip.net,<br></span>
+ * <span style="margin-left: 30px">sipPassword:"1234567890",<br></span>
+ * <span style="margin-left: 30px">sipApplicationProfile,<br></span>
+ * <span style="margin-left: 30px">sipRegisterMode:true,<br></span>
+ * }<br>
+ *  </p>
  * @return true configuration ok false otherwise
  */ 
 PrivateJainSipClientConnector.prototype.checkConfiguration=function(configuration){
@@ -1274,8 +1202,8 @@ PrivateJainSipClientConnector.prototype.checkConfiguration=function(configuratio
 }  
     
 /**
- * JAIN SIP stack event listener interface implementation
- * @private 
+ * Implementation of JAIN SIP stack event listener interface: process WebSocket connection event
+ * @public 
  */ 
 PrivateJainSipClientConnector.prototype.processConnected=function(){
     console.debug("PrivateJainSipClientConnector:processConnected()"); 
@@ -1316,7 +1244,7 @@ PrivateJainSipClientConnector.prototype.processConnected=function(){
             else
             {
                 this.openedFlag=true;
-                this.webRtcCommClient.onClientConnectorOpenedEvent();
+                this.webRtcCommClient.onPrivateClientConnectorOpenedEvent();
                 return;
             }
         }
@@ -1327,25 +1255,25 @@ PrivateJainSipClientConnector.prototype.processConnected=function(){
             
         // Open failed
         this.reset();
-        this.webRtcCommClient.onClientConnectorOpenErrorEvent();
+        this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent();
     }
     catch(exception){       
         this.reset();
-        this.webRtcCommClient.onClientConnectorOpenErrorEvent();
+        this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent();
         console.error("PrivateJainSipClientConnector:processConnected(): catched exception:"+exception);
     } 
 }   
 
 /**
- * JAIN SIP stack event listener interface SIPListener implementation 
- * @private
+ * Implementation of JAIN SIP stack event listener interface: process WebSocket disconnection/close event
+ * @public
  */     
 PrivateJainSipClientConnector.prototype.processDisconnected=function(){
     console.debug("PrivateJainSipClientConnector:processDisconnected(): SIP connectivity has been lost");  
     try
     { 
         this.reset();    
-        this.webRtcCommClient.onClientConnectorClosedEvent();
+        this.webRtcCommClient.onPrivateClientConnectorClosedEvent();
     }
     catch(exception){
         console.error("PrivateJainSipClientConnector:processDisconnected(): catched exception:"+exception);
@@ -1353,16 +1281,16 @@ PrivateJainSipClientConnector.prototype.processDisconnected=function(){
 }
 
 /**
- * JAIN SIP stack event listener interface SIPListener implementation
- * @private 
- * @param error
+ * Implementation of JAIN SIP stack event listener interface: process WebSocket connection error event
+ * @public 
+ * @param {string} error WebSocket connection error
  */ 
 PrivateJainSipClientConnector.prototype.processConnectionError=function(error){
     console.war("PrivateJainSipClientConnector:processConnectionError(): SIP connection has failed, error:"+error);
     try
     {
         this.reset();
-        this.webRtcCommClient.onClientConnectorOpenErrorEvent();
+        this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent();
     }
     catch(exception){
         console.error("PrivateJainSipClientConnector:processConnectionError(): catched exception:"+exception);  
@@ -1370,9 +1298,9 @@ PrivateJainSipClientConnector.prototype.processConnectionError=function(error){
 }
 
 /**
- * JAIN SIP stack event listener interface implementation
- * @private 
- * @param requestEvent RequestEvent
+ * Implementation of JAIN SIP stack event listener interface: process SIP request event
+ * @public 
+ * @param {RequestEvent} requestEvent JAIN SIP request event
  */ 
 PrivateJainSipClientConnector.prototype.processRequest=function(requestEvent){
     console.debug("PrivateJainSipClientConnector:processRequest()");        
@@ -1386,7 +1314,7 @@ PrivateJainSipClientConnector.prototype.processRequest=function(requestEvent){
         } 
         else 
         {
-            // Find related WebRTC dialog
+            // Find related PrivateJainSipCallConnector (subsequent request)
             var sipCallId = jainSipRequest.getCallId().getCallId();
             var callConnector = this.findCallConnector(sipCallId);
             if(callConnector)
@@ -1399,13 +1327,15 @@ PrivateJainSipClientConnector.prototype.processRequest=function(requestEvent){
                 {
                     // Incoming SIP Call
                     var newWebRtcCommCall = new WebRtcCommCall(this.webRtcCommClient);
-                    newWebRtcCommCall.connector=this.createCallConnector(newWebRtcCommCall, sipCallId); 
+                    newWebRtcCommCall.connector=this.createPrivateCallConnector(newWebRtcCommCall, sipCallId); 
+                    newWebRtcCommCall.id=newWebRtcCommCall.connector.getId();
                     newWebRtcCommCall.connector.sipCallState=PrivateJainSipCallConnector.prototype.SIP_INVITED_INITIAL_STATE;
                     newWebRtcCommCall.connector.onJainSipClientConnectorSipRequestEvent(requestEvent);
                 }
                 else
                 {
-                    console.warn("PrivateJainSipClientConnector:processRequest(): related WebRtcCommCall not found, SIP response ignored"); 
+                    console.warn("PrivateJainSipClientConnector:processRequest(): SIP request ignored"); 
+                //@todo Should send SIP response 404 NOT FOUND or 501 NOT_IMPLEMENTED 
                 }
             }
         }
@@ -1417,9 +1347,9 @@ PrivateJainSipClientConnector.prototype.processRequest=function(requestEvent){
 
 
 /**
- * JAIN SIP stack event listener interface implementation
- * @private 
- * @param responseEvent ResponseEvent
+ * Implementation of JAIN SIP stack event listener interface: process SIP response event
+ * @public 
+ * @param {ResponseEvent} responseEvent JAIN SIP response event
  */ 
 PrivateJainSipClientConnector.prototype.processResponse=function(responseEvent){
     console.debug("PrivateJainSipClientConnector:processResponse()");   
@@ -1432,7 +1362,7 @@ PrivateJainSipClientConnector.prototype.processResponse=function(responseEvent){
         }
         else 
         {
-            // Find related WebRTC INVITE dialog
+            // Find related PrivateJainSipCallConnector
             var callConnector = this.findCallConnector(jainSipResponse.getCallId().getCallId());
             if(callConnector)
             {
@@ -1440,7 +1370,7 @@ PrivateJainSipClientConnector.prototype.processResponse=function(responseEvent){
             }
             else
             {
-                console.warn("PrivateJainSipClientConnector:processResponse(): related WebRtcCommCall not found, SIP response ignored");  
+                console.warn("PrivateJainSipClientConnector:processResponse(): PrivateJainSipCallConnector not found, SIP response ignored");  
             }
         }
     }
@@ -1450,52 +1380,52 @@ PrivateJainSipClientConnector.prototype.processResponse=function(responseEvent){
 }
    
 /**
- * JAIN SIP stack event listener interface SIPListener implementation
- * @private 
+ * Implementation of JAIN SIP stack event listener interface: process SIP transaction terminated event
+ * @public 
  */ 
 PrivateJainSipClientConnector.prototype.processTransactionTerminated=function(){
     console.debug("PrivateJainSipClientConnector:processTransactionTerminated()");   
 }   
     
 /**
- * JAIN SIP stack event listener interface SIPListener implementation
- * @private 
+ * Implementation of JAIN SIP stack event listener interface: process SIP dialog terminated event
+ * @public 
  */ 
 PrivateJainSipClientConnector.prototype.processDialogTerminated=function(){
     console.debug("PrivateJainSipClientConnector:processDialogTerminated()"); 
 }
     
 /**
- * JAIN SIP stack event listener interface SIPListener implementation
- * @private 
- * @param exceptionEvent ExceptionEvent
+ * Implementation of JAIN SIP stack event listener interface: process I/O websocket  error event
+ * @public 
+ * @param {ExceptionEvent} exceptionEvent JAIN SIP exception event 
  */ 
 PrivateJainSipClientConnector.prototype.processIOException=function(exceptionEvent){
     console.error("PrivateJainSipClientConnector:processIOException(): exceptionEvent="+exceptionEvent.message);  
 }
 
 /**
- * JAIN SIP stack event listener interface SIPListener implementation
- * @private 
- * @param timeoutEvent TimeoutEvent
+ * Implementation of JAIN SIP stack event listener interface: process SIP Dialog Timeout event
+ * @public 
+ * @param {TimeoutEvent} timeoutEvent JAIN SIP timeout event
  */ 
 PrivateJainSipClientConnector.prototype.processTimeout=function(timeoutEvent){
     console.debug("PrivateJainSipClientConnector:processTimeout():timeoutEvent="+timeoutEvent);
     try
     {
         var sipClientTransaction = timeoutEvent.getClientTransaction();
-        // Find related WebRTC INVITE dialog
+        // Find related PrivateJainSipCallConnector
         var sipCallId=sipClientTransaction.getDialog().getCallId().getCallId();
         var callConnector = this.findCallConnector(sipCallId,false);
         if(callConnector)
         {
-            callConnector.webRtcCommCall.onPrivateCallConnectorCallOpenErrorEvent("Request Timeout");     
+            callConnector.onJainSipClientConnectorSipTimeoutEvent(timeoutEvent);   
         }
         else if(this.jainSipRegisterSentRequest.getCallId().getCallId()==sipCallId)
         {
             console.error("PrivateJainSipClientConnector:processTimeout(): SIP registration failed, request timeout, no response from SIP server") 
             this.reset();
-            this.webRtcCommClient.onClientConnectorOpenErrorEvent("Request Timeout"); 
+            this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent("Request Timeout"); 
         }
         else
         {
@@ -1510,7 +1440,6 @@ PrivateJainSipClientConnector.prototype.processTimeout=function(timeoutEvent){
 /**
  * SIP REGISTER refresh timeout
  * @private 
- * @throw Exception "bad state"
  */ 
 PrivateJainSipClientConnector.prototype.onSipRegisterTimeout=function(){
     console.debug("PrivateJainSipClientConnector:onSipRegisterTimeout()");
@@ -1541,7 +1470,7 @@ PrivateJainSipClientConnector.prototype.onSipRegisterTimeout=function(){
 /**
  * SIP REGISTER state machine
  * @private 
- * @param responseEvent ResponseEvent
+ * @param {ResponseEvent} responseEvent JAIN SIP response to process
  */ 
 PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(responseEvent){
     console.debug ("PrivateJainSipClientConnector:processSipRegisterResponse(): this.sipRegisterState="+this.sipRegisterState);  
@@ -1578,7 +1507,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
                 // Authentification required but not SIP credentials in SIP profile
                 console.error("PrivateJainSipClientConnector:processSipRegisterResponse(): SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine()) 
                 this.reset();
-                this.webRtcCommClient.onClientConnectorOpenErrorEvent();
+                this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent();
             }
         }
         else if(statusCode==200)
@@ -1587,7 +1516,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
             if(this.openedFlag==false)
             {
                 this.openedFlag=true;
-                this.webRtcCommClient.onClientConnectorOpenedEvent();
+                this.webRtcCommClient.onPrivateClientConnectorOpenedEvent();
             }           
             
             if(this.sipUnregisterPendingFlag==true) {
@@ -1620,7 +1549,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
         {
             console.error("PrivateJainSipClientConnector:processSipRegisterResponse(): SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine()) 
             this.reset();
-            this.webRtcCommClient.onClientConnectorOpenErrorEvent();
+            this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent();
         }
     }                     
     else if(this.sipRegisterState==this.SIP_REGISTERING_401_STATE)
@@ -1636,7 +1565,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
             {
                 console.debug("PrivateJainSipClientConnector:processSipRegisterResponse(): this.openedFlag=true"); 
                 this.openedFlag=true;
-                this.webRtcCommClient.onClientConnectorOpenedEvent();
+                this.webRtcCommClient.onPrivateClientConnectorOpenedEvent();
             }
             
             if(this.sipUnregisterPendingFlag==true) {
@@ -1669,7 +1598,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
         {
             console.error("PrivateJainSipClientConnector:processSipRegisterResponse(): SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
             this.reset();
-            this.webRtcCommClient.onClientConnectorErrorEvent();
+            this.webRtcCommClient.onPrivateClientConnectorErrorEvent();
         } 
     }
     else if(this.sipRegisterState==this.SIP_REGISTERED_STATE)
@@ -1698,13 +1627,13 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
         else if(statusCode==200)
         {
             this.reset();
-            this.webRtcCommClient.onClientConnectorClosedEvent();
+            this.webRtcCommClient.onPrivateClientConnectorClosedEvent();
         }
         else
         {
             console.error("PrivateJainSipClientConnector:processSipRegisterResponse(): SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());  
             this.reset();
-            this.webRtcCommClient.onClientConnectorClosedEvent();
+            this.webRtcCommClient.onPrivateClientConnectorClosedEvent();
         }
     }
     else if(this.sipRegisterState==this.SIP_UNREGISTERING_401_STATE)
@@ -1716,13 +1645,13 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
         else if(statusCode==200)
         {
             this.reset();
-            this.webRtcCommClient.onClientConnectorClosedEvent();
+            this.webRtcCommClient.onPrivateClientConnectorClosedEvent();
         }
         else
         {
             console.error("PrivateJainSipClientConnector:processSipRegisterResponse(): SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
             this.reset();
-            this.webRtcCommClient.onClientConnectorClosedEvent();
+            this.webRtcCommClient.onPrivateClientConnectorClosedEvent();
         }
     }
     else if(this.sipRegisterState==this.SIP_UNREGISTERED_STATE)
@@ -1736,8 +1665,8 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
 }
 
 /**
- *  Handle SIP OPTIONS RESPONSE (default behaviour: send 200OK repsonse)                  
- * @param requestEvent RequestEvent
+ * Handle SIP OPTIONS RESPONSE (default behaviour: send 200 OK response)                  
+ * @param {RequestEvent} requestEvent JAIN SIP request event to process
  * @private 
  */ 
 PrivateJainSipClientConnector.prototype.processSipOptionRequest=function(requestEvent){
@@ -1752,46 +1681,25 @@ PrivateJainSipClientConnector.prototype.processSipOptionRequest=function(request
     jainSip200OKResponse.removeHeader("P-Charging-Function-Addresses");
     jainSip200OKResponse.removeHeader("P-Called-Party-ID");
     requestEvent.getServerTransaction().sendResponse(jainSip200OKResponse);
-}/*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-
-/*
- * Class WebRtcCommCall
- * Package  WebRtcComm
- * @author Laurent STRULLU (laurent.strullu@orange.com) 
- */
-
+}
 /**
- * Contructor
+ * @class WebRtcCommCall
+ * @classdesc Main class of the WebRtcComm Framework providing high level communication management: 
+ *            ringing, ringing back, accept, reject, cancel, bye 
+ * @constructor
  * @public
- * @param  webRtcCommClient event Listener object
+ * @param  {WebRtcCommClient} webRtcCommClient client owner 
+ * @author Laurent STRULLU (laurent.strullu@orange.com) 
  */ 
 WebRtcCommCall = function(webRtcCommClient)
 {
     if(webRtcCommClient instanceof WebRtcCommClient)
     {
+        console.debug("WebRtcCommCall:WebRtcCommCall()");
+        this.id=undefined;
         this.webRtcCommClient=webRtcCommClient;
-        console.debug("WebRtcCommCall:WebRtcCommCall(): callId="+this.id);
         this.calleePhoneNumber = undefined;
+        this.callerPhoneNumber = undefined;
         this.configuration=undefined;
         this.connector=undefined;
         this.peerConnection = undefined;
@@ -1805,17 +1713,10 @@ WebRtcCommCall = function(webRtcCommClient)
     }
 };
 
-WebRtcCommCall.prototype.constructor=WebRtcCommCall;
-
-
-/*
- * Public methods 
- */
-
 /**
- * Check if opened
+ * Get opened/closed status 
  * @public
- * @return true is opened, false otherise
+ * @returns {boolean} true if opened, false if closed
  */
 WebRtcCommCall.prototype.isOpened=function(){
     if(this.connector) return this.connector.isOpened();
@@ -1826,66 +1727,74 @@ WebRtcCommCall.prototype.isOpened=function(){
 /**
  * Get call ID
  * @public
- * @return id  string
+ * @returns id  string 
  */ 
 WebRtcCommCall.prototype.getId= function() {
-    return this.id;
+    return this.id;  
 }
 
 /**
  * Get caller phone number
  * @public
- * @return callerPhoneNumber string
+ * @returns callerPhoneNumber string
  */ 
 WebRtcCommCall.prototype.getCallerPhoneNumber= function() {
     return this.callerPhoneNumber;
 }
 
 /**
+ * Get client configuration
+ * @public
+ * @returns {object} configuration property  or undefined
+ */
+WebRtcCommCall.prototype.getConfiguration=function(){
+    return this.configuration;  
+}
+
+
+/**
  * Get callee phone number
  * @public
- * @return calleePhoneNumber string
+ * @return calleePhoneNumber string or undefined
  */ 
 WebRtcCommCall.prototype.getCalleePhoneNumber= function() {
-    return this.configuration.calleePhoneNumberPhoneNumber;
+    return this.calleePhoneNumber;
 }
 
 /**
  * get remote media stream
  * @public
- * @return remoteMediaStream RemoetMediaStream
- * @throw Exception "bad state"
+ * @return remoteMediaStream RemoteMediaStream or undefined
  */ 
 WebRtcCommCall.prototype.getRemoteMediaStream= function() {
     return this.remoteMediaStream;
 }
 
 /**
- * Open WebRTC communication
+ * Open WebRTC communication,  asynchronous action, opened or error event are notified to the WebRtcCommClient eventListener
  * @public 
- * @asynchrounous, requires implementation of the WebRtcCommCall listener interface 
- * @param calleePhoneNumber callee phone number
+ * @param calleePhoneNumber callee phone number (bob@sip.net)
  * @param configuration communication configuration JSON object
- *  configuration = {
- *       calleePhoneNumber:"+33xxxxxxx",
- *       localMediaStream: [LocalMediaStream],
- *       audio: true,
- *       video: true,
- *       data:false
- *   }
- *   
- * @throw String Exception "bad argument, check API documentation"
- * @throw String Exception "bad configuration, missing parameter"
- * @throw String Exception "bad state, unauthorized action"
- * @throw String Exception internal error
+ * <p> Call configuration sample: <br>
+ * { <br>
+ * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
+ * <span style="margin-left: 30px">audio: true,<br></span>
+ * <span style="margin-left: 30px">video: true,<br></span>
+ * <span style="margin-left: 30px">data:false<br></span>
+ * }<br>
+ * </p>
+ * @throw {String} Exception "bad argument, check API documentation"
+ * @throw {String} Exception "bad configuration, missing parameter"
+ * @throw {String} Exception "bad state, unauthorized action"
+ * @throw {String} Exception internal error
  */ 
 WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
     console.debug("WebRtcCommCall:open():calleePhoneNumber="+calleePhoneNumber);
     if(typeof(configuration) == 'object')
     {
-        if(this.webRtcCommClient.isOpened()==true)
+        if(this.webRtcCommClient.isOpened())
         {
-            if(this.checkConfiguration(configuration)==true)
+            if(this.checkConfiguration(configuration))
             {
                 if(this.isOpened()==false)
                 {
@@ -1895,12 +1804,11 @@ WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
                         this.configuration=configuration; 
                         this.connector.open(configuration);
                     
+                        // @todo Activate/desactivate audio/video tracks based on the requested communication configuration
+                        // @todo Create a data channel if requested in the communication configuration
                         // Setup RTCPeerConnection first
                         this.createRTCPeerConnection();
-                        if(this.configuration.localMediaStream)
-                        {
-                            this.peerConnection.addStream(this.configuration.localMediaStream);
-                        }
+                        this.peerConnection.addStream(this.configuration.localMediaStream);
                         var that=this;
                         if(window.webkitRTCPeerConnection)
                         {
@@ -1928,7 +1836,7 @@ WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
                         // Close properly the communication
                         try {
                             this.close();
-                        } catch(exception) {} 
+                        } catch(e) {} 
                         throw exception;  
                     } 
                 }
@@ -1959,34 +1867,34 @@ WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
 
 
 /**
- * Close WebRTC communication
+ * Close WebRTC communication, asynchronous action, closed event are notified to the WebRtcCommClient eventListener
  * @public 
- * @throw String Exception "bad state, unauthorized action"
- * @throw String Exception internal error
+ * @throw {String} Exception "bad state, unauthorized action"
  */ 
 WebRtcCommCall.prototype.close =function(){
     console.debug("WebRtcCommCall:close()");
-    if(this.webRtcCommClient.isOpened()==true)
+    if(this.webRtcCommClient.isOpened())
     {
         try
         {
-            // Close Connector
+            // Close private Call Connector
             if(this.connector) 
             {
                 this.connector.close();
-                // notify asynchronously the closed event
-                var that=this;
-                setTimeout(function(){
-                    that.webRtcCommClient.eventListener.onWebRtcCommCallClosedEvent(that);
-                },1);
-                this.connector=undefined;
             }
+            
             // Close RTCPeerConnection
             if(this.peerConnection && this.peerConnection.readyState!='closed') 
             {
                 this.peerConnection.close();
                 this.peerConnection=undefined;
+                // Notify asynchronously the closed event
+                var that=this;
+                setTimeout(function(){
+                    that.webRtcCommClient.eventListener.onWebRtcCommCallClosedEvent(that);
+                },1);
             }
+
         }
         catch(exception){
             console.error("WebRtcCommCall:open(): catched exception:"+exception);
@@ -2003,24 +1911,24 @@ WebRtcCommCall.prototype.close =function(){
  * Accept incoming WebRTC communication
  * @public 
  * @param configuration communication configuration JSON object
- *  configuration = {
- *       calleePhoneNumber:"+33xxxxxxx",
- *       localMediaStream: [LocalMediaStream],
- *       audio: true,
- *       video: true,
- *       data:false
- *   }
- * @asynchronous, requires implementation of the WebRtcCommCall listener interface 
- * @throw String Exception "bad state, unauthorized action"
- * @throw String Exception "internal error,check console logs"
+ * <p> Call configuration sample: <br>
+ * { <br>
+ * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
+ * <span style="margin-left: 30px">audio: true,<br></span>
+ * <span style="margin-left: 30px">video: true,<br></span>
+ * <span style="margin-left: 30px">data:false<br></span>
+ * }<br>
+ * </p> 
+ * @throw {String} Exception "bad state, unauthorized action"
+ * @throw {String} Exception "internal error,check console logs"
  */ 
 WebRtcCommCall.prototype.accept =function(configuration){
     console.debug("WebRtcCommCall:accept()");
     if(typeof(configuration) == 'object')
     {
-        if(this.webRtcCommClient.isOpened()==true)
+        if(this.webRtcCommClient.isOpened())
         {
-            if(this.checkConfiguration(configuration)==true)
+            if(this.checkConfiguration(configuration))
             {
                 this.configuration = configuration;
                 if(this.isOpened()==false)
@@ -2056,10 +1964,9 @@ WebRtcCommCall.prototype.accept =function(configuration){
                     catch(exception){
                         console.error("WebRtcCommCall:accept(): catched exception:"+exception);
                         // Close properly the communication
-                        // Close properly the communication
                         try {
                             this.close();
-                        } catch(exception) {} 
+                        } catch(e) {} 
                         throw exception;  
                     }
                 }
@@ -2071,8 +1978,8 @@ WebRtcCommCall.prototype.accept =function(configuration){
             }
             else
             {
-                console.error("WebRtcCommCall:open(): bad configuration");
-                throw "WebRtcCommCall:open(): bad configuration";   
+                console.error("WebRtcCommCall:accept(): bad configuration");
+                throw "WebRtcCommCall:accept(): bad configuration";   
             }
         }
         else
@@ -2084,21 +1991,20 @@ WebRtcCommCall.prototype.accept =function(configuration){
     else
     {   
         // Client closed
-        console.error("WebRtcCommCall:open(): bad argument, check API documentation");
-        throw "WebRtcCommCall:open(): bad argument, check API documentation"    
+        console.error("WebRtcCommCall:accept(): bad argument, check API documentation");
+        throw "WebRtcCommCall:accept(): bad argument, check API documentation"    
     }
 }
 
 /**
  * Reject/refuse incoming WebRTC communication
  * @public 
- * @asynchronous, requires implementation of the WebRtcCommCall listener interface 
- * @throw String Exception "bad state, unauthorized action"
- * @throw String Exception "internal error,check console logs"
+ * @throw {String} Exception "bad state, unauthorized action"
+ * @throw {String} Exception "internal error,check console logs"
  */ 
 WebRtcCommCall.prototype.reject =function(){
     console.debug("WebRtcCommCall:reject()");
-    if(this.webRtcCommClient.isOpened()==true)
+    if(this.webRtcCommClient.isOpened())
     {
         try
         {
@@ -2110,9 +2016,9 @@ WebRtcCommCall.prototype.reject =function(){
             // Close properly the communication
             try {
                 this.close();
-            } catch(exception) {}    
+            } catch(e) {}    
             throw exception;  
-        } 
+        }
     }
     else
     {   
@@ -2120,12 +2026,6 @@ WebRtcCommCall.prototype.reject =function(){
         throw "WebRtcCommCall:reject(): bad state, unauthorized action";    
     }
 }
-
-
-
-/*
- * Private methods 
- */
 
 /**
  * Check configuration 
@@ -2240,13 +2140,9 @@ WebRtcCommCall.prototype.createRTCPeerConnection =function(){
 }
    
 /**
- * Implementation of the PrivateJainSipCallConnector  listener interface
- **/
-
-/**
- * Process remote SDP offer event
+ * Implementation of the PrivateCallConnector listener interface: process remote SDP offer event
  * @private 
- * @param remoteSdpOffer String
+ * @param {string} remoteSdpOffer Remote peer SDP offer
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorRemoteSdpOfferEvent=function(remoteSdpOffer){
     console.debug("WebRtcCommCall:onPrivateCallConnectorSdpOfferEvent()");   
@@ -2254,9 +2150,9 @@ WebRtcCommCall.prototype.onPrivateCallConnectorRemoteSdpOfferEvent=function(remo
 }  
 
 /**
- * Process remote SDP answer event
+ * Implementation of the PrivateCallConnector listener interface: process remote SDP answer event
  * @private 
- * @param remoteSdpAnswer
+ * @param {string} remoteSdpAnswer
  * @throw exception internal error
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorRemoteSdpAnswerEvent=function(remoteSdpAnswer){
@@ -2294,70 +2190,80 @@ WebRtcCommCall.prototype.onPrivateCallConnectorRemoteSdpAnswerEvent=function(rem
     } 
 } 
 
-
 /**
- * Process connector call opened event
+ * Implementation of the PrivateCallConnector listener interface: process call opened event
  * @private 
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallOpenedEvent=function()
 {
     console.debug("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent()"); 
-    // Notify the closed event to the listener
+    // Notify event to the listener
     if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenEvent)
     {
-        try {
-            this.webRtcCommClient.eventListener.onWebRtcCommCallOpenEvent(this);
-        }
-        catch(exception)
-        {
-            console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
-        }
+        var that=this;
+        setTimeout(function(){
+            try {
+                that.webRtcCommClient.eventListener.onWebRtcCommCallOpenEvent(that);
+            }
+            catch(exception)
+            {
+                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
+            }
+        },1);
     }
 }
 
 /**
- * Process connector call opened event
+ * Implementation of the PrivateCallConnector listener interface: process call in progress event
  * @private 
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallInProgressEvent=function()
 {
     console.debug("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent()"); 
-    // Notify the closed event to the listener
+    // Notify event to the listener
     if(this.webRtcCommClient.eventListener.onWebRtcCommCallInProgressEvent)
     {
-        try {
-            this.webRtcCommClient.eventListener.onWebRtcCommCallInProgressEvent(this);
-        }
-        catch(exception)
-        {
-            console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
-        }
+        var that=this;
+        setTimeout(function(){
+            try {
+                that.webRtcCommClient.eventListener.onWebRtcCommCallInProgressEvent(that);
+            }
+            catch(exception)
+            {
+                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
+            }
+        },1);
     }
 }
 
 /**
- * Process connector call error event
+ * Implementation of the PrivateCallConnector listener interface: process call error event
  * @private 
+ * @param {string} error call control error
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallOpenErrorEvent=function(error)
 {
     console.debug("WebRtcCommCall:onPrivateCallConnectorCallOpenErrorEvent():error="+error);
-    // Notify the error event to the listener
+    // Notify event to the listener
     if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenErrorEvent)
     {
-        try {
-            this.webRtcCommClient.eventListener.onWebRtcCommCallOpenErrorEvent(this,error);
-        }
-        catch(exception)
-        {
-            console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
-        }
+        var that=this;
+        setTimeout(function(){
+            try {
+                that.webRtcCommClient.eventListener.onWebRtcCommCallOpenErrorEvent(that,error);
+            }
+            catch(exception)
+            {
+                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenErrorEvent(): catched exception in listener:"+exception);    
+            }
+        },1);
     }
 }
 
 /**
- * Process connector call ringing event
+ * Implementation of the PrivateCallConnector listener interface: process call ringing event
  * @private 
+ * @param {string} callerPhoneNumber  caller contact identifier (e.g. bob@sip.net)
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallRingingEvent=function(callerPhoneNumber)
 {
@@ -2365,18 +2271,22 @@ WebRtcCommCall.prototype.onPrivateCallConnectorCallRingingEvent=function(callerP
     // Notify the closed event to the listener
     if(this.webRtcCommClient.eventListener.onWebRtcCommCallRingingEvent)
     {
-        try {
-            this.webRtcCommClient.eventListener.onWebRtcCommCallRingingEvent(this,callerPhoneNumber);
-        }
-        catch(exception)
-        {
-            console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
-        }
+        this.callerPhoneNumber=callerPhoneNumber;
+        var that=this;
+        setTimeout(function(){
+            try {
+                that.webRtcCommClient.eventListener.onWebRtcCommCallRingingEvent(that,that.callerPhoneNumber);
+            }
+            catch(exception)
+            {
+                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenErrorEvent(): catched exception in listener:"+exception);    
+            }
+        },1);
     }
 }
 
 /**
- * Process connector call ringing back event 
+ * Implementation of the PrivateCallConnector listener interface: process call ringing back event
  * @private 
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallRingingBackEvent=function()
@@ -2385,25 +2295,29 @@ WebRtcCommCall.prototype.onPrivateCallConnectorCallRingingBackEvent=function()
     // Notify the closed event to the listener
     if(this.webRtcCommClient.eventListener.onWebRtcCommCallRingingBackEvent)
     {
-        try {
-            this.webRtcCommClient.eventListener.onWebRtcCommCallRingingBackEvent(this);
-        }
-        catch(exception)
-        {
-            console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
-        }
+        var that=this;
+        setTimeout(function(){
+            try {
+                that.webRtcCommClient.eventListener.onWebRtcCommCallRingingBackEvent(that);
+            }
+            catch(exception)
+            {
+                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenErrorEvent(): catched exception in listener:"+exception);    
+            }
+        },1);
     }
 }
 
 
 /**
- * Process connector call closed event 
+ * Implementation of the PrivateCallConnector listener interface: process call closed event 
  * @private 
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallClosedEvent=function()
 {
     console.debug("WebRtcCommCall:onPrivateCallConnectorCallClosedEvent()");
-    // Close properly the communication
+    this.connector=undefined;
+    // Force communication close 
     try {
         this.close();
     } catch(exception) {}   
@@ -2411,7 +2325,7 @@ WebRtcCommCall.prototype.onPrivateCallConnectorCallClosedEvent=function()
  
 
 /**
- * Process connector call closed event 
+ * Implementation of the PrivateCallConnector listener interface: process call hangup event  
  * @private 
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallHangupEvent=function()
@@ -2420,25 +2334,23 @@ WebRtcCommCall.prototype.onPrivateCallConnectorCallHangupEvent=function()
     // Notify the closed event to the listener
     if(this.webRtcCommClient.eventListener.onWebRtcCommCallHangupEvent)
     {
-        try {
-            this.webRtcCommClient.eventListener.onWebRtcCommCallHangupEvent(this);
-        }
-        catch(exception)
-        {
-            console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
-        }
+        var that=this;
+        setTimeout(function(){
+            try {
+                that.webRtcCommClient.eventListener.onWebRtcCommCallHangupEvent(that);
+            }
+            catch(exception)
+            {
+                console.error("WebRtcCommCall:onPrivateCallConnectorCallHangupEvent(): catched exception in listener:"+exception);    
+            }
+        },1);
     }  
 }
 
- 
 /**
- * Implementation of the RTCPeerConnection listener interface
- **/
-
-/**
- * Handle RTCPeerConnection error event
+ * Implementation of the RTCPeerConnection listener interface: process RTCPeerConnection error event
  * @private 
- * @param error 
+ * @param {string} error internal error
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionError=function(error){  
     console.debug("WebRtcCommCall:processRtcPeerConnectionError(): error="+error);
@@ -2453,7 +2365,7 @@ WebRtcCommCall.prototype.processRtcPeerConnectionError=function(error){
             }
             catch(exception)
             {
-                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
+                console.error("WebRtcCommCall:processRtcPeerConnectionError(): catched exception in listener:"+exception);    
             }
         },1); 
     }
@@ -2465,8 +2377,9 @@ WebRtcCommCall.prototype.processRtcPeerConnectionError=function(error){
 
 
 /**
- * RTCPeerConnection listener implementation
+ * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
  * @private
+ * @param {MediaStreamEvent} event  RTCPeerConnection Event
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionOnAddStream=function(event){
     try
@@ -2481,10 +2394,6 @@ WebRtcCommCall.prototype.processRtcPeerConnectionOnAddStream=function(event){
         {
             this.remoteMediaStream = event.stream;
         }
-        else
-        {
-                
-        }
     }
     catch(exception)
     {
@@ -2494,8 +2403,9 @@ WebRtcCommCall.prototype.processRtcPeerConnectionOnAddStream=function(event){
 }
 
 /**
- * RTCPeerConnection listener implementation
+ * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
  * @private
+ * @param {MediaStreamEvent} event  RTCPeerConnection Event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionOnRemoveStreamEvent=function(event){
     try
@@ -2519,8 +2429,9 @@ WebRtcCommCall.prototype.onRtcPeerConnectionOnRemoveStreamEvent=function(event){
 }
 
 /**
- * RTCPeerConnection listener implementation
+ * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
  * @private
+ * @param {RTCPeerConnectionIceEvent} rtcIceCandidateEvent  RTCPeerConnection Event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionIceCandidateEvent=function(rtcIceCandidateEvent){
     try
@@ -2545,22 +2456,26 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIceCandidateEvent=function(rtcIceCan
                 {
                     if(this.peerConnectionState == 'preparing-offer') 
                     {
-                        this.connector.onWebRtcCommCallLocalSdpOfferEvent(this.peerConnection.localDescription.sdp)
+                        this.connector.invite(this.peerConnection.localDescription.sdp)
                         this.peerConnectionState = 'offer-sent';
                     } 
                     else if (this.peerConnectionState == 'preparing-answer') 
                     {
-                        this.connector.onWebRtcCommCallLocalSdpAnswerEvent(this.peerConnection.localDescription.sdp)
+                        this.connector.accept(this.peerConnection.localDescription.sdp)
                         this.peerConnectionState = 'established';
                         // Notify opened event to listener
                         if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent) 
                         {
-                            try{
-                                this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(this);
-                            } 
-                            catch(exception){
-                                console.error("WebRtcCommCall:processInvitingSipRequest(): catched exception in event listener:"+exception);
-                            }   
+                            var that=this;
+                            setTimeout(function(){
+                                try {
+                                    that.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(that);
+                                }
+                                catch(exception)
+                                {
+                                    console.error("WebRtcCommCall:processInvitingSipRequest(): catched exception in listener:"+exception);    
+                                }
+                            },1); 
                         }
                     }
                     else if (this.peerConnectionState == 'established') 
@@ -2587,8 +2502,9 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIceCandidateEvent=function(rtcIceCan
 }
 
 /**
- * RTCPeerConnection listener implementation
+ * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
  * @private
+ * @param {RTCSessionDescription} offer  RTCPeerConnection SDP offer event
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionCreateOfferSuccess=function(offer){ 
     try
@@ -2624,7 +2540,7 @@ WebRtcCommCall.prototype.processRtcPeerConnectionCreateOfferSuccess=function(off
 }
 
 /**
- * RTCPeerConnection listener implementation
+ *Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
  * @private
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionCreateOfferError=function(error){
@@ -2645,7 +2561,7 @@ WebRtcCommCall.prototype.processRtcPeerConnectionCreateOfferError=function(error
 }
 
 /**
- * RTCPeerConnection listener implementation
+ * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
  * @private
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionSetLocalDescriptionSuccess=function(){
@@ -2675,12 +2591,16 @@ WebRtcCommCall.prototype.processRtcPeerConnectionSetLocalDescriptionSuccess=func
                 // Notify opened event to listener
                 if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent) 
                 {
-                    try{
-                        this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(this);
-                    } 
-                    catch(exception){
-                        console.error("WebRtcCommCall:processInvitingSipRequest(): catched exception in event listener:"+exception);
-                    }   
+                    var that=this;
+                    setTimeout(function(){
+                        try {
+                            that.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(that);
+                        }
+                        catch(exception)
+                        {
+                            console.error("WebRtcCommCall:processRtcPeerConnectionSetLocalDescriptionSuccess(): catched exception in listener:"+exception);    
+                        }
+                    },1); 
                 } 
             }
             else if (this.peerConnectionState == 'established') 
@@ -2689,19 +2609,19 @@ WebRtcCommCall.prototype.processRtcPeerConnectionSetLocalDescriptionSuccess=func
             } 
             else
             {
-                console.error("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): RTCPeerConnection bad state!");
+                console.error("WebRtcCommCall:processRtcPeerConnectionSetLocalDescriptionSuccess(): RTCPeerConnection bad state!");
             }
         }
     }
     catch(exception)
     {
-        console.error("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): catched exception, exception:"+exception);
+        console.error("WebRtcCommCall:processRtcPeerConnectionSetLocalDescriptionSuccess(): catched exception, exception:"+exception);
         this.processRtcPeerConnectionError();     
     }
 }
 
 /**
- * RTCPeerConnection listener implementation
+ * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
  * @private
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionSetLocalDescriptionError=function(error){
@@ -2722,8 +2642,9 @@ WebRtcCommCall.prototype.processRtcPeerConnectionSetLocalDescriptionError=functi
 }
 
 /**
- * RTCPeerConnection listener implementation
+ * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
  * @private
+ * @param {RTCSessionDescription} answer  RTCPeerConnection SDP answer event
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionCreateAnswerSuccess=function(answer){
     try
@@ -2759,8 +2680,9 @@ WebRtcCommCall.prototype.processRtcPeerConnectionCreateAnswerSuccess=function(an
 }
 
 /**
- * RTCPeerConnection listener implementation
+ * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
  * @private
+ * @param {String} error  SDP error
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionCreateAnswerError=function(error){
     console.error("WebRtcCommCall:processRtcPeerConnectionCreateAnswerError():error="+error);
@@ -2796,12 +2718,16 @@ WebRtcCommCall.prototype.processRtcPeerConnectionSetRemoteDescriptionSuccess=fun
             // Notify closed event to listener
             if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent) 
             {
-                try{
-                    this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(this);
-                } 
-                catch(exception){
-                    console.error("WebRtcCommCall:processInvitingSipRequest(): catched exception in event listener:"+exception);
-                }   
+                var that=this;
+                setTimeout(function(){
+                    try {
+                        that.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(that);
+                    }
+                    catch(exception)
+                    {
+                        console.error("WebRtcCommCall:processRtcPeerConnectionSetLocalDescriptionSuccess(): catched exception in listener:"+exception);    
+                    }
+                },1); 
             } 
         }
         else if (this.peerConnectionState == 'offer-received') 
@@ -2842,6 +2768,7 @@ WebRtcCommCall.prototype.processRtcPeerConnectionSetRemoteDescriptionSuccess=fun
 /**
  * RTCPeerConnection listener implementation
  * @private
+ * @param {String} error  SDP error
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionSetRemoteDescriptionError=function(error){
     try
@@ -2863,6 +2790,7 @@ WebRtcCommCall.prototype.processRtcPeerConnectionSetRemoteDescriptionError=funct
 /**
  * RTCPeerConnection listener implementation
  * @private
+ * @param {Event} event  RTCPeerConnection open event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionOnOpenEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionOnOpen(): event="+event); 
@@ -2876,6 +2804,7 @@ WebRtcCommCall.prototype.onRtcPeerConnectionOnOpenEvent=function(event){
 /**
  * RTCPeerConnection listener implementation
  * @private
+ * @param {Event} event  RTCPeerConnection open event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionStateChangeEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionStateChange(): event="+event);
@@ -2890,6 +2819,7 @@ WebRtcCommCall.prototype.onRtcPeerConnectionStateChangeEvent=function(event){
 /**
  * RTCPeerConnection listener implementation
  * @private
+ * @param {Event} event  RTCPeerConnection ICE negociation Needed event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionIceNegotationNeededEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionIceNegotationNeeded():event="+event);
@@ -2903,6 +2833,7 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIceNegotationNeededEvent=function(ev
 /**
  * RTCPeerConnection listener implementation
  * @private
+ * @param {Event} event  RTCPeerConnection ICE change event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionGatheringChangeEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionGatheringChange():event="+event);
@@ -2916,6 +2847,7 @@ WebRtcCommCall.prototype.onRtcPeerConnectionGatheringChangeEvent=function(event)
 /**
  * RTCPeerConnection listener implementation
  * @private
+ * @param {Event} event  RTCPeerConnection open event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionIceChangeEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionIceChange():event="+event); 
@@ -2929,6 +2861,7 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIceChangeEvent=function(event){
 /**
  * RTCPeerConnection listener implementation
  * @private
+ * @param {Event} event  RTCPeerConnection identity event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionIdentityResultEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionIdentityResult():event="+event);
@@ -2938,38 +2871,15 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIdentityResultEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionIdentityResult(): peerConnection.iceState="+peerConnection.iceState); 
     console.debug("WebRtcCommCall:processRtcPeerConnectionIdentityResult(): this.peerConnectionState="+this.peerConnectionState);
 }
-/*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
 
-/*
- * Class WebRtcCommClient
- * Package  WebRtcComm
- * @author Laurent STRULLU (laurent.strullu@orange.com) 
- */
+
 
 /**
- * Contructor
+ * @class WebRtcCommClient
+ * @classdesc Main class of the WebRtcComm Framework providing high level communication service: call and be call
+ * @constructor
  * @public
- * @param  eventListener event Listener object
+ * @param  {object} eventListener event listener object implementing WebRtcCommClient and WebRtcCommCall listener interface
  */ 
 WebRtcCommClient = function(eventListener)
 { 
@@ -2977,11 +2887,10 @@ WebRtcCommClient = function(eventListener)
     {
         this.id = "WebRtcCommClient" + Math.floor(Math.random() * 2147483648);
         console.debug("WebRtcCommClient:WebRtcCommClient():this.id="+this.id);
-        WebRtcCommClient.prototype.WEBRTC_CLIENTS[this.id] = this;
-        this.eventListener = eventListener; 
-        this.configuration=undefined;
-        this.connector=undefined;
-        this.closePendingFlag=false;
+        this.eventListener = eventListener;  
+        this.configuration=undefined; 
+        this.connector=undefined; 
+        this.closePendingFlag=false; 
     }
     else 
     {
@@ -2989,49 +2898,61 @@ WebRtcCommClient = function(eventListener)
     }
 } 
 
-WebRtcCommClient.prototype.constructor=WebRtcCommClient;
-
-// Private webRtc class variable
-WebRtcCommClient.prototype.WEBRTC_CLIENTS = new Array(); 
-WebRtcCommClient.prototype.SIP="SIP"
 
 /**
- * Get opened status
+ * SIP call control protocol mode 
  * @public
- * @return true is opened, false otherise
+ * @constant
+ */ 
+WebRtcCommClient.prototype.SIP="SIP";
+
+
+/**
+ * Get opened/closed status 
+ * @public
+ * @returns {boolean} true if opened, false if closed
  */
 WebRtcCommClient.prototype.isOpened=function(){
     if(this.connector) return this.connector.isOpened();
     else return false;   
 }
 
+/**
+ * Get client configuration
+ * @public
+ * @returns {object} configuration
+ */
+WebRtcCommClient.prototype.getConfiguration=function(){
+    return this.configuration;  
+}
 
 /**
- * Open WebRtcCommClient 
+ * Open the WebRTC communication client, asynchronous action, opened or error event are notified to the eventListener
  * @public 
- * @asynchronous : requires WebRtcCommClient  listener interface implementation
- * @param configuration
- *     configuration =  { 
-        communicationMode:WebRtcCommClient.prototype.SIP,
-        sip:{
-            sipUserAgent:"WebRtcCommTestWebApp/0.0.1",
-            sipOutboundProxy:this.DEFAULT_SIP_OUTBOUND_PROXY,
-            sipDomain:this.DEFAULT_SIP_DOMAIN,
-            sipUserName:this.DEFAULT_SIP_USER_NAME,
-            sipLogin:this.DEFAULT_SIP_LOGIN,
-            sipPassword:this.DEFAULT_SIP_PASSWORD,
-            sipApplicationProfile:this.DEFAULT_SIP_APPLICATION_PROFILE,
-            sipRegisterMode:this.DEFAULT_SIP_REGISTER_MODE
-        },
-        rtcPeerConnection:
-        {
-            stunServer:undefined         
-        } 
- * @throw String Exception "bad argument, check API documentation"
- * @throw String Exception "bad configuration, missing parameter"
- * @throw String Exception "bad state, unauthorized action"
- * @throw String Exception internal error
- */ 
+ * @param {object} configuration  WebRTC communication client configuration <br>
+ * <p> Client configuration sample: <br>
+ * { <br>
+ * <span style="margin-left: 30px">communicationMode:WebRtcCommClient.prototype.SIP,<br></span>
+ * <span style="margin-left: 30px">sip: {,<br></span>
+ * <span style="margin-left: 60px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
+ * <span style="margin-left: 60px">sipOutboundProxy:"ws://localhost:5082",<br></span>
+ * <span style="margin-left: 60px">sipDomain:"sip.net",<br></span>
+ * <span style="margin-left: 60px"> sipUserName:"alice",<br></span>
+ * <span style="margin-left: 60px">sipLogin:"alice@sip.net,<br></span>
+ * <span style="margin-left: 60px"> sipPassword:"1234567890",<br></span>
+ * <span style="margin-left: 60px">sipApplicationProfile,<br></span>
+ * <span style="margin-left: 60px">sipRegisterMode:true,<br></span>
+ * <span style="margin-left: 30px">}<br></span>
+ * <span style="margin-left: 30px">webRtcPeeConnection: {,<br></span>
+ * <span style="margin-left: 60px"stunServer:undefined,<br></span>
+ * <span style="margin-left: 30px">}<br></span>
+ * }<br>
+ *  </p>
+ * @throw {String} Exception "bad argument, check API documentation"
+ * @throw {String} Exception "bad configuration, missing parameter"
+ * @throw {String} Exception "bad state, unauthorized action"
+ * @throw {String} Exception [internal error]
+ */
 WebRtcCommClient.prototype.open=function(configuration){
     console.debug("WebRtcCommClient:open()");
     if(typeof(configuration) == 'object')
@@ -3067,12 +2988,11 @@ WebRtcCommClient.prototype.open=function(configuration){
 }
 
 /**
- * Close WebRtcCommClient  
+ * Close the WebRTC communication client, asynchronous action, closed event is notified to the eventListener
  * @public 
- * @asynchronous : requires WebRtcCommClient  listener interface implementation 
- * @throw String Exception "bad argument, check API documentation"
- * @throw String Exception "bad configuration, missing parameter"
- * @throw String Exception "bad state, unauthorized action"
+ * @throw {String} Exception "bad argument, check API documentation"
+ * @throw {String} Exception "bad configuration, missing parameter"
+ * @throw {String} Exception "bad state, unauthorized action"
  */ 
 WebRtcCommClient.prototype.close=function(){
     console.debug("WebRtcCommClient:close()");
@@ -3085,26 +3005,43 @@ WebRtcCommClient.prototype.close=function(){
         }
         catch(exception){
             console.error("WebRtcCommClient:close(): catched exception:"+exception);
-            // Force notification of closed event
+            // Force notification of closed event to listener
             this.closePendingFlag=false;
             this.connector=undefined;
-            var that=this;
-            setTimeout(function(){
-                that.webRtcCommClient.eventListener.onWebRtcCommClientClosed(that);
-            },40000);
+            if(this.eventListener.onWebRtcCommClientClosedEvent!=undefined) 
+            {
+                var that=this;
+                setTimeout(function(){
+                    try{
+                        that.eventListener.onWebRtcCommClientClosedEvent(that);
+                    }
+                    catch(exception)
+                    {
+                        console.error("WebRtcCommClient:onWebRtcCommClientClosed(): catched exception in event listener:"+exception);  
+                    }
+                },1);
+            }
         } 
     }
 }
  
 /**
- * Initiate a WebRTC communication 
+ * Request a WebRTC communication, asynchronous action, call events are notified to the eventListener 
  * @public 
- * @asynchronous : requires WebRtcCommClient  listener interface implementation 
- * @param calleePhoneNumber String
- * @param callConfiguration JSON object
- * @throw String Exception "bad argument, check API documentation"
- * @throw String Exception "bad configuration, missing parameter"
- * @throw String Exception "bad state, unauthorized action"
+ * @param {string} calleePhoneNumber Callee contact identifier (Tel URI, SIP URI: sip:bob@sip.net)
+ * @param {object} callConfiguration Communication configuration <br>
+ * <p> Communication configuration sample: <br>
+ * { <br>
+ * <span style="margin-left: 30px">displayedName:sip:alice,<br></span>
+ * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
+ * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
+ * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
+ * <span style="margin-left: 30px">dataMediaFlag:false,<br></span>
+ * }<br>
+ * </p>
+ * @throw {String} Exception "bad argument, check API documentation"
+ * @throw {String} Exception "bad configuration, missing parameter"
+ * @throw {String} Exception "bad state, unauthorized action"
  */ 
 WebRtcCommClient.prototype.call=function(calleePhoneNumber, callConfiguration){
     console.debug("WebRtcCommClient:call():calleePhoneNumber="+calleePhoneNumber);
@@ -3116,7 +3053,8 @@ WebRtcCommClient.prototype.call=function(calleePhoneNumber, callConfiguration){
             if(this.isOpened())
             {       
                 var newWebRtcCommCall = new WebRtcCommCall(this);
-                newWebRtcCommCall.connector=this.connector.createCallConnector(newWebRtcCommCall); 
+                newWebRtcCommCall.connector=this.connector.createPrivateCallConnector(newWebRtcCommCall); 
+                newWebRtcCommCall.id=newWebRtcCommCall.connector.getId();
                 newWebRtcCommCall.open(calleePhoneNumber, callConfiguration);
                 return newWebRtcCommCall;
             }
@@ -3138,11 +3076,12 @@ WebRtcCommClient.prototype.call=function(calleePhoneNumber, callConfiguration){
     }  
 }
 
+
 /**
- * Check configuration 
+ * Check validity of the client configuration 
  * @private
- * @param configuration JSON object
- * @return true configuration ok false otherwise
+ * @param {object} configuration client configuration
+ * @returns {boolean} true valid false unvalid
  */ 
 WebRtcCommClient.prototype.checkConfiguration=function(configuration){
     console.debug("WebRtcCommClient:checkConfiguration()");
@@ -3157,53 +3096,64 @@ WebRtcCommClient.prototype.checkConfiguration=function(configuration){
 }
 
 /**
-  * Implements ClientConnector listener interface
+  * Implements PrivateClientConnector opened event listener interface
   * @private
   */
-WebRtcCommClient.prototype.onClientConnectorOpenedEvent=function()
+WebRtcCommClient.prototype.onPrivateClientConnectorOpenedEvent=function()
 {
-    console.debug ("WebRtcCommClient:onClientConnectorOpenedEvent()");
+    console.debug ("WebRtcCommClient:onPrivateClientConnectorOpenedEvent()");
     if(this.eventListener.onWebRtcCommClientOpenedEvent!=undefined) 
     {
-        try{
-            this.eventListener.onWebRtcCommClientOpenedEvent();
-        } 
-        catch(exception){
-            console.error("WebRtcCommClient:onClientConnectorOpenedEvent(): catched exception in event listener:"+exception);
-        }   
+        var that=this;
+        setTimeout(function(){
+            try{
+                that.eventListener.onWebRtcCommClientOpenedEvent();
+            } 
+            catch(exception){
+                console.error("WebRtcCommClient:onPrivateClientConnectorOpenedEvent(): catched exception in event listener:"+exception);
+            }          
+        },1);    
     }
 }
 
 /**
-  * Implements ClientConnector listener interface
+  * Implements PrivateClientConnector error event listener interface
   * @private
+  * @param {string} error Error message
   */
-WebRtcCommClient.prototype.onClientConnectorOpenErrorEvent=function(error)
+WebRtcCommClient.prototype.onPrivateClientConnectorOpenErrorEvent=function(error)
 {
-    console.debug ("WebRtcCommClient:onClientConnectorOpenErrorEvent():error:"+error); 
+    console.debug ("WebRtcCommClient:onPrivateClientConnectorOpenErrorEvent():error:"+error); 
+    // Force closing of the client
+    try {
+        this.close();
+    } catch(exception) {}
+        
     if(this.eventListener.onWebRtcCommClientOpenErrorEvent!=undefined) 
     {
-        try{
-            this.eventListener.onWebRtcCommClientOpenErrorEvent();
-        } 
-        catch(exception){
-            console.error("WebRtcCommClient:onClientConnectorOpenErrorEvent(): catched exception in event listener:"+exception);
-        } 
-        // Close properly the client
-        try {
-            this.close();
-        } catch(exception) {}
+        var that=this;
+        setTimeout(function(){
+            try{
+                that.eventListener.onWebRtcCommClientOpenErrorEvent(error);
+            } 
+            catch(exception){
+                console.error("WebRtcCommClient:onPrivateClientConnectorOpenErrorEvent(): catched exception in event listener:"+exception);
+            }          
+        },1); 
     }
 } 
     
 /**
-  * Implements ClientConnector listener interface
+  * Implements PrivateClientConnector closed event listener interface
+  * @callback PrivatePrivateClientConnector interface
   * @private
- */
-WebRtcCommClient.prototype.onClientConnectorClosedEvent=function()
+  */
+
+WebRtcCommClient.prototype.onPrivateClientConnectorClosedEvent=function()
 {
-    console.debug ("WebRtcCommClient:onClientConnectorClosedEvent()");
-       
+    console.debug ("WebRtcCommClient:onPrivateClientConnectorClosedEvent()");  
+    var wasOpenedFlag = this.isOpened()||this.closePendingFlag;
+    
     // Close properly the client
     try {
         if(this.closePendingFlag==false) this.close();
@@ -3211,17 +3161,28 @@ WebRtcCommClient.prototype.onClientConnectorClosedEvent=function()
     } catch(exception) {     
     }
     
-    if(this.eventListener.onWebRtcCommClientClosedEvent!=undefined) 
+    if(wasOpenedFlag && this.eventListener.onWebRtcCommClientClosedEvent!=undefined) 
     {
-        try{
-            this.eventListener.onWebRtcCommClientClosedEvent();
-        } 
-        catch(exception){
-            console.error("WebRtcCommClient:onClientConnectorClosedEvent(): catched exception in event listener:"+exception);
-        }   
-    }
+        var that=this;
+        setTimeout(function(){
+            try{
+                that.eventListener.onWebRtcCommClientClosedEvent();
+            } 
+            catch(exception){
+                console.error("WebRtcCommClient:onPrivateClientConnectorClosedEvent(): catched exception in event listener:"+exception);
+            }          
+        },1);  
+    } 
+    else  if(!wasOpenedFlag && this.eventListener.onWebRtcCommClientOpenErrorEvent!=undefined) 
+    {
+        var that=this;
+        setTimeout(function(){
+            try{
+                that.eventListener.onWebRtcCommClientOpenErrorEvent("Connection to WebRtcCommServer has failed");
+            } 
+            catch(exception){
+                console.error("WebRtcCommClient:onWebRtcCommClientOpenErrorEvent(): catched exception in event listener:"+exception);
+            }          
+        },1);  
+    } 
 }
-
-
-    
-    

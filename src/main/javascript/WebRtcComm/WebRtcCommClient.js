@@ -1,35 +1,9 @@
-/*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-
-/*
- * Class WebRtcCommClient
- * Package  WebRtcComm
- * @author Laurent STRULLU (laurent.strullu@orange.com) 
- */
-
 /**
- * Contructor
+ * @class WebRtcCommClient
+ * @classdesc Main class of the WebRtcComm Framework providing high level communication service: call and be call
+ * @constructor
  * @public
- * @param  eventListener event Listener object
+ * @param  {object} eventListener event listener object implementing WebRtcCommClient and WebRtcCommCall listener interface
  */ 
 WebRtcCommClient = function(eventListener)
 { 
@@ -37,11 +11,10 @@ WebRtcCommClient = function(eventListener)
     {
         this.id = "WebRtcCommClient" + Math.floor(Math.random() * 2147483648);
         console.debug("WebRtcCommClient:WebRtcCommClient():this.id="+this.id);
-        WebRtcCommClient.prototype.WEBRTC_CLIENTS[this.id] = this;
-        this.eventListener = eventListener; 
-        this.configuration=undefined;
-        this.connector=undefined;
-        this.closePendingFlag=false;
+        this.eventListener = eventListener;  
+        this.configuration=undefined; 
+        this.connector=undefined; 
+        this.closePendingFlag=false; 
     }
     else 
     {
@@ -49,49 +22,61 @@ WebRtcCommClient = function(eventListener)
     }
 } 
 
-WebRtcCommClient.prototype.constructor=WebRtcCommClient;
-
-// Private webRtc class variable
-WebRtcCommClient.prototype.WEBRTC_CLIENTS = new Array(); 
-WebRtcCommClient.prototype.SIP="SIP"
 
 /**
- * Get opened status
+ * SIP call control protocol mode 
  * @public
- * @return true is opened, false otherise
+ * @constant
+ */ 
+WebRtcCommClient.prototype.SIP="SIP";
+
+
+/**
+ * Get opened/closed status 
+ * @public
+ * @returns {boolean} true if opened, false if closed
  */
 WebRtcCommClient.prototype.isOpened=function(){
     if(this.connector) return this.connector.isOpened();
     else return false;   
 }
 
+/**
+ * Get client configuration
+ * @public
+ * @returns {object} configuration
+ */
+WebRtcCommClient.prototype.getConfiguration=function(){
+    return this.configuration;  
+}
 
 /**
- * Open WebRtcCommClient 
+ * Open the WebRTC communication client, asynchronous action, opened or error event are notified to the eventListener
  * @public 
- * @asynchronous : requires WebRtcCommClient  listener interface implementation
- * @param configuration
- *     configuration =  { 
-        communicationMode:WebRtcCommClient.prototype.SIP,
-        sip:{
-            sipUserAgent:"WebRtcCommTestWebApp/0.0.1",
-            sipOutboundProxy:this.DEFAULT_SIP_OUTBOUND_PROXY,
-            sipDomain:this.DEFAULT_SIP_DOMAIN,
-            sipUserName:this.DEFAULT_SIP_USER_NAME,
-            sipLogin:this.DEFAULT_SIP_LOGIN,
-            sipPassword:this.DEFAULT_SIP_PASSWORD,
-            sipApplicationProfile:this.DEFAULT_SIP_APPLICATION_PROFILE,
-            sipRegisterMode:this.DEFAULT_SIP_REGISTER_MODE
-        },
-        rtcPeerConnection:
-        {
-            stunServer:undefined         
-        } 
- * @throw String Exception "bad argument, check API documentation"
- * @throw String Exception "bad configuration, missing parameter"
- * @throw String Exception "bad state, unauthorized action"
- * @throw String Exception internal error
- */ 
+ * @param {object} configuration  WebRTC communication client configuration <br>
+ * <p> Client configuration sample: <br>
+ * { <br>
+ * <span style="margin-left: 30px">communicationMode:WebRtcCommClient.prototype.SIP,<br></span>
+ * <span style="margin-left: 30px">sip: {,<br></span>
+ * <span style="margin-left: 60px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
+ * <span style="margin-left: 60px">sipOutboundProxy:"ws://localhost:5082",<br></span>
+ * <span style="margin-left: 60px">sipDomain:"sip.net",<br></span>
+ * <span style="margin-left: 60px"> sipUserName:"alice",<br></span>
+ * <span style="margin-left: 60px">sipLogin:"alice@sip.net,<br></span>
+ * <span style="margin-left: 60px"> sipPassword:"1234567890",<br></span>
+ * <span style="margin-left: 60px">sipApplicationProfile,<br></span>
+ * <span style="margin-left: 60px">sipRegisterMode:true,<br></span>
+ * <span style="margin-left: 30px">}<br></span>
+ * <span style="margin-left: 30px">webRtcPeeConnection: {,<br></span>
+ * <span style="margin-left: 60px"stunServer:undefined,<br></span>
+ * <span style="margin-left: 30px">}<br></span>
+ * }<br>
+ *  </p>
+ * @throw {String} Exception "bad argument, check API documentation"
+ * @throw {String} Exception "bad configuration, missing parameter"
+ * @throw {String} Exception "bad state, unauthorized action"
+ * @throw {String} Exception [internal error]
+ */
 WebRtcCommClient.prototype.open=function(configuration){
     console.debug("WebRtcCommClient:open()");
     if(typeof(configuration) == 'object')
@@ -127,12 +112,11 @@ WebRtcCommClient.prototype.open=function(configuration){
 }
 
 /**
- * Close WebRtcCommClient  
+ * Close the WebRTC communication client, asynchronous action, closed event is notified to the eventListener
  * @public 
- * @asynchronous : requires WebRtcCommClient  listener interface implementation 
- * @throw String Exception "bad argument, check API documentation"
- * @throw String Exception "bad configuration, missing parameter"
- * @throw String Exception "bad state, unauthorized action"
+ * @throw {String} Exception "bad argument, check API documentation"
+ * @throw {String} Exception "bad configuration, missing parameter"
+ * @throw {String} Exception "bad state, unauthorized action"
  */ 
 WebRtcCommClient.prototype.close=function(){
     console.debug("WebRtcCommClient:close()");
@@ -145,26 +129,43 @@ WebRtcCommClient.prototype.close=function(){
         }
         catch(exception){
             console.error("WebRtcCommClient:close(): catched exception:"+exception);
-            // Force notification of closed event
+            // Force notification of closed event to listener
             this.closePendingFlag=false;
             this.connector=undefined;
-            var that=this;
-            setTimeout(function(){
-                that.webRtcCommClient.eventListener.onWebRtcCommClientClosed(that);
-            },40000);
+            if(this.eventListener.onWebRtcCommClientClosedEvent!=undefined) 
+            {
+                var that=this;
+                setTimeout(function(){
+                    try{
+                        that.eventListener.onWebRtcCommClientClosedEvent(that);
+                    }
+                    catch(exception)
+                    {
+                        console.error("WebRtcCommClient:onWebRtcCommClientClosed(): catched exception in event listener:"+exception);  
+                    }
+                },1);
+            }
         } 
     }
 }
  
 /**
- * Initiate a WebRTC communication 
+ * Request a WebRTC communication, asynchronous action, call events are notified to the eventListener 
  * @public 
- * @asynchronous : requires WebRtcCommClient  listener interface implementation 
- * @param calleePhoneNumber String
- * @param callConfiguration JSON object
- * @throw String Exception "bad argument, check API documentation"
- * @throw String Exception "bad configuration, missing parameter"
- * @throw String Exception "bad state, unauthorized action"
+ * @param {string} calleePhoneNumber Callee contact identifier (Tel URI, SIP URI: sip:bob@sip.net)
+ * @param {object} callConfiguration Communication configuration <br>
+ * <p> Communication configuration sample: <br>
+ * { <br>
+ * <span style="margin-left: 30px">displayedName:sip:alice,<br></span>
+ * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
+ * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
+ * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
+ * <span style="margin-left: 30px">dataMediaFlag:false,<br></span>
+ * }<br>
+ * </p>
+ * @throw {String} Exception "bad argument, check API documentation"
+ * @throw {String} Exception "bad configuration, missing parameter"
+ * @throw {String} Exception "bad state, unauthorized action"
  */ 
 WebRtcCommClient.prototype.call=function(calleePhoneNumber, callConfiguration){
     console.debug("WebRtcCommClient:call():calleePhoneNumber="+calleePhoneNumber);
@@ -176,7 +177,8 @@ WebRtcCommClient.prototype.call=function(calleePhoneNumber, callConfiguration){
             if(this.isOpened())
             {       
                 var newWebRtcCommCall = new WebRtcCommCall(this);
-                newWebRtcCommCall.connector=this.connector.createCallConnector(newWebRtcCommCall); 
+                newWebRtcCommCall.connector=this.connector.createPrivateCallConnector(newWebRtcCommCall); 
+                newWebRtcCommCall.id=newWebRtcCommCall.connector.getId();
                 newWebRtcCommCall.open(calleePhoneNumber, callConfiguration);
                 return newWebRtcCommCall;
             }
@@ -198,11 +200,12 @@ WebRtcCommClient.prototype.call=function(calleePhoneNumber, callConfiguration){
     }  
 }
 
+
 /**
- * Check configuration 
+ * Check validity of the client configuration 
  * @private
- * @param configuration JSON object
- * @return true configuration ok false otherwise
+ * @param {object} configuration client configuration
+ * @returns {boolean} true valid false unvalid
  */ 
 WebRtcCommClient.prototype.checkConfiguration=function(configuration){
     console.debug("WebRtcCommClient:checkConfiguration()");
@@ -217,53 +220,64 @@ WebRtcCommClient.prototype.checkConfiguration=function(configuration){
 }
 
 /**
-  * Implements ClientConnector listener interface
+  * Implements PrivateClientConnector opened event listener interface
   * @private
   */
-WebRtcCommClient.prototype.onClientConnectorOpenedEvent=function()
+WebRtcCommClient.prototype.onPrivateClientConnectorOpenedEvent=function()
 {
-    console.debug ("WebRtcCommClient:onClientConnectorOpenedEvent()");
+    console.debug ("WebRtcCommClient:onPrivateClientConnectorOpenedEvent()");
     if(this.eventListener.onWebRtcCommClientOpenedEvent!=undefined) 
     {
-        try{
-            this.eventListener.onWebRtcCommClientOpenedEvent();
-        } 
-        catch(exception){
-            console.error("WebRtcCommClient:onClientConnectorOpenedEvent(): catched exception in event listener:"+exception);
-        }   
+        var that=this;
+        setTimeout(function(){
+            try{
+                that.eventListener.onWebRtcCommClientOpenedEvent();
+            } 
+            catch(exception){
+                console.error("WebRtcCommClient:onPrivateClientConnectorOpenedEvent(): catched exception in event listener:"+exception);
+            }          
+        },1);    
     }
 }
 
 /**
-  * Implements ClientConnector listener interface
+  * Implements PrivateClientConnector error event listener interface
   * @private
+  * @param {string} error Error message
   */
-WebRtcCommClient.prototype.onClientConnectorOpenErrorEvent=function(error)
+WebRtcCommClient.prototype.onPrivateClientConnectorOpenErrorEvent=function(error)
 {
-    console.debug ("WebRtcCommClient:onClientConnectorOpenErrorEvent():error:"+error); 
+    console.debug ("WebRtcCommClient:onPrivateClientConnectorOpenErrorEvent():error:"+error); 
+    // Force closing of the client
+    try {
+        this.close();
+    } catch(exception) {}
+        
     if(this.eventListener.onWebRtcCommClientOpenErrorEvent!=undefined) 
     {
-        try{
-            this.eventListener.onWebRtcCommClientOpenErrorEvent();
-        } 
-        catch(exception){
-            console.error("WebRtcCommClient:onClientConnectorOpenErrorEvent(): catched exception in event listener:"+exception);
-        } 
-        // Close properly the client
-        try {
-            this.close();
-        } catch(exception) {}
+        var that=this;
+        setTimeout(function(){
+            try{
+                that.eventListener.onWebRtcCommClientOpenErrorEvent(error);
+            } 
+            catch(exception){
+                console.error("WebRtcCommClient:onPrivateClientConnectorOpenErrorEvent(): catched exception in event listener:"+exception);
+            }          
+        },1); 
     }
 } 
     
 /**
-  * Implements ClientConnector listener interface
+  * Implements PrivateClientConnector closed event listener interface
+  * @callback PrivatePrivateClientConnector interface
   * @private
- */
-WebRtcCommClient.prototype.onClientConnectorClosedEvent=function()
+  */
+
+WebRtcCommClient.prototype.onPrivateClientConnectorClosedEvent=function()
 {
-    console.debug ("WebRtcCommClient:onClientConnectorClosedEvent()");
-       
+    console.debug ("WebRtcCommClient:onPrivateClientConnectorClosedEvent()");  
+    var wasOpenedFlag = this.isOpened()||this.closePendingFlag;
+    
     // Close properly the client
     try {
         if(this.closePendingFlag==false) this.close();
@@ -271,17 +285,28 @@ WebRtcCommClient.prototype.onClientConnectorClosedEvent=function()
     } catch(exception) {     
     }
     
-    if(this.eventListener.onWebRtcCommClientClosedEvent!=undefined) 
+    if(wasOpenedFlag && this.eventListener.onWebRtcCommClientClosedEvent!=undefined) 
     {
-        try{
-            this.eventListener.onWebRtcCommClientClosedEvent();
-        } 
-        catch(exception){
-            console.error("WebRtcCommClient:onClientConnectorClosedEvent(): catched exception in event listener:"+exception);
-        }   
-    }
+        var that=this;
+        setTimeout(function(){
+            try{
+                that.eventListener.onWebRtcCommClientClosedEvent();
+            } 
+            catch(exception){
+                console.error("WebRtcCommClient:onPrivateClientConnectorClosedEvent(): catched exception in event listener:"+exception);
+            }          
+        },1);  
+    } 
+    else  if(!wasOpenedFlag && this.eventListener.onWebRtcCommClientOpenErrorEvent!=undefined) 
+    {
+        var that=this;
+        setTimeout(function(){
+            try{
+                that.eventListener.onWebRtcCommClientOpenErrorEvent("Connection to WebRtcCommServer has failed");
+            } 
+            catch(exception){
+                console.error("WebRtcCommClient:onWebRtcCommClientOpenErrorEvent(): catched exception in event listener:"+exception);
+            }          
+        },1);  
+    } 
 }
-
-
-    
-    

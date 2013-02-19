@@ -424,7 +424,6 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommClientOpenedEvent=function(
     this.view.disableAcceptCallButton();
     this.view.disableEndCallButton();
     this.view.disableCancelCallButton();
-    this.view.disableConnectButton();
     alert("Online"); 
 }
     
@@ -438,7 +437,6 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommClientOpenErrorEvent=functi
     this.view.disableAcceptCallButton();
     this.view.disableEndCallButton();
     this.view.disableCancelCallButton();
-    this.view.disableConnectButton();
     this.webRtcCommCall=undefined;
     alert("Connection has failed, offline"); 
 } 

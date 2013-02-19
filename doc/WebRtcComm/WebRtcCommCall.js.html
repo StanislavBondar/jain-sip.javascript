@@ -1,8 +1,36 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: WebRtcCommCall.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: WebRtcCommCall.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>/**
  * @class WebRtcCommCall
- * @classdesc Main class of the WebRtcComm Framework providing high level communication management: 
- *            ringing, ringing back, accept, reject, cancel, bye 
+ * @classdesc Main object of the WebRtcComm framework providing high level communication management: 
  * @constructor
+ * @property {string} calleePhoneNumber Calle contact identifier
+ * @property {object} configuration  communication configuration
  * @public
  * @param  {WebRtcCommClient} webRtcCommClient client owner 
  * @author Laurent STRULLU (laurent.strullu@orange.com) 
@@ -11,11 +39,9 @@ WebRtcCommCall = function(webRtcCommClient)
 {
     if(webRtcCommClient instanceof WebRtcCommClient)
     {
-        console.debug("WebRtcCommCall:WebRtcCommCall()");
-        this.id=undefined;
         this.webRtcCommClient=webRtcCommClient;
+        console.debug("WebRtcCommCall:WebRtcCommCall(): callId="+this.id);
         this.calleePhoneNumber = undefined;
-        this.callerPhoneNumber = undefined;
         this.configuration=undefined;
         this.connector=undefined;
         this.peerConnection = undefined;
@@ -29,10 +55,15 @@ WebRtcCommCall = function(webRtcCommClient)
     }
 };
 
+
+/*
+ * Public methods 
+ */
+
 /**
- * Get opened/closed status 
+ * Check if opened
  * @public
- * @returns {boolean} true if opened, false if closed
+ * @return true is opened, false otherise
  */
 WebRtcCommCall.prototype.isOpened=function(){
     if(this.connector) return this.connector.isOpened();
@@ -43,74 +74,66 @@ WebRtcCommCall.prototype.isOpened=function(){
 /**
  * Get call ID
  * @public
- * @returns id  string 
+ * @return id  string
  */ 
 WebRtcCommCall.prototype.getId= function() {
-    return this.id;  
+    return this.id;
 }
 
 /**
  * Get caller phone number
  * @public
- * @returns callerPhoneNumber string
+ * @return callerPhoneNumber string
  */ 
 WebRtcCommCall.prototype.getCallerPhoneNumber= function() {
     return this.callerPhoneNumber;
 }
 
 /**
- * Get client configuration
- * @public
- * @returns {object} configuration property  or undefined
- */
-WebRtcCommCall.prototype.getConfiguration=function(){
-    return this.configuration;  
-}
-
-
-/**
  * Get callee phone number
  * @public
- * @return calleePhoneNumber string or undefined
+ * @return calleePhoneNumber string
  */ 
 WebRtcCommCall.prototype.getCalleePhoneNumber= function() {
-    return this.calleePhoneNumber;
+    return this.configuration.calleePhoneNumberPhoneNumber;
 }
 
 /**
  * get remote media stream
  * @public
- * @return remoteMediaStream RemoteMediaStream or undefined
+ * @return remoteMediaStream RemoetMediaStream
+ * @throw Exception "bad state"
  */ 
 WebRtcCommCall.prototype.getRemoteMediaStream= function() {
     return this.remoteMediaStream;
 }
 
 /**
- * Open WebRTC communication,  asynchronous action, opened or error event are notified to the WebRtcCommClient eventListener
+ * Open WebRTC communication
  * @public 
- * @param calleePhoneNumber callee phone number (bob@sip.net)
+ * @asynchrounous, requires implementation of the WebRtcCommCall listener interface 
+ * @param calleePhoneNumber callee phone number
  * @param configuration communication configuration JSON object
- * <p> Call configuration sample: <br>
- * { <br>
- * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
- * <span style="margin-left: 30px">audio: true,<br></span>
- * <span style="margin-left: 30px">video: true,<br></span>
- * <span style="margin-left: 30px">data:false<br></span>
- * }<br>
- * </p>
- * @throw {String} Exception "bad argument, check API documentation"
- * @throw {String} Exception "bad configuration, missing parameter"
- * @throw {String} Exception "bad state, unauthorized action"
- * @throw {String} Exception internal error
+ *  configuration = {
+ *       calleePhoneNumber:"+33xxxxxxx",
+ *       localMediaStream: [LocalMediaStream],
+ *       audio: true,
+ *       video: true,
+ *       data:false
+ *   }
+ *   
+ * @throw String Exception "bad argument, check API documentation"
+ * @throw String Exception "bad configuration, missing parameter"
+ * @throw String Exception "bad state, unauthorized action"
+ * @throw String Exception internal error
  */ 
 WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
     console.debug("WebRtcCommCall:open():calleePhoneNumber="+calleePhoneNumber);
     if(typeof(configuration) == 'object')
     {
-        if(this.webRtcCommClient.isOpened())
+        if(this.webRtcCommClient.isOpened()==true)
         {
-            if(this.checkConfiguration(configuration))
+            if(this.checkConfiguration(configuration)==true)
             {
                 if(this.isOpened()==false)
                 {
@@ -120,11 +143,12 @@ WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
                         this.configuration=configuration; 
                         this.connector.open(configuration);
                     
-                        // @todo Activate/desactivate audio/video tracks based on the requested communication configuration
-                        // @todo Create a data channel if requested in the communication configuration
                         // Setup RTCPeerConnection first
                         this.createRTCPeerConnection();
-                        this.peerConnection.addStream(this.configuration.localMediaStream);
+                        if(this.configuration.localMediaStream)
+                        {
+                            this.peerConnection.addStream(this.configuration.localMediaStream);
+                        }
                         var that=this;
                         if(window.webkitRTCPeerConnection)
                         {
@@ -152,7 +176,7 @@ WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
                         // Close properly the communication
                         try {
                             this.close();
-                        } catch(e) {} 
+                        } catch(exception) {} 
                         throw exception;  
                     } 
                 }
@@ -183,34 +207,34 @@ WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
 
 
 /**
- * Close WebRTC communication, asynchronous action, closed event are notified to the WebRtcCommClient eventListener
+ * Close WebRTC communication
  * @public 
- * @throw {String} Exception "bad state, unauthorized action"
+ * @throw String Exception "bad state, unauthorized action"
+ * @throw String Exception internal error
  */ 
 WebRtcCommCall.prototype.close =function(){
     console.debug("WebRtcCommCall:close()");
-    if(this.webRtcCommClient.isOpened())
+    if(this.webRtcCommClient.isOpened()==true)
     {
         try
         {
-            // Close private Call Connector
+            // Close Connector
             if(this.connector) 
             {
                 this.connector.close();
+                // notify asynchronously the closed event
+                var that=this;
+                setTimeout(function(){
+                    that.webRtcCommClient.eventListener.onWebRtcCommCallClosedEvent(that);
+                },1);
+                this.connector=undefined;
             }
-            
             // Close RTCPeerConnection
             if(this.peerConnection && this.peerConnection.readyState!='closed') 
             {
                 this.peerConnection.close();
                 this.peerConnection=undefined;
-                // Notify asynchronously the closed event
-                var that=this;
-                setTimeout(function(){
-                    that.webRtcCommClient.eventListener.onWebRtcCommCallClosedEvent(that);
-                },1);
             }
-
         }
         catch(exception){
             console.error("WebRtcCommCall:open(): catched exception:"+exception);
@@ -227,24 +251,24 @@ WebRtcCommCall.prototype.close =function(){
  * Accept incoming WebRTC communication
  * @public 
  * @param configuration communication configuration JSON object
- * <p> Call configuration sample: <br>
- * { <br>
- * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
- * <span style="margin-left: 30px">audio: true,<br></span>
- * <span style="margin-left: 30px">video: true,<br></span>
- * <span style="margin-left: 30px">data:false<br></span>
- * }<br>
- * </p> 
- * @throw {String} Exception "bad state, unauthorized action"
- * @throw {String} Exception "internal error,check console logs"
+ *  configuration = {
+ *       calleePhoneNumber:"+33xxxxxxx",
+ *       localMediaStream: [LocalMediaStream],
+ *       audio: true,
+ *       video: true,
+ *       data:false
+ *   }
+ * @asynchronous, requires implementation of the WebRtcCommCall listener interface 
+ * @throw String Exception "bad state, unauthorized action"
+ * @throw String Exception "internal error,check console logs"
  */ 
 WebRtcCommCall.prototype.accept =function(configuration){
     console.debug("WebRtcCommCall:accept()");
     if(typeof(configuration) == 'object')
     {
-        if(this.webRtcCommClient.isOpened())
+        if(this.webRtcCommClient.isOpened()==true)
         {
-            if(this.checkConfiguration(configuration))
+            if(this.checkConfiguration(configuration)==true)
             {
                 this.configuration = configuration;
                 if(this.isOpened()==false)
@@ -280,9 +304,10 @@ WebRtcCommCall.prototype.accept =function(configuration){
                     catch(exception){
                         console.error("WebRtcCommCall:accept(): catched exception:"+exception);
                         // Close properly the communication
+                        // Close properly the communication
                         try {
                             this.close();
-                        } catch(e) {} 
+                        } catch(exception) {} 
                         throw exception;  
                     }
                 }
@@ -294,8 +319,8 @@ WebRtcCommCall.prototype.accept =function(configuration){
             }
             else
             {
-                console.error("WebRtcCommCall:accept(): bad configuration");
-                throw "WebRtcCommCall:accept(): bad configuration";   
+                console.error("WebRtcCommCall:open(): bad configuration");
+                throw "WebRtcCommCall:open(): bad configuration";   
             }
         }
         else
@@ -307,20 +332,21 @@ WebRtcCommCall.prototype.accept =function(configuration){
     else
     {   
         // Client closed
-        console.error("WebRtcCommCall:accept(): bad argument, check API documentation");
-        throw "WebRtcCommCall:accept(): bad argument, check API documentation"    
+        console.error("WebRtcCommCall:open(): bad argument, check API documentation");
+        throw "WebRtcCommCall:open(): bad argument, check API documentation"    
     }
 }
 
 /**
  * Reject/refuse incoming WebRTC communication
  * @public 
- * @throw {String} Exception "bad state, unauthorized action"
- * @throw {String} Exception "internal error,check console logs"
+ * @asynchronous, requires implementation of the WebRtcCommCall listener interface 
+ * @throw String Exception "bad state, unauthorized action"
+ * @throw String Exception "internal error,check console logs"
  */ 
 WebRtcCommCall.prototype.reject =function(){
     console.debug("WebRtcCommCall:reject()");
-    if(this.webRtcCommClient.isOpened())
+    if(this.webRtcCommClient.isOpened()==true)
     {
         try
         {
@@ -332,9 +358,9 @@ WebRtcCommCall.prototype.reject =function(){
             // Close properly the communication
             try {
                 this.close();
-            } catch(e) {}    
+            } catch(exception) {}    
             throw exception;  
-        }
+        } 
     }
     else
     {   
@@ -342,6 +368,12 @@ WebRtcCommCall.prototype.reject =function(){
         throw "WebRtcCommCall:reject(): bad state, unauthorized action";    
     }
 }
+
+
+
+/*
+ * Private methods 
+ */
 
 /**
  * Check configuration 
@@ -456,9 +488,13 @@ WebRtcCommCall.prototype.createRTCPeerConnection =function(){
 }
    
 /**
- * Implementation of the PrivateCallConnector listener interface: process remote SDP offer event
+ * Implementation of the PrivateJainSipCallConnector  listener interface
+ **/
+
+/**
+ * Process remote SDP offer event
  * @private 
- * @param {string} remoteSdpOffer Remote peer SDP offer
+ * @param remoteSdpOffer String
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorRemoteSdpOfferEvent=function(remoteSdpOffer){
     console.debug("WebRtcCommCall:onPrivateCallConnectorSdpOfferEvent()");   
@@ -466,9 +502,9 @@ WebRtcCommCall.prototype.onPrivateCallConnectorRemoteSdpOfferEvent=function(remo
 }  
 
 /**
- * Implementation of the PrivateCallConnector listener interface: process remote SDP answer event
+ * Process remote SDP answer event
  * @private 
- * @param {string} remoteSdpAnswer
+ * @param remoteSdpAnswer
  * @throw exception internal error
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorRemoteSdpAnswerEvent=function(remoteSdpAnswer){
@@ -506,80 +542,70 @@ WebRtcCommCall.prototype.onPrivateCallConnectorRemoteSdpAnswerEvent=function(rem
     } 
 } 
 
+
 /**
- * Implementation of the PrivateCallConnector listener interface: process call opened event
+ * Process connector call opened event
  * @private 
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallOpenedEvent=function()
 {
     console.debug("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent()"); 
-    // Notify event to the listener
+    // Notify the closed event to the listener
     if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenEvent)
     {
-        var that=this;
-        setTimeout(function(){
-            try {
-                that.webRtcCommClient.eventListener.onWebRtcCommCallOpenEvent(that);
-            }
-            catch(exception)
-            {
-                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
-            }
-        },1);
+        try {
+            this.webRtcCommClient.eventListener.onWebRtcCommCallOpenEvent(this);
+        }
+        catch(exception)
+        {
+            console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
+        }
     }
 }
 
 /**
- * Implementation of the PrivateCallConnector listener interface: process call in progress event
+ * Process connector call opened event
  * @private 
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallInProgressEvent=function()
 {
     console.debug("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent()"); 
-    // Notify event to the listener
+    // Notify the closed event to the listener
     if(this.webRtcCommClient.eventListener.onWebRtcCommCallInProgressEvent)
     {
-        var that=this;
-        setTimeout(function(){
-            try {
-                that.webRtcCommClient.eventListener.onWebRtcCommCallInProgressEvent(that);
-            }
-            catch(exception)
-            {
-                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
-            }
-        },1);
+        try {
+            this.webRtcCommClient.eventListener.onWebRtcCommCallInProgressEvent(this);
+        }
+        catch(exception)
+        {
+            console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
+        }
     }
 }
 
 /**
- * Implementation of the PrivateCallConnector listener interface: process call error event
+ * Process connector call error event
  * @private 
- * @param {string} error call control error
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallOpenErrorEvent=function(error)
 {
     console.debug("WebRtcCommCall:onPrivateCallConnectorCallOpenErrorEvent():error="+error);
-    // Notify event to the listener
+    // Notify the error event to the listener
     if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenErrorEvent)
     {
-        var that=this;
-        setTimeout(function(){
-            try {
-                that.webRtcCommClient.eventListener.onWebRtcCommCallOpenErrorEvent(that,error);
-            }
-            catch(exception)
-            {
-                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenErrorEvent(): catched exception in listener:"+exception);    
-            }
-        },1);
+        try {
+            this.webRtcCommClient.eventListener.onWebRtcCommCallOpenErrorEvent(this,error);
+        }
+        catch(exception)
+        {
+            console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
+        }
     }
 }
 
 /**
- * Implementation of the PrivateCallConnector listener interface: process call ringing event
+ * Process connector call ringing event
  * @private 
- * @param {string} callerPhoneNumber  caller contact identifier (e.g. bob@sip.net)
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallRingingEvent=function(callerPhoneNumber)
 {
@@ -587,22 +613,18 @@ WebRtcCommCall.prototype.onPrivateCallConnectorCallRingingEvent=function(callerP
     // Notify the closed event to the listener
     if(this.webRtcCommClient.eventListener.onWebRtcCommCallRingingEvent)
     {
-        this.callerPhoneNumber=callerPhoneNumber;
-        var that=this;
-        setTimeout(function(){
-            try {
-                that.webRtcCommClient.eventListener.onWebRtcCommCallRingingEvent(that,that.callerPhoneNumber);
-            }
-            catch(exception)
-            {
-                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenErrorEvent(): catched exception in listener:"+exception);    
-            }
-        },1);
+        try {
+            this.webRtcCommClient.eventListener.onWebRtcCommCallRingingEvent(this,callerPhoneNumber);
+        }
+        catch(exception)
+        {
+            console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
+        }
     }
 }
 
 /**
- * Implementation of the PrivateCallConnector listener interface: process call ringing back event
+ * Process connector call ringing back event 
  * @private 
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallRingingBackEvent=function()
@@ -611,29 +633,25 @@ WebRtcCommCall.prototype.onPrivateCallConnectorCallRingingBackEvent=function()
     // Notify the closed event to the listener
     if(this.webRtcCommClient.eventListener.onWebRtcCommCallRingingBackEvent)
     {
-        var that=this;
-        setTimeout(function(){
-            try {
-                that.webRtcCommClient.eventListener.onWebRtcCommCallRingingBackEvent(that);
-            }
-            catch(exception)
-            {
-                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenErrorEvent(): catched exception in listener:"+exception);    
-            }
-        },1);
+        try {
+            this.webRtcCommClient.eventListener.onWebRtcCommCallRingingBackEvent(this);
+        }
+        catch(exception)
+        {
+            console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
+        }
     }
 }
 
 
 /**
- * Implementation of the PrivateCallConnector listener interface: process call closed event 
+ * Process connector call closed event 
  * @private 
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallClosedEvent=function()
 {
     console.debug("WebRtcCommCall:onPrivateCallConnectorCallClosedEvent()");
-    this.connector=undefined;
-    // Force communication close 
+    // Close properly the communication
     try {
         this.close();
     } catch(exception) {}   
@@ -641,7 +659,7 @@ WebRtcCommCall.prototype.onPrivateCallConnectorCallClosedEvent=function()
  
 
 /**
- * Implementation of the PrivateCallConnector listener interface: process call hangup event  
+ * Process connector call closed event 
  * @private 
  */ 
 WebRtcCommCall.prototype.onPrivateCallConnectorCallHangupEvent=function()
@@ -650,23 +668,25 @@ WebRtcCommCall.prototype.onPrivateCallConnectorCallHangupEvent=function()
     // Notify the closed event to the listener
     if(this.webRtcCommClient.eventListener.onWebRtcCommCallHangupEvent)
     {
-        var that=this;
-        setTimeout(function(){
-            try {
-                that.webRtcCommClient.eventListener.onWebRtcCommCallHangupEvent(that);
-            }
-            catch(exception)
-            {
-                console.error("WebRtcCommCall:onPrivateCallConnectorCallHangupEvent(): catched exception in listener:"+exception);    
-            }
-        },1);
+        try {
+            this.webRtcCommClient.eventListener.onWebRtcCommCallHangupEvent(this);
+        }
+        catch(exception)
+        {
+            console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
+        }
     }  
 }
 
+ 
 /**
- * Implementation of the RTCPeerConnection listener interface: process RTCPeerConnection error event
+ * Implementation of the RTCPeerConnection listener interface
+ **/
+
+/**
+ * Handle RTCPeerConnection error event
  * @private 
- * @param {string} error internal error
+ * @param error 
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionError=function(error){  
     console.debug("WebRtcCommCall:processRtcPeerConnectionError(): error="+error);
@@ -681,7 +701,7 @@ WebRtcCommCall.prototype.processRtcPeerConnectionError=function(error){
             }
             catch(exception)
             {
-                console.error("WebRtcCommCall:processRtcPeerConnectionError(): catched exception in listener:"+exception);    
+                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenedEvent(): catched exception in listener:"+exception);    
             }
         },1); 
     }
@@ -693,9 +713,8 @@ WebRtcCommCall.prototype.processRtcPeerConnectionError=function(error){
 
 
 /**
- * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
+ * RTCPeerConnection listener implementation
  * @private
- * @param {MediaStreamEvent} event  RTCPeerConnection Event
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionOnAddStream=function(event){
     try
@@ -710,6 +729,10 @@ WebRtcCommCall.prototype.processRtcPeerConnectionOnAddStream=function(event){
         {
             this.remoteMediaStream = event.stream;
         }
+        else
+        {
+                
+        }
     }
     catch(exception)
     {
@@ -719,9 +742,8 @@ WebRtcCommCall.prototype.processRtcPeerConnectionOnAddStream=function(event){
 }
 
 /**
- * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
+ * RTCPeerConnection listener implementation
  * @private
- * @param {MediaStreamEvent} event  RTCPeerConnection Event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionOnRemoveStreamEvent=function(event){
     try
@@ -745,9 +767,8 @@ WebRtcCommCall.prototype.onRtcPeerConnectionOnRemoveStreamEvent=function(event){
 }
 
 /**
- * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
+ * RTCPeerConnection listener implementation
  * @private
- * @param {RTCPeerConnectionIceEvent} rtcIceCandidateEvent  RTCPeerConnection Event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionIceCandidateEvent=function(rtcIceCandidateEvent){
     try
@@ -772,26 +793,22 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIceCandidateEvent=function(rtcIceCan
                 {
                     if(this.peerConnectionState == 'preparing-offer') 
                     {
-                        this.connector.invite(this.peerConnection.localDescription.sdp)
+                        this.connector.onWebRtcCommCallLocalSdpOfferEvent(this.peerConnection.localDescription.sdp)
                         this.peerConnectionState = 'offer-sent';
                     } 
                     else if (this.peerConnectionState == 'preparing-answer') 
                     {
-                        this.connector.accept(this.peerConnection.localDescription.sdp)
+                        this.connector.onWebRtcCommCallLocalSdpAnswerEvent(this.peerConnection.localDescription.sdp)
                         this.peerConnectionState = 'established';
                         // Notify opened event to listener
                         if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent) 
                         {
-                            var that=this;
-                            setTimeout(function(){
-                                try {
-                                    that.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(that);
-                                }
-                                catch(exception)
-                                {
-                                    console.error("WebRtcCommCall:processInvitingSipRequest(): catched exception in listener:"+exception);    
-                                }
-                            },1); 
+                            try{
+                                this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(this);
+                            } 
+                            catch(exception){
+                                console.error("WebRtcCommCall:processInvitingSipRequest(): catched exception in event listener:"+exception);
+                            }   
                         }
                     }
                     else if (this.peerConnectionState == 'established') 
@@ -818,9 +835,8 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIceCandidateEvent=function(rtcIceCan
 }
 
 /**
- * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
+ * RTCPeerConnection listener implementation
  * @private
- * @param {RTCSessionDescription} offer  RTCPeerConnection SDP offer event
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionCreateOfferSuccess=function(offer){ 
     try
@@ -856,7 +872,7 @@ WebRtcCommCall.prototype.processRtcPeerConnectionCreateOfferSuccess=function(off
 }
 
 /**
- *Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
+ * RTCPeerConnection listener implementation
  * @private
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionCreateOfferError=function(error){
@@ -877,7 +893,7 @@ WebRtcCommCall.prototype.processRtcPeerConnectionCreateOfferError=function(error
 }
 
 /**
- * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
+ * RTCPeerConnection listener implementation
  * @private
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionSetLocalDescriptionSuccess=function(){
@@ -907,16 +923,12 @@ WebRtcCommCall.prototype.processRtcPeerConnectionSetLocalDescriptionSuccess=func
                 // Notify opened event to listener
                 if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent) 
                 {
-                    var that=this;
-                    setTimeout(function(){
-                        try {
-                            that.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(that);
-                        }
-                        catch(exception)
-                        {
-                            console.error("WebRtcCommCall:processRtcPeerConnectionSetLocalDescriptionSuccess(): catched exception in listener:"+exception);    
-                        }
-                    },1); 
+                    try{
+                        this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(this);
+                    } 
+                    catch(exception){
+                        console.error("WebRtcCommCall:processInvitingSipRequest(): catched exception in event listener:"+exception);
+                    }   
                 } 
             }
             else if (this.peerConnectionState == 'established') 
@@ -925,19 +937,19 @@ WebRtcCommCall.prototype.processRtcPeerConnectionSetLocalDescriptionSuccess=func
             } 
             else
             {
-                console.error("WebRtcCommCall:processRtcPeerConnectionSetLocalDescriptionSuccess(): RTCPeerConnection bad state!");
+                console.error("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): RTCPeerConnection bad state!");
             }
         }
     }
     catch(exception)
     {
-        console.error("WebRtcCommCall:processRtcPeerConnectionSetLocalDescriptionSuccess(): catched exception, exception:"+exception);
+        console.error("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): catched exception, exception:"+exception);
         this.processRtcPeerConnectionError();     
     }
 }
 
 /**
- * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
+ * RTCPeerConnection listener implementation
  * @private
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionSetLocalDescriptionError=function(error){
@@ -958,9 +970,8 @@ WebRtcCommCall.prototype.processRtcPeerConnectionSetLocalDescriptionError=functi
 }
 
 /**
- * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
+ * RTCPeerConnection listener implementation
  * @private
- * @param {RTCSessionDescription} answer  RTCPeerConnection SDP answer event
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionCreateAnswerSuccess=function(answer){
     try
@@ -996,9 +1007,8 @@ WebRtcCommCall.prototype.processRtcPeerConnectionCreateAnswerSuccess=function(an
 }
 
 /**
- * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
+ * RTCPeerConnection listener implementation
  * @private
- * @param {String} error  SDP error
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionCreateAnswerError=function(error){
     console.error("WebRtcCommCall:processRtcPeerConnectionCreateAnswerError():error="+error);
@@ -1034,16 +1044,12 @@ WebRtcCommCall.prototype.processRtcPeerConnectionSetRemoteDescriptionSuccess=fun
             // Notify closed event to listener
             if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent) 
             {
-                var that=this;
-                setTimeout(function(){
-                    try {
-                        that.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(that);
-                    }
-                    catch(exception)
-                    {
-                        console.error("WebRtcCommCall:processRtcPeerConnectionSetLocalDescriptionSuccess(): catched exception in listener:"+exception);    
-                    }
-                },1); 
+                try{
+                    this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(this);
+                } 
+                catch(exception){
+                    console.error("WebRtcCommCall:processInvitingSipRequest(): catched exception in event listener:"+exception);
+                }   
             } 
         }
         else if (this.peerConnectionState == 'offer-received') 
@@ -1084,7 +1090,6 @@ WebRtcCommCall.prototype.processRtcPeerConnectionSetRemoteDescriptionSuccess=fun
 /**
  * RTCPeerConnection listener implementation
  * @private
- * @param {String} error  SDP error
  */ 
 WebRtcCommCall.prototype.processRtcPeerConnectionSetRemoteDescriptionError=function(error){
     try
@@ -1106,7 +1111,6 @@ WebRtcCommCall.prototype.processRtcPeerConnectionSetRemoteDescriptionError=funct
 /**
  * RTCPeerConnection listener implementation
  * @private
- * @param {Event} event  RTCPeerConnection open event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionOnOpenEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionOnOpen(): event="+event); 
@@ -1120,7 +1124,6 @@ WebRtcCommCall.prototype.onRtcPeerConnectionOnOpenEvent=function(event){
 /**
  * RTCPeerConnection listener implementation
  * @private
- * @param {Event} event  RTCPeerConnection open event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionStateChangeEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionStateChange(): event="+event);
@@ -1135,7 +1138,6 @@ WebRtcCommCall.prototype.onRtcPeerConnectionStateChangeEvent=function(event){
 /**
  * RTCPeerConnection listener implementation
  * @private
- * @param {Event} event  RTCPeerConnection ICE negociation Needed event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionIceNegotationNeededEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionIceNegotationNeeded():event="+event);
@@ -1149,7 +1151,6 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIceNegotationNeededEvent=function(ev
 /**
  * RTCPeerConnection listener implementation
  * @private
- * @param {Event} event  RTCPeerConnection ICE change event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionGatheringChangeEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionGatheringChange():event="+event);
@@ -1163,7 +1164,6 @@ WebRtcCommCall.prototype.onRtcPeerConnectionGatheringChangeEvent=function(event)
 /**
  * RTCPeerConnection listener implementation
  * @private
- * @param {Event} event  RTCPeerConnection open event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionIceChangeEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionIceChange():event="+event); 
@@ -1177,7 +1177,6 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIceChangeEvent=function(event){
 /**
  * RTCPeerConnection listener implementation
  * @private
- * @param {Event} event  RTCPeerConnection identity event
  */ 
 WebRtcCommCall.prototype.onRtcPeerConnectionIdentityResultEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionIdentityResult():event="+event);
@@ -1190,3 +1189,25 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIdentityResultEvent=function(event){
 
 
 
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-WebRtcComm.html">WebRtcComm</a></li></ul><h3>Classes</h3><ul><li><a href="32c9aa3017.html">PrivateJainSipCallConnector</a></li><li><a href="PrivateJainSipClientConnector.html">PrivateJainSipClientConnector</a></li><li><a href="WebRtcCommCall.html">WebRtcCommCall</a></li><li><a href="WebRtcCommClient.html">WebRtcCommClient</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Feb 15 2013 17:28:30 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+</body>
+</html>

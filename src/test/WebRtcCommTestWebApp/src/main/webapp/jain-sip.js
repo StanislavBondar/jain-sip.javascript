@@ -26527,7 +26527,6 @@ function SIPDialog() {
     this.reInviteWaitTime = 100;
     this.dialogDeleteTask=null;
     this.timerdelete=null;
-    this.dialogDeleteIfNoAckSentTask=null;
     this.isAcknowledged=null;
     this.highestSequenceNumberAcknowledged = -1;
     this.isBackToBackUserAgent=null;
@@ -26650,7 +26649,7 @@ SIPDialog.prototype.dialogTimerTask = function(transaction){
 SIPDialog.prototype.dialogDeleteIfNoAckSentTask=function(seqno){
     this.seqno = seqno;
     if (this.highestSequenceNumberAcknowledged < seqno) {
-        this.dialogDeleteIfNoAckSentTask = null;
+        this.timer = null;
         if (!this.isBackToBackUserAgent) {
             if (this.sipProvider.getSipListener() instanceof SipListener) {
                 this.raiseErrorEvent(SIPDialogErrorEvent.DIALOG_ACK_NOT_SENT_TIMEOUT);
@@ -27893,7 +27892,7 @@ SIPDialog.prototype.doDeferredDeleteIfNoAckSent =function(seqno){
     if (this.sipStack.getTimer() == null) {
         this.setState(this.TERMINATED_STATE);
     } 
-    else if (this.dialogDeleteIfNoAckSentTask == null) {
+    else if (this.timer == null) {
         var sipdialog=this;
         this.timer=setTimeout(function(){
             sipdialog.dialogDeleteIfNoAckSentTask(seqno);

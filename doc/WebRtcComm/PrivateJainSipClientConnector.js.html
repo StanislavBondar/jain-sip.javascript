@@ -1,10 +1,36 @@
-/**
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: PrivateJainSipClientConnector.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: PrivateJainSipClientConnector.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>/**
  * @class PrivateJainSipClientConnector
- * @classdesc Private framework class handling  SIP client/user agent control 
+ * @classdesc Private framework class handling  SIP client control: 
  * @constructor 
  * @public
- * @param {WebRtcCommClient} webRtcCommClient "connected" WebRtcCommClient object 
- * @throw {String} Exception "bad argument"
+ * @param  {WebRtcCommClient} webRtcCommClient client owner 
  * @author Laurent STRULLU (laurent.strullu@orange.com) 
  */ 
 PrivateJainSipClientConnector = function(webRtcCommClient)
@@ -34,34 +60,23 @@ PrivateJainSipClientConnector.prototype.SIP_UNREGISTERING_401_STATE="SIP_UNREGIS
 PrivateJainSipClientConnector.prototype.SIP_UNREGISTERING_STATE="SIP_UNREGISTERING_STATE";
 
 /**
- * Get SIP client/user agent opened/closed status 
- * @public
- * @returns {boolean} true if opened, false if closed
+ * Get opened status
+ * @private
+ * @return true is opened, false otherise
  */
 PrivateJainSipClientConnector.prototype.isOpened=function(){
     return this.openedFlag;   
 }
 
 /**
- * Open SIP client/user agent, asynchronous action, opened or error event is notified to WebRtcClientComm
+ * Open 
  * @public 
- * @param {object} configuration   SIP client/user agent configuration <br>
- * <p> Client configuration sample: <br>
- * { <br>
- * <span style="margin-left: 30px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
- * <span style="margin-left: 30px">sipOutboundProxy:"ws://localhost:5082",<br></span>
- * <span style="margin-left: 30px">sipDomain:"sip.net",<br></span>
- * <span style="margin-left: 30px">sipUserName:"alice",<br></span>
- * <span style="margin-left: 30px">sipLogin:"alice@sip.net,<br></span>
- * <span style="margin-left: 30px">sipPassword:"1234567890",<br></span>
- * <span style="margin-left: 30px">sipApplicationProfile,<br></span>
- * <span style="margin-left: 30px">sipRegisterMode:true,<br></span>
- * }<br>
- *  </p>
- * @throw {String} Exception "bad argument"
- * @throw {String} Exception "bad configuration, missing parameter"
- * @throw {String} Exception "bad state, unauthorized action"
- * @throw {String} Exception [internal error]
+ * @asynchronous: require PrivateJainSipClientConnector event listener implementation
+ * @param configuration JSON object
+ * @throw String Exception "bad argument, check API documentation"
+ * @throw String Exception "bad configuration, missing parameter"
+ * @throw String Exception "bad state, unauthorized action"
+ * @throw String Exception "internal error,check console logs"
  */ 
 PrivateJainSipClientConnector.prototype.open=function(configuration){
     console.debug("PrivateJainSipClientConnector:open()");
@@ -118,11 +133,13 @@ PrivateJainSipClientConnector.prototype.open=function(configuration){
 }
 
 /**
- * Close SIP client/User Agent, asynchronous action,closed event is notified to WebRtcClientComm
- * Open SIP Call/communication are closed
+ * Close 
  * @public 
- * @throw {String} Exception "bad state, unauthorized action"
- * @throw {String} Exception [internal error]
+ * @asynchronous: require PrivateJainSipClientConnector event listener implementation
+ * @throw String Exception "bad argument, check API documentation"
+ * @throw String Exception "bad configuration, missing parameter"
+ * @throw String Exception "bad state, unauthorized action"
+ * @throw String Exception "internal error,check console logs"
  */ 
 PrivateJainSipClientConnector.prototype.close=function(){
     console.debug("PrivateJainSipClientConnector:close()");
@@ -166,7 +183,10 @@ PrivateJainSipClientConnector.prototype.close=function(){
             else
             {
                 this.reset();
-                this.webRtcCommClient.onPrivateClientConnectorClosedEvent();
+                var that=this;
+                setTimeout(function(){
+                    that.webRtcCommClient.onClientConnectorClosedEvent();
+                },1);
             }
         }
         else
@@ -184,14 +204,15 @@ PrivateJainSipClientConnector.prototype.close=function(){
 /**
  * Create new CallConnector object
  * @public 
- * @param {WebRtcCommCall} webRtcCommCall connected "object"
- * @param {string} sipCallId  SIP call ID 
- * @throw {String} Exception "bad argument, check API documentation"
- * @throw {String} Exception "bad state, unauthorized action"
- * @throw {String} Exception [internal error]
+ * @param webRtcCommCall WebRtcCommCall
+ * @param sipCallId  String SIP 
+ * @throw String Exception "bad argument, check API documentation"
+ * @throw String Exception "bad configuration, missing parameter"
+ * @throw String Exception "bad state, unauthorized action"
+ * @throw String Exception "internal error,check console logs"
  */ 
-PrivateJainSipClientConnector.prototype.createPrivateCallConnector=function(webRtcCommCall, sipCallId){
-    console.debug("PrivateJainSipClientConnector:createPrivateCallConnector()");
+PrivateJainSipClientConnector.prototype.createCallConnector=function(webRtcCommCall, sipCallId){
+    console.debug("PrivateJainSipClientConnector:createCallConnector()");
     try
     {
         if(webRtcCommCall instanceof WebRtcCommCall)
@@ -204,28 +225,27 @@ PrivateJainSipClientConnector.prototype.createPrivateCallConnector=function(webR
             }
             else
             {   
-                console.error("PrivateJainSipClientConnector:createPrivateCallConnector(): bad state, unauthorized action");
-                throw "PrivateJainSipClientConnector:createPrivateCallConnector(): bad state, unauthorized action";    
+                console.error("PrivateJainSipClientConnector:createCallConnector(): bad state, unauthorized action");
+                throw "PrivateJainSipClientConnector:createCallConnector(): bad state, unauthorized action";    
             }
         }
         else
         {   
-            console.error("PrivateJainSipClientConnector:createPrivateCallConnector(): bad argument, check API documentation");
-            throw "PrivateJainSipClientConnector:createPrivateCallConnector(): bad argument, check API documentation"    
+            console.error("PrivateJainSipClientConnector:createCallConnector(): bad argument, check API documentation");
+            throw "PrivateJainSipClientConnector:createCallConnector(): bad argument, check API documentation"    
         }
     }
     catch(exception){
-        console.error("PrivateJainSipClientConnector:createPrivateCallConnector(): catched exception:"+exception);
+        console.error("PrivateJainSipClientConnector:createCallConnector(): catched exception:"+exception);
         throw exception;  
     }   
 }
 
-
 /**
- * Find a PrivateJainSipClientConnector object from its SIP call ID in the call table
+ * Find a WebRtcCommCall from its SIP call ID in the call table
  * @private
- * @param {string} sipCallId SIP call ID 
- * @return PrivateJainSipClientConnector object or undefined if not found
+ * @param sipCallId String
+ * @return WebRtcCommCall
  */ 
 PrivateJainSipClientConnector.prototype.findCallConnector=function(sipCallId){  
     console.debug("PrivateJainSipClientConnector:findCallConnector(): sipCallId="+sipCallId);
@@ -233,14 +253,16 @@ PrivateJainSipClientConnector.prototype.findCallConnector=function(sipCallId){
 }
 
 /**
- * Remove a PrivateJainSipClientConnector object  in the call table
+ * Find a WebRtcCommCall from its SIP call ID in the call table
  * @private
- * @param {string} sipCallId SIP SIP call ID
+ * @param SIP callId String
+ * @return WebRtcCommCall
  */ 
 PrivateJainSipClientConnector.prototype.removeCallConnector=function(sipCallId){  
     console.debug("PrivateJainSipClientConnector:removeCallConnector(): sipCallId="+sipCallId);
     delete this.callConnectors.sipCallId;
 }
+
 
 
 /**
@@ -273,19 +295,7 @@ PrivateJainSipClientConnector.prototype.resetSipRegisterContext=function(){
 /**
  * Check configuration 
  * @private
- * @param {object} configuration SIP user agent configuration
- * * <p> Client configuration sample: <br>
- * { <br>
- * <span style="margin-left: 30px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
- * <span style="margin-left: 30px">sipOutboundProxy:"ws://localhost:5082",<br></span>
- * <span style="margin-left: 30px">sipDomain:"sip.net",<br></span>
- * <span style="margin-left: 30px">sipUserName:"alice",<br></span>
- * <span style="margin-left: 30px">sipLogin:"alice@sip.net,<br></span>
- * <span style="margin-left: 30px">sipPassword:"1234567890",<br></span>
- * <span style="margin-left: 30px">sipApplicationProfile,<br></span>
- * <span style="margin-left: 30px">sipRegisterMode:true,<br></span>
- * }<br>
- *  </p>
+ * @param configuration JSON object
  * @return true configuration ok false otherwise
  */ 
 PrivateJainSipClientConnector.prototype.checkConfiguration=function(configuration){
@@ -357,8 +367,8 @@ PrivateJainSipClientConnector.prototype.checkConfiguration=function(configuratio
 }  
     
 /**
- * Implementation of JAIN SIP stack event listener interface: process WebSocket connection event
- * @public 
+ * JAIN SIP stack event listener interface implementation
+ * @private 
  */ 
 PrivateJainSipClientConnector.prototype.processConnected=function(){
     console.debug("PrivateJainSipClientConnector:processConnected()"); 
@@ -399,7 +409,7 @@ PrivateJainSipClientConnector.prototype.processConnected=function(){
             else
             {
                 this.openedFlag=true;
-                this.webRtcCommClient.onPrivateClientConnectorOpenedEvent();
+                this.webRtcCommClient.onClientConnectorOpenedEvent();
                 return;
             }
         }
@@ -410,25 +420,25 @@ PrivateJainSipClientConnector.prototype.processConnected=function(){
             
         // Open failed
         this.reset();
-        this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent();
+        this.webRtcCommClient.onClientConnectorOpenErrorEvent();
     }
     catch(exception){       
         this.reset();
-        this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent();
+        this.webRtcCommClient.onClientConnectorOpenErrorEvent();
         console.error("PrivateJainSipClientConnector:processConnected(): catched exception:"+exception);
     } 
 }   
 
 /**
- * Implementation of JAIN SIP stack event listener interface: process WebSocket disconnection/close event
- * @public
+ * JAIN SIP stack event listener interface SIPListener implementation 
+ * @private
  */     
 PrivateJainSipClientConnector.prototype.processDisconnected=function(){
     console.debug("PrivateJainSipClientConnector:processDisconnected(): SIP connectivity has been lost");  
     try
     { 
         this.reset();    
-        this.webRtcCommClient.onPrivateClientConnectorClosedEvent();
+        this.webRtcCommClient.onClientConnectorClosedEvent();
     }
     catch(exception){
         console.error("PrivateJainSipClientConnector:processDisconnected(): catched exception:"+exception);
@@ -436,16 +446,16 @@ PrivateJainSipClientConnector.prototype.processDisconnected=function(){
 }
 
 /**
- * Implementation of JAIN SIP stack event listener interface: process WebSocket connection error event
- * @public 
- * @param {string} error WebSocket connection error
+ * JAIN SIP stack event listener interface SIPListener implementation
+ * @private 
+ * @param error
  */ 
 PrivateJainSipClientConnector.prototype.processConnectionError=function(error){
     console.war("PrivateJainSipClientConnector:processConnectionError(): SIP connection has failed, error:"+error);
     try
     {
         this.reset();
-        this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent();
+        this.webRtcCommClient.onClientConnectorOpenErrorEvent();
     }
     catch(exception){
         console.error("PrivateJainSipClientConnector:processConnectionError(): catched exception:"+exception);  
@@ -453,9 +463,9 @@ PrivateJainSipClientConnector.prototype.processConnectionError=function(error){
 }
 
 /**
- * Implementation of JAIN SIP stack event listener interface: process SIP request event
- * @public 
- * @param {RequestEvent} requestEvent JAIN SIP request event
+ * JAIN SIP stack event listener interface implementation
+ * @private 
+ * @param requestEvent RequestEvent
  */ 
 PrivateJainSipClientConnector.prototype.processRequest=function(requestEvent){
     console.debug("PrivateJainSipClientConnector:processRequest()");        
@@ -469,7 +479,7 @@ PrivateJainSipClientConnector.prototype.processRequest=function(requestEvent){
         } 
         else 
         {
-            // Find related PrivateJainSipCallConnector (subsequent request)
+            // Find related WebRTC dialog
             var sipCallId = jainSipRequest.getCallId().getCallId();
             var callConnector = this.findCallConnector(sipCallId);
             if(callConnector)
@@ -482,15 +492,13 @@ PrivateJainSipClientConnector.prototype.processRequest=function(requestEvent){
                 {
                     // Incoming SIP Call
                     var newWebRtcCommCall = new WebRtcCommCall(this.webRtcCommClient);
-                    newWebRtcCommCall.connector=this.createPrivateCallConnector(newWebRtcCommCall, sipCallId); 
-                    newWebRtcCommCall.id=newWebRtcCommCall.connector.getId();
+                    newWebRtcCommCall.connector=this.createCallConnector(newWebRtcCommCall, sipCallId); 
                     newWebRtcCommCall.connector.sipCallState=PrivateJainSipCallConnector.prototype.SIP_INVITED_INITIAL_STATE;
                     newWebRtcCommCall.connector.onJainSipClientConnectorSipRequestEvent(requestEvent);
                 }
                 else
                 {
-                    console.warn("PrivateJainSipClientConnector:processRequest(): SIP request ignored"); 
-                //@todo Should send SIP response 404 NOT FOUND or 501 NOT_IMPLEMENTED 
+                    console.warn("PrivateJainSipClientConnector:processRequest(): related WebRtcCommCall not found, SIP response ignored"); 
                 }
             }
         }
@@ -502,9 +510,9 @@ PrivateJainSipClientConnector.prototype.processRequest=function(requestEvent){
 
 
 /**
- * Implementation of JAIN SIP stack event listener interface: process SIP response event
- * @public 
- * @param {ResponseEvent} responseEvent JAIN SIP response event
+ * JAIN SIP stack event listener interface implementation
+ * @private 
+ * @param responseEvent ResponseEvent
  */ 
 PrivateJainSipClientConnector.prototype.processResponse=function(responseEvent){
     console.debug("PrivateJainSipClientConnector:processResponse()");   
@@ -517,7 +525,7 @@ PrivateJainSipClientConnector.prototype.processResponse=function(responseEvent){
         }
         else 
         {
-            // Find related PrivateJainSipCallConnector
+            // Find related WebRTC INVITE dialog
             var callConnector = this.findCallConnector(jainSipResponse.getCallId().getCallId());
             if(callConnector)
             {
@@ -525,7 +533,7 @@ PrivateJainSipClientConnector.prototype.processResponse=function(responseEvent){
             }
             else
             {
-                console.warn("PrivateJainSipClientConnector:processResponse(): PrivateJainSipCallConnector not found, SIP response ignored");  
+                console.warn("PrivateJainSipClientConnector:processResponse(): related WebRtcCommCall not found, SIP response ignored");  
             }
         }
     }
@@ -535,52 +543,52 @@ PrivateJainSipClientConnector.prototype.processResponse=function(responseEvent){
 }
    
 /**
- * Implementation of JAIN SIP stack event listener interface: process SIP transaction terminated event
- * @public 
+ * JAIN SIP stack event listener interface SIPListener implementation
+ * @private 
  */ 
 PrivateJainSipClientConnector.prototype.processTransactionTerminated=function(){
     console.debug("PrivateJainSipClientConnector:processTransactionTerminated()");   
 }   
     
 /**
- * Implementation of JAIN SIP stack event listener interface: process SIP dialog terminated event
- * @public 
+ * JAIN SIP stack event listener interface SIPListener implementation
+ * @private 
  */ 
 PrivateJainSipClientConnector.prototype.processDialogTerminated=function(){
     console.debug("PrivateJainSipClientConnector:processDialogTerminated()"); 
 }
     
 /**
- * Implementation of JAIN SIP stack event listener interface: process I/O websocket  error event
- * @public 
- * @param {ExceptionEvent} exceptionEvent JAIN SIP exception event 
+ * JAIN SIP stack event listener interface SIPListener implementation
+ * @private 
+ * @param exceptionEvent ExceptionEvent
  */ 
 PrivateJainSipClientConnector.prototype.processIOException=function(exceptionEvent){
     console.error("PrivateJainSipClientConnector:processIOException(): exceptionEvent="+exceptionEvent.message);  
 }
 
 /**
- * Implementation of JAIN SIP stack event listener interface: process SIP Dialog Timeout event
- * @public 
- * @param {TimeoutEvent} timeoutEvent JAIN SIP timeout event
+ * JAIN SIP stack event listener interface SIPListener implementation
+ * @private 
+ * @param timeoutEvent TimeoutEvent
  */ 
 PrivateJainSipClientConnector.prototype.processTimeout=function(timeoutEvent){
     console.debug("PrivateJainSipClientConnector:processTimeout():timeoutEvent="+timeoutEvent);
     try
     {
         var sipClientTransaction = timeoutEvent.getClientTransaction();
-        // Find related PrivateJainSipCallConnector
+        // Find related WebRTC INVITE dialog
         var sipCallId=sipClientTransaction.getDialog().getCallId().getCallId();
         var callConnector = this.findCallConnector(sipCallId,false);
         if(callConnector)
         {
-            callConnector.onJainSipClientConnectorSipTimeoutEvent(timeoutEvent);   
+            callConnector.webRtcCommCall.onPrivateCallConnectorCallOpenErrorEvent("Request Timeout");     
         }
         else if(this.jainSipRegisterSentRequest.getCallId().getCallId()==sipCallId)
         {
             console.error("PrivateJainSipClientConnector:processTimeout(): SIP registration failed, request timeout, no response from SIP server") 
             this.reset();
-            this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent("Request Timeout"); 
+            this.webRtcCommClient.onClientConnectorOpenErrorEvent("Request Timeout"); 
         }
         else
         {
@@ -595,6 +603,7 @@ PrivateJainSipClientConnector.prototype.processTimeout=function(timeoutEvent){
 /**
  * SIP REGISTER refresh timeout
  * @private 
+ * @throw Exception "bad state"
  */ 
 PrivateJainSipClientConnector.prototype.onSipRegisterTimeout=function(){
     console.debug("PrivateJainSipClientConnector:onSipRegisterTimeout()");
@@ -625,7 +634,7 @@ PrivateJainSipClientConnector.prototype.onSipRegisterTimeout=function(){
 /**
  * SIP REGISTER state machine
  * @private 
- * @param {ResponseEvent} responseEvent JAIN SIP response to process
+ * @param responseEvent ResponseEvent
  */ 
 PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(responseEvent){
     console.debug ("PrivateJainSipClientConnector:processSipRegisterResponse(): this.sipRegisterState="+this.sipRegisterState);  
@@ -638,7 +647,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
     }
     else if((this.sipRegisterState==this.SIP_REGISTERING_STATE) || (this.sipRegisterState==this.SIP_REGISTER_REFRESHING_STATE))
     {   
-        if(statusCode < 200)
+        if(statusCode &lt; 200)
         {
             console.debug("PrivateJainSipClientConnector:processSipRegisterResponse(): 1XX response ignored"); 
         }
@@ -662,7 +671,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
                 // Authentification required but not SIP credentials in SIP profile
                 console.error("PrivateJainSipClientConnector:processSipRegisterResponse(): SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine()) 
                 this.reset();
-                this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent();
+                this.webRtcCommClient.onClientConnectorOpenErrorEvent();
             }
         }
         else if(statusCode==200)
@@ -671,7 +680,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
             if(this.openedFlag==false)
             {
                 this.openedFlag=true;
-                this.webRtcCommClient.onPrivateClientConnectorOpenedEvent();
+                this.webRtcCommClient.onClientConnectorOpenedEvent();
             }           
             
             if(this.sipUnregisterPendingFlag==true) {
@@ -704,12 +713,12 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
         {
             console.error("PrivateJainSipClientConnector:processSipRegisterResponse(): SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine()) 
             this.reset();
-            this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent();
+            this.webRtcCommClient.onClientConnectorOpenErrorEvent();
         }
     }                     
     else if(this.sipRegisterState==this.SIP_REGISTERING_401_STATE)
     {
-        if(statusCode < 200)
+        if(statusCode &lt; 200)
         {
         //  No temporary response for SIP REGISTER request 
         }
@@ -720,7 +729,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
             {
                 console.debug("PrivateJainSipClientConnector:processSipRegisterResponse(): this.openedFlag=true"); 
                 this.openedFlag=true;
-                this.webRtcCommClient.onPrivateClientConnectorOpenedEvent();
+                this.webRtcCommClient.onClientConnectorOpenedEvent();
             }
             
             if(this.sipUnregisterPendingFlag==true) {
@@ -753,7 +762,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
         {
             console.error("PrivateJainSipClientConnector:processSipRegisterResponse(): SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
             this.reset();
-            this.webRtcCommClient.onPrivateClientConnectorErrorEvent();
+            this.webRtcCommClient.onClientConnectorErrorEvent();
         } 
     }
     else if(this.sipRegisterState==this.SIP_REGISTERED_STATE)
@@ -762,7 +771,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
     }
     else if(this.sipRegisterState==this.SIP_UNREGISTERING_STATE)
     {
-        if(statusCode< 200)
+        if(statusCode&lt; 200)
         {
         //  Not temporary response for SIP REGISTER request  
         }
@@ -782,31 +791,31 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
         else if(statusCode==200)
         {
             this.reset();
-            this.webRtcCommClient.onPrivateClientConnectorClosedEvent();
+            this.webRtcCommClient.onClientConnectorClosedEvent();
         }
         else
         {
             console.error("PrivateJainSipClientConnector:processSipRegisterResponse(): SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());  
             this.reset();
-            this.webRtcCommClient.onPrivateClientConnectorClosedEvent();
+            this.webRtcCommClient.onClientConnectorClosedEvent();
         }
     }
     else if(this.sipRegisterState==this.SIP_UNREGISTERING_401_STATE)
     {
-        if(statusCode< 200)
+        if(statusCode&lt; 200)
         { 
         //  Not temporary response for SIP REGISTER request 
         }
         else if(statusCode==200)
         {
             this.reset();
-            this.webRtcCommClient.onPrivateClientConnectorClosedEvent();
+            this.webRtcCommClient.onClientConnectorClosedEvent();
         }
         else
         {
             console.error("PrivateJainSipClientConnector:processSipRegisterResponse(): SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
             this.reset();
-            this.webRtcCommClient.onPrivateClientConnectorClosedEvent();
+            this.webRtcCommClient.onClientConnectorClosedEvent();
         }
     }
     else if(this.sipRegisterState==this.SIP_UNREGISTERED_STATE)
@@ -820,8 +829,8 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
 }
 
 /**
- * Handle SIP OPTIONS RESPONSE (default behaviour: send 200 OK response)                  
- * @param {RequestEvent} requestEvent JAIN SIP request event to process
+ *  Handle SIP OPTIONS RESPONSE (default behaviour: send 200OK repsonse)                  
+ * @param requestEvent RequestEvent
  * @private 
  */ 
 PrivateJainSipClientConnector.prototype.processSipOptionRequest=function(requestEvent){
@@ -837,3 +846,25 @@ PrivateJainSipClientConnector.prototype.processSipOptionRequest=function(request
     jainSip200OKResponse.removeHeader("P-Called-Party-ID");
     requestEvent.getServerTransaction().sendResponse(jainSip200OKResponse);
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Modules</h3><ul><li><a href="module-WebRtcComm.html">WebRtcComm</a></li></ul><h3>Classes</h3><ul><li><a href="32c9aa3017.html">PrivateJainSipCallConnector</a></li><li><a href="PrivateJainSipClientConnector.html">PrivateJainSipClientConnector</a></li><li><a href="WebRtcCommCall.html">WebRtcCommCall</a></li><li><a href="WebRtcCommClient.html">WebRtcCommClient</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Feb 15 2013 17:28:30 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+</body>
+</html>
