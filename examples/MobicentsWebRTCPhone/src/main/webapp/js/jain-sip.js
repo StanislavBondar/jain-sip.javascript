@@ -20845,9 +20845,8 @@ ParserFactory.prototype.put =function(table,name, value){
  *  @version 1.0 
  *   
  */
-function WSMsgParser(sipstack,data) {
+function WSMsgParser(sipstack) {
     this.classname="WSMsgParser"; 
-    this.data=data;
     this.peerProtocol=null;
     this.messageProcessor = null;
     this.sipStack=sipstack;
@@ -20856,10 +20855,10 @@ function WSMsgParser(sipstack,data) {
 WSMsgParser.prototype.RPORT="rport";
 WSMsgParser.prototype.RECEIVED="received";
 
-WSMsgParser.prototype.parsermessage =function(requestsent){
+WSMsgParser.prototype.parsermessage =function(sipMessage){
     var smp = new StringMsgParser();
-    var sipMessage = smp.parseSIPMessage(this.data);
-    var cl =  sipMessage.getContentLength();
+    var parsedSipMessage = smp.parseSIPMessage(sipMessage);
+    var cl =  parsedSipMessage.getContentLength();
     var contentLength = 0;
     if (cl != null) {
         contentLength = cl.getContentLength();
@@ -20868,22 +20867,22 @@ WSMsgParser.prototype.parsermessage =function(requestsent){
         contentLength = 0;
     }
     if (contentLength == 0) {
-        sipMessage.removeContent();
+        parsedSipMessage.removeContent();
     } 
-    console.info("SIP message received: "+sipMessage.encode());
-    this.processMessage(sipMessage,requestsent);
+    console.info("SIP message received: "+parsedSipMessage.encode());
+    this.processMessage(parsedSipMessage);
 }
 
-WSMsgParser.prototype.processMessage =function(sipMessage,requestSent){
-    if (sipMessage.getFrom() == null
-        ||  sipMessage.getTo() == null || sipMessage.getCallId() == null
-        || sipMessage.getCSeq() == null || sipMessage.getViaHeaders() == null) {
+WSMsgParser.prototype.processMessage =function(parsedSipMessage){
+    if (parsedSipMessage.getFrom() == null
+        ||  parsedSipMessage.getTo() == null || parsedSipMessage.getCallId() == null
+        || parsedSipMessage.getCSeq() == null || parsedSipMessage.getViaHeaders() == null) {
         return;
     }
     var channel=this.getSIPStack().getChannel();
-    if (sipMessage instanceof SIPRequest) {
+    if (parsedSipMessage instanceof SIPRequest) {
         this.peerProtocol = "WS";
-        var sipRequest =  sipMessage;
+        var sipRequest =  parsedSipMessage;
         var sipServerRequest = this.sipStack.newSIPServerRequest(sipRequest, channel);
         if (sipServerRequest != null) 
         {
@@ -20891,7 +20890,7 @@ WSMsgParser.prototype.processMessage =function(sipMessage,requestSent){
         }//i delete all parts of logger 
     } 
     else {
-        var sipResponse = sipMessage;
+        var sipResponse = parsedSipMessage;
         try {
             sipResponse.checkHeaders();
         } catch (ex) {
@@ -21177,6 +21176,8 @@ SIPMessage.prototype.RECORDROUTE_LOWERCASE="record-route";
 SIPMessage.prototype.CONTENT_DISPOSITION_LOWERCASE="content-disposition";
 SIPMessage.prototype.EXPIRES_LOWERCASE="expires";
 
+SIPMessage.prototype.listMap = new ListMap();
+
 SIPMessage.prototype.isRequestHeader =function(sipHeader){
     if(sipHeader instanceof Authorization || sipHeader instanceof MaxForwards
         || sipHeader instanceof UserAgent|| sipHeader instanceof ProxyAuthorization
@@ -21344,10 +21345,9 @@ SIPMessage.prototype.attachHeaderargu3 =function(header, replaceFlag, top){
         throw "MessageFactoryImpl:attachHeaderargu3(): null header!";
     }
     var h=null;
-    var listmap=new ListMap();
-    if(listmap.hasList(header) && !(header instanceof SIPHeaderList))
+    if(SIPMessage.prototype.listMap.hasList(header) && !(header instanceof SIPHeaderList))
     {
-        var hdrList = listmap.getList(header);
+        var hdrList = SIPMessage.prototype.listMap.getList(header);
         hdrList.add(header);
         h = hdrList;
     }
@@ -21407,7 +21407,7 @@ SIPMessage.prototype.attachHeaderargu3 =function(header, replaceFlag, top){
     else 
     {
         if (h instanceof SIPHeaderList) {
-            var hdrlist =  this.nameTable[l][0];
+            var hdrlist =  this.nameTable[l][1];
             if (hdrlist != null)
             {
                 hdrlist.concatenate(h, top);
@@ -26040,7 +26040,6 @@ DefaultRouter.prototype.getNextHops =function(request){
  */
 function WSMessageChannel() {
     this.classname="WSMessageChannel"; 
-    this.myParser=null;
     this.key=null;
     this.isCached=null;
     this.isRunning=null;
@@ -26062,6 +26061,7 @@ function WSMessageChannel() {
         this.wsurl=this.messageProcessor.getURLWS();
         this.websocket=this.createWebSocket(this.wsurl);
     }
+    this.wsMsgParser=new WSMsgParser(this.sipStack);
 }
 
 WSMessageChannel.prototype.isReliable =function(){
@@ -26070,32 +26070,43 @@ WSMessageChannel.prototype.isReliable =function(){
 
 WSMessageChannel.prototype.createWebSocket =function(wsurl){
     this.websocket=new WebSocket(wsurl,"sip");
-    var wsmc=this;
+    this.websocket.binaryType='arraybuffer'
+    var that=this;
     this.websocket.onclose=function()
     {
-        console.warn("WSMessageChannel:createWebSocket(): the websocket is closed, reconnecting...");
-        wsmc.sipStack.sipListener.processDisconnected();
-        wsmc.websocket=null;
+        console.warn("WSMessageChannel:createWebSocket(): the websocket is closed");
+        that.sipStack.sipListener.processDisconnected();
+        that.websocket=null;
         this.alive=false;
     }
     
     this.websocket.onopen=function()
     {
         console.info("WSMessageChannel:createWebSocket(): the websocket is opened");
-        wsmc.sipStack.sipListener.processConnected();
+        that.sipStack.sipListener.processConnected();
     }
     
     this.websocket.onerror=function(error)
     {
         console.error("WSMessageChannel:createWebSocket(): websocket connection has failed:"+error);
-        wsmc.sipStack.sipListener.processConnectionError(error);
+        that.sipStack.sipListener.processConnectionError(error);
     }
     
     this.websocket.onmessage=function(event)
     {
-        var data=event.data;
-        wsmc.myParser=new WSMsgParser(wsmc.sipStack,data);
-        wsmc.myParser.parsermessage(wsmc.requestsent); 
+        if(event.data instanceof ArrayBuffer)
+        {
+            var sipMessage = String.fromCharCode.apply(null,new Uint8Array(event.data))
+            that.wsMsgParser.parsermessage(sipMessage);
+        } 
+        else if(typeof(event.data) == 'string')
+        {
+            that.wsMsgParser.parsermessage(event.data);
+        }
+        else 
+        {
+           console.error("WSMessageChannel:onmessage(): bad data object type, event ignored");     
+        }
     }
     return this.websocket;
 }
@@ -27224,24 +27235,19 @@ SIPDialog.prototype.addRouteList =function(recordRouteList){
         {
             var rr = recordRouteList.getHeaderList()[i];
             var route = new Route();
-            var address =  rr.getAddress();
-
-            route.setAddress(address);
+            route.setAddress(rr.getAddress());
             route.setParameters(rr.getParameters());
             this.routeList.add(route);
         }
     } 
     else {
         this.routeList = new RouteList();
-        for(i=0;i<recordRouteList.length;i--)
+        for(i=0;i<recordRouteList.getHeaderList().length;i--)
         {
-            rr = recordRouteList[i];
-            route = new Route();
-            address =  rr.getAddress();
-
-            route.setAddress(address);
+            var rr = recordRouteList.getHeaderList()[i];
+            var route = new Route();
+            route.setAddress( rr.getAddress());
             route.setParameters(rr.getParameters());
-
             this.routeList.add(route);
         }
     }
@@ -29119,11 +29125,11 @@ SIPClientTransaction.prototype.createAck =function(){
     }
     ackRequest.removeHeader(this.RouteHeader);
     var routeList = new RouteList();
-    for(var i=recordRouteList.length-1;i>=0;i--)
+    for(var i=recordRouteList.getHeaderList().length-1;i>=0;i--)
     {
-        var rr =  recordRouteList[i];
+        var rr =  recordRouteList.getHeaderList()[i];
         var route = new Route();
-        route.setAddressrr.getAddress();
+        route.setAddress(rr.getAddress());
         route.setParameters(rr.getParameters());
         routeList.add(route);
     }
