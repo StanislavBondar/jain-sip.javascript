@@ -27686,7 +27686,7 @@ WSMessageChannel.prototype.createWebSocket =function(wsurl){
     var that=this;
     this.websocket.onclose=function()
     {
-        console.warn("WSMessageChannel:createWebSocket(): the websocket is closed, reconnecting...");
+        console.warn("WSMessageChannel:createWebSocket(): the websocket is closed");
         that.sipStack.sipListener.processDisconnected();
         that.websocket=null;
         this.alive=false;
@@ -28931,24 +28931,19 @@ SIPDialog.prototype.addRouteList =function(recordRouteList){
         {
             var rr = recordRouteList.getHeaderList()[i];
             var route = new Route();
-            var address =  rr.getAddress();
-
-            route.setAddress(address);
+            route.setAddress(rr.getAddress());
             route.setParameters(rr.getParameters());
             this.routeList.add(route);
         }
     } 
     else {
         this.routeList = new RouteList();
-        for(i=0;i<recordRouteList.length;i--)
+        for(i=0;i<recordRouteList.getHeaderList().length;i--)
         {
-            rr = recordRouteList[i];
-            route = new Route();
-            address =  rr.getAddress();
-
-            route.setAddress(address);
+            var rr = recordRouteList.getHeaderList()[i];
+            var route = new Route();
+            route.setAddress( rr.getAddress());
             route.setParameters(rr.getParameters());
-
             this.routeList.add(route);
         }
     }
@@ -30971,11 +30966,11 @@ SIPClientTransaction.prototype.createAck =function(){
     }
     ackRequest.removeHeader(this.RouteHeader);
     var routeList = new RouteList();
-    for(var i=recordRouteList.length-1;i>=0;i--)
+    for(var i=recordRouteList.getHeaderList().length-1;i>=0;i--)
     {
-        var rr =  recordRouteList[i];
+        var rr =  recordRouteList.getHeaderList()[i];
         var route = new Route();
-        route.setAddressrr.getAddress();
+        route.setAddress(rr.getAddress());
         route.setParameters(rr.getParameters());
         routeList.add(route);
     }

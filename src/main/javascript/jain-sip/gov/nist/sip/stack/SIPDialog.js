@@ -825,24 +825,19 @@ SIPDialog.prototype.addRouteList =function(recordRouteList){
         {
             var rr = recordRouteList.getHeaderList()[i];
             var route = new Route();
-            var address =  rr.getAddress();
-
-            route.setAddress(address);
+            route.setAddress(rr.getAddress());
             route.setParameters(rr.getParameters());
             this.routeList.add(route);
         }
     } 
     else {
         this.routeList = new RouteList();
-        for(i=0;i<recordRouteList.length;i--)
+        for(i=0;i<recordRouteList.getHeaderList().length;i--)
         {
-            rr = recordRouteList[i];
-            route = new Route();
-            address =  rr.getAddress();
-
-            route.setAddress(address);
+            var rr = recordRouteList.getHeaderList()[i];
+            var route = new Route();
+            route.setAddress( rr.getAddress());
             route.setParameters(rr.getParameters());
-
             this.routeList.add(route);
         }
     }

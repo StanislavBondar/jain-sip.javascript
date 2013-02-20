@@ -66,7 +66,7 @@ WSMessageChannel.prototype.createWebSocket =function(wsurl){
     var that=this;
     this.websocket.onclose=function()
     {
-        console.warn("WSMessageChannel:createWebSocket(): the websocket is closed, reconnecting...");
+        console.warn("WSMessageChannel:createWebSocket(): the websocket is closed");
         that.sipStack.sipListener.processDisconnected();
         that.websocket=null;
         this.alive=false;

@@ -616,11 +616,11 @@ SIPClientTransaction.prototype.createAck =function(){
     }
     ackRequest.removeHeader(this.RouteHeader);
     var routeList = new RouteList();
-    for(var i=recordRouteList.length-1;i>=0;i--)
+    for(var i=recordRouteList.getHeaderList().length-1;i>=0;i--)
     {
-        var rr =  recordRouteList[i];
+        var rr =  recordRouteList.getHeaderList()[i];
         var route = new Route();
-        route.setAddressrr.getAddress();
+        route.setAddress(rr.getAddress());
         route.setParameters(rr.getParameters());
         routeList.add(route);
     }
