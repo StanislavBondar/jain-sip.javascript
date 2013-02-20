@@ -68,6 +68,8 @@ SIPMessage.prototype.RECORDROUTE_LOWERCASE="record-route";
 SIPMessage.prototype.CONTENT_DISPOSITION_LOWERCASE="content-disposition";
 SIPMessage.prototype.EXPIRES_LOWERCASE="expires";
 
+SIPMessage.prototype.listMap = new ListMap();
+
 SIPMessage.prototype.isRequestHeader =function(sipHeader){
     if(logger!=undefined) logger.debug("SIPMessage:isRequestHeader():sipHeader="+sipHeader.classname);
     if(sipHeader instanceof Authorization || sipHeader instanceof MaxForwards
@@ -247,10 +249,9 @@ SIPMessage.prototype.attachHeaderargu3 =function(header, replaceFlag, top){
         throw "MessageFactoryImpl:attachHeaderargu3(): null header!";
     }
     var h=null;
-    var listmap=new ListMap();
-    if(listmap.hasList(header) && !(header instanceof SIPHeaderList))
+    if(SIPMessage.prototype.listMap.hasList(header) && !(header instanceof SIPHeaderList))
     {
-        var hdrList = listmap.getList(header);
+        var hdrList = SIPMessage.prototype.listMap.getList(header);
         hdrList.add(header);
         h = hdrList;
     }
@@ -310,7 +311,7 @@ SIPMessage.prototype.attachHeaderargu3 =function(header, replaceFlag, top){
     else 
     {
         if (h instanceof SIPHeaderList) {
-            var hdrlist =  this.nameTable[l][0];
+            var hdrlist =  this.nameTable[l][1];
             if (hdrlist != null)
             {
                 hdrlist.concatenate(h, top);
