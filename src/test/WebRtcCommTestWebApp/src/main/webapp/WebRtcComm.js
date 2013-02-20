@@ -27,7 +27,10 @@
  * API on top of the opensource JAIN SIP JavaScript Stack (implementing transport of SIP over WebSocket). 
  * By using a convergent HTTP/SIP Application Server (e.g. Mobicents MSS) or directly access a 
  * SIP server (e.g. Asterisk), the web developer can rapidly and easily link his web site to a 
- * telephony infrastructure. 
+ * telephony infrastructure.<br> 
+ * 
+ * A simple test web application of the WebRtcComm Framework can be found 
+ * <a href="http://code.google.com/p/jain-sip/source/browse/?repo=javascript#git%2Fsrc%2Ftest%2FWebRtcCommTestWebApp">here</a>
  * 
  * @module WebRtcComm 
  * @author Laurent STRULLU (laurent.strullu@orange.com) 
@@ -35,7 +38,7 @@
 
 /**
  * @class PrivateJainSipCallConnector
- * @public
+ * @private
  * @classdesc Private framework class handling  SIP client/user call control: ringing, ringing back, accept, reject, cancel, bye 
  * @constructor
  * @param {WebRtcCommCall} webRtcCommCall WebRtcCommCall "connected" object
@@ -844,7 +847,7 @@ PrivateJainSipCallConnector.prototype.processInvitedSipResponseEvent =function(r
  * @class PrivateJainSipClientConnector
  * @classdesc Private framework class handling  SIP client/user agent control 
  * @constructor 
- * @public
+ * @private
  * @param {WebRtcCommClient} webRtcCommClient "connected" WebRtcCommClient object 
  * @throw {String} Exception "bad argument"
  * @author Laurent STRULLU (laurent.strullu@orange.com) 
@@ -1595,7 +1598,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
         {
             console.error("PrivateJainSipClientConnector:processSipRegisterResponse(): SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
             this.reset();
-            this.webRtcCommClient.onPrivateClientConnectorErrorEvent();
+            this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent();
         } 
     }
     else if(this.sipRegisterState==this.SIP_REGISTERED_STATE)

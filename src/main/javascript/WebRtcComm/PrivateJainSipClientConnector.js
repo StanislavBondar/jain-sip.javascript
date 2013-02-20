@@ -753,7 +753,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
         {
             console.error("PrivateJainSipClientConnector:processSipRegisterResponse(): SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
             this.reset();
-            this.webRtcCommClient.onPrivateClientConnectorErrorEvent();
+            this.webRtcCommClient.onPrivateClientConnectorOpenErrorEvent();
         } 
     }
     else if(this.sipRegisterState==this.SIP_REGISTERED_STATE)
