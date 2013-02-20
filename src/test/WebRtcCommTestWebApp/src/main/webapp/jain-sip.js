@@ -26527,6 +26527,7 @@ function SIPDialog() {
     this.reInviteWaitTime = 100;
     this.dialogDeleteTask=null;
     this.timerdelete=null;
+    this.dialogDeleteIfNoAckSentTask=null;
     this.isAcknowledged=null;
     this.highestSequenceNumberAcknowledged = -1;
     this.isBackToBackUserAgent=null;
@@ -26615,54 +26616,60 @@ SIPDialog.prototype.TIMER_H=64;
 SIPDialog.prototype.TIMER_J=64;
 SIPDialog.prototype.BASE_TIMER_INTERVAL=500;
 
-SIPDialog.prototype.lingerTimerDialog=function (){
+var timer=this.timer;
+var sipdialog=null;
+var variabletransaction=null;
+var variabledialog=null;
+var variablereinvite=null;
+function lingerTimerDialog(){
+    var dialog = sipdialog;
     if (this.eventListeners != null) {
-        this.eventListeners=new Array();
+        this.eventListeners.clear();
     }
     this.timerTaskLock = null;
-    this.sipStack.removeDialog(this);
+    dialog.sipStack.removeDialog(dialog);
 }
-
-SIPDialog.prototype.dialogDeleteTask=function (){
-    this.dialogDeleteTask=null;
+function DialogDeleteTask(){
+    sipdialog.dialogDeleteTask=null;
 }
-
-
-SIPDialog.prototype.dialogTimerTask = function(transaction){
+function DialogTimerTask(){
     this.transaction=null;
-    if(transaction!=null)
+    if(variabletransaction!=null)
     {
-        this.transaction = transaction;
+        this.transaction = variabletransaction;
     }
-    if ((!this.ackSeen) && (transaction != null)) {
+    var dialog = sipdialog;
+    var transaction = sipdialog.transaction;
+    if ((!dialog.ackSeen) && (transaction != null)) {
         var response = transaction.getLastResponse();
         if (response.getStatusCode() == 200) {
             transaction.fireTimer();
         }
     }
-    if (this.isAckSeen() || this.dialogState == 2) {
-        this.transaction = null;
-        clearTimeout(this.timer);
+    if (dialog.isAckSeen() || dialog.dialogState == 2) {
+        sipdialog.transaction = null;
+        clearTimeout(sipdialog.timer);
     }
 }
 
-SIPDialog.prototype.dialogDeleteIfNoAckSentTask=function(seqno){
+function DialogDeleteIfNoAckSentTask(seqno){
     this.seqno = seqno;
-    if (this.highestSequenceNumberAcknowledged < seqno) {
-        this.timer = null;
-        if (!this.isBackToBackUserAgent) {
-            if (this.sipProvider.getSipListener() instanceof SipListener) {
+    var dialog = sipdialog;
+    if (dialog.highestSequenceNumberAcknowledged < seqno) {
+        dialog.dialogDeleteIfNoAckSentTask = null;
+        if (!dialog.isBackToBackUserAgent) {
+            if (dialog.sipProvider.getSipListener() instanceof SipListener) {
                 this.raiseErrorEvent(SIPDialogErrorEvent.DIALOG_ACK_NOT_SENT_TIMEOUT);
             } else {
                 this.delet();
             }
         } else {
-            if (this.sipProvider.getSipListener() instanceof SipListener) {
+            if (dialog.sipProvider.getSipListener() instanceof SipListener) {
                 this.raiseErrorEvent(SIPDialogErrorEvent.DIALOG_ACK_NOT_SENT_TIMEOUT);
             } 
             else {
                 try {
-                    var byeRequest = this.createRequest("BYE");
+                    var byeRequest = dialog.createRequest("BYE");
                     var mfi=new MessageFactoryImpl();
                     if (mfi.getDefaultUserAgentHeader() != null) {
                         byeRequest.addHeader(mfi.getDefaultUserAgentHeader());
@@ -26672,18 +26679,17 @@ SIPDialog.prototype.dialogDeleteIfNoAckSentTask=function(seqno){
                     reasonHeader.setCause(1025);
                     reasonHeader.setText("Timed out waiting to send ACK");
                     byeRequest.addHeader(reasonHeader);
-                    var byeCtx = this.getSipProvider().getNewClientTransaction(byeRequest);
-                    this.sendRequest(byeCtx);
+                    var byeCtx = dialog.getSipProvider().getNewClientTransaction(byeRequest);
+                    dialog.sendRequest(byeCtx);
                     return;
                 } catch (ex) {
                     console.error("SIPDialog:DialogDeleteIfNoAckSentTask(): catched exception:"+ex);
-                    this.delet();
+                    dialog.delet();
                 }
             }
         }
     }
 }
-
 
 SIPDialog.prototype.ackReceived =function(sipRequest){
     if (this.ackSeen) {
@@ -26720,10 +26726,8 @@ SIPDialog.prototype.setState =function(state){
     if (state == this.TERMINATED_STATE) {
         if (this.sipStack.getTimer() != null) { 
             this.timer=this.sipStack.getTimer();
-            var sipdialog=this;
-            this.timer=setTimeout(function(){
-            sipdialog.lingerTimerDialog();
-        }, this.DIALOG_LINGER_TIME * 1000);
+            sipdialog=this;
+            this.timer=setTimeout("lingerTimerDialog()", this.DIALOG_LINGER_TIME * 1000);
         }
     }
 }
@@ -27230,24 +27234,19 @@ SIPDialog.prototype.addRouteList =function(recordRouteList){
         {
             var rr = recordRouteList.getHeaderList()[i];
             var route = new Route();
-            var address =  rr.getAddress();
-
-            route.setAddress(address);
+            route.setAddress(rr.getAddress());
             route.setParameters(rr.getParameters());
             this.routeList.add(route);
         }
     } 
     else {
         this.routeList = new RouteList();
-        for(i=0;i<recordRouteList.length;i--)
+        for(i=0;i<recordRouteList.getHeaderList().length;i--)
         {
-            rr = recordRouteList[i];
-            route = new Route();
-            address =  rr.getAddress();
-
-            route.setAddress(address);
+            var rr = recordRouteList.getHeaderList()[i];
+            var route = new Route();
+            route.setAddress( rr.getAddress());
             route.setParameters(rr.getParameters());
-
             this.routeList.add(route);
         }
     }
@@ -27320,9 +27319,9 @@ SIPDialog.prototype.doDeferredDelete =function(){
         this.setState(this.TERMINATED_STATE);
     } else {
         this.timerdelete=this.sipStack.getTimer();
-        var sipdialog=this;
+        sipdialog=this;
         this.timerdelete=setTimeout(function(){
-            sipdialog.dialogDeleteTask();
+            sipdialog.dialogDeleteTask = new DialogDeleteTask();
         },this.TIMER_H * this.BASE_TIMER_INTERVAL);
     }
 }
@@ -27640,11 +27639,12 @@ SIPDialog.prototype.startTimer =function(transaction){
     if (this.timerTask != null) {
         this.timerTask.transaction = transaction;
     } else {
+        variabletransaction=transaction;
         this.timer=this.sipStack.getTimer();
-        var sipdialog=this;
+        sipdialog=this;
         this.timer=setTimeout(function(){
             sipdialog.timer=setInterval(function(){
-                sipdialog.dialogTimerTask(transaction);
+                sipdialog.timerTask = new DialogTimerTask(variabletransaction);
             }, sipdialog.BASE_TIMER_INTERVAL);
         }, this.BASE_TIMER_INTERVAL);
     } 
@@ -27892,10 +27892,12 @@ SIPDialog.prototype.doDeferredDeleteIfNoAckSent =function(seqno){
     if (this.sipStack.getTimer() == null) {
         this.setState(this.TERMINATED_STATE);
     } 
-    else if (this.timer == null) {
-        var sipdialog=this;
-        this.timer=setTimeout(function(){
-            sipdialog.dialogDeleteIfNoAckSentTask(seqno);
+    else if (this.dialogDeleteIfNoAckSentTask == null) {
+        variabledialog=seqno;
+        var timer=this.sipStack.getTimer();
+        sipdialog=this;
+        timer=setTimeout(function(){
+            sipdialog.dialogDeleteIfNoAckSentTask = new DialogDeleteIfNoAckSentTask(variabledialog);
         },this.TIMER_J* this.BASE_TIMER_INTERVAL);
     }
 }
@@ -29122,11 +29124,11 @@ SIPClientTransaction.prototype.createAck =function(){
     }
     ackRequest.removeHeader(this.RouteHeader);
     var routeList = new RouteList();
-    for(var i=recordRouteList.length-1;i>=0;i--)
+    for(var i=recordRouteList.getHeaderList().length-1;i>=0;i--)
     {
-        var rr =  recordRouteList[i];
+        var rr =  recordRouteList.getHeaderList()[i];
         var route = new Route();
-        route.setAddressrr.getAddress();
+        route.setAddress(rr.getAddress());
         route.setParameters(rr.getParameters());
         routeList.add(route);
     }
