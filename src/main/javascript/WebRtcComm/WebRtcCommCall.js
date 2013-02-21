@@ -91,12 +91,13 @@ WebRtcCommCall.prototype.getRemoteMediaStream= function() {
  * @public 
  * @param calleePhoneNumber callee phone number (bob@sip.net)
  * @param configuration communication configuration JSON object
- * <p> Call configuration sample: <br>
+ * <p> Communication configuration sample: <br>
  * { <br>
+ * <span style="margin-left: 30px">displayedName:alice,<br></span>
  * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
- * <span style="margin-left: 30px">audio: true,<br></span>
- * <span style="margin-left: 30px">video: true,<br></span>
- * <span style="margin-left: 30px">data:false<br></span>
+ * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
+ * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
+ * <span style="margin-left: 30px">dataMediaFlag:false,<br></span>
  * }<br>
  * </p>
  * @throw {String} Exception "bad argument, check API documentation"
@@ -229,6 +230,7 @@ WebRtcCommCall.prototype.close =function(){
  * @param configuration communication configuration JSON object
  * <p> Call configuration sample: <br>
  * { <br>
+ * <span style="margin-left: 30px">displayedName:alice,<br></span>
  * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
  * <span style="margin-left: 30px">audio: true,<br></span>
  * <span style="margin-left: 30px">video: true,<br></span>
@@ -393,22 +395,22 @@ WebRtcCommCall.prototype.checkConfiguration=function(configuration){
  */ 
 WebRtcCommCall.prototype.createRTCPeerConnection =function(){
     console.debug("WebRtcCommCall:createPeerConnection()");
-    var peerConnectionConfiguration = {
+    var rtcPeerConnectionConfiguration = {
         "iceServers": []
     };
     this.peerConnectionState='new';
     var that = this;
-    if(this.configuration.stunServer)
+    if(this.webRtcCommClient.configuration.RTCPeerConnection.stunServer)
     {
-        peerConnectionConfiguration = {
+        rtcPeerConnectionConfiguration = {
             "iceServers": [{
-                "url":this.webRtcCommClient.configuration.rtcPeerConnection.stunServer
+                "url":"stun:"+this.webRtcCommClient.configuration.RTCPeerConnection.stunServer
             }]
         };
     }
     if(window.webkitRTCPeerConnection)
     {
-        this.peerConnection = new window.webkitRTCPeerConnection(peerConnectionConfiguration);
+        this.peerConnection = new window.webkitRTCPeerConnection(rtcPeerConnectionConfiguration);
     }
     else if(window.mozRTCPeerConnection)
     {

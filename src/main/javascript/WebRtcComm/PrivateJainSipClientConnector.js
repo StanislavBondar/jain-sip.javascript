@@ -49,12 +49,12 @@ PrivateJainSipClientConnector.prototype.isOpened=function(){
  * <p> Client configuration sample: <br>
  * { <br>
  * <span style="margin-left: 30px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
+ * <span style="margin-left: 30px">sipUserAgentCapabilities:"+g.oma.sip-im",<br></span>
  * <span style="margin-left: 30px">sipOutboundProxy:"ws://localhost:5082",<br></span>
  * <span style="margin-left: 30px">sipDomain:"sip.net",<br></span>
  * <span style="margin-left: 30px">sipUserName:"alice",<br></span>
  * <span style="margin-left: 30px">sipLogin:"alice@sip.net,<br></span>
  * <span style="margin-left: 30px">sipPassword:"1234567890",<br></span>
- * <span style="margin-left: 30px">sipApplicationProfile,<br></span>
  * <span style="margin-left: 30px">sipRegisterMode:true,<br></span>
  * }<br>
  *  </p>
@@ -85,9 +85,9 @@ PrivateJainSipClientConnector.prototype.open=function(configuration){
                     this.addressFactory=this.sipFactory.createAddressFactory();
                     this.messageFactory=this.sipFactory.createMessageFactory(this.listeningPoint);
                     this.jainSipContactHeader = this.listeningPoint.createContactHeader(this.configuration.sipUserName);
-                    if((this.configuration.sipApplicationProfile!=undefined)&&(this.configuration.sipApplicationProfile.length!=0))
+                    if(this.configuration.sipUserAgentCapabilities)
                     {
-                        this.jainSipContactHeader.setParameter(this.configuration.sipApplicationProfile,null);
+                        this.jainSipContactHeader.setParameter(this.configuration.sipUserAgentCapabilities,null);
                     }
                     this.jainSipUserAgentHeader = this.headerFactory.createUserAgentHeader(this.listeningPoint.getUserAgent());
                     this.sipStack.start();                   
@@ -277,12 +277,13 @@ PrivateJainSipClientConnector.prototype.resetSipRegisterContext=function(){
  * * <p> Client configuration sample: <br>
  * { <br>
  * <span style="margin-left: 30px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
+ * <span style="margin-left: 30px">sipUserAgentCapabilities:"+g.oma.sip-im",<br></span>
  * <span style="margin-left: 30px">sipOutboundProxy:"ws://localhost:5082",<br></span>
  * <span style="margin-left: 30px">sipDomain:"sip.net",<br></span>
  * <span style="margin-left: 30px">sipUserName:"alice",<br></span>
  * <span style="margin-left: 30px">sipLogin:"alice@sip.net,<br></span>
  * <span style="margin-left: 30px">sipPassword:"1234567890",<br></span>
- * <span style="margin-left: 30px">sipApplicationProfile,<br></span>
+ * <span style="margin-left: 30px">sipUserAgentCapabilities,<br></span>
  * <span style="margin-left: 30px">sipRegisterMode:true,<br></span>
  * }<br>
  *  </p>
@@ -293,7 +294,7 @@ PrivateJainSipClientConnector.prototype.checkConfiguration=function(configuratio
     try
     {
         var check=true;
-        // stunServer, sipLogin, sipPassword, sipApplicationprofile not mandatory
+        // sipLogin, sipPassword, sipUserAgentCapabilities not mandatory
         if(configuration.sipUserAgent==undefined || configuration.sipUserAgent.length==0) 
         {
             check=false;
@@ -325,29 +326,29 @@ PrivateJainSipClientConnector.prototype.checkConfiguration=function(configuratio
             console.error("PrivateJainSipClientConnector:checkConfiguration(): missing configuration parameter sipRegisterMode");       
         }
                 
-        if(configuration.sipLogin!=undefined  && configuration.sipLogin.length==0)
+        if(configuration.sipLogin!=undefined  && configuration.sipLogin=="")
         {
             configuration.sipLogin=undefined;
         }
      
-        if(configuration.sipPassword!=undefined  && configuration.sipPassword.length==0)
+        if(configuration.sipPassword!=undefined  && configuration.sipPassword=="")
         {
             configuration.sipPassword=undefined;
         }
                 
-        if(configuration.sipApplicationProfile!=undefined  && configuration.sipApplicationProfile.length==0)
+        if(configuration.sipUserAgentCapabilities!=undefined  && configuration.sipUserAgentCapabilities=="")
         {
-            configuration.sipApplicationProfile=undefined;
+            configuration.sipUserAgentCapabilities=undefined;
         }
                 
         console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipUserAgent:"+configuration.sipUserAgent);
+        console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipUserAgentCapabilities:"+configuration.sipUserAgentCapabilities)
         console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipOutboundProxy:"+configuration.sipOutboundProxy);
         console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipDomain:"+configuration.sipDomain);
         console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipUserName:"+configuration.sipUserName);
         console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipLogin:"+configuration.sipLogin);
         console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipPassword: "+configuration.sipPassword);
-        console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipRegisterMode:"+configuration.sipRegisterMode);
-        console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipApplicationProfile:"+configuration.sipApplicationProfile);
+        console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipRegisterMode:"+configuration.sipRegisterMode);      
         return check;
     }
     catch(exception){

@@ -203,6 +203,11 @@
                 document.getElementById("sipOutboundProxy").value=value;
             }
 
+            function setSipUserAgentCapabilitiesTextInputValue(value) 
+            {
+                document.getElementById("sipUserAgentCapabilities").value=value;
+            }
+            
             function setSipDomainTextInputValue(value) 
             {
                 document.getElementById("sipDomain").value=value;
@@ -272,44 +277,57 @@
                 document.getElementById("sipContact").value=value;
             }
 
+            function getTextInputValue(elementId) 
+            {
+                var value = document.getElementById(elementId).value;
+                if(value=="undefined") return undefined;
+                else if(value=="") return undefined;
+                else return value
+            }
+            
             function getStunServerTextInputValue() 
             {
-                return  document.getElementById("stunServer").value;
+                return getTextInputValue("stunServer")
             }
 
             function getSipOutboundProxyTextInputValue() 
             {
-                return document.getElementById("sipOutboundProxy").value;
+                return getTextInputValue("sipOutboundProxy");
             }
 
+            function getSipUserAgentCapabilitiesTextInputValue() 
+            {
+                return getTextInputValue("sipUserAgentCapabilities");
+            }
+            
             function getSipDomainTextInputValue() 
             {
-                return document.getElementById("sipDomain").value;
+                return getTextInputValue("sipDomain");
             }
 
             function getSipDisplayNameTextInputValue() 
             {
-                return document.getElementById("sipDisplayName").value;
+                return getTextInputValue("sipDisplayName");
             }
 
             function getSipUserNameTextInputValue() 
             {
-                return document.getElementById("sipUserName").value;
+                return getTextInputValue("sipUserName"); 
             }
 
             function getSipLoginTextInputValue() 
             {
-                return document.getElementById("sipLogin").value;
+                return getTextInputValue("sipLogin");
             }
 
             function getSipPasswordTextInputValue() 
             {
-                return document.getElementById("sipPassword").value;
+                return getTextInputValue("sipPassword"); 
             }
 
             function getSipContactTextInputValue() 
             {
-                return document.getElementById("sipContact").value;
+                return getTextInputValue("sipContact");
             }
             
             function getSipRegisterModeValue() 
@@ -332,10 +350,11 @@
     </head>
     <body onload='webRtcCommTestWebAppController.onLoadViewEventHandler();' onunload='webRtcCommTestWebAppController.onUnloadViewEventHandler();'>
         <div style=" color: red">With Firefox, don't forget to set your about:config preferences! </div>
-        <a href="http://localhost:8080/WebRtcCommTestWebApp/?sipDomain=sipasf.fr&sipLogin=1111@sipasf.fr&sipPassword=1234&sipUserName=1111&sipDisplayName=lolo&sipContactUserName=2222">
-            http://localhost:8080/WebRtcCommTestWebApp/?sipDomain=sipasf.fr&sipLogin=1111@sipasf.fr&sipPassword=1234&sipUserName=1111&sipDisplayName=lolo&sipContactUserName=2222
+        <a href="http://localhost:8080/WebRtcCommTestWebApp/?sipDomain=sip.test&sipLogin=&sipPassword=&sipUserName=alice&sipDisplayName=alice&sipContactUserName=bob">
+            http://localhost:8080/WebRtcCommTestWebApp/?sipDomain=sip.test&sipLogin=&sipPassword=&sipUserName=alice&sipDisplayName=alice&sipContactUserName=bob
         </a>
-        <div id="sipAccountSettings" >
+        <div style=" color: red">Google public STUN server:stun.l.google.com:19302</div>
+        <div id="webRtcCommClientConfigurationDiv" >
             <div id='stunServerDiv'>
                 <label>STUN server:</label>
                 <input  id="stunServer"  type="text" size="40" > 
@@ -344,6 +363,10 @@
                 <label>SIP outbound proxy WS URL:</label>
                 <input  id="sipOutboundProxy"  type="text" size="40"> 
             </div>
+            <div id='sipUserAgentCapabilitiesDiv'>
+                <label>SIP User Agent Capabilities:</label>
+                <input id="sipUserAgentCapabilities"  type="text" size="30"> 
+            </div> 
             <div id='sipDomainDiv'>
                 <label>SIP Domain:</label>
                 <input id="sipDomain"  type="text" size="30"> 
@@ -362,7 +385,7 @@
             </div>
             <div id='sipPasswordDiv'>
                 <label>SIP Password:</label>
-                <input id="sipPassword"   type="password" size="30"> 
+                <input id="sipPassword"   type="text" size="30"> 
             </div>
             <div id='sipContactPhoneNumberDiv'>
                 <label>SIP Contact phone number:</label>

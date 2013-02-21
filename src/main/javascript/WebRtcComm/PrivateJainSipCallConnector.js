@@ -107,23 +107,20 @@ PrivateJainSipCallConnector.prototype.getId= function() {
 /**
  * Open JAIN SIP call/communication, asynchronous action,  opened or error event is notified to WebRtcClientCall eventListener
  * @public 
- * @param {object} configuration  WebRTC communication client configuration 
- *     configuration sample:<br> 
- *     { 
- *           sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br>
- *           sipOutboundProxy:this.DEFAULT_SIP_OUTBOUND_PROXY,<br>
- *           sipDomain:this.DEFAULT_SIP_DOMAIN,<br>
- *           sipUserName:this.DEFAULT_SIP_USER_NAME,<br>
- *           sipLogin:this.DEFAULT_SIP_LOGIN,<br>
- *           sipPassword:this.DEFAULT_SIP_PASSWORD,<br>
- *           sipApplicationProfile:this.DEFAULT_SIP_APPLICATION_PROFILE,<br>
- *           sipRegisterMode:this.DEFAULT_SIP_REGISTER_MODE<br>
- 
- *      }<br>
-* @public  
-* @throw {String} Exception "bad configuration, missing parameter"
-* @throw {String} Exception "bad state, unauthorized action"
-*/ 
+ * @param {object} configuration  WebRTC communication configuration 
+ * <p> Communication configuration sample: <br>
+ * { <br>
+ * <span style="margin-left: 30px">displayedName:alice,<br></span>
+ * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
+ * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
+ * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
+ * <span style="margin-left: 30px">dataMediaFlag:false,<br></span>
+ * }<br>
+ * </p>
+ * @public  
+ * @throw {String} Exception "bad configuration, missing parameter"
+ * @throw {String} Exception "bad state, unauthorized action"
+ */ 
 PrivateJainSipCallConnector.prototype.open=function(configuration){
     console.debug("PrivateJainSipCallConnector:open()");
     if(this.sipCallState==undefined)
@@ -315,7 +312,8 @@ PrivateJainSipCallConnector.prototype.invite=function(sdpOffer){
     var jainSipRequestUri=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createSipURI_user_host(null,toSipUriString);
     var jainSipAllowListHeader=this.webRtcCommCall.webRtcCommClient.connector.headerFactory.createHeaders("Allow: INVITE,ACK,CANCEL,BYE");         
     var jainSipFromUri=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createSipURI_user_host(null,fromSipUriString);
-    var jainSipFromAdress=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createAddress_name_uri(null,jainSipFromUri);
+    var jainSipFromAdress=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createAddress_name_uri(this.configuration.displayedName,jainSipFromUri);
+    
     var tagfrom=random.getTime();
     var jainSipFromHeader=this.webRtcCommCall.webRtcCommClient.connector.headerFactory.createFromHeader(jainSipFromAdress, tagfrom);           
     var jainSiptoUri=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createSipURI_user_host(null,toSipUriString);

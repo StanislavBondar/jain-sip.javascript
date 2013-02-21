@@ -22,7 +22,6 @@ WebRtcCommClient = function(eventListener)
     }
 } 
 
-
 /**
  * SIP call control protocol mode 
  * @public
@@ -59,15 +58,15 @@ WebRtcCommClient.prototype.getConfiguration=function(){
  * <span style="margin-left: 30px">communicationMode:WebRtcCommClient.prototype.SIP,<br></span>
  * <span style="margin-left: 30px">sip: {,<br></span>
  * <span style="margin-left: 60px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
+ * <span style="margin-left: 60px">sipUserAgentCapabilities=undefined,<br></span>
  * <span style="margin-left: 60px">sipOutboundProxy:"ws://localhost:5082",<br></span>
  * <span style="margin-left: 60px">sipDomain:"sip.net",<br></span>
- * <span style="margin-left: 60px"> sipUserName:"alice",<br></span>
+ * <span style="margin-left: 60px">sipUserName:"alice",<br></span>
  * <span style="margin-left: 60px">sipLogin:"alice@sip.net,<br></span>
- * <span style="margin-left: 60px"> sipPassword:"1234567890",<br></span>
- * <span style="margin-left: 60px">sipApplicationProfile,<br></span>
+ * <span style="margin-left: 60px">sipPassword:"1234567890",<br></span>
  * <span style="margin-left: 60px">sipRegisterMode:true,<br></span>
  * <span style="margin-left: 30px">}<br></span>
- * <span style="margin-left: 30px">webRtcPeeConnection: {,<br></span>
+ * <span style="margin-left: 30px">RTCPeerConnection: {,<br></span>
  * <span style="margin-left: 60px"stunServer:undefined,<br></span>
  * <span style="margin-left: 30px">}<br></span>
  * }<br>
@@ -156,7 +155,7 @@ WebRtcCommClient.prototype.close=function(){
  * @param {object} callConfiguration Communication configuration <br>
  * <p> Communication configuration sample: <br>
  * { <br>
- * <span style="margin-left: 30px">displayedName:sip:alice,<br></span>
+ * <span style="margin-left: 30px">displayedName:alice,<br></span>
  * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
  * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
  * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
@@ -205,18 +204,48 @@ WebRtcCommClient.prototype.call=function(calleePhoneNumber, callConfiguration){
  * Check validity of the client configuration 
  * @private
  * @param {object} configuration client configuration
+ *  * <p> Client configuration sample: <br>
+ * { <br>
+ * <span style="margin-left: 30px">communicationMode:WebRtcCommClient.prototype.SIP,<br></span>
+ * <span style="margin-left: 30px">sip: {,<br></span>
+ * <span style="margin-left: 60px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
+ * <span style="margin-left: 60px">sipUserAgentCapabilities=undefined,<br></span>
+ * <span style="margin-left: 60px">sipOutboundProxy:"ws://localhost:5082",<br></span>
+ * <span style="margin-left: 60px">sipDomain:"sip.net",<br></span>
+ * <span style="margin-left: 60px">sipUserName:"alice",<br></span>
+ * <span style="margin-left: 60px">sipLogin:"alice@sip.net,<br></span>
+ * <span style="margin-left: 60px">sipPassword:"1234567890",<br></span>
+ * <span style="margin-left: 60px">sipRegisterMode:true,<br></span>
+ * <span style="margin-left: 30px">}<br></span>
+ * <span style="margin-left: 30px">RTCPeerConnection: {,<br></span>
+ * <span style="margin-left: 60px"stunServer:undefined,<br></span>
+ * <span style="margin-left: 30px">}<br></span>
+ * }<br>
+ *  </p>
  * @returns {boolean} true valid false unvalid
  */ 
 WebRtcCommClient.prototype.checkConfiguration=function(configuration){
     console.debug("WebRtcCommClient:checkConfiguration()");
+    var check=true;
     if(configuration.communicationMode!=undefined)
     {
         if(configuration.communicationMode==WebRtcCommClient.prototype.SIP) 
         {
-            return true
-        }
+            console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.communicationMode:"+configuration.communicationMode);
+        } 
+        else  
+        {
+            check=false;
+            console.error("WebRtcCommClient:checkConfiguration(): unsupported communicationMode");  
+        } 
+        console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.RTCPeerConnection.stunServer:"+configuration.RTCPeerConnection.stunServer);
     }
-    return false;
+    else
+    {
+        check=false;
+        console.error("WebRtcCommClient:checkConfiguration(): missing configuration parameter communicationMode");           
+    }
+    return check;
 }
 
 /**

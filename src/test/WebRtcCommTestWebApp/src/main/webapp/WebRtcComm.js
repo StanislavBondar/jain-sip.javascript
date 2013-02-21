@@ -107,23 +107,20 @@ PrivateJainSipCallConnector.prototype.getId= function() {
 /**
  * Open JAIN SIP call/communication, asynchronous action,  opened or error event is notified to WebRtcClientCall eventListener
  * @public 
- * @param {object} configuration  WebRTC communication client configuration 
- *     configuration sample:<br> 
- *     { 
- *           sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br>
- *           sipOutboundProxy:this.DEFAULT_SIP_OUTBOUND_PROXY,<br>
- *           sipDomain:this.DEFAULT_SIP_DOMAIN,<br>
- *           sipUserName:this.DEFAULT_SIP_USER_NAME,<br>
- *           sipLogin:this.DEFAULT_SIP_LOGIN,<br>
- *           sipPassword:this.DEFAULT_SIP_PASSWORD,<br>
- *           sipApplicationProfile:this.DEFAULT_SIP_APPLICATION_PROFILE,<br>
- *           sipRegisterMode:this.DEFAULT_SIP_REGISTER_MODE<br>
- 
- *      }<br>
-* @public  
-* @throw {String} Exception "bad configuration, missing parameter"
-* @throw {String} Exception "bad state, unauthorized action"
-*/ 
+ * @param {object} configuration  WebRTC communication configuration 
+ * <p> Communication configuration sample: <br>
+ * { <br>
+ * <span style="margin-left: 30px">displayedName:alice,<br></span>
+ * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
+ * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
+ * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
+ * <span style="margin-left: 30px">dataMediaFlag:false,<br></span>
+ * }<br>
+ * </p>
+ * @public  
+ * @throw {String} Exception "bad configuration, missing parameter"
+ * @throw {String} Exception "bad state, unauthorized action"
+ */ 
 PrivateJainSipCallConnector.prototype.open=function(configuration){
     console.debug("PrivateJainSipCallConnector:open()");
     if(this.sipCallState==undefined)
@@ -315,7 +312,8 @@ PrivateJainSipCallConnector.prototype.invite=function(sdpOffer){
     var jainSipRequestUri=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createSipURI_user_host(null,toSipUriString);
     var jainSipAllowListHeader=this.webRtcCommCall.webRtcCommClient.connector.headerFactory.createHeaders("Allow: INVITE,ACK,CANCEL,BYE");         
     var jainSipFromUri=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createSipURI_user_host(null,fromSipUriString);
-    var jainSipFromAdress=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createAddress_name_uri(null,jainSipFromUri);
+    var jainSipFromAdress=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createAddress_name_uri(this.configuration.displayedName,jainSipFromUri);
+    
     var tagfrom=random.getTime();
     var jainSipFromHeader=this.webRtcCommCall.webRtcCommClient.connector.headerFactory.createFromHeader(jainSipFromAdress, tagfrom);           
     var jainSiptoUri=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createSipURI_user_host(null,toSipUriString);
@@ -894,12 +892,12 @@ PrivateJainSipClientConnector.prototype.isOpened=function(){
  * <p> Client configuration sample: <br>
  * { <br>
  * <span style="margin-left: 30px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
+ * <span style="margin-left: 30px">sipUserAgentCapabilities:"+g.oma.sip-im",<br></span>
  * <span style="margin-left: 30px">sipOutboundProxy:"ws://localhost:5082",<br></span>
  * <span style="margin-left: 30px">sipDomain:"sip.net",<br></span>
  * <span style="margin-left: 30px">sipUserName:"alice",<br></span>
  * <span style="margin-left: 30px">sipLogin:"alice@sip.net,<br></span>
  * <span style="margin-left: 30px">sipPassword:"1234567890",<br></span>
- * <span style="margin-left: 30px">sipApplicationProfile,<br></span>
  * <span style="margin-left: 30px">sipRegisterMode:true,<br></span>
  * }<br>
  *  </p>
@@ -930,9 +928,9 @@ PrivateJainSipClientConnector.prototype.open=function(configuration){
                     this.addressFactory=this.sipFactory.createAddressFactory();
                     this.messageFactory=this.sipFactory.createMessageFactory(this.listeningPoint);
                     this.jainSipContactHeader = this.listeningPoint.createContactHeader(this.configuration.sipUserName);
-                    if((this.configuration.sipApplicationProfile!=undefined)&&(this.configuration.sipApplicationProfile.length!=0))
+                    if(this.configuration.sipUserAgentCapabilities)
                     {
-                        this.jainSipContactHeader.setParameter(this.configuration.sipApplicationProfile,null);
+                        this.jainSipContactHeader.setParameter(this.configuration.sipUserAgentCapabilities,null);
                     }
                     this.jainSipUserAgentHeader = this.headerFactory.createUserAgentHeader(this.listeningPoint.getUserAgent());
                     this.sipStack.start();                   
@@ -1122,12 +1120,13 @@ PrivateJainSipClientConnector.prototype.resetSipRegisterContext=function(){
  * * <p> Client configuration sample: <br>
  * { <br>
  * <span style="margin-left: 30px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
+ * <span style="margin-left: 30px">sipUserAgentCapabilities:"+g.oma.sip-im",<br></span>
  * <span style="margin-left: 30px">sipOutboundProxy:"ws://localhost:5082",<br></span>
  * <span style="margin-left: 30px">sipDomain:"sip.net",<br></span>
  * <span style="margin-left: 30px">sipUserName:"alice",<br></span>
  * <span style="margin-left: 30px">sipLogin:"alice@sip.net,<br></span>
  * <span style="margin-left: 30px">sipPassword:"1234567890",<br></span>
- * <span style="margin-left: 30px">sipApplicationProfile,<br></span>
+ * <span style="margin-left: 30px">sipUserAgentCapabilities,<br></span>
  * <span style="margin-left: 30px">sipRegisterMode:true,<br></span>
  * }<br>
  *  </p>
@@ -1138,7 +1137,7 @@ PrivateJainSipClientConnector.prototype.checkConfiguration=function(configuratio
     try
     {
         var check=true;
-        // stunServer, sipLogin, sipPassword, sipApplicationprofile not mandatory
+        // sipLogin, sipPassword, sipUserAgentCapabilities not mandatory
         if(configuration.sipUserAgent==undefined || configuration.sipUserAgent.length==0) 
         {
             check=false;
@@ -1170,29 +1169,29 @@ PrivateJainSipClientConnector.prototype.checkConfiguration=function(configuratio
             console.error("PrivateJainSipClientConnector:checkConfiguration(): missing configuration parameter sipRegisterMode");       
         }
                 
-        if(configuration.sipLogin!=undefined  && configuration.sipLogin.length==0)
+        if(configuration.sipLogin!=undefined  && configuration.sipLogin=="")
         {
             configuration.sipLogin=undefined;
         }
      
-        if(configuration.sipPassword!=undefined  && configuration.sipPassword.length==0)
+        if(configuration.sipPassword!=undefined  && configuration.sipPassword=="")
         {
             configuration.sipPassword=undefined;
         }
                 
-        if(configuration.sipApplicationProfile!=undefined  && configuration.sipApplicationProfile.length==0)
+        if(configuration.sipUserAgentCapabilities!=undefined  && configuration.sipUserAgentCapabilities=="")
         {
-            configuration.sipApplicationProfile=undefined;
+            configuration.sipUserAgentCapabilities=undefined;
         }
                 
         console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipUserAgent:"+configuration.sipUserAgent);
+        console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipUserAgentCapabilities:"+configuration.sipUserAgentCapabilities)
         console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipOutboundProxy:"+configuration.sipOutboundProxy);
         console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipDomain:"+configuration.sipDomain);
         console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipUserName:"+configuration.sipUserName);
         console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipLogin:"+configuration.sipLogin);
         console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipPassword: "+configuration.sipPassword);
-        console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipRegisterMode:"+configuration.sipRegisterMode);
-        console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipApplicationProfile:"+configuration.sipApplicationProfile);
+        console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.sipRegisterMode:"+configuration.sipRegisterMode);      
         return check;
     }
     catch(exception){
@@ -1775,12 +1774,13 @@ WebRtcCommCall.prototype.getRemoteMediaStream= function() {
  * @public 
  * @param calleePhoneNumber callee phone number (bob@sip.net)
  * @param configuration communication configuration JSON object
- * <p> Call configuration sample: <br>
+ * <p> Communication configuration sample: <br>
  * { <br>
+ * <span style="margin-left: 30px">displayedName:alice,<br></span>
  * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
- * <span style="margin-left: 30px">audio: true,<br></span>
- * <span style="margin-left: 30px">video: true,<br></span>
- * <span style="margin-left: 30px">data:false<br></span>
+ * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
+ * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
+ * <span style="margin-left: 30px">dataMediaFlag:false,<br></span>
  * }<br>
  * </p>
  * @throw {String} Exception "bad argument, check API documentation"
@@ -2077,22 +2077,22 @@ WebRtcCommCall.prototype.checkConfiguration=function(configuration){
  */ 
 WebRtcCommCall.prototype.createRTCPeerConnection =function(){
     console.debug("WebRtcCommCall:createPeerConnection()");
-    var peerConnectionConfiguration = {
+    var rtcPeerConnectionConfiguration = {
         "iceServers": []
     };
     this.peerConnectionState='new';
     var that = this;
-    if(this.configuration.stunServer)
+    if(this.webRtcCommClient.configuration.RTCPeerConnection.stunServer)
     {
-        peerConnectionConfiguration = {
+        rtcPeerConnectionConfiguration = {
             "iceServers": [{
-                "url":this.webRtcCommClient.configuration.rtcPeerConnection.stunServer
+                "url":"stun:"+this.webRtcCommClient.configuration.RTCPeerConnection.stunServer
             }]
         };
     }
     if(window.webkitRTCPeerConnection)
     {
-        this.peerConnection = new window.webkitRTCPeerConnection(peerConnectionConfiguration);
+        this.peerConnection = new window.webkitRTCPeerConnection(rtcPeerConnectionConfiguration);
     }
     else if(window.mozRTCPeerConnection)
     {
@@ -2898,7 +2898,6 @@ WebRtcCommClient = function(eventListener)
     }
 } 
 
-
 /**
  * SIP call control protocol mode 
  * @public
@@ -2935,15 +2934,15 @@ WebRtcCommClient.prototype.getConfiguration=function(){
  * <span style="margin-left: 30px">communicationMode:WebRtcCommClient.prototype.SIP,<br></span>
  * <span style="margin-left: 30px">sip: {,<br></span>
  * <span style="margin-left: 60px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
+ * <span style="margin-left: 60px">sipUserAgentCapabilities=undefined,<br></span>
  * <span style="margin-left: 60px">sipOutboundProxy:"ws://localhost:5082",<br></span>
  * <span style="margin-left: 60px">sipDomain:"sip.net",<br></span>
- * <span style="margin-left: 60px"> sipUserName:"alice",<br></span>
+ * <span style="margin-left: 60px">sipUserName:"alice",<br></span>
  * <span style="margin-left: 60px">sipLogin:"alice@sip.net,<br></span>
- * <span style="margin-left: 60px"> sipPassword:"1234567890",<br></span>
- * <span style="margin-left: 60px">sipApplicationProfile,<br></span>
+ * <span style="margin-left: 60px">sipPassword:"1234567890",<br></span>
  * <span style="margin-left: 60px">sipRegisterMode:true,<br></span>
  * <span style="margin-left: 30px">}<br></span>
- * <span style="margin-left: 30px">webRtcPeeConnection: {,<br></span>
+ * <span style="margin-left: 30px">RTCPeerConnection: {,<br></span>
  * <span style="margin-left: 60px"stunServer:undefined,<br></span>
  * <span style="margin-left: 30px">}<br></span>
  * }<br>
@@ -3032,7 +3031,7 @@ WebRtcCommClient.prototype.close=function(){
  * @param {object} callConfiguration Communication configuration <br>
  * <p> Communication configuration sample: <br>
  * { <br>
- * <span style="margin-left: 30px">displayedName:sip:alice,<br></span>
+ * <span style="margin-left: 30px">displayedName:alice,<br></span>
  * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
  * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
  * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
@@ -3081,18 +3080,48 @@ WebRtcCommClient.prototype.call=function(calleePhoneNumber, callConfiguration){
  * Check validity of the client configuration 
  * @private
  * @param {object} configuration client configuration
+ *  * <p> Client configuration sample: <br>
+ * { <br>
+ * <span style="margin-left: 30px">communicationMode:WebRtcCommClient.prototype.SIP,<br></span>
+ * <span style="margin-left: 30px">sip: {,<br></span>
+ * <span style="margin-left: 60px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
+ * <span style="margin-left: 60px">sipUserAgentCapabilities=undefined,<br></span>
+ * <span style="margin-left: 60px">sipOutboundProxy:"ws://localhost:5082",<br></span>
+ * <span style="margin-left: 60px">sipDomain:"sip.net",<br></span>
+ * <span style="margin-left: 60px">sipUserName:"alice",<br></span>
+ * <span style="margin-left: 60px">sipLogin:"alice@sip.net,<br></span>
+ * <span style="margin-left: 60px">sipPassword:"1234567890",<br></span>
+ * <span style="margin-left: 60px">sipRegisterMode:true,<br></span>
+ * <span style="margin-left: 30px">}<br></span>
+ * <span style="margin-left: 30px">RTCPeerConnection: {,<br></span>
+ * <span style="margin-left: 60px"stunServer:undefined,<br></span>
+ * <span style="margin-left: 30px">}<br></span>
+ * }<br>
+ *  </p>
  * @returns {boolean} true valid false unvalid
  */ 
 WebRtcCommClient.prototype.checkConfiguration=function(configuration){
     console.debug("WebRtcCommClient:checkConfiguration()");
+    var check=true;
     if(configuration.communicationMode!=undefined)
     {
         if(configuration.communicationMode==WebRtcCommClient.prototype.SIP) 
         {
-            return true
-        }
+            console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.communicationMode:"+configuration.communicationMode);
+        } 
+        else  
+        {
+            check=false;
+            console.error("WebRtcCommClient:checkConfiguration(): unsupported communicationMode");  
+        } 
+        console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.RTCPeerConnection.stunServer:"+configuration.RTCPeerConnection.stunServer);
     }
-    return false;
+    else
+    {
+        check=false;
+        console.error("WebRtcCommClient:checkConfiguration(): missing configuration parameter communicationMode");           
+    }
+    return check;
 }
 
 /**

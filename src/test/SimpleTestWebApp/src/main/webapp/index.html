@@ -4,21 +4,22 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script src="./jain-sip.js" type="text/javascript"></script>      
         <script src="./SimpleWebRtcSipPhone.js" type="text/javascript" ></script>
-        <script type="text/javascript">	
-            
-            // Test domain 
+        <script type="text/javascript">	 
             var simpleWebRtcSipPhone=null;
-            var sipWsUrl="ws://localhost:5082/";
-                   
-            // test URL http://localhost:8080/SimpleTestWebApp/?sipDomain=sipasf.fr&sipLogin=1111@sipasf.fr&sipPassword=1234&sipUserName=1111&sipDisplayName=lolo&sipContactUserName=2222
+                             
+            var stunServer=undefined;         
+            var localAudioVideoMediaStream=null;
+            var localAudioMediaStream=null;
+            var localVideoMediaStream=null;
             
-            // SIP profile
+            // SIP configuration
+            var sipWsUrl="ws://localhost:5082/";
+            var sipUserAgentCapabilities=undefined;
             var sipDomain=undefined;
             var sipDisplayName=undefined;
             var sipUserName=undefined;
             var sipLogin=undefined;
             var sipPassword=undefined;
-            var sipDomain=undefined;
             var sipContactUserName=undefined;
                         
             if(location.search.length>0)
@@ -32,29 +33,31 @@
                     if("sipUserName"==argument[0])
                     {
                         sipUserName =argument[1];
+                        if(sipUserName=="") sipUserName=undefined;
                     } else if("sipDomain"==argument[0])
                     {
                         sipDomain =argument[1];
+                        if(sipDomain=="") sipDomain=undefined;
                     } else if("sipDisplayName"==argument[0])
                     {
                         sipDisplayName =argument[1];
+                        if(sipDisplayName=="") sipDisplayName=undefined;
                     } else if("sipPassword"==argument[0])
                     {
                         sipPassword =argument[1];
+                        if(sipPassword=="") sipPassword=undefined;
                     } else if("sipLogin"==argument[0])
                     {
                         sipLogin =argument[1];
+                        if(sipLogin=="") sipLogin=undefined;
                     }  else if("sipContactUserName"==argument[0])
                     {
                         sipContactUserName =argument[1];
+                        if(sipContactUserName=="") sipContactUserName=undefined;
                     }
                 }
             }
-           
-            var defaultStunServer="";         
-            var localAudioVideoMediaStream=null;
-            var localAudioMediaStream=null;
-            var localVideoMediaStream=null;
+
             
             function onLoad()
             {
@@ -68,7 +71,8 @@
                 hideUnRegisterButton();
                 hideRegisterButton();
             
-                document.getElementById("stunServer").value=defaultStunServer;
+                document.getElementById("stunServer").value=stunServer;
+                document.getElementById("sipUserAgentCapabilities").value=sipUserAgentCapabilities;
                 document.getElementById("sipWsUrl").value=sipWsUrl;
                 document.getElementById("sipDomain").value=sipDomain;
                 document.getElementById("sipDisplayName").value=sipDisplayName;
@@ -76,6 +80,7 @@
                 document.getElementById("sipLogin").value=sipLogin;
                 document.getElementById("sipPassword").value=sipPassword;
                 document.getElementById("sipContactPhoneNumber").value=sipContactUserName;
+                
                 if(navigator.webkitGetUserMedia)
                     navigator.webkitGetUserMedia({audio:true, video:true},webkitGetUserMediaSuccess, webkitGetUserMediaError);
                 else if(navigator.mozGetUserMedia)
@@ -92,6 +97,15 @@
                 {
                     console.log("OnBeforeUnLoad()");  
                 }     
+            }
+            
+            
+            function getTextInputValue(elementId) 
+            {
+                var value = document.getElementById(elementId).value;
+                if(value=="undefined") return undefined;
+                else if(value=="") return undefined;
+                else return value
             }
             
             function webkitGetUserMediaSuccess (localStream) {
@@ -171,13 +185,14 @@
             function register()
             {   
                 var configuration = {
-                    stunServer:document.getElementById("stunServer").value,
-                    sipOutboundProxy:document.getElementById("sipWsUrl").value,
-                    sipDomain: document.getElementById("sipDomain").value,
-                    sipDisplayName: document.getElementById("sipDisplayName").value,
-                    sipUserName: document.getElementById("sipUserName").value,
-                    sipLogin: document.getElementById("sipLogin").value,
-                    sipPassword: document.getElementById("sipPassword").value,
+                    stunServer:getTextInputValue("stunServer"),
+                    sipUserAgentCapabilities:getTextInputValue("sipUserAgentCapabilities"),
+                    sipOutboundProxy:getTextInputValue("sipWsUrl"),
+                    sipDomain: getTextInputValue("sipDomain"),
+                    sipDisplayName: getTextInputValue("sipDisplayName"),
+                    sipUserName: getTextInputValue("sipUserName"),
+                    sipLogin: getTextInputValue("sipLogin"),
+                    sipPassword: getTextInputValue("sipPassword"),
                     sipRegisterMode:document.getElementById("sipRegistrationCkeckBox").checked,
                     localAudioVideoMediaStream:localAudioVideoMediaStream,
                     localAudioMediaStream:localAudioMediaStream,
@@ -201,13 +216,14 @@
                 if(simpleWebRtcSipPhone==null) 
                 {
                     var configuration = {
-                        stunServer:document.getElementById("stunServer").value,
-                        sipOutboundProxy:document.getElementById("sipWsUrl").value,
-                        sipDomain: document.getElementById("sipDomain").value,
-                        sipDisplayName: document.getElementById("sipDisplayName").value,
-                        sipUserName: document.getElementById("sipUserName").value,
-                        sipLogin: document.getElementById("sipLogin").value,
-                        sipPassword: document.getElementById("sipPassword").value,
+                        stunServer:getTextInputValue("stunServer"),
+                        sipUserAgentCapabilities:getTextInputValue("sipUserAgentCapabilities"),
+                        sipOutboundProxy:getTextInputValue("sipWsUrl"),
+                        sipDomain: getTextInputValue("sipDomain"),
+                        sipDisplayName: getTextInputValue("sipDisplayName"),
+                        sipUserName: getTextInputValue("sipUserName"),
+                        sipLogin: getTextInputValue("sipLogin"),
+                        sipPassword: getTextInputValue("sipPassword"),
                         sipRegisterMode:document.getElementById("sipRegistrationCkeckBox").checked,
                         localAudioVideoMediaStream:localAudioVideoMediaStream,
                         localAudioMediaStream:localAudioMediaStream,
@@ -374,9 +390,10 @@
     </head>
     <body onload="onLoad()" onbeforeunload="onBeforeUnload()">
         <div style=" color: red">With Firefox, don't forget to set your about:config preferences! </div>
-        <a href="http://localhost:8080/SimpleTestWebApp/?sipDomain=sipasf.fr&sipLogin=1111@sipasf.fr&sipPassword=1234&sipUserName=1111&sipDisplayName=lolo&sipContactUserName=2222">
-            http://localhost:8080/SimpleTestWebApp/?sipDomain=sipasf.fr&sipLogin=1111@sipasf.fr&sipPassword=1234&sipUserName=1111&sipDisplayName=lolo&sipContactUserName=2222
+        <a href="http://localhost:8080/SimpleTestWebApp/?sipDomain=sip.test&sipLogin=&sipPassword=&sipUserName=alice&sipDisplayName=alice&sipContactUserName=bob">
+            http://localhost:8080/SimpleTestWebApp/?sipDomain=sip.test&sipLogin=&sipPassword=&sipUserName=alice&sipDisplayName=alice&sipContactUserName=bob
         </a>
+        <div style=" color: red">Google public STUN server:stun.l.google.com:19302</div>
         <div id="sipAccountSettings" >
             <div id='stunServerDiv'>
                 <label>STUN server:</label>
@@ -386,6 +403,10 @@
                 <label>SIP outbound proxy WS URL:</label>
                 <input  id="sipWsUrl"  type="text" size="40"> 
             </div>
+            <div id='sipUserAgentCapabilitiesDiv'>
+                <label>SIP User Agent Capabilities:</label>
+                <input id="sipUserAgentCapabilities"  type="text" size="30"> 
+            </div> 
             <div id='sipDomainDiv'>
                 <label>SIP Domain:</label>
                 <input id="sipDomain"  type="text" size="30"> 
@@ -404,7 +425,7 @@
             </div>
             <div id='sipPasswordDiv'>
                 <label>SIP Password:</label>
-                <input id="sipPassword"   type="password" size="30"> 
+                <input id="sipPassword"   type="text" size="30"> 
             </div>
             <div id='sipContactPhoneNumberDiv'>
                 <label>SIP Contact phone number:</label>

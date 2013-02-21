@@ -21,16 +21,16 @@ WebRtcCommTestWebAppController.prototype.constructor=WebRtcCommTestWebAppControl
 
 // Default SIP profile to use
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://localhost:5082";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT="WebRtcCommTestWebApp/0.0.1" 
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT_CAPABILITIES=undefined // +g.oma.sip-im
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DOMAIN="sip.test.com";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DISPLAY_NAME="alice";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_NAME="alice";
-WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_LOGIN="alice@sip.test.com";
-WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_PASSWORD="1234";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_LOGIN=undefined;
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_PASSWORD=undefined;
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_CONTACT="bob";
-WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_APPLICATION_PROFILE="";
-WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_REGISTER_MODE=undefined;
-WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER="";
-
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_REGISTER_MODE=true;
+WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER=undefined; // stun.l.google.com:19302
 
 /**
  * on load event handler
@@ -43,18 +43,18 @@ WebRtcCommTestWebAppController.prototype.onLoadViewEventHandler=function()
     this.webRtcCommClientConfiguration =  { 
         communicationMode:WebRtcCommClient.prototype.SIP,
         sip:{
-            sipUserAgent:"WebRtcCommTestWebApp/0.0.1",
+            sipUserAgent:this.DEFAULT_SIP_USER_AGENT,
             sipOutboundProxy:this.DEFAULT_SIP_OUTBOUND_PROXY,
             sipDomain:this.DEFAULT_SIP_DOMAIN,
             sipUserName:this.DEFAULT_SIP_USER_NAME,
             sipLogin:this.DEFAULT_SIP_LOGIN,
             sipPassword:this.DEFAULT_SIP_PASSWORD,
-            sipApplicationProfile:this.DEFAULT_SIP_APPLICATION_PROFILE,
+            sipUserAgentCapabilities:this.DEFAULT_SIP_USER_AGENT_CAPABILITIES,
             sipRegisterMode:this.DEFAULT_SIP_REGISTER_MODE
         },
-        rtcPeerConnection:
+        RTCPeerConnection:
         {
-            stunServer:undefined         
+            stunServer:this.DEFAULT_STUN_SERVER         
         }
     } 
     
@@ -70,26 +70,32 @@ WebRtcCommTestWebAppController.prototype.onLoadViewEventHandler=function()
             if("sipUserName"==argument[0])
             {
                 this.webRtcCommClientConfiguration.sip.sipUserName =argument[1];
+                if(this.webRtcCommClientConfiguration.sip.sipUserName=="") this.webRtcCommClientConfiguration.sip.sipUserName=undefined;
             } 
             else if("sipDomain"==argument[0])
             {
                 this.webRtcCommClientConfiguration.sip.sipDomain =argument[1];
+                if(this.webRtcCommClientConfiguration.sip.sipDomain=="") this.webRtcCommClientConfiguration.sip.sipDomain=undefined;
             } 
             else if("sipDisplayName"==argument[0])
             {
                 this.webRtcCommClientConfiguration.sip.sipDisplayName =argument[1];
+                if(this.webRtcCommClientConfiguration.sip.sipDisplayName=="") this.webRtcCommClientConfiguration.sip.sipDisplayName=undefined;
             } 
             else if("sipPassword"==argument[0])
             {
                 this.webRtcCommClientConfiguration.sip.sipPassword =argument[1];
+                if(this.webRtcCommClientConfiguration.sip.sipPassword=="") this.webRtcCommClientConfiguration.sip.sipPassword=undefined;
             } 
             else if("sipLogin"==argument[0])
             {
                 this.webRtcCommClientConfiguration.sip.sipLogin =argument[1];
+                if(this.webRtcCommClientConfiguration.sip.sipLogin=="") this.webRtcCommClientConfiguration.sip.sipLogin=undefined;
             }
             else if("sipContact"==argument[0])
             {
                 this.sipContact =argument[1];
+                if(this.webRtcCommClientConfiguration.sip.sipContact=="") this.webRtcCommClientConfiguration.sip.sipContact=undefined;
             }
         }
     }  
@@ -133,8 +139,9 @@ WebRtcCommTestWebAppController.prototype.initView=function(){
     this.view.hideLocalVideo();
     this.view.stopRemoteVideo();
     this.view.hideRemoteVideo();
-    this.view.setStunServerTextInputValue(this.webRtcCommClientConfiguration.rtcPeerConnection.stunServer);
+    this.view.setStunServerTextInputValue(this.webRtcCommClientConfiguration.RTCPeerConnection.stunServer);
     this.view.setSipOutboundProxyTextInputValue(this.webRtcCommClientConfiguration.sip.sipOutboundProxy);
+    this.view.setSipUserAgentCapabilitiesTextInputValue(this.webRtcCommClientConfiguration.sip.sipUserAgentCapabilities);
     this.view.setSipDomainTextInputValue(this.webRtcCommClientConfiguration.sip.sipDomain);
     this.view.setSipDisplayNameTextInputValue(this.webRtcCommClientConfiguration.sip.sipDisplayName);
     this.view.setSipUserNameTextInputValue(this.webRtcCommClientConfiguration.sip.sipUserName);
@@ -219,8 +226,9 @@ WebRtcCommTestWebAppController.prototype.onClickConnectButtonViewEventHandler=fu
     {
         try
         {
-            this.webRtcCommClientConfiguration.rtcPeerConnection.stunServer= this.view.getStunServerTextInputValue();
+            this.webRtcCommClientConfiguration.RTCPeerConnection.stunServer= this.view.getStunServerTextInputValue();
             this.webRtcCommClientConfiguration.sip.sipOutboundProxy = this.view.getSipOutboundProxyTextInputValue();
+            this.webRtcCommClientConfiguration.sip.sipUserAgentCapabilities = this.view.getSipUserAgentCapabilitiesTextInputValue();
             this.webRtcCommClientConfiguration.sip.sipDomain = this.view.getSipDomainTextInputValue();
             this.webRtcCommClientConfiguration.sip.sipDisplayName= this.view.getSipDisplayNameTextInputValue();
             this.webRtcCommClientConfiguration.sip.sipUserName = this.view.getSipUserNameTextInputValue();
