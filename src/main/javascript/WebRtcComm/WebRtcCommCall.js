@@ -93,7 +93,7 @@ WebRtcCommCall.prototype.getRemoteMediaStream= function() {
  * @param configuration communication configuration JSON object
  * <p> Communication configuration sample: <br>
  * { <br>
- * <span style="margin-left: 30px">displayedName:alice,<br></span>
+ * <span style="margin-left: 30px">displayName:alice,<br></span>
  * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
  * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
  * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
@@ -230,7 +230,7 @@ WebRtcCommCall.prototype.close =function(){
  * @param configuration communication configuration JSON object
  * <p> Call configuration sample: <br>
  * { <br>
- * <span style="margin-left: 30px">displayedName:alice,<br></span>
+ * <span style="margin-left: 30px">displayName:alice,<br></span>
  * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
  * <span style="margin-left: 30px">audio: true,<br></span>
  * <span style="margin-left: 30px">video: true,<br></span>
@@ -380,7 +380,7 @@ WebRtcCommCall.prototype.checkConfiguration=function(configuration){
         console.error("WebRtcCommCall:checkConfiguration(): missing data media flag");       
     }
                 
-    console.debug("WebRtcCommCall:checkConfiguration(): configuration.displayedName="+configuration.displayedName);
+    console.debug("WebRtcCommCall:checkConfiguration(): configuration.displayName="+configuration.displayName);
     console.debug("WebRtcCommCall:checkConfiguration(): configuration.localMediaStream="+configuration.localMediaStream);
     console.debug("WebRtcCommCall:checkConfiguration(): configuration.audioMediaFlag="+configuration.audioMediaFlag);
     console.debug("WebRtcCommCall:checkConfiguration(): configuration.audioMediaFlag="+configuration.audioMediaFlag);

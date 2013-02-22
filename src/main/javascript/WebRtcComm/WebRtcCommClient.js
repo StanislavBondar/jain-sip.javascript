@@ -155,7 +155,7 @@ WebRtcCommClient.prototype.close=function(){
  * @param {object} callConfiguration Communication configuration <br>
  * <p> Communication configuration sample: <br>
  * { <br>
- * <span style="margin-left: 30px">displayedName:alice,<br></span>
+ * <span style="margin-left: 30px">displayName:alice,<br></span>
  * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
  * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
  * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>

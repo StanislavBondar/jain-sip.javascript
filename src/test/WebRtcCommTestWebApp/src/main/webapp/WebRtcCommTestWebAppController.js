@@ -1,5 +1,5 @@
 /**
- * Class WebRtcCommTestWebApp
+ * Class WebRtcCommTestWebAppController
  * @public 
  */ 
 
@@ -46,6 +46,7 @@ WebRtcCommTestWebAppController.prototype.onLoadViewEventHandler=function()
             sipUserAgent:this.DEFAULT_SIP_USER_AGENT,
             sipOutboundProxy:this.DEFAULT_SIP_OUTBOUND_PROXY,
             sipDomain:this.DEFAULT_SIP_DOMAIN,
+            sipDisplayName:this.DEFAULT_SIP_DISPLAY_NAME,
             sipUserName:this.DEFAULT_SIP_USER_NAME,
             sipLogin:this.DEFAULT_SIP_LOGIN,
             sipPassword:this.DEFAULT_SIP_PASSWORD,
@@ -108,7 +109,7 @@ WebRtcCommTestWebAppController.prototype.onLoadViewEventHandler=function()
  */ 
 WebRtcCommTestWebAppController.prototype.onUnloadViewEventHandler=function()
 {
-    console.debug ("WebRtcCommTestWebAppController:onBeforeUnloadEventHandler()"); 
+    console.debug ("WebRtcCommTestWebAppController:onUnloadViewEventHandler()"); 
     if(this.webRtcCommClient != undefined)
     {
         try
@@ -117,7 +118,7 @@ WebRtcCommTestWebAppController.prototype.onUnloadViewEventHandler=function()
         }
         catch(exception)
         {
-            alert("Connection has failed, reason:"+exception)  
+             console.error("WebRtcCommTestWebAppController:onUnloadViewEventHandler(): catched exception:"+exception);  
         }
     }    
 }
@@ -213,7 +214,7 @@ WebRtcCommTestWebAppController.prototype.onGetUserMediaSuccessEventHandler=funct
 WebRtcCommTestWebAppController.prototype.onGetUserMediaErrorEventHandler=function(error) 
 {
     console.debug("WebRtcCommTestWebAppController:onGetUserMediaErrorEventHandler(): error="+error);
-    alert("failed to get local user media: error="+error);
+    alert("Failed to get local user media: error="+error);
 }	
   
 /**
@@ -284,7 +285,7 @@ WebRtcCommTestWebAppController.prototype.onClickCallButtonViewEventHandler=funct
         try
         {
             var callConfiguration = {
-                displayedName:this.DEFAULT_SIP_DISPLAY_NAME,
+                displayName:this.DEFAULT_SIP_DISPLAY_NAME,
                 localMediaStream: this.localAudioVideoMediaStream,
                 audioMediaFlag:this.view.getAudioMediaValue(),
                 videoMediaFlag:this.view.getVideoMediaValue(),
@@ -341,7 +342,6 @@ WebRtcCommTestWebAppController.prototype.onClickEndCallButtonViewEventHandler=fu
         try
         {
             this.webRtcCommCall.close();
-            this.view.disableCancelCallButton();
         }
         catch(exception)
         {
@@ -365,7 +365,7 @@ WebRtcCommTestWebAppController.prototype.onClickAcceptCallButtonViewEventHandler
         try
         {
             var callConfiguration = {
-                displayedName:this.DEFAULT_SIP_DISPLAY_NAME,
+                displayName:this.DEFAULT_SIP_DISPLAY_NAME,
                 localMediaStream: this.localAudioVideoMediaStream,
                 audioMediaFlag:this.view.getAudioMediaValue(),
                 videoMediaFlag:this.view.getVideoMediaValue(),

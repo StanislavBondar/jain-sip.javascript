@@ -800,8 +800,7 @@ SimpleWebRtcSipPhone.prototype.byeCall =function(){
     {
         try
         {
-            
-            var jainSipByeRequest=this.jainSipInvitingRequest.createBYERequest(true);
+            var jainSipByeRequest=this.jainSipInvitingDialog.createRequest("BYE");
             jainSipByeRequest.removeHeader("Contact");
             jainSipByeRequest.removeHeader("User-Agent");
             jainSipByeRequest.addHeader(this.jainSipContactHeader);
@@ -828,7 +827,7 @@ SimpleWebRtcSipPhone.prototype.byeCall =function(){
     {
         try
         {
-            var jainSipByeRequest=this.jainSipInvitedRequest.createBYERequest(true);
+            var jainSipByeRequest=this.jainSipInvitedDialog.createRequest("BYE");
             jainSipByeRequest.removeHeader("Contact");
             jainSipByeRequest.removeHeader("User-Agent");
             jainSipByeRequest.addHeader(this.jainSipContactHeader);

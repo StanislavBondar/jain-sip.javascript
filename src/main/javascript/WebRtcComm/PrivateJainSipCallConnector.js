@@ -110,7 +110,7 @@ PrivateJainSipCallConnector.prototype.getId= function() {
  * @param {object} configuration  WebRTC communication configuration 
  * <p> Communication configuration sample: <br>
  * { <br>
- * <span style="margin-left: 30px">displayedName:alice,<br></span>
+ * <span style="margin-left: 30px">displayName:alice,<br></span>
  * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
  * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
  * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
@@ -185,7 +185,7 @@ PrivateJainSipCallConnector.prototype.close =function(){
             else if(this.sipCallState==this.SIP_INVITING_ACCEPTED_STATE)
             {
                 // Sent SIP BYE
-                var jainSipByeRequest=this.jainSipInvitingRequest.createBYERequest(true);
+                var jainSipByeRequest=this.jainSipInvitingDialog.createRequest("BYE");
                 jainSipByeRequest.removeHeader("Contact");
                 jainSipByeRequest.removeHeader("User-Agent");
                 jainSipByeRequest.addHeader(this.webRtcCommCall.webRtcCommClient.connector.jainSipContactHeader);
@@ -209,7 +209,7 @@ PrivateJainSipCallConnector.prototype.close =function(){
             else if(this.sipCallState==this.SIP_INVITED_ACCEPTED_STATE)
             {
                 // Sent SIP BYE
-                var jainSipByeRequest=this.jainSipInvitedRequest.createBYERequest(true);
+                var jainSipByeRequest=this.jainSipInvitedDialog.createRequest("BYE");
                 jainSipByeRequest.removeHeader("Contact");
                 jainSipByeRequest.removeHeader("User-Agent");
                 jainSipByeRequest.addHeader(this.webRtcCommCall.webRtcCommClient.connector.jainSipContactHeader);
@@ -302,21 +302,26 @@ PrivateJainSipCallConnector.prototype.resetSipContext=function(){
  */ 
 PrivateJainSipCallConnector.prototype.invite=function(sdpOffer){
     console.debug("PrivateJainSipCallConnector:invite()");
-    // Send INVITE    
+    // Send INVITE 
+    var calleeSipUri = this.webRtcCommCall.getCalleePhoneNumber();
+    if(calleeSipUri.indexOf("@")==-1)
+    {
+       //No domain, add caller one 
+       calleeSipUri += "@"+this.webRtcCommCall.webRtcCommClient.connector.configuration.sipDomain;
+    }
     var fromSipUriString=this.webRtcCommCall.webRtcCommClient.connector.configuration.sipUserName+"@"+this.webRtcCommCall.webRtcCommClient.connector.configuration.sipDomain;
-    var toSipUriString= this.webRtcCommCall.calleePhoneNumber+"@"+this.webRtcCommCall.webRtcCommClient.connector.configuration.sipDomain;
     var random=new Date();       
     var jainSipCseqHeader=this.webRtcCommCall.webRtcCommClient.connector.headerFactory.createCSeqHeader(1,"INVITE");
     var jainSipCallIdHeader=this.webRtcCommCall.webRtcCommClient.connector.headerFactory.createCallIdHeader(this.sipCallId);
     var jainSipMaxForwardHeader=this.webRtcCommCall.webRtcCommClient.connector.headerFactory.createMaxForwardsHeader(70);
-    var jainSipRequestUri=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createSipURI_user_host(null,toSipUriString);
+    var jainSipRequestUri=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createSipURI_user_host(null,calleeSipUri);
     var jainSipAllowListHeader=this.webRtcCommCall.webRtcCommClient.connector.headerFactory.createHeaders("Allow: INVITE,ACK,CANCEL,BYE");         
     var jainSipFromUri=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createSipURI_user_host(null,fromSipUriString);
-    var jainSipFromAdress=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createAddress_name_uri(this.configuration.displayedName,jainSipFromUri);
+    var jainSipFromAdress=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createAddress_name_uri(this.configuration.displayName,jainSipFromUri);
     
     var tagfrom=random.getTime();
     var jainSipFromHeader=this.webRtcCommCall.webRtcCommClient.connector.headerFactory.createFromHeader(jainSipFromAdress, tagfrom);           
-    var jainSiptoUri=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createSipURI_user_host(null,toSipUriString);
+    var jainSiptoUri=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createSipURI_user_host(null,calleeSipUri);
     var jainSipToAddress=this.webRtcCommCall.webRtcCommClient.connector.addressFactory.createAddress_name_uri(null,jainSiptoUri);
     var jainSipToHeader=this.webRtcCommCall.webRtcCommClient.connector.headerFactory.createToHeader(jainSipToAddress, null);           
     var jainSipContentTypeHeader=this.webRtcCommCall.webRtcCommClient.connector.headerFactory.createContentTypeHeader("application","sdp");
