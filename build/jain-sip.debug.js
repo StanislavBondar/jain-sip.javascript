@@ -28138,7 +28138,6 @@ WSMessageProcessor.prototype.getDefaultPort =function(){
 function SIPDialog() {
     if(logger!=undefined) logger.debug("SIPDialog:SIPDialog()");
     this.classname="SIPDialog"; 
-    
     this.serialVersionUID = "-1429794423085204069L";
     this.dialogTerminatedEventDelivered=null; 
     this.stackTrace=null;
@@ -28939,7 +28938,7 @@ SIPDialog.prototype.addRouteList =function(recordRouteList){
     } 
     else {
         this.routeList = new RouteList();
-        for(i=0;i<recordRouteList.getHeaderList().length;i--)
+        for(i=0;i<recordRouteList.getHeaderList().length;i++)
         {
             var rr = recordRouteList.getHeaderList()[i];
             var route = new Route();
@@ -33933,6 +33932,7 @@ SipProviderImpl.prototype.getNewServerTransaction =function(request){
             if (sipRequest.getMethod()=="INVITE" && this.isDialogErrorsAutomaticallyHandled()) {
                 this.sipStack.putInMergeTable(transaction, sipRequest);
             }
+            dialog.addRoute(sipRequest);
             if (dialog.getRemoteTag() != null && dialog.getLocalTag() != null) {
                 this.sipStack.putDialog(dialog);
             }

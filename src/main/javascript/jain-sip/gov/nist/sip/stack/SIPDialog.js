@@ -832,7 +832,7 @@ SIPDialog.prototype.addRouteList =function(recordRouteList){
     } 
     else {
         this.routeList = new RouteList();
-        for(i=0;i<recordRouteList.getHeaderList().length;i--)
+        for(i=0;i<recordRouteList.getHeaderList().length;i++)
         {
             var rr = recordRouteList.getHeaderList()[i];
             var route = new Route();
