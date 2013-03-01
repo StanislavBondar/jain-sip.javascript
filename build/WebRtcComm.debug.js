@@ -115,6 +115,8 @@ PrivateJainSipCallConnector.prototype.getId= function() {
  * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
  * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
  * <span style="margin-left: 30px">dataMediaFlag:false,<br></span>
+ * <span style="margin-left: 30px">audioCodecsFilter:PCMA,PCMU,OPUS,<br></span>
+ * <span style="margin-left: 30px">videoCodecsFilter:VP8,H264,<br></span>
  * }<br>
  * </p>
  * @public  
@@ -306,8 +308,8 @@ PrivateJainSipCallConnector.prototype.invite=function(sdpOffer){
     var calleeSipUri = this.webRtcCommCall.getCalleePhoneNumber();
     if(calleeSipUri.indexOf("@")==-1)
     {
-       //No domain, add caller one 
-       calleeSipUri += "@"+this.webRtcCommCall.webRtcCommClient.connector.configuration.sipDomain;
+        //No domain, add caller one 
+        calleeSipUri += "@"+this.webRtcCommCall.webRtcCommClient.connector.configuration.sipDomain;
     }
     var fromSipUriString=this.webRtcCommCall.webRtcCommClient.connector.configuration.sipUserName+"@"+this.webRtcCommCall.webRtcCommClient.connector.configuration.sipDomain;
     var random=new Date();       
@@ -1718,6 +1720,16 @@ WebRtcCommCall = function(webRtcCommClient)
 };
 
 /**
+ * Audio Codec Name 
+ * @private
+ * @constant
+ */ 
+WebRtcCommCall.prototype.codecNames={
+    0:"PCMU", 
+    8:"PCMA"
+};
+
+/**
  * Get opened/closed status 
  * @public
  * @returns {boolean} true if opened, false if closed
@@ -1786,6 +1798,8 @@ WebRtcCommCall.prototype.getRemoteMediaStream= function() {
  * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
  * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
  * <span style="margin-left: 30px">dataMediaFlag:false,<br></span>
+ * <span style="margin-left: 30px">audioCodecsFilter:PCMA,PCMU,OPUS,<br></span>
+ * <span style="margin-left: 30px">videoCodecsFilter:VP8,H264,<br></span>
  * }<br>
  * </p>
  * @throw {String} Exception "bad argument, check API documentation"
@@ -1916,15 +1930,17 @@ WebRtcCommCall.prototype.close =function(){
  * Accept incoming WebRTC communication
  * @public 
  * @param configuration communication configuration JSON object
- * <p> Call configuration sample: <br>
+ * <p> Communication configuration sample: <br>
  * { <br>
  * <span style="margin-left: 30px">displayName:alice,<br></span>
  * <span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span>
- * <span style="margin-left: 30px">audio: true,<br></span>
- * <span style="margin-left: 30px">video: true,<br></span>
- * <span style="margin-left: 30px">data:false<br></span>
+ * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
+ * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
+ * <span style="margin-left: 30px">dataMediaFlag:false,<br></span>
+ * <span style="margin-left: 30px">audioCodecsFilter:PCMA,PCMU,OPUS,<br></span>
+ * <span style="margin-left: 30px">videoCodecsFilter:VP8,H264,<br></span>
  * }<br>
- * </p> 
+ * </p>
  * @throw {String} Exception "bad state, unauthorized action"
  * @throw {String} Exception "internal error,check console logs"
  */ 
@@ -2042,7 +2058,7 @@ WebRtcCommCall.prototype.checkConfiguration=function(configuration){
     console.debug("WebRtcCommCall:checkConfiguration()");
             
     var check=true;
-    // stunServer, sipLogin, sipPassword, sipApplicationProfile not mandatory other mandatory
+    // displayName, audioCodecsFilter, videoCodecsFilter NOT mandatoty in configuration
             
     if(configuration.localMediaStream==undefined)
     {
@@ -2071,8 +2087,10 @@ WebRtcCommCall.prototype.checkConfiguration=function(configuration){
     console.debug("WebRtcCommCall:checkConfiguration(): configuration.displayName="+configuration.displayName);
     console.debug("WebRtcCommCall:checkConfiguration(): configuration.localMediaStream="+configuration.localMediaStream);
     console.debug("WebRtcCommCall:checkConfiguration(): configuration.audioMediaFlag="+configuration.audioMediaFlag);
-    console.debug("WebRtcCommCall:checkConfiguration(): configuration.audioMediaFlag="+configuration.audioMediaFlag);
+    console.debug("WebRtcCommCall:checkConfiguration(): configuration.videoMediaFlag="+configuration.videoMediaFlag);
     console.debug("WebRtcCommCall:checkConfiguration(): configuration.dataMediaFlag="+configuration.dataMediaFlag);
+    console.debug("WebRtcCommCall:checkConfiguration(): configuration.audioCodecsFilter="+configuration.audioCodecsFilter);
+    console.debug("WebRtcCommCall:checkConfiguration(): configuration.videoCodecsFilter="+configuration.videoCodecsFilter);
     return check;
 }
 
@@ -2510,12 +2528,12 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIceCandidateEvent=function(rtcIceCan
 /**
  * Implementation of the RTCPeerConnection listener interface: handle RTCPeerConnection state machine
  * @private
- * @param {RTCSessionDescription} offer  RTCPeerConnection SDP offer event
+ * @param {RTCSessionDescription} sdpOffer  RTCPeerConnection SDP offer event
  */ 
-WebRtcCommCall.prototype.processRtcPeerConnectionCreateOfferSuccess=function(offer){ 
+WebRtcCommCall.prototype.processRtcPeerConnectionCreateOfferSuccess=function(sdpOffer){ 
     try
     {
-        console.debug("WebRtcCommCall:processRtcPeerConnectionCreateOfferSuccess(): offer="+offer.sdp); 
+        console.debug("WebRtcCommCall:processRtcPeerConnectionCreateOfferSuccess(): sdpOffer="+sdpOffer.sdp); 
         console.debug("WebRtcCommCall:processRtcPeerConnectionCreateOfferSuccess(): this.peerConnection.readyState="+this.peerConnection.readyState);
         console.debug("WebRtcCommCall:processRtcPeerConnectionCreateOfferSuccess(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
         console.debug("WebRtcCommCall:processRtcPeerConnectionCreateOfferSuccess(): this.peerConnection.iceState="+this.peerConnection.iceState); 
@@ -2526,8 +2544,26 @@ WebRtcCommCall.prototype.processRtcPeerConnectionCreateOfferSuccess=function(off
             // Preparing offer.
             var that=this;
             this.peerConnectionState = 'preparing-offer';
-            this.peerConnectionLocalDescription=offer;
-            this.peerConnection.setLocalDescription(offer, function() {
+            var sdpOfferString=sdpOffer.sdp;
+            if(this.configuration.audioCodecsFilter || this.configuration.videoCodecsFilter)
+            {
+                try
+                {
+                    // Apply audio/video codecs filter to RTCPeerConnection SDP offer to
+                    var sdpParser = new SDPParser();
+                    var parsedSdpOffer = sdpParser.parse(sdpOfferString);
+                    this.applyConfiguredCodecFilterOnSessionDescription(parsedSdpOffer, this.configuration.audioCodecsFilter);
+                    console.debug("WebRtcCommCall:processRtcPeerConnectionCreateOfferSuccess(): parsedSdpOffer="+parsedSdpOffer);
+                    sdpOffer.sdp=parsedSdpOffer;
+                }
+                catch(exception)
+                {
+                    console.error("WebRtcCommCall:processRtcPeerConnectionCreateOfferSuccess(): configured codec filtering has failded, use inital RTCPeerConnection SDP offer");
+                }
+            }
+            
+            this.peerConnectionLocalDescription=sdpOffer;
+            this.peerConnection.setLocalDescription(sdpOffer, function() {
                 that.processRtcPeerConnectionSetLocalDescriptionSuccess();
             }, function(error) {
                 that.processRtcPeerConnectionSetLocalDescriptionError(error);
@@ -2878,9 +2914,195 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIdentityResultEvent=function(event){
     console.debug("WebRtcCommCall:processRtcPeerConnectionIdentityResult(): this.peerConnectionState="+this.peerConnectionState);
 }
 
-
+/**
+ * Modifiy SDP based on configured codec filter
+ * @private
+ * @param {SessionDescription} sessionDescription  JAIN (gov.nist.sdp) SDP offer object 
+ */ 
+WebRtcCommCall.prototype.applyConfiguredCodecFilterOnSessionDescription=function(sessionDescription){ 
+    if(sessionDescription instanceof SessionDescription)
+    {
+        try
+        {
+            console.debug("WebRtcCommCall:applyConfiguredCodecFilterOnSessionDescription(): sessionDescription="+sessionDescription); 
+            // Deep copy the media descriptions
+            var mediaDescriptions = sessionDescription.getMediaDescriptions(false);
+            for (var i = 0; i <  mediaDescriptions.length; i++) 
+            {
+                var mediaDescription = mediaDescriptions[i];
+                var mediaField = mediaDescription.getMedia();
+                var mediaType = mediaField.getType();
+                if(mediaType=="audio" &&  this.configuration.audioCodecsFilter)
+                {
+                    var offeredAudioCodecs = this.getOfferedCodecsInMediaDescription(mediaDescription);
+                    // Filter offered codec
+                    var splitAudioCodecsFilters = (this.configuration.audioCodecsFilter).split(",");
+                    this.applyCodecFiltersOnOfferedCodecs(offeredAudioCodecs, splitAudioCodecsFilters);
+                    // Apply modification on audio media description
+                    this.updateMediaDescription(mediaDescription, offeredAudioCodecs, splitAudioCodecsFilters);
+                }
+                else if(mediaType=="video" && this.configuration.videoCodecsFilter)
+                {
+                    var offeredVideoCodecs = this.getOfferedCodecsInMediaDescription(mediaDescription); 
+                    // Filter offered codec
+                    var splitVideoCodecFilter = (this.configuration.videoCodecsFilter).split(",");
+                    this.applyCodecFiltersOnOfferedCodecs(offeredVideoCodecs, splitVideoCodecFilter);
+                    // Apply modification on video media description
+                    this.updateMediaDescription(mediaDescription, offeredVideoCodecs, splitVideoCodecFilter);
+                }
+            }
+        }
+        catch(exception)
+        {
+            console.error("WebRtcCommCall:applyConfiguredCodecFilterOnSessionDescription(): catched exception, exception:"+exception);
+            throw exception;
+        }
+    }
+    else 
+    {
+        throw "WebRtcCommCall:applyConfiguredCodecFilterOnSessionDescription(): bad arguments"      
+    }
+}
 
 /**
+ * Get offered codecs in media description
+ * @private
+ * @param {MediaDescription} mediaDescription  JAIN (gov.nist.sdp) MediaDescription object 
+ * @return offeredCodec JSON object { "0":"PCMU", "111":"OPUS", .....} 
+ */ 
+WebRtcCommCall.prototype.getOfferedCodecsInMediaDescription=function(mediaDescription){ 
+    if(mediaDescription instanceof MediaDescription)
+    {
+        var mediaFormats = mediaDescription.getMedia().getFormats(false);
+        var foundCodecs = {};
+                    
+        // Set static payload type and codec name
+        for(var j = 0; j <  mediaFormats.length; j++) 
+        {
+            var payloadType = mediaFormats[j];
+            console.debug("WebRtcCommCall:getOfferedCodecsInMediaDescription(): payloadType="+payloadType); 
+            console.debug("WebRtcCommCall:getOfferedCodecsInMediaDescription(): this.codecNames[payloadType]="+this.codecNames[payloadType]); 
+            foundCodecs[payloadType]=this.codecNames[payloadType];
+        }
+                    
+        // Set dynamic payload type and codec name 
+        var attributFields = mediaDescription.getAttributes();
+        for(var k = 0; k <  attributFields.length; k++) 
+        {
+            var attributField = attributFields[k];
+            console.debug("WebRtcCommCall:getOfferedCodecsInMediaDescription(): attributField.getName()="+attributField.getName()); 
+            if(attributField.getName()=="rtpmap")
+            {
+                try
+                {
+                    var rtpmapValue = attributField.getValue(); 
+                    var splitRtpmapValue = rtpmapValue.split(" ");
+                    var payloadType = splitRtpmapValue[0];
+                    var codecInfo = splitRtpmapValue[1];
+                    var splittedCodecInfo = codecInfo.split("/");
+                    var codecName = splittedCodecInfo[0];
+                    foundCodecs[payloadType]=codecName.toUpperCase();
+                    console.debug("WebRtcCommCall:getOfferedCodecsInMediaDescription(): payloadType="+payloadType); 
+                    console.debug("WebRtcCommCall:getOfferedCodecsInMediaDescription(): codecName="+codecName); 
+                }
+                catch(exception)
+                {
+                    console.error("WebRtcCommCall:getOfferedCodecsInMediaDescription(): rtpmap format not supported");  
+                }
+            }
+        }
+        return foundCodecs;
+    }
+    else 
+    {
+        throw "WebRtcCommCall:getOfferedCodecsInMediaDescription(): bad arguments"      
+    }
+}
+
+/**
+ * Get offered codec list
+ * @private
+ * @param {JSON object} foundCodecs  
+ * @param {Array} codecFilters  
+ */ 
+WebRtcCommCall.prototype.applyCodecFiltersOnOfferedCodecs=function(foundCodecs, codecFilters){ 
+    if(typeof(foundCodecs)=='object' && codecFilters instanceof Array)
+    {
+        for(var offeredMediaCodecPayloadType in foundCodecs){
+            var filteredFlag=false;
+            for(var i=0; i<codecFilters.length;i++ )
+            {
+                if ( foundCodecs[offeredMediaCodecPayloadType] == codecFilters[i] ) { 
+                    filteredFlag=true;
+                    break;
+                } 
+            }
+            if(filteredFlag==false)
+            {
+                delete(foundCodecs[offeredMediaCodecPayloadType]);     
+            }
+        }
+    }
+    else 
+    {
+        throw "WebRtcCommCall:applyCodecFiltersOnOfferedCodecs(): bad arguments"      
+    }
+}
+
+/**
+ * Update offered media description avec configured filters
+ * @private
+ * @param {MediaDescription} mediaDescription  JAIN (gov.nist.sdp) MediaDescription object 
+ * @param {JSON object} filteredCodecs 
+ * @param {Array} codecFilters  
+ */ 
+WebRtcCommCall.prototype.updateMediaDescription=function(mediaDescription, filteredCodecs, codecFilters){ 
+    if(mediaDescription instanceof MediaDescription  && typeof(filteredCodecs)=='object' && codecFilters instanceof Array)
+    {
+        // Build new media field format lis
+        var newFormatListArray=new Array();
+        for(var i=0;i<codecFilters.length;i++)
+        {
+            for(var offeredCodecPayloadType in filteredCodecs)
+            {
+                if (filteredCodecs[offeredCodecPayloadType] == codecFilters[i] ) { 
+                    newFormatListArray.push(offeredCodecPayloadType);
+                    break;
+                } 
+            }
+        }
+        mediaDescription.getMedia().setFormats(newFormatListArray);
+        // Remove obsolte rtpmap attributs 
+        var newAttributeFieldArray=new Array();
+        var attributFields = mediaDescription.getAttributes();
+        for(var k = 0; k <  attributFields.length; k++) 
+        {
+            var attributField = attributFields[k];
+            console.debug("WebRtcCommCall:updateMediaDescription(): attributField.getName()="+attributField.getName()); 
+            if(attributField.getName()=="rtpmap")
+            {
+                try
+                {
+                    var rtpmapValue = attributField.getValue(); 
+                    var splitedRtpmapValue = rtpmapValue.split(" ");
+                    var payloadType = splitedRtpmapValue[0];
+                    if(filteredCodecs[payloadType]!=undefined) 
+                        newAttributeFieldArray.push(attributField);
+                }
+                catch(exception)
+                {
+                    console.error("WebRtcCommCall:updateMediaDescription(): rtpmap format not supported");  
+                }
+            }
+            else newAttributeFieldArray.push(attributField);
+        }
+        mediaDescription.setAttributes(newAttributeFieldArray);
+    }
+    else 
+    {
+        throw "WebRtcCommCall:updateMediaDescription(): bad arguments"      
+    }
+}/**
  * @class WebRtcCommClient
  * @classdesc Main class of the WebRtcComm Framework providing high level communication service: call and be call
  * @constructor
@@ -3042,6 +3264,8 @@ WebRtcCommClient.prototype.close=function(){
  * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
  * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
  * <span style="margin-left: 30px">dataMediaFlag:false,<br></span>
+ * <span style="margin-left: 30px">audioCodecsFilter:PCMA,PCMU,OPUS,<br></span>
+ * <span style="margin-left: 30px">videoCodecsFilter:VP8,H264,<br></span>
  * }<br>
  * </p>
  * @throw {String} Exception "bad argument, check API documentation"
