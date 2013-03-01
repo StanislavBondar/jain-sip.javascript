@@ -192,6 +192,26 @@
             {
                 document.getElementById("videoMediaCkeckBox").checked=true;
             }
+             function uncheckAudioMediaFlag() 
+            {
+                document.getElementById("audioMediaCkeckBox").checked=false;
+            }
+
+            function checkAudioMediaFlag() 
+            {
+                document.getElementById("audioMediaCkeckBox").checked=true;
+            }
+
+            function uncheckDataMediaFlag() 
+            {
+                document.getElementById("dataMediaCkeckBox").checked=false;
+            }
+
+            function checkDataMediaFlag() 
+            {
+                document.getElementById("dataMediaCkeckBox").checked=true;
+            }
+            
 
             function setStunServerTextInputValue(value) 
             {
@@ -237,46 +257,17 @@
             {
                 document.getElementById("sipContact").value=value;
             }
-            function setStunServerTextInputValue(value) 
+            
+            function setAudioCodecsFilterTextInputValue(value) 
             {
-                document.getElementById("stunServer").value=value;
+                document.getElementById("audioCodecsFilter").value=value;
             }
-
-            function setSipOutboundProxyTextInputValue(value) 
+            
+            function setVideoCodecsFilterTextInputValue(value) 
             {
-                document.getElementById("sipOutboundProxy").value=value;
+                document.getElementById("videoCodecsFilter").value=value;
             }
-
-            function setSipDomainTextInputValue(value) 
-            {
-                document.getElementById("sipDomain").value=value;
-            }
-
-            function setSipDisplayNameTextInputValue(value) 
-            {
-                document.getElementById("sipDisplayName").value=value;
-            }
-
-            function setSipUserNameTextInputValue(value) 
-            {
-                document.getElementById("sipUserName").value=value;
-            }
-
-            function setSipLoginTextInputValue(value) 
-            {
-                document.getElementById("sipLogin").value=value;
-            }
-
-            function setSipPasswordTextInputValue(value) 
-            {
-                document.getElementById("sipPassword").value=value;
-            }
-
-            function setSipContactTextInputValue(value) 
-            {
-                document.getElementById("sipContact").value=value;
-            }
-
+            
             function getTextInputValue(elementId) 
             {
                 var value = document.getElementById(elementId).value;
@@ -345,6 +336,22 @@
                 return document.getElementById("videoMediaCkeckBox").checked;
             }
             
+             
+            function getDataMediaValue() 
+            {
+                return document.getElementById("dataMediaCkeckBox").checked;
+            }
+            
+            function getAudioCodecsFilterTextInputValue() 
+            {
+                return getTextInputValue("audioCodecsFilter")
+            }
+            
+            function getVideoCodecsFilterTextInputValue() 
+            {
+                return getTextInputValue("videoCodecsFilter")
+            }
+            
         </script>
 
     </head>
@@ -397,13 +404,26 @@
             </div>
             <div id='audioMediaDiv'>
                 <label>Audio media:</label>
-                <input  id='audioMediaCkeckBox' type="checkbox" checked name="audioMediaCkeckBox">
+                <input  id='audioMediaCkeckBox' type="checkbox" checked>
             </div>
             <div id='videoMediaDiv'>
                 <label>Video media:</label>
-                <input  id='videoMediaCkeckBox' type="checkbox" checked name="videoMediaCheckBox" >
+                <input  id='videoMediaCkeckBox' type="checkbox" checked >
+            </div>
+            <div id='dataMediaDiv'>
+                <label>Data media:</label>
+                <input  id='dataMediaCkeckBox' type="checkbox" checked>
+            </div>
+            <div id='audioCodecsFilterDiv'>
+                <label>Audio codecs filter (ordered by priority e.g. PCMU,PCMA,OPUS):</label>
+                <input id='audioCodecsFilter' type="text" size="30" >
+            </div>
+            <div id='videoCodecsFilterDiv'>
+                <label>Video codecs filter (ordered by priority e.g. VP8, H264):</label>
+                <input id='videoCodecsFilter' type="text" size="30" >
             </div>
             <audio id="ringing" loop src="audio/ringing.wav" />
+            <audio id="ringingBack" loop src="audio/ringing.wav" />
         </div>
         <div id='input'>
             <div>

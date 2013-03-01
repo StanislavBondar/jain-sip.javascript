@@ -31,6 +31,8 @@ WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_PASSWORD=undefined;
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_CONTACT="bob";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_REGISTER_MODE=true;
 WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER=undefined; // stun.l.google.com:19302
+WebRtcCommTestWebAppController.prototype.DEFAULT_AUDIO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
+WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
 
 /**
  * on load event handler
@@ -149,6 +151,8 @@ WebRtcCommTestWebAppController.prototype.initView=function(){
     this.view.setSipLoginTextInputValue(this.webRtcCommClientConfiguration.sip.sipLogin);
     this.view.setSipPasswordTextInputValue(this.webRtcCommClientConfiguration.sip.sipPassword);
     this.view.setSipContactTextInputValue(this.sipContact);
+    this.view.setAudioCodecsFilterTextInputValue(WebRtcCommTestWebAppController.prototype.DEFAULT_AUDIO_CODECS_FILTER);
+    this.view.setVideoCodecsFilterTextInputValue(WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER);
     
     // Get local user media
     try
@@ -289,7 +293,9 @@ WebRtcCommTestWebAppController.prototype.onClickCallButtonViewEventHandler=funct
                 localMediaStream: this.localAudioVideoMediaStream,
                 audioMediaFlag:this.view.getAudioMediaValue(),
                 videoMediaFlag:this.view.getVideoMediaValue(),
-                dataMediaFlag:false
+                dataMediaFlag:this.view.getDataMediaValue(),
+                audioCodecsFilter:this.view.getAudioCodecsFilterTextInputValue(),
+                videoCodecsFilter:this.view.getVideoCodecsFilterTextInputValue()
             }
             this.webRtcCommCall = this.webRtcCommClient.call(calleePhoneNumber, callConfiguration);
             this.view.disableCallButton();
@@ -319,6 +325,7 @@ WebRtcCommTestWebAppController.prototype.onClickCancelCallButtonViewEventHandler
         {
             this.webRtcCommCall.close();
             this.view.disableCancelCallButton();
+             this.view.stopRinging();
         }
         catch(exception)
         {
