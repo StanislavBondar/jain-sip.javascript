@@ -115,6 +115,8 @@ PrivateJainSipCallConnector.prototype.getId= function() {
  * <span style="margin-left: 30px">audioMediaFlag:true,<br></span>
  * <span style="margin-left: 30px">videoMediaFlag:false,<br></span>
  * <span style="margin-left: 30px">dataMediaFlag:false,<br></span>
+ * <span style="margin-left: 30px">audioCodecsFilter:PCMA,PCMU,OPUS,<br></span>
+ * <span style="margin-left: 30px">videoCodecsFilter:VP8,H264,<br></span>
  * }<br>
  * </p>
  * @public  
@@ -306,8 +308,8 @@ PrivateJainSipCallConnector.prototype.invite=function(sdpOffer){
     var calleeSipUri = this.webRtcCommCall.getCalleePhoneNumber();
     if(calleeSipUri.indexOf("@")==-1)
     {
-       //No domain, add caller one 
-       calleeSipUri += "@"+this.webRtcCommCall.webRtcCommClient.connector.configuration.sipDomain;
+        //No domain, add caller one 
+        calleeSipUri += "@"+this.webRtcCommCall.webRtcCommClient.connector.configuration.sipDomain;
     }
     var fromSipUriString=this.webRtcCommCall.webRtcCommClient.connector.configuration.sipUserName+"@"+this.webRtcCommCall.webRtcCommClient.connector.configuration.sipDomain;
     var random=new Date();       
