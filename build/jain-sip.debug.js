@@ -6079,11 +6079,11 @@ MediaDescription.prototype.getKey=function() {
 /**
  * Return attribut fields.
  * @public
- * @return AttributeFields
+ * @return attributeFieldArray
  */
 MediaDescription.prototype.getAttributes=function() {
     if(logger!=undefined) logger.debug("MediaDescription:getAttributes()");
-    return this.attributeFields;
+    return this.attributeFieldArray;
 }
 
 
@@ -6098,9 +6098,9 @@ MediaDescription.prototype.getAttribute=function(name) {
     if(typeof name == 'string')
     {
         if(logger!=undefined) logger.debug("MediaDescription:getAttribute():name="+name);
-        for (var i = 0; i < this.attributeFields.length; i++) {
-            if (name == this.attributeFields[i].getAttribute().getName())
-                return this.attributeFields[i].getAttribute().getValueAsObject();
+        for (var i = 0; i < this.attributeFieldArray.length; i++) {
+            if (name == this.attributeFieldArray[i].getAttribute().getName())
+                return this.attributeFieldArray[i].getAttribute().getValueAsObject();
         }
         return null;
     }
@@ -6168,7 +6168,7 @@ MediaDescription.prototype.setKey=function(keyField) {
 }
 
 /**
- * Set the attributeFields member
+ * Set the attributeFieldArray member
  */
 MediaDescription.prototype.setAttributes=function(attributeFieldArray) {
     if(attributeFieldArray instanceof Array) 
@@ -6924,7 +6924,7 @@ SessionDescription.prototype.copy=function(otherSessionDescription)
             if (otherMediaField != null) {
                 // Media field clone() makes a shallow copy, so don't use clone()
                 var newMF = new MediaField();
-                newMF.setMedia(otherMediaField.getMedia());
+                newMF.setType(otherMediaField.getType());
                 newMF.setPort(otherMediaField.getPort());
                 newMF.setNports(otherMediaField.getNports());
                 newMF.setProto(otherMediaField.getProto());
@@ -28138,6 +28138,7 @@ WSMessageProcessor.prototype.getDefaultPort =function(){
 function SIPDialog() {
     if(logger!=undefined) logger.debug("SIPDialog:SIPDialog()");
     this.classname="SIPDialog"; 
+    
     this.serialVersionUID = "-1429794423085204069L";
     this.dialogTerminatedEventDelivered=null; 
     this.stackTrace=null;
