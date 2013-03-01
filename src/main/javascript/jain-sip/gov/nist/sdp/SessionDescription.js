@@ -241,7 +241,7 @@ SessionDescription.prototype.copy=function(otherSessionDescription)
             if (otherMediaField != null) {
                 // Media field clone() makes a shallow copy, so don't use clone()
                 var newMF = new MediaField();
-                newMF.setMedia(otherMediaField.getMedia());
+                newMF.setType(otherMediaField.getType());
                 newMF.setPort(otherMediaField.getPort());
                 newMF.setNports(otherMediaField.getNports());
                 newMF.setProto(otherMediaField.getProto());
