@@ -29,7 +29,6 @@
  */
 function Contact() {
     if(logger!=undefined) logger.debug("Contact:Contact()");
-    this.serialVersionUID = "1677294871695706288L";
     this.classname="Contact";
     this.headerName=this.NAME;
     this.parameters = new NameValueList();

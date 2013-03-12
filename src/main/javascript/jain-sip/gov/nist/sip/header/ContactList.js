@@ -29,7 +29,6 @@
  */
 function ContactList() {
     if(logger!=undefined) logger.debug("ContactList:ContactList()");
-    this.serialVersionUID = "1224806837758986814L";
     this.classname="ContactList";
     this.headerName = this.NAME;
     this.myClass =  "Contact";

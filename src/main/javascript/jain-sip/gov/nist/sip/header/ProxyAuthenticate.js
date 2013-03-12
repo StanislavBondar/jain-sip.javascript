@@ -29,7 +29,6 @@
  */
 function ProxyAuthenticate() {
     if(logger!=undefined) logger.debug("ProxyAuthenticate:ProxyAuthenticate()");
-    this.serialVersionUID = "-3826145955463251116L";
     this.classname="ProxyAuthenticate";
     this.headerName=this.PROXY_AUTHENTICATE;
     this.parameters = new NameValueList();

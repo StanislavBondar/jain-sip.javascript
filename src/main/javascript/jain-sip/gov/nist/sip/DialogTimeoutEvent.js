@@ -33,7 +33,6 @@ function DialogTimeoutEvent(source,dialog,reason) {
     if(logger!=undefined) logger.debug("DialogTimeoutEvent:DialogTimeoutEvent(): dialog="+dialog);
     if(logger!=undefined) logger.debug("DialogTimeoutEvent:DialogTimeoutEvent(): reason="+reason);
     this.classname="DialogTimeoutEvent";
-    this.serialVersionUID = "-2514000059989311925L";
     this.source=source;
     this.m_dialog = dialog;
     this.m_reason = reason;

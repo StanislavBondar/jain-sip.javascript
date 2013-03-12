@@ -30,7 +30,6 @@
 function TimeStamp() {
     if(logger!=undefined) logger.debug("TimeStamp:TimeStamp()");
     this.classname="TimeStamp";
-    this.serialVersionUID = "-3711322366481232720L";
     this.timeStamp = -1;
     this.delay = -1;
     this.delayFloat = -1;

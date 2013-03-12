@@ -20,7 +20,7 @@ function WebRtcCommTestWebAppController(view) {
 WebRtcCommTestWebAppController.prototype.constructor=WebRtcCommTestWebAppController;
 
 // Default SIP profile to use
-WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://localhost:5082";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.193.13.222:5082";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT="WebRtcCommTestWebApp/0.0.1" 
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT_CAPABILITIES=undefined // +g.oma.sip-im
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DOMAIN="sip.test.com";
@@ -555,7 +555,7 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommCallOpenErrorEvent=function
 /**
  * Implementation of the WebRtcCommCall listener interface
  */
-WebRtcCommTestWebAppController.prototype.onWebRtcCommCallRingingEvent=function(webRtcCommCall, callerPhoneNumber)
+WebRtcCommTestWebAppController.prototype.onWebRtcCommCallRingingEvent=function(webRtcCommCall)
 {
     console.debug ("WebRtcCommTestWebAppController:onWebRtcCommCallRingingEvent(): webRtcCommCall.getId()="+webRtcCommCall.getId()); 
     this.webRtcCommCall=webRtcCommCall;
@@ -567,7 +567,7 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommCallRingingEvent=function(w
     this.view.disableEndCallButton();
     this.view.disableCancelCallButton();
     this.view.disableConnectButton();
-    alert("Communication from "+callerPhoneNumber + ", accept or reject"); 
+    alert("Communication from "+webRtcCommCall.getCallerPhoneNumber() + ", accept or reject"); 
 
 }
 
@@ -587,7 +587,28 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommCallRingingBackEvent=functi
     this.view.disableConnectButton();
 }
 
-    
+/**
+ * Implementation of the WebRtcCommCall listener interface
+ */
+WebRtcCommTestWebAppController.prototype.onWebRtcCommCallHangupEvent=function(webRtcCommCall)
+{
+    console.debug ("WebRtcCommTestWebAppController:onWebRtcCommCallHangupEvent(): webRtcCommCall.getId()="+webRtcCommCall.getId()); 
+    //Enabled button DISCONECT, CALL
+    this.view.enableCallButton();
+    this.view.enableDisconnectButton();
+    this.view.disableRejectCallButton();
+    this.view.disableAcceptCallButton();
+    this.view.disableEndCallButton();
+    this.view.disableCancelCallButton();
+    this.view.disableConnectButton();
+    this.view.hideRemoteVideo();
+    this.view.stopRemoteVideo();
+    this.view.stopRinging();
+    this.webRtcCommCall=undefined;
+    alert("Communication from "+webRtcCommCall.getCallerPhoneNumber() + " closed");  
+}
+
+
 
 
 

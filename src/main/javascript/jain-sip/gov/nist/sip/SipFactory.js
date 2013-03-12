@@ -30,72 +30,42 @@
 function SipFactory() {
     if(logger!=undefined) logger.debug("SipFactory:SipFactory()");
     this.classname="SipFactory"; 
-    this.sipFactory=null;
-    this.mNameSipStackMap=new Array();
 }
 
-SipFactory.prototype.getInstance =function(){
-    if(logger!=undefined) logger.debug("SipFactory:getInstance()");
-    if (this.sipFactory == null) 
-    {
-        this.sipFactory = new SipFactory();
-    }
-    return this.sipFactory;
-}
-
-SipFactory.prototype.resetFactory =function(){
-    if(logger!=undefined) logger.debug("SipFactory:resetFactory()");
-    this.mNameSipStackMap=new Array();
-}
-
-SipFactory.prototype.createSipStack =function(wsUrl,sipUserAgentName){
+SipFactory.prototype.createSipStack =function(sipUserAgentName){
     if(logger!=undefined) logger.debug("SipFactory:createSipStack()");
-
-    var sipStack = null;
-    for(var i=0;i<this.mNameSipStackMap.length;i++)
-    {
-        if(this.mNameSipStackMap[i][0]==wsUrl)
-        {
-            sipStack=this.mNameSipStackMap[i][1]
-        }
+    try {
+       return new SipStackImpl(sipUserAgentName);
+    } catch (exception) {
+        console.error("SipFactory:createAddressFactory(): failed to create SipStackImpl");
+        throw "SipFactory:createAddressFactory(): failed to create SipStackImpl";
     }
-    if (sipStack == null) {
-        var array=new Array();
-        sipStack=new SipStackImpl(wsUrl,sipUserAgentName);
-        array[0]=wsUrl;
-        array[1]=sipStack;
-        this.mNameSipStackMap.push(array);
-    }
-    return sipStack;
 }
-
 
 SipFactory.prototype.createAddressFactory =function(){
     if(logger!=undefined) logger.debug("SipFactory:createAddressFactory()");
     try {
-        var afi=new AddressFactoryImpl();
-        return afi;
-    } catch (ex) {
+        return new AddressFactoryImpl();
+    } catch (exception) {
         console.error("SipFactory:createAddressFactory(): failed to create AddressFactory");
         throw "SipFactory:createAddressFactory(): failed to create AddressFactory";
     }
 }
+
 SipFactory.prototype.createHeaderFactory =function(){
     if(logger!=undefined) logger.debug("SipFactory:createHeaderFactory()");
     try {
-        var hfi=new HeaderFactoryImpl();
-        return hfi;
-    } catch (ex) {
+        return new HeaderFactoryImpl();
+    } catch (exception) {
         console.error("SipFactory:createHeaderFactory(): failed to create HeaderFactory");
         throw "SipFactory:createHeaderFactory(): failed to create HeaderFactory";
     }
 }
-SipFactory.prototype.createMessageFactory =function(listeningpoint){
-    if(logger!=undefined) logger.debug("SipFactory:createMessageFactory():listeningpoint:"+listeningpoint);
+SipFactory.prototype.createMessageFactory =function(){
+    if(logger!=undefined) logger.debug("SipFactory:createMessageFactory():");
     try {
-        var mfi=new MessageFactoryImpl(listeningpoint);
-        return mfi;
-    } catch (ex) {
+        return new MessageFactoryImpl();
+    } catch (exception) {
         console.error("SipFactory:createMessageFactory(): failed to create MessageFactory");
         throw "SipFactory:createMessageFactory():failed to create MessageFactory";
     }

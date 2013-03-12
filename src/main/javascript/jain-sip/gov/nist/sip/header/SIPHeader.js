@@ -29,7 +29,6 @@
  */
 function SIPHeader(headername) {
     if(logger!=undefined) logger.debug("SIPHeader:SIPHeader()");
-    this.serialVersionUID = "7749781076218987044L";
     this.classname="SIPHeader";
     this.headerName=null;
     if(headername!=null)
@@ -69,7 +68,7 @@ SIPHeader.prototype.getHeaderValue =function(){
     {
         buffer=buffer.substring(1);
     }
-    return buffer.toString().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
+    return buffer.toString().trim();
 }
 
 SIPHeader.prototype.isHeaderList =function(){

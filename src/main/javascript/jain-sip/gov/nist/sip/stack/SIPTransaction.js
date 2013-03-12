@@ -28,7 +28,6 @@
  *  @version 1.0 
  *   
  */
-var siptransaction;
 function SIPTransaction(newParentStack,newEncapsulatedChannel) {
     if(logger!=undefined) logger.debug("SIPTransaction:SIPTransaction()");
     this.classname="SIPTransaction"; 
@@ -41,20 +40,9 @@ function SIPTransaction(newParentStack,newEncapsulatedChannel) {
     this.sipStack=newParentStack;
     this.originalRequest=null;
     this.encapsulatedChannel=newEncapsulatedChannel;
-    if(arguments.length==0)
-    {
-        this.wsurl=null;
-    }
-    else
-    {
-        this.wsurl=this.encapsulatedChannel.wsurl;
-        /*if (this.isReliable()) {            
-            this.encapsulatedChannel.useCount++;
-        }*/
-        this.disableTimeoutTimer();
-        this.addEventListener(newParentStack);
-    }
+    this.disableTimeoutTimer();
     this.eventListeners = new Array();
+    this.addEventListener(newParentStack);
     this.transactionTimerStarted = false;
     this.branch=null;
     this.method=null;
@@ -71,7 +59,6 @@ function SIPTransaction(newParentStack,newEncapsulatedChannel) {
     this.terminatedEventDelivered=null;
 }
 
-SIPTransaction.prototype = new WSMessageChannel();
 SIPTransaction.prototype.constructor=SIPTransaction;
 SIPTransaction.prototype.BASE_TIMER_INTERVAL = 500;
 SIPTransaction.prototype.T4 = 5000 / SIPTransaction.prototype.BASE_TIMER_INTERVAL;
@@ -96,16 +83,10 @@ SIPTransaction.prototype.MAXIMUM_RETRANSMISSION_TICK_COUNT = 8;
 SIPTransaction.prototype.TIMEOUT_RETRANSMIT = 3;
 SIPTransaction.prototype.CONNECTION_LINGER_TIME=8;
 
-function lingerTimer() {
+SIPTransaction.prototype.lingerTimer =function(){
     if(logger!=undefined) logger.debug("lingerTimer()");
-    var transaction = siptransaction;
-    var sipStack = transaction.getSIPStack();
-    if (transaction instanceof SIPClientTransaction) {
-        sipStack.removeTransaction(transaction);
-    } 
-    else if (transaction instanceof ServerTransaction) {
-        sipStack.removeTransaction(transaction);
-    }
+    var sipStack = this.getSIPStack();
+    sipStack.removeTransaction(this);
 }
 
 SIPTransaction.prototype.getBranchId =function(){
@@ -270,11 +251,6 @@ SIPTransaction.prototype.isTerminated =function(){
     }
 }
 
-SIPTransaction.prototype.getURLWS =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getURLWS()");
-    return this.encapsulatedChannel.getURLWS();
-}
-
 SIPTransaction.prototype.getKey =function(){
     if(logger!=undefined) logger.debug("SIPTransaction:getKey()");
     return this.encapsulatedChannel.getKey();
@@ -308,19 +284,23 @@ SIPTransaction.prototype.sendMessage=function(messageToSend){
 //this.startTransactionTimer();
 }
 
+
 SIPTransaction.prototype.addEventListener =function(newListener){
     if(logger!=undefined) logger.debug("SIPTransaction:addEventListener():newListener="+newListener);
-    var l=null;
-    for(var i=0;i<this.eventListeners.length;i++)
+    if(newListener)
     {
-        if(this.eventListeners[i]==newListener)
+        var l=null;
+        for(var i=0;i<this.eventListeners.length;i++)
         {
-            l=i;
+            if(this.eventListeners[i]==newListener)
+            {
+                l=i;
+            }
         }
-    }
-    if(l==null)
-    {
-        this.eventListeners.push(newListener);
+        if(l==null)
+        {
+            this.eventListeners.push(newListener);
+        }
     }
 }
 
@@ -331,10 +311,10 @@ SIPTransaction.prototype.removeEventListener =function(oldListener){
     {
         if(this.eventListeners[i]==oldListener)
         {
-            l=i;
+           this.eventListeners.splice(l,1);
+           return;
         }
     }
-    this.eventListeners.splice(l,1);
 }
 
 SIPTransaction.prototype.raiseErrorEvent =function(errorEventID){
@@ -495,11 +475,6 @@ SIPTransaction.prototype.setApplicationData =function(applicationData){
     this.applicationData = applicationData;
 }
 
-SIPTransaction.prototype.getURLWS =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:getURLWS()");
-    return this.wsurl;
-}
-
 SIPTransaction.prototype.getApplicationData =function(){
     if(logger!=undefined) logger.debug("SIPTransaction:getApplicationData()");
     return this.applicationData;
@@ -544,10 +519,5 @@ SIPTransaction.prototype.startTransactionTimer =function(){
 
 SIPTransaction.prototype.isMessagePartOfTransaction =function(){
     if(logger!=undefined) logger.debug("SIPTransaction:isMessagePartOfTransaction()");
-    
-}
-
-SIPTransaction.prototype.fireTimeoutTimer =function(){
-    if(logger!=undefined) logger.debug("SIPTransaction:fireTimeoutTimer()");
     
 }

@@ -29,7 +29,6 @@
  */
 function ProxyAuthorization() {
     if(logger!=undefined) logger.debug("ProxyAuthorization:ProxyAuthorization()");
-    this.serialVersionUID = "-6374966905199799098L";
     this.classname="ProxyAuthorization";
     this.scheme=null;
     this.headerName=this.PROXY_AUTHORIZATION;

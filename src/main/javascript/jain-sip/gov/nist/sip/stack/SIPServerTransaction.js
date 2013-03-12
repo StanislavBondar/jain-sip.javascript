@@ -28,7 +28,6 @@
  *  @version 1.0 
  *  
  */
-var sipservertransaction=this;
 function SIPServerTransaction(sipStack,newChannelToUse) {
     if(logger!=undefined) logger.debug("SIPServerTransaction:SIPServerTransaction()");
     this.classname="SIPServerTransaction"; 
@@ -36,15 +35,12 @@ function SIPServerTransaction(sipStack,newChannelToUse) {
     this.sipStack=sipStack;
     this.originalRequest=null;
     this.encapsulatedChannel=newChannelToUse;
-    this.wsurl=this.encapsulatedChannel.wsurl;
     this.disableTimeoutTimer();
-    this.eventListeners = new Array();
     this.addEventListener(sipStack);
     this.timert=null;
     this.timer=null;
     
     if (sipStack.maxListenerResponseTime != -1) {
-        this.timer=sipStack.getTimer();
         this.timer=setTimeout(this.listenerExecutionMaxTimer(), sipStack.maxListenerResponseTime * 1000);
     }
     
@@ -56,7 +52,6 @@ function SIPServerTransaction(sipStack,newChannelToUse) {
     this.isAckSeen=null;
     this.pendingSubscribeTransaction=null;
     this.inviteTransaction=null;
-    sipservertransaction=this;
 }
 
 SIPServerTransaction.prototype = new SIPTransaction();
@@ -76,14 +71,13 @@ SIPServerTransaction.prototype.BASE_TIMER_INTERVAL=500;
 SIPServerTransaction.prototype.ExpiresHeader="Expires";
 SIPServerTransaction.prototype.ContactHeader="Contact";
 
-function listenerExecutionMaxTimer(){
-    if(logger!=undefined) logger.debug("ListenerExecutionMaxTimer()");
-    var serverTransaction = sipservertransaction;
-    if (serverTransaction.getState() == null) {
-        serverTransaction.terminate();
-        var sipStack = serverTransaction.getSIPStack();
-        sipStack.removePendingTransaction(serverTransaction);
-        sipStack.removeTransaction(serverTransaction);
+SIPServerTransaction.prototype.listenerExecutionMaxTimer =function(){
+    if(logger!=undefined) logger.debug("SIPServerTransaction:listenerExecutionMaxTimer()");
+    if (this.getState() == null) {
+        this.terminate();
+        var sipStack = this.getSIPStack();
+        sipStack.removePendingTransaction(this);
+        sipStack.removeTransaction(this);
     }
 }
 
@@ -460,8 +454,7 @@ SIPServerTransaction.prototype.sendResponse =function(response){
             if (sipResponse.getStatusCode() / 100 == 2
                 && this.sipStack.isDialogCreated(sipResponse.getCSeq().getMethod())) {
                 if (dialog.getLocalTag() == null && sipResponse.getTo().getTag() == null) {
-                    var utils=new Utils();
-                    sipResponse.getTo().setTag(utils.generateTag());
+                    sipResponse.getTo().setTag(Utils.prototype.generateTag());
                 } 
                 else if (dialog.getLocalTag() != null && sipResponse.getToTag() == null) {
                     sipResponse.setToTag(dialog.getLocalTag());
@@ -534,12 +527,11 @@ SIPServerTransaction.prototype.startTransactionTimer =function(){
         this.transactionTimerStarted=true;
     }
     if (this.transactionTimerStarted) {
-        if (this.sipStack.getTimer() != null) {
-            this.timer = this.sipStack.getTimer();
-            var transaction=this;
+        if (this.timer == null) {
+            var that=this;
             this.timer=setInterval(function(){
-                if(!transaction.isTerminated()){
-                    transaction.fireTimer();
+                if(!that.isTerminated()){
+                    that.fireTimer();
                 }
             }, this.BASE_TIMER_INTERVAL);
         }

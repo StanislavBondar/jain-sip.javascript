@@ -415,7 +415,7 @@ HeaderFactoryImpl.prototype.createHeader =function(){
     {
         var headerText = arguments[0];
         var smp = new StringMsgParser();
-        var sipHeader = smp.parseSIPHeader(headerText.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, ''));
+        var sipHeader = smp.parseSIPHeader(headerText.trim());
         
         if(sipHeader instanceof SIPHeaderList)
         {

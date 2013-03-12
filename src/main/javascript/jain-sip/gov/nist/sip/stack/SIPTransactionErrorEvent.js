@@ -31,7 +31,6 @@
 function SIPTransactionErrorEvent(sourceTransaction,transactionErrorID) {
     if(logger!=undefined) logger.debug("SIPTransactionErrorEvent:SIPTransactionErrorEvent(): sourceTransaction="+sourceTransaction+", transactionErrorID="+transactionErrorID);
     this.classname="SIPTransactionErrorEvent"; 
-    this.serialVersionUID = "-2713188471978065031L";
     this.source=sourceTransaction;
     this.errorID=transactionErrorID;
 }

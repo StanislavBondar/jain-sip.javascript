@@ -30,7 +30,6 @@
  */
 function AddressImpl() {
     if(logger!=undefined) logger.debug("AddressImpl:AddressImpl()");
-    this.serialVersionUID = "429592779568617259L";
     this.classname="AddressImpl";
     this.addressType =1;
     this.displayName=null;

@@ -29,7 +29,6 @@
  */
 function Protocol() {
     if(logger!=undefined) logger.debug("Protocol:Protocol()");
-    this.serialVersionUID = "2216758055974073280L";
     this.classname="Protocol";
     this.protocolName="SIP";
     this.protocolVersion="2.0";

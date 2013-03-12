@@ -27,35 +27,24 @@
  *  @author Laurent STRULLU (laurent.strullu@orange.com)
  *  @version 1.0 
  */
-function ListeningPointImpl() {
+function ListeningPointImpl(sipStack, messageProcessor) {
     if(logger!=undefined) logger.debug("ListeningPointImpl:ListeningPointImpl()");
     this.classname="ListeningPointImpl";
-    this.transport="ws";
-    this.messageProcessor=null;
+    this.sipStack=sipStack;
+    this.messageProcessor=messageProcessor;
     this.sipProvider=null;
-    if(arguments.length!=0)
-    {
-        var sipStack=arguments[0];
-        this.sipStack=sipStack;
-    }
 }
 
 ListeningPointImpl.prototype.makeKey =function(host,transport){
     if(logger!=undefined) logger.debug("ListeningPointImpl:makeKey():host="+host);
     if(logger!=undefined) logger.debug("ListeningPointImpl:makeKey():transport="+transport);
-    var string="";
-    string=(string+host+"/"+transport).toLowerCase();
-    return string;
+    return (""+host+"/"+transport).toLowerCase();
 }
+
 
 ListeningPointImpl.prototype.getKey =function(){
     if(logger!=undefined) logger.debug("ListeningPointImpl:getKey()");
-    return this.makeKey(this.sipStack.getHostAddress(), this.transport);
-}
-
-ListeningPointImpl.prototype.getUserAgent =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getUserAgent()");
-    return this.sipStack.getUserAgent();
+    return this.makeKey(this.sipStack.getHostAddress(), this.messageProcessor.getTransport());
 }
 
 ListeningPointImpl.prototype.setSipProvider =function(sipProviderImpl){
@@ -66,11 +55,6 @@ ListeningPointImpl.prototype.setSipProvider =function(sipProviderImpl){
 ListeningPointImpl.prototype.removeSipProvider =function(){
     if(logger!=undefined) logger.debug("ListeningPointImpl:removeSipProvider()");
     this.sipProvider = null;
-}
-
-ListeningPointImpl.prototype.getURLWS =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getURLWS()");
-    return this.messageProcessor.getURLWS();
 }
 
 ListeningPointImpl.prototype.getTransport =function(){
@@ -108,11 +92,6 @@ ListeningPointImpl.prototype.getMessageProcessor =function(){
     return this.messageProcessor;
 }
 
-ListeningPointImpl.prototype.getHost =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:getMessageProcessor()");
-    return this.hostname;
-}
-
 ListeningPointImpl.prototype.createContactHeader =function(userName){
     if(logger!=undefined) logger.debug("ListeningPointImpl:createContactHeader()");
     try {
@@ -120,7 +99,7 @@ ListeningPointImpl.prototype.createContactHeader =function(userName){
         var sipURI = new SipUri();
         sipURI.setHost_String(hostname);
         sipURI.setUser(userName);
-        sipURI.setTransportParam(this.transport);
+        sipURI.setTransportParam(this.messageProcessor.getTransport());
         var contact = new Contact();
         var address = new AddressImpl();
         address.setURI(sipURI);
@@ -138,11 +117,6 @@ ListeningPointImpl.prototype.sendHeartbeat =function(infoApp){
     var siprequest = new SIPRequest();
     siprequest.setNullRequest();
     messageChannel.sendMessage(siprequest);
-}
-
-ListeningPointImpl.prototype.createViaHeader =function(){
-    if(logger!=undefined) logger.debug("ListeningPointImpl:createViaHeader()");
-    return this.getViaHeader();
 }
 
 ListeningPointImpl.prototype.getPort =function(){

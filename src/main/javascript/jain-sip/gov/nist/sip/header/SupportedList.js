@@ -29,7 +29,6 @@
  */
 function SupportedList() {
     if(logger!=undefined) logger.debug("SupportedList:SupportedList()");
-    this.serialVersionUID = "-4539299544895602367L";
     this.classname="SupportedList";
     this.headerName = this.NAME;
     this.myClass =  "Supported";

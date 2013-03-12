@@ -32,6 +32,7 @@ PrivateJainSipClientConnector.prototype.SIP_REGISTERING_401_STATE="SIP_REGISTERI
 PrivateJainSipClientConnector.prototype.SIP_REGISTERED_STATE="SIP_REGISTERED_STATE";
 PrivateJainSipClientConnector.prototype.SIP_UNREGISTERING_401_STATE="SIP_UNREGISTERING_401_STATE";
 PrivateJainSipClientConnector.prototype.SIP_UNREGISTERING_STATE="SIP_UNREGISTERING_STATE";
+PrivateJainSipClientConnector.prototype.SIP_SESSION_EXPIRATION_TIMER=3600;
 
 /**
  * Get SIP client/user agent opened/closed status 
@@ -76,21 +77,21 @@ PrivateJainSipClientConnector.prototype.open=function(configuration){
                     this.configuration=configuration;
                     
                     // Create JAIN SIP main objects
-                    this.sipFactory=new SipFactory();
-                    this.sipStack=this.sipFactory.createSipStack(this.configuration.sipOutboundProxy,this.configuration.sipUserAgent);
-                    this.listeningPoint=this.sipStack.createListeningPoint();
-                    this.sipProvider=this.sipStack.createSipProvider(this.listeningPoint);
-                    this.sipProvider.addSipListener(this);
-                    this.headerFactory=this.sipFactory.createHeaderFactory();
-                    this.addressFactory=this.sipFactory.createAddressFactory();
-                    this.messageFactory=this.sipFactory.createMessageFactory(this.listeningPoint);
-                    this.jainSipContactHeader = this.listeningPoint.createContactHeader(this.configuration.sipUserName);
+                    this.jainSipFactory=new SipFactory();
+                    this.jainSipStack=this.jainSipFactory.createSipStack(this.configuration.sipUserAgent);
+                    this.jainSipListeningPoint=this.jainSipStack.createListeningPoint(this.configuration.sipOutboundProxy);
+                    this.jainSipProvider=this.jainSipStack.createSipProvider(this.jainSipListeningPoint);
+                    this.jainSipProvider.addSipListener(this);
+                    this.jainSipHeaderFactory=this.jainSipFactory.createHeaderFactory();
+                    this.jainSipAddressFactory=this.jainSipFactory.createAddressFactory();
+                    this.jainSipMessageFactory=this.jainSipFactory.createMessageFactory();
+                    this.jainSipContactHeader = this.jainSipListeningPoint.createContactHeader(this.configuration.sipUserName);
                     if(this.configuration.sipUserAgentCapabilities)
                     {
                         this.jainSipContactHeader.setParameter(this.configuration.sipUserAgentCapabilities,null);
                     }
-                    this.jainSipUserAgentHeader = this.headerFactory.createUserAgentHeader(this.listeningPoint.getUserAgent());
-                    this.sipStack.start();                   
+                    this.jainSipMessageFactory.setDefaultUserAgentHeader(this.jainSipHeaderFactory.createUserAgentHeader(this.jainSipStack.getUserAgent()));
+                    this.jainSipStack.start();
                 } 
                 else
                 {
@@ -149,13 +150,7 @@ PrivateJainSipClientConnector.prototype.close=function(){
                         // Cancel SIP REGISTER refresh timer
                         clearTimeout(this.sipRegisterRefreshTimer);
                     }
-                    var num=new Number(this.jainSipRegisterSentRequest.getCSeq().getSeqNumber());
-                    this.jainSipRegisterSentRequest.getCSeq().setSeqNumber(num+1);
-                    this.jainSipRegisterSentRequest.getExpires().setExpires(0);
-                    this.jainSipRegisterSentRequest = this.jainSipRegisterSentRequest=this.messageFactory.setNewViaHeader(this.jainSipRegisterSentRequest); 
-                    this.jainSipRegisterTransaction = this.sipProvider.getNewClientTransaction(this.jainSipRegisterSentRequest);
-                    this.jainSipRegisterSentRequest.setTransaction(this.jainSipRegisterTransaction);
-                    this.jainSipRegisterTransaction.sendRequest(); 
+                    this.sendSipRegisterRequest(0);
                 }
                 else
                 {
@@ -198,7 +193,8 @@ PrivateJainSipClientConnector.prototype.createPrivateCallConnector=function(webR
         {
             if(this.openedFlag==true)
             {
-                var callConnector = new PrivateJainSipCallConnector(webRtcCommCall,sipCallId);
+                var callConnector = new PrivateJainSipCallConnector(this,webRtcCommCall,sipCallId);
+                callConnector.clientConnector=this;
                 this.callConnectors[callConnector.sipCallId]=callConnector;
                 return callConnector;
             }
@@ -265,9 +261,11 @@ PrivateJainSipClientConnector.prototype.resetSipRegisterContext=function(){
     this.sipRegisterState=this.SIP_UNREGISTERED_STATE;
     this.sipRegisterRefreshTimer=undefined; 
     this.sipRegisterAuthenticatedFlag=false;
-    this.jainSipRegisterSentRequest=undefined;
+    this.jainSipRegisterRequest=undefined;
     this.jainSipRegisterTransaction=undefined;
-    this.sipUnregisterPendingFlag=false;    
+    this.jainSipRegisterDialog=undefined;
+    this.sipUnregisterPendingFlag=false;
+    this.jainSipAuthorizationHeader=undefined;
 }
 
 /**
@@ -372,28 +370,7 @@ PrivateJainSipClientConnector.prototype.processConnected=function(){
             {
                 this.resetSipRegisterContext();
                 // Send SIP REGISTER request
-                var fromSipUriString=this.configuration.sipUserName+"@"+this.configuration.sipDomain;            
-                var jainSipCseqHeader=this.headerFactory.createCSeqHeader(1,"REGISTER");
-                var jainSipCallIdHeader=this.headerFactory.createCallIdHeader();
-                var jainSipExpiresHeader=this.headerFactory.createExpiresHeader(3600);
-                var jainSipMaxForwardHeader=this.headerFactory.createMaxForwardsHeader(70);
-                var jainSipRequestUri=this.addressFactory.createSipURI_user_host(null,this.configuration.sipDomain);
-                var jainSipAllowListHeader=this.headerFactory.createHeaders(PrivateJainSipClientConnector.prototype.SIP_ALLOW_HEADER);
-                var jainSipFromUri=this.addressFactory.createSipURI_user_host(null,fromSipUriString);
-                var jainSipFromAddress=this.addressFactory.createAddress_name_uri(null,jainSipFromUri);
-                var random=new Date();
-                var tag=random.getTime();
-                var jainSipFromHeader=this.headerFactory.createFromHeader(jainSipFromAddress, tag);
-                var jainSipToHeader=this.headerFactory.createToHeader(jainSipFromAddress, null);               
-                var jainSipRegisterRequest=this.messageFactory.createRequest(jainSipRequestUri,"REGISTER",jainSipCallIdHeader,jainSipCseqHeader,jainSipFromHeader,jainSipToHeader,jainSipMaxForwardHeader);   
-                this.messageFactory.addHeader(jainSipRegisterRequest, jainSipExpiresHeader);
-                this.messageFactory.addHeader(jainSipRegisterRequest, this.jainSipUserAgentHeader);
-                this.messageFactory.addHeader(jainSipRegisterRequest, jainSipAllowListHeader);
-                this.messageFactory.addHeader(jainSipRegisterRequest, this.jainSipContactHeader); 
-                this.jainSipRegisterSentRequest=jainSipRegisterRequest;
-                this.jainSipRegisterTransaction = this.sipProvider.getNewClientTransaction(jainSipRegisterRequest);
-                jainSipRegisterRequest.setTransaction(this.jainSipRegisterTransaction);
-                this.jainSipRegisterTransaction.sendRequest();
+                this.sendSipRegisterRequest(this.SIP_SESSION_EXPIRATION_TIMER);
                 this.sipRegisterState=this.SIP_REGISTERING_STATE;
                 return;
             }
@@ -419,6 +396,40 @@ PrivateJainSipClientConnector.prototype.processConnected=function(){
         console.error("PrivateJainSipClientConnector:processConnected(): catched exception:"+exception);
     } 
 }   
+
+/**
+ * Send SIP REGISTER request 
+ * @private
+ */ 
+PrivateJainSipClientConnector.prototype.sendSipRegisterRequest=function(expiration){
+    console.debug("PrivateJainSipClientConnector:sendSipRegisterRequest()");
+    var fromSipUriString=this.configuration.sipUserName+"@"+this.configuration.sipDomain;            
+    var jainSipCseqHeader=this.jainSipHeaderFactory.createCSeqHeader(1,"REGISTER");
+    var jainSipCallIdHeader=this.jainSipHeaderFactory.createCallIdHeader(new String(new Date().getTime()));
+    var jainSipExpiresHeader=this.jainSipHeaderFactory.createExpiresHeader(expiration);
+    var jainSipMaxForwardHeader=this.jainSipHeaderFactory.createMaxForwardsHeader(70);
+    var jainSipRequestUri=this.jainSipAddressFactory.createSipURI_user_host(null,this.configuration.sipDomain);
+    var jainSipAllowListHeader=this.jainSipHeaderFactory.createHeaders(PrivateJainSipClientConnector.prototype.SIP_ALLOW_HEADER);
+    var jainSipFromUri=this.jainSipAddressFactory.createSipURI_user_host(null,fromSipUriString);
+    var jainSipFromAddress=this.jainSipAddressFactory.createAddress_name_uri(null,jainSipFromUri);
+    var random=new Date();
+    var tag=random.getTime();
+    var jainSipFromHeader=this.jainSipHeaderFactory.createFromHeader(jainSipFromAddress, tag);
+    var jainSipToHeader=this.jainSipHeaderFactory.createToHeader(jainSipFromAddress, null);   
+    var jainSipViaHeader=this.jainSipListeningPoint.getViaHeader();
+    this.jainSipRegisterRequest=this.jainSipMessageFactory.createRequest(jainSipRequestUri,"REGISTER",jainSipCallIdHeader,jainSipCseqHeader,jainSipFromHeader,jainSipToHeader,jainSipViaHeader, jainSipMaxForwardHeader);   
+    this.jainSipMessageFactory.addHeader(this.jainSipRegisterRequest, jainSipExpiresHeader);
+    this.jainSipMessageFactory.addHeader(this.jainSipRegisterRequest, jainSipAllowListHeader);
+    this.jainSipMessageFactory.addHeader(this.jainSipRegisterRequest, this.jainSipContactHeader);
+    if(this.jainSipAuthorizationHeader)
+    {
+        this.jainSipMessageFactory.addHeader(this.jainSipRegisterRequest, this.jainSipAuthorizationHeader); 
+    }  
+    this.jainSipRegisterTransaction = this.jainSipProvider.getNewClientTransaction(this.jainSipRegisterRequest);
+    this.jainSipRegisterDialog=this.jainSipRegisterTransaction.getDialog();
+    this.jainSipRegisterRequest.setTransaction(this.jainSipRegisterTransaction);
+    this.jainSipRegisterTransaction.sendRequest();
+}
 
 /**
  * Implementation of JAIN SIP stack event listener interface: process WebSocket disconnection/close event
@@ -577,7 +588,7 @@ PrivateJainSipClientConnector.prototype.processTimeout=function(timeoutEvent){
         {
             callConnector.onJainSipClientConnectorSipTimeoutEvent(timeoutEvent);   
         }
-        else if(this.jainSipRegisterSentRequest.getCallId().getCallId()==sipCallId)
+        else if(this.jainSipRegisterRequest.getCallId().getCallId()==sipCallId)
         {
             console.error("PrivateJainSipClientConnector:processTimeout(): SIP registration failed, request timeout, no response from SIP server") 
             this.reset();
@@ -605,12 +616,8 @@ PrivateJainSipClientConnector.prototype.onSipRegisterTimeout=function(){
         {
             this.sipRegisterRefreshTimer=undefined;
             this.sipRegisterState=this.SIP_REGISTER_REFRESHING_STATE;
-            var num=new Number(this.jainSipRegisterSentRequest.getCSeq().getSeqNumber());
-            this.jainSipRegisterSentRequest.getCSeq().setSeqNumber(num+1);
-            this.jainSipRegisterSentRequest = this.messageFactory.setNewViaHeader(this.jainSipRegisterSentRequest);
-            this.jainSipRegisterTransaction = this.sipProvider.getNewClientTransaction(this.jainSipRegisterSentRequest);
-            this.jainSipRegisterSentRequest.setTransaction(this.jainSipRegisterTransaction);
-            this.jainSipRegisterTransaction.sendRequest();
+            // Send SIP REGISTER request
+            this.sendSipRegisterRequest(this.SIP_SESSION_EXPIRATION_TIMER);
         }
         else
         {
@@ -648,15 +655,9 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
             if(this.configuration.sipPassword!=undefined && this.configuration.sipLogin!=undefined)
             {
                 this.sipRegisterState=this.SIP_REGISTERING_401_STATE;
-                this.jainSipRegisterSentRequest.removeHeader("Authorization");
-                var num=new Number(this.jainSipRegisterSentRequest.getCSeq().getSeqNumber());
-                this.jainSipRegisterSentRequest.getCSeq().setSeqNumber(num+1);
-                var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.configuration.sipPassword,this.configuration.sipLogin);
-                this.messageFactory.addHeader(this.jainSipRegisterSentRequest, jainSipAuthorizationHeader); 
-                this.jainSipRegisterSentRequest = this.messageFactory.setNewViaHeader(this.jainSipRegisterSentRequest);
-                this.jainSipRegisterTransaction = this.sipProvider.getNewClientTransaction(this.jainSipRegisterSentRequest);
-                this.jainSipRegisterSentRequest.setTransaction(this.jainSipRegisterTransaction);
-                this.jainSipRegisterTransaction.sendRequest();
+                this.jainSipAuthorizationHeader=this.jainSipHeaderFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterRequest,this.configuration.sipPassword,this.configuration.sipLogin);           
+                // Send SIP REGISTER request
+                this.sendSipRegisterRequest(this.SIP_SESSION_EXPIRATION_TIMER);
             }
             else
             {
@@ -683,13 +684,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
                     // Cancel SIP REGISTER refresh timer
                     clearTimeout(this.sipRegisterRefreshTimer);
                 }
-                var num=new Number(this.jainSipRegisterSentRequest.getCSeq().getSeqNumber());
-                this.jainSipRegisterSentRequest.getCSeq().setSeqNumber(num+1);
-                this.jainSipRegisterSentRequest.getExpires().setExpires(0);
-                this.jainSipRegisterSentRequest = this.jainSipRegisterSentRequest=this.messageFactory.setNewViaHeader(this.jainSipRegisterSentRequest); 
-                this.jainSipRegisterTransaction = this.sipProvider.getNewClientTransaction(this.jainSipRegisterSentRequest);
-                this.jainSipRegisterSentRequest.setTransaction(this.jainSipRegisterTransaction);
-                this.jainSipRegisterTransaction.sendRequest(); 
+                this.sendSipRegisterRequest(0);
             }
             else
             {
@@ -732,13 +727,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
                     // Cancel SIP REGISTER refresh timer
                     clearTimeout(this.sipRegisterRefreshTimer);
                 }
-                var num=new Number(this.jainSipRegisterSentRequest.getCSeq().getSeqNumber());
-                this.jainSipRegisterSentRequest.getCSeq().setSeqNumber(num+1);
-                this.jainSipRegisterSentRequest.getExpires().setExpires(0);
-                this.jainSipRegisterSentRequest = this.jainSipRegisterSentRequest=this.messageFactory.setNewViaHeader(this.jainSipRegisterSentRequest); 
-                this.jainSipRegisterTransaction = this.sipProvider.getNewClientTransaction(this.jainSipRegisterSentRequest);
-                this.jainSipRegisterSentRequest.setTransaction(this.jainSipRegisterTransaction);
-                this.jainSipRegisterTransaction.sendRequest();  
+                this.sendSipRegisterRequest(0);
             }
             else
             {
@@ -770,15 +759,9 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
         else if(statusCode==401)
         {
             this.sipRegisterState=this.SIP_UNREGISTERING_401_STATE;
-            this.jainSipRegisterSentRequest.removeHeader("Authorization");
-            var num=new Number(this.jainSipRegisterSentRequest.getCSeq().getSeqNumber());
-            this.jainSipRegisterSentRequest.getCSeq().setSeqNumber(num+1);
-            var jainSipAuthorizationHeader=this.headerFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterSentRequest,this.configuration.sipPassword,this.configuration.sipLogin);
-            this.messageFactory.addHeader(this.jainSipRegisterSentRequest, jainSipAuthorizationHeader); 
-            this.jainSipRegisterSentRequest = this.messageFactory.setNewViaHeader(this.jainSipRegisterSentRequest);
-            this.jainSipRegisterTransaction = this.sipProvider.getNewClientTransaction(this.jainSipRegisterSentRequest);
-            this.jainSipRegisterSentRequest.setTransaction(this.jainSipRegisterTransaction);
-            this.jainSipRegisterTransaction.sendRequest();
+            this.jainSipRegisterRequest.removeHeader("Authorization");
+            this.jainSipAuthorizationHeader=this.jainSipHeaderFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterRequest,this.configuration.sipPassword,this.configuration.sipLogin); 
+            this.sendSipRegisterRequest(0);
         }
         else if(statusCode==200)
         {
@@ -831,7 +814,6 @@ PrivateJainSipClientConnector.prototype.processSipOptionRequest=function(request
     var jainSipRequest=requestEvent.getRequest();
     var jainSip200OKResponse=jainSipRequest.createResponse(200, "OK");
     jainSip200OKResponse.addHeader(this.jainSipContactHeader);
-    jainSip200OKResponse.addHeader(this.jainSipUserAgentHeader);
     jainSip200OKResponse.removeHeader("P-Asserted-Identity");
     jainSip200OKResponse.removeHeader("P-Charging-Vector");
     jainSip200OKResponse.removeHeader("P-Charging-Function-Addresses");

@@ -29,7 +29,6 @@
  */
 function RequestLine(requestURI, method) {
     if(logger!=undefined) logger.debug("RequestLine:RequestLine()");
-    this.serialVersionUID = "-3286426172326043129L";
     this.classname="RequestLine";
     this.uri=new GenericURI();
     this.method=null;

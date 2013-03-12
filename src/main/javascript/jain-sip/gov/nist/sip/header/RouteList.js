@@ -29,7 +29,6 @@
  */
 function RouteList() {
     if(logger!=undefined) logger.debug("RouteList:RouteList()");
-    this.serialVersionUID = "1L";
     this.classname="RouteList";
     this.headerName = this.NAME;
     this.myClass =  "Route";

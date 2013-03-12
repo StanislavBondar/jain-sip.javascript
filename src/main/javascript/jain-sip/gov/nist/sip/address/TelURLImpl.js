@@ -31,7 +31,6 @@
 
 function TelURLImpl() {
     if(logger!=undefined) logger.debug("TelURLImpl:TelURLImpl()");
-    this.serialVersionUID = "5873527320305915954L";
     this.classname="TelURLImpl";
     this.telephoneNumber=new TelephoneNumber();
     this.scheme = "tel";

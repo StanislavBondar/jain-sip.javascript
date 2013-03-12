@@ -75,7 +75,7 @@ AddressParser.prototype.nameAddr =function(){
         {
             name = this.lexer.getNextToken('<');
         }
-        addr.setDisplayName(name.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, ''));
+        addr.setDisplayName(name.trim());
         
         this.lexer.match('<');
         

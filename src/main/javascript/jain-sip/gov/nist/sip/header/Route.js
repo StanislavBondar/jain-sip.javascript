@@ -29,7 +29,6 @@
  */
 function Route(address) {
     if(logger!=undefined) logger.debug("Route:Route()");
-    this.serialVersionUID = "5683577362998368846L";
     this.classname="Route";
     if(address==null)
     {

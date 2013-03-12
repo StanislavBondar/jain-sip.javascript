@@ -29,7 +29,6 @@
  */
 function Server(to) {
     if(logger!=undefined) logger.debug("Server:Server(): to="+to);
-    this.serialVersionUID = "-3587764149383342973L";
     this.classname="Server";
     this.productTokens = new Array();
     this.headerName=this.NAME;

@@ -31,7 +31,6 @@
 function NameValue(n,v,isFlag) {
     //if(logger!=undefined) logger.debug("NameValue:NameValue()");
     this.classname="NameValue"; 
-    this.serialVersionUID = "-1857729012596437950L";
     this.isQuotedString = null;
     this.isFlagParameter= isFlag;
     this.separator = this.EQUALS;

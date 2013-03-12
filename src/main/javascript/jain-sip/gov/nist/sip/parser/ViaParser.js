@@ -69,14 +69,7 @@ ViaParser.prototype.parseVia =function(v){
     var protocol = new Protocol();
     protocol.setProtocolName(protocolName.getTokenValue());
     protocol.setProtocolVersion(protocolVersion.getTokenValue());
-    if(transport.getTokenValue()=="WS")
-    {
-        protocol.setTransport("WS");
-    }
-    else
-    {
-        protocol.setTransport(transport.getTokenValue());
-    }
+    protocol.setTransport(transport.getTokenValue());
     v.setSentProtocol(protocol);
     var hnp = new HostNameParser(this.getLexer());
     var hostPort = hnp.hostPort( true );

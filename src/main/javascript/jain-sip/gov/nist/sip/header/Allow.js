@@ -30,7 +30,6 @@
 
 function Allow (m) {
     if(logger!=undefined) logger.debug("Allow:Allow(): m="+m);
-    this.serialVersionUID = "-3105079479020693930L";
     this.classname="Allow"; 
     this.method=null;
     if(m==null)

@@ -31,7 +31,6 @@
 function ExtensionHeaderImpl(headerName) {
     if(logger!=undefined) logger.debug("ExtensionHeaderImpl:ExtensionHeaderImpl(): headerName="+headerName);
     this.classname="ExtensionHeaderImpl"; 
-    this.serialVersionUID = "-8693922839612081849L";
     this.value=null;
     if(headerName!=null)
     {
@@ -77,7 +76,7 @@ ExtensionHeaderImpl.prototype.getHeaderValue =function(){
         }
         x=x+1;
         chaine=buffer.substring(x);
-        this.value = chaine.toString().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
+        this.value = chaine.toString().trim();
         return this.value;
     }
 }

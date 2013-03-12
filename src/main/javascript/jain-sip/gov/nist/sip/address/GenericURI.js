@@ -32,7 +32,6 @@
 function GenericURI(uriString) {
     if(logger!=undefined) logger.debug("GenericURI:GenericURI()");
     this.classname="GenericURI"; 
-    this.serialVersionUID = "3237685256878068790L";
     this.uriString=null;
     this.scheme=null;
     if(uriString!=null)

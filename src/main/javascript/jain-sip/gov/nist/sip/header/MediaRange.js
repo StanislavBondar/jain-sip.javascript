@@ -29,7 +29,6 @@
  */
 function MediaRange() {
     if(logger!=undefined) logger.debug("MediaRange:MediaRange()");
-    this.serialVersionUID = "-6297125815438079210L";
     this.classname="MediaRange";
     this.type=null;
     this.subtype=null;

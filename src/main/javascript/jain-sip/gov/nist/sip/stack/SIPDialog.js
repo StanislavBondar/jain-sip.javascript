@@ -31,8 +31,6 @@
 function SIPDialog() {
     if(logger!=undefined) logger.debug("SIPDialog:SIPDialog()");
     this.classname="SIPDialog"; 
-    
-    this.serialVersionUID = "-1429794423085204069L";
     this.dialogTerminatedEventDelivered=null; 
     this.stackTrace=null;
     this.method=null;
@@ -56,7 +54,6 @@ function SIPDialog() {
     this.lastAckSent=null;
     this.lastAckReceived=null;
     this.ackProcessed=false;
-    this.timerTask=null;
     this.nextSeqno=null;
     this.retransmissionTicksLeft=null;
     this.prevRetransmissionTicks=null;
@@ -74,9 +71,6 @@ function SIPDialog() {
     this.eventHeader=null; // for Subscribe notify
     this.lastInviteOkReceived=null;
     this.reInviteWaitTime = 100;
-    this.dialogDeleteTask=null;
-    this.timerdelete=null;
-    this.dialogDeleteIfNoAckSentTask=null;
     this.isAcknowledged=null;
     this.highestSequenceNumberAcknowledged = -1;
     this.isBackToBackUserAgent=null;
@@ -117,7 +111,7 @@ function SIPDialog() {
             this.addEventListener(this.sipStack); 
         }
     }
-    else if(arguments[0].classname!="SipProviderImpl")
+    else 
     {
         var transaction=arguments[0];
         this.sipProvider = transaction.getSipProvider();
@@ -165,79 +159,66 @@ SIPDialog.prototype.TIMER_H=64;
 SIPDialog.prototype.TIMER_J=64;
 SIPDialog.prototype.BASE_TIMER_INTERVAL=500;
 
-var timer=this.timer;
-var sipdialog=null;
-var variabletransaction=null;
-var variabledialog=null;
-var variablereinvite=null;
-function lingerTimerDialog(){
-    if(logger!=undefined) logger.debug("lingerTimerDialog()");
-    var dialog = sipdialog;
+SIPDialog.prototype.lingerTimeout =function(){
+    if(logger!=undefined) logger.debug("SIPDialog.prototype.lingerTimeout()");
     if (this.eventListeners != null) {
-        this.eventListeners.clear();
+        this.eventListeners=null;
     }
-    this.timerTaskLock = null;
-    dialog.sipStack.removeDialog(dialog);
+    this.sipStack.removeDialog(this);
 }
-function DialogDeleteTask(){
-    if(logger!=undefined) logger.debug("DialogDeleteTask()");
-    sipdialog.dialogDeleteTask=null;
+
+SIPDialog.prototype.deferredDeleteTimeout =function(){
+    if(logger!=undefined) logger.debug("SIPDialog.prototype.deferredDeleteTimeout()");
+    throw "bug";
 }
-function DialogTimerTask(){
-    if(logger!=undefined) logger.debug("DialogTimerTask()");
-    this.transaction=null;
-    if(variabletransaction!=null)
-    {
-        this.transaction = variabletransaction;
-    }
-    var dialog = sipdialog;
-    var transaction = sipdialog.transaction;
-    if ((!dialog.ackSeen) && (transaction != null)) {
-        var response = transaction.getLastResponse();
+
+SIPDialog.prototype.dialogTimeout =function(){
+    if(logger!=undefined) logger.debug("SIPDialog.prototype.dialogTimeout()");
+    if ((!this.ackSeen) && (this.dialogTransactionTimeout != null)) {
+        var response = this.dialogTransactionTimeout.getLastResponse();
         if (response.getStatusCode() == 200) {
-            transaction.fireTimer();
+            this.dialogTransactionTimeout.fireTimer();
         }
     }
-    if (dialog.isAckSeen() || dialog.dialogState == 2) {
-        sipdialog.transaction = null;
-        clearTimeout(sipdialog.timer);
+    if (this.isAckSeen() || this.dialogState == 2) {
+        this.dialogTransactionTimeout = null;
+        if(logger!=undefined) logger.debug("SIPDialog.prototype.dialogTimeout(): clearInterval(this.timer):"+this.timer);
+        clearInterval(this.timer);
     }
 }
 
-function DialogDeleteIfNoAckSentTask(seqno){
-    if(logger!=undefined) logger.debug("DialogDeleteIfNoAckSentTask():seqno="+seqno);
+SIPDialog.prototype.deleteIfNoAckSentTimeout=function(seqno){
+    if(logger!=undefined) logger.debug("SIPDialog.prototype.deleteIfNoAckSentTimeout()");
     this.seqno = seqno;
-    var dialog = sipdialog;
-    if (dialog.highestSequenceNumberAcknowledged < seqno) {
-        dialog.dialogDeleteIfNoAckSentTask = null;
-        if (!dialog.isBackToBackUserAgent) {
-            if (dialog.sipProvider.getSipListener() instanceof SipListener) {
+    if (this.highestSequenceNumberAcknowledged < seqno) {
+        this.dialogDeleteIfNoAckSentTask = null;
+        if (!this.isBackToBackUserAgent) {
+            if (this.sipProvider.getSipListener() instanceof SipListener) {
                 this.raiseErrorEvent(SIPDialogErrorEvent.DIALOG_ACK_NOT_SENT_TIMEOUT);
             } else {
                 this.delet();
             }
         } else {
-            if (dialog.sipProvider.getSipListener() instanceof SipListener) {
+            if (this.sipProvider.getSipListener() instanceof SipListener) {
                 this.raiseErrorEvent(SIPDialogErrorEvent.DIALOG_ACK_NOT_SENT_TIMEOUT);
             } 
             else {
                 try {
-                    var byeRequest = dialog.createRequest("BYE");
-                    var mfi=new MessageFactoryImpl();
-                    if (mfi.getDefaultUserAgentHeader() != null) {
-                        byeRequest.addHeader(mfi.getDefaultUserAgentHeader());
+                    var byeRequest = this.createRequest("BYE");
+                    if (MessageFactoryImpl.prototype.getDefaultUserAgentHeader() != null) {
+                        byeRequest.addHeader(MessageFactoryImpl.prototype.getDefaultUserAgentHeader());
                     }
                     var reasonHeader = new Reason();
                     reasonHeader.setProtocol("SIP");
                     reasonHeader.setCause(1025);
                     reasonHeader.setText("Timed out waiting to send ACK");
                     byeRequest.addHeader(reasonHeader);
-                    var byeCtx = dialog.getSipProvider().getNewClientTransaction(byeRequest);
-                    dialog.sendRequest(byeCtx);
+                    var byeCtx = this.getSipProvider().getNewClientTransaction(byeRequest);
+                    this.sendRequest(byeCtx);
                     return;
                 } catch (ex) {
                     console.error("SIPDialog:DialogDeleteIfNoAckSentTask(): catched exception:"+ex);
-                    dialog.delet();
+                    this.delet();
                 }
             }
         }
@@ -280,11 +261,8 @@ SIPDialog.prototype.setState =function(state){
     if(logger!=undefined) logger.debug("SIPDialog:setState():state="+state);
     this.dialogState = state;
     if (state == this.TERMINATED_STATE) {
-        if (this.sipStack.getTimer() != null) { 
-            this.timer=this.sipStack.getTimer();
-            sipdialog=this;
-            this.timer=setTimeout("lingerTimerDialog()", this.DIALOG_LINGER_TIME * 1000);
-        }
+            var that = this;
+            this.timer=setTimeout(function() { that.lingerTimeout();} , this.DIALOG_LINGER_TIME * 1000);
     }
 }
 
@@ -554,12 +532,12 @@ SIPDialog.prototype.sendAck =function(request){
         console.error("SIPDialog:sendAck(): no route!");
         throw "SIPDialog:sendAck(): no route!";
     }
-    var lp = this.sipProvider.getListeningPoint();
+    var lp = this.sipProvider.getListeningPoint(hop.getTransport());
     if (lp == null) {
         console.error("SIPDialog:sendAck(): no listening point for this provider registered at " + hop);
         throw "SIPDialog:sendAck(): no listening point for this provider registered at " + hop;
     }
-    var messageChannel = lp.getMessageProcessor().getIncomingwsMessageChannels();
+    var messageChannel = lp.getMessageProcessor().getMessageChannel();
     this.setLastAckSent(ackRequest);
     messageChannel.sendMessage(ackRequest);
     this.isAcknowledged = true;
@@ -768,8 +746,7 @@ SIPDialog.prototype.addRouteResponse =function(sipResponse){
     else if (this.dialogState == 1) {
         if (200<=sipResponse.getStatusCode() && sipResponse.getStatusCode()<=299 && !this.isServer()) {
             var contactList = sipResponse.getContactHeaders();
-            var request=new SIPRequest();
-            if (contactList != null && request.isTargetRefresh(sipResponse.getCSeq().getMethod())) {
+            if (contactList != null && SIPRequest.prototype.isTargetRefresh(sipResponse.getCSeq().getMethod())) {
                 this.setRemoteTarget(contactList.getFirst());
             }
         }
@@ -794,8 +771,7 @@ SIPDialog.prototype.addRouteResponse =function(sipResponse){
 
 SIPDialog.prototype.addRouteRequest =function(sipRequest){
     if(logger!=undefined) logger.debug("SIPDialog:addRouteRequest():sipRequest="+sipRequest);
-    var siprequest=new SIPRequest();
-    if (this.dialogState == "CONFIRMED"&& siprequest.isTargetRefresh(sipRequest.getMethod())) {
+    if (this.dialogState == "CONFIRMED"&& SIPRequest.prototype.isTargetRefresh(sipRequest.getMethod())) {
         this.doTargetRefresh(sipRequest);
     }
     if (this.dialogState == "CONFIRMED" || this.dialogState == "TERMINATED") {
@@ -917,14 +893,11 @@ SIPDialog.prototype.isRequestConsumable =function(dialogRequest){
 
 SIPDialog.prototype.doDeferredDelete =function(){
     if(logger!=undefined) logger.debug("SIPDialog:doDeferredDelete()");
-    if (this.sipStack.getTimer() == null) {
+    if (this.timer == null) {
         this.setState(this.TERMINATED_STATE);
     } else {
-        this.timerdelete=this.sipStack.getTimer();
-        sipdialog=this;
-        this.timerdelete=setTimeout(function(){
-            sipdialog.dialogDeleteTask = new DialogDeleteTask();
-        },this.TIMER_H * this.BASE_TIMER_INTERVAL);
+        var that = this;
+        this.timer=setTimeout(function(){ that.deferredDeleteTimeout();},this.TIMER_H * this.BASE_TIMER_INTERVAL);
     }
 }
 
@@ -998,7 +971,7 @@ SIPDialog.prototype.setRemoteTag =function(hisTag){
         else if (this.sipStack.isRemoteTagReassignmentAllowed()) {
             var removed = false;
             if (this.sipStack.getDialog(this.dialogId) == this) {
-                this.sipStack.removeDialog(this.dialogId);
+                this.sipStack.removeDialog(this);
                 removed = true;
             }
             this.dialogId = null;
@@ -1140,7 +1113,7 @@ SIPDialog.prototype.createRequestargu2 =function(method,sipResponse){
             sipRequest.addHeader(this.eventHeader);
         }
     }
-    var lp = this.sipProvider.getListeningPoint();
+    var lp = this.sipProvider.getListeningPoint(sipResponse.getTopmostVia().getTransport());
     if (lp == null) {
         
         console.error("SIPDialog:createRequestargu2(): cannot find listening point for transport " + sipResponse.getTopmostVia().getTransport());
@@ -1163,9 +1136,8 @@ SIPDialog.prototype.createRequestargu2 =function(method,sipResponse){
     }
     var sipRequest = sipResponse.createRequest(sipUri, via, cseq, from, to);
     
-    var siprq=new SIPRequest();
-    if (siprq.isTargetRefresh(method)) {
-        var contactHeader = this.sipProvider.getListeningPoint().createContactHeader();
+    if (SIPRequest.prototype.isTargetRefresh(method)) {
+        var contactHeader = this.sipProvider.getListeningPoint(sipResponse.getTopmostVia().getTransport()).createContactHeader();
         contactHeader.getAddress().getURI().setSecure(this.isSecure());
         sipRequest.setHeader(contactHeader);
     }
@@ -1258,30 +1230,26 @@ SIPDialog.prototype.sendRequest =function(clientTransactionId){
 }
 
 SIPDialog.prototype.startTimer =function(transaction){
-    if(logger!=undefined) logger.debug("SIPDialog:startTimer():transaction="+transaction);
-    if (this.timerTask != null && this.timerTask.transaction == transaction) {
+   if(logger!=undefined) logger.debug("SIPDialog:startTimer():transaction="+transaction);
+    if (this.dialogTransactionTimeout  == transaction) {
         return;
     }
     this.ackSeen = false;
-    if (this.timerTask != null) {
-        this.timerTask.transaction = transaction;
+    if (this.dialogTransactionTimeout != null) {
+        this.dialogTransactionTimeout = transaction;
     } else {
-        variabletransaction=transaction;
-        this.timer=this.sipStack.getTimer();
-        sipdialog=this;
-        this.timer=setTimeout(function(){
-            sipdialog.timer=setInterval(function(){
-                sipdialog.timerTask = new DialogTimerTask(variabletransaction);
-            }, sipdialog.BASE_TIMER_INTERVAL);
-        }, this.BASE_TIMER_INTERVAL);
+        this.dialogTransactionTimeout=transaction;
+        var that =this;
+        this.timer=that.timer=setInterval(function(){that.dialogTimeout();}, that.BASE_TIMER_INTERVAL);
+        console.error("SIPDialog:startTimer(): that.timer=setInterval()="+this.timer);
     } 
 }
-
 SIPDialog.prototype.stopTimer =function(){
     if(logger!=undefined) logger.debug("SIPDialog:stopTimer()");
-    if (this.timerTask != null) {
-        clearTimeout(this.timer);
-        this.timerTask = null;
+    if (this.dialogTransactionTimeout != null) {
+        if(logger!=undefined) logger.debug("SIPDialog:startTimer(): clearInterval():"+this.timer);
+        clearInterval(this.timer);
+        this.dialogTransactionTimeout = null;
     }
 }
 
@@ -1293,9 +1261,8 @@ SIPDialog.prototype.updateRequest =function(sipRequest){
     } else {
         sipRequest.removeHeader("Route");
     }
-    var mfi=new MessageFactoryImpl();
-    if (mfi.getDefaultUserAgentHeader() != null) {
-        sipRequest.setHeader(mfi.getDefaultUserAgentHeader());
+    if (MessageFactoryImpl.prototype.getDefaultUserAgentHeader() != null) {
+        sipRequest.setHeader(MessageFactoryImpl.prototype.getDefaultUserAgentHeader());
     }
 }
 
@@ -1349,8 +1316,7 @@ SIPDialog.prototype.createAck =function(cseqno){
                 via.setParameters(originalRequestParameters.clone());
             }
         }
-        var utils=new Utils();
-        via.setBranch(utils.generateBranchId()); // new branch
+        via.setBranch(Utils.prototype.generateBranchId()); // new branch
         vias.add(via);
         sipRequest.setVia(vias);
         var from = new From();
@@ -1534,17 +1500,13 @@ SIPDialog.prototype.isBackToBackUserAgent =function(){
 }
 
 SIPDialog.prototype.doDeferredDeleteIfNoAckSent =function(seqno){
-    if(logger!=undefined) logger.debug("SIPDialog:doDeferredDeleteIfNoAckSent():seqno:"+seqno);
-    if (this.sipStack.getTimer() == null) {
+   if(logger!=undefined) logger.debug("SIPDialog:doDeferredDeleteIfNoAckSent():seqno:"+seqno);
+    if (this.timer == null) {
         this.setState(this.TERMINATED_STATE);
     } 
-    else if (this.dialogDeleteIfNoAckSentTask == null) {
-        variabledialog=seqno;
-        var timer=this.sipStack.getTimer();
-        sipdialog=this;
-        timer=setTimeout(function(){
-            sipdialog.dialogDeleteIfNoAckSentTask = new DialogDeleteIfNoAckSentTask(variabledialog);
-        },this.TIMER_J* this.BASE_TIMER_INTERVAL);
+    else if (this.dialogDeleteIfNoAckSentTimer == null) {
+        var that=this;
+        this.dialogDeleteIfNoAckSentTimer=setTimeout( function(){that.deleteIfNoAckSentTimeout(seqno);},this.TIMER_J* this.BASE_TIMER_INTERVAL);
     }
 }
 

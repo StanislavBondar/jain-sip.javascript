@@ -29,7 +29,6 @@
  */
 function WWWAuthenticateList() {
     if(logger!=undefined) logger.debug("WWWAuthenticateList:WWWAuthenticateList()");
-    this.serialVersionUID = "-6978902284285501346L";
     this.classname="WWWAuthenticateList";
     this.headerName = this.NAME;
     this.myClass =  "WWWAuthenticate";

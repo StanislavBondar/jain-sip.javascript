@@ -29,7 +29,6 @@
  */
 function StatusLine() {
     if(logger!=undefined) logger.debug("StatusLine:StatusLine()");
-    this.serialVersionUID = "-4738092215519950414L";
     this.classname="StatusLine";
     this.matchStatusClass=null;
     this.sipVersion=this.SIP_VERSION_STRING;

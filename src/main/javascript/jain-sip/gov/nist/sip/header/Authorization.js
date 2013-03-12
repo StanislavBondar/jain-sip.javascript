@@ -29,7 +29,6 @@
  */
 function Authorization() {
     if(logger!=undefined) logger.debug("Authorization:Authorization()");
-    this.serialVersionUID = "-8897770321892281348L";
     this.classname="Authorization";
     this.headerName=this.NAME;
     this.parameters = new NameValueList();

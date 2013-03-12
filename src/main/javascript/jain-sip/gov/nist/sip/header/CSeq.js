@@ -29,7 +29,6 @@
  */
 function CSeq() {
     if(logger!=undefined) logger.debug("CSeq:CSeq()");
-    this.serialVersionUID = "-5405798080040422910L";
     this.classname="CSeq";
     this.method=null;
     this.seqno=null;

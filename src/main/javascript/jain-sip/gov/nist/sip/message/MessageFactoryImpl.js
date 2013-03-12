@@ -31,38 +31,21 @@
 function MessageFactoryImpl() {
     if(logger!=undefined) logger.debug("MessageFactoryImpl:MessageFactoryImpl()");
     this.classname="MessageFactoryImpl";
-    this.testing = false;
-    this.strict  = true;
     this.defaultContentEncodingCharset = "UTF-8"
     this.userAgent=null;
     this.server=null;
-    if(arguments.length!=0)
-    {
-        this.listeningpoint=arguments[0];
-        this.viaheader=this.listeningpoint.getViaHeader();
-    }
 }
 
 MessageFactoryImpl.prototype.CONTENTTYPEHEADER="Content-Type";
-
-MessageFactoryImpl.prototype.setStrict =function(){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:setStrict()");
-    
-}
-
-MessageFactoryImpl.prototype.setTest =function(){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:setTest()");
-    
-}
 
 MessageFactoryImpl.prototype.createRequest =function(){
     if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequest()");
     if(arguments.length==1)
     {
         var requestString = arguments[0];
-        return this.createRequestPrototype5(requestString);
+        return this.createRequestPrototype3(requestString);
     }
-    else if(arguments.length==7)
+    else if(arguments.length==8)
     {
         var requestURI = arguments[0];
         var method = arguments[1];
@@ -70,13 +53,13 @@ MessageFactoryImpl.prototype.createRequest =function(){
         var cSeq = arguments[3];
         var from = arguments[4];
         var to = arguments[5];
-        var maxForwards = arguments[6];
-        var via=this.viaheader;
-        return this.createRequestPrototype3(requestURI, method, callId, cSeq, from, to, via, maxForwards);
+        var via = arguments[6];
+        var maxForwards = arguments[7];
+        return this.createRequestPrototype1(requestURI, method, callId, cSeq, from, to, via, maxForwards);
     }
-    else if(arguments.length==9)
+    else if(arguments.length==10)
     {
-        if(arguments[7].classname!="ContentType")
+        if(arguments[8].classname=="ContentType")
         {
             requestURI = arguments[0];
             method = arguments[1];
@@ -84,45 +67,48 @@ MessageFactoryImpl.prototype.createRequest =function(){
             cSeq = arguments[3];
             from = arguments[4];
             to = arguments[5];
-            via=this.viaheader;
-            maxForwards = arguments[6];
-            var content = arguments[7];
+            via = arguments[6];
+            maxForwards = arguments[7];
             var contentType = arguments[8];
-            return this.createRequestPrototype2(requestURI, method, callId, cSeq, from, to, via, maxForwards, content, contentType);
-        }
-        else if(arguments[8].constructor!=Array)
-        {
-            requestURI = arguments[0];
-            method = arguments[1];
-            callId = arguments[2];
-            cSeq = arguments[3];
-            from = arguments[4];
-            to = arguments[5];
-            via=this.viaheader;
-            maxForwards = arguments[6];
-            contentType = arguments[7];
-            content = arguments[8];
-            return this.createRequestPrototype4(requestURI, method, callId, cSeq, from, to, via, maxForwards, contentType, content);
-        }
-        else if(arguments[8].constructor==Array)
-        {
-            requestURI = arguments[0];
-            method = arguments[1];
-            callId = arguments[2];
-            cSeq = arguments[3];
-            from = arguments[4];
-            to = arguments[5];
-            via=this.viaheader;
-            maxForwards = arguments[6];
-            contentType = arguments[7];
-            content = arguments[8];
-            return this.createRequestPrototype1(requestURI, method, callId, cSeq, from, to, via, maxForwards, contentType, content);
+            var content = arguments[9];
+            return this.createRequestPrototype2(requestURI, method, callId, cSeq, from, to, via, maxForwards, contentType, content);
         }
     }
 }
 
+MessageFactoryImpl.prototype.createRequestPrototype1 =function(requestURI,method,callId,cSeq,from,to,via,maxForwards){
+    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():requestURI="+requestURI);
+    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():method="+method);
+    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():callId="+callId);
+    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():cSeq="+cSeq);
+    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():from="+from);
+    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():to="+to);
+    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():via="+via);
+    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():maxForwards="+maxForwards);
+    if (requestURI == null || method == null || callId == null
+        || cSeq == null || from == null || to == null || via == null
+        || maxForwards == null)
+        {
+        console.error("MessageFactoryImpl:createRequestPrototype1(): some parameters are missing, unable to create the request");
+        throw "MessageFactoryImpl:createRequestPrototype1(): some parameters are missing, unable to create the request";
+    }
+    var sipRequest = new SIPRequest();
+    sipRequest.setRequestURI(requestURI);
+    sipRequest.setMethod(method);
+    sipRequest.setCallId(callId);
+    sipRequest.setCSeq(cSeq);
+    sipRequest.setFrom(from);
+    sipRequest.setTo(to);
+    sipRequest.setVia(via);
+    sipRequest.setMaxForwards(maxForwards);
+    if (this.userAgent != null) {
+        sipRequest.setHeader(this.userAgent);
+    }
+    return sipRequest;
+}
 
-MessageFactoryImpl.prototype.createRequestPrototype1 =function(requestURI,method,callId,cSeq,from,to,via,maxForwards,contentType,content){
+
+MessageFactoryImpl.prototype.createRequestPrototype2 =function(requestURI,method,callId,cSeq,from,to,via,maxForwards,contentType,content){
     if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():requestURI="+requestURI);
     if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():method="+method);
     if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():callId="+callId);
@@ -133,45 +119,6 @@ MessageFactoryImpl.prototype.createRequestPrototype1 =function(requestURI,method
     if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():maxForwards="+maxForwards);
     if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():contentType="+contentType);
     if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype1():content="+content);
-    
-    if (requestURI == null || method == null || callId == null
-        || cSeq == null || from == null || to == null || via == null
-        || maxForwards == null || content == null
-        || contentType == null)
-        {
-        console.error("MessageFactoryImpl:createRequestPrototype1(): some parameters are missing, unable to create the request");
-        throw "MessageFactoryImpl:createRequestPrototype1(): some parameters are missing, unable to create the request";
-    }
-    
-    var sipRequest = new SIPRequest();
-    sipRequest.setRequestURI(requestURI);
-    sipRequest.setMethod(method);
-    sipRequest.setCallId(callId);
-    sipRequest.setCSeq(cSeq);
-    sipRequest.setFrom(from);
-    sipRequest.setTo(to);
-    sipRequest.setVia(via);
-    sipRequest.setMaxForwards(maxForwards);
-    sipRequest.setContent(content, contentType);
-    if (this.userAgent != null ) {
-        sipRequest.setHeader(this.userAgent);
-    }
-    return sipRequest;
-}
-
-
-MessageFactoryImpl.prototype.createRequestPrototype2 =function(requestURI,method,callId,cSeq,from,to,via,maxForwards,content,contentType){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():requestURI="+requestURI);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():method="+method);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():callId="+callId);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():cSeq="+cSeq);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():from="+from);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():to="+to);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():via="+via);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():maxForwards="+maxForwards);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():contentType="+contentType);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():content="+content);
-    
     if (requestURI == null || method == null || callId == null
         || cSeq == null || from == null || to == null || via == null
         || maxForwards == null || content == null
@@ -180,76 +127,6 @@ MessageFactoryImpl.prototype.createRequestPrototype2 =function(requestURI,method
         console.error("MessageFactoryImpl:createRequestPrototype2(): some parameters are missing, unable to create the request");
         throw "MessageFactoryImpl:createRequestPrototype2(): some parameters are missing, unable to create the request";
     }
-
-    var sipRequest = new SIPRequest();
-    sipRequest.setRequestURI(requestURI);
-    sipRequest.setMethod(method);
-    sipRequest.setCallId(callId);
-    sipRequest.setCSeq(cSeq);
-    sipRequest.setFrom(from);
-    sipRequest.setTo(to);
-    sipRequest.setVia(via);
-    sipRequest.setMaxForwards(maxForwards);
-    sipRequest.setHeader(contentType);
-    sipRequest.setMessageContent(content);
-    if (this.userAgent != null ) {
-        sipRequest.setHeader(this.userAgent);
-    }
-    return sipRequest;
-}
-
-MessageFactoryImpl.prototype.createRequestPrototype3 =function(requestURI,method,callId,cSeq,from,to,via,maxForwards){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():requestURI="+requestURI);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():method="+method);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():callId="+callId);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():cSeq="+cSeq);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():from="+from);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():to="+to);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():via="+via);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():maxForwards="+maxForwards);
-    
-    if (requestURI == null || method == null || callId == null
-        || cSeq == null || from == null || to == null || via == null
-        || maxForwards == null)
-        {
-        console.error("MessageFactoryImpl:createRequestPrototype3(): some parameters are missing, unable to create the request");
-        throw "MessageFactoryImpl:createRequestPrototype3(): some parameters are missing, unable to create the request";
-    }
-    var sipRequest = new SIPRequest();
-    sipRequest.setRequestURI(requestURI);
-    sipRequest.setMethod(method);
-    sipRequest.setCallId(callId);
-    sipRequest.setCSeq(cSeq);
-    sipRequest.setFrom(from);
-    sipRequest.setTo(to);
-    sipRequest.setVia(via);
-    sipRequest.setMaxForwards(maxForwards);
-    if (this.userAgent != null) {
-        sipRequest.setHeader(this.userAgent);
-    }
-    return sipRequest;
-}
-
-MessageFactoryImpl.prototype.createRequestPrototype4 =function(requestURI,method,callId,cSeq,from,to,via,maxForwards,contentType,content){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():requestURI="+requestURI);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():method="+method);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():callId="+callId);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():cSeq="+cSeq);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():from="+from);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():to="+to);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():via="+via);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():maxForwards="+maxForwards);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():contentType="+contentType);
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype2():content="+content);
-    
-    if (requestURI == null || method == null || callId == null
-        || cSeq == null || from == null || to == null || via == null
-        || maxForwards == null || content == null
-        || contentType == null)
-        {
-        console.error("MessageFactoryImpl:createRequestPrototype4(): some parameters are missing, unable to create the request");
-        throw "MessageFactoryImpl:createRequestPrototype4(): some parameters are missing, unable to create the request";
-    }
     
     var sipRequest = new SIPRequest();
     sipRequest.setRequestURI(requestURI);
@@ -261,14 +138,14 @@ MessageFactoryImpl.prototype.createRequestPrototype4 =function(requestURI,method
     sipRequest.setVia(via);
     sipRequest.setMaxForwards(maxForwards);
     sipRequest.setContent(content, contentType);
-    if (this.userAgent != null) {
+    if (this.userAgent != null ) {
         sipRequest.setHeader(this.userAgent);
     }
     return sipRequest;
 }
 
 
-MessageFactoryImpl.prototype.createRequestPrototype5 =function(requestString){
+MessageFactoryImpl.prototype.createRequestPrototype3 =function(requestString){
     if(logger!=undefined) logger.debug("MessageFactoryImpl:createRequestPrototype5():requestString="+requestString);
     if (requestString == null || requestString.equals("")) {
         var retval = new SIPRequest();
@@ -280,12 +157,11 @@ MessageFactoryImpl.prototype.createRequestPrototype5 =function(requestString){
     var sipMessage = smp.parseSIPMessage(requestString);
     if (!(sipMessage instanceof SIPRequest))
     {
-        console.error("MessageFactoryImpl:createRequestPrototype5(): parsing error");
-        throw "MessageFactoryImpl:createRequestPrototype5(): parsing error";
+        console.error("MessageFactoryImpl:createRequestPrototype3(): parsing error");
+        throw "MessageFactoryImpl:createRequestPrototype3(): parsing error";
     }
     return  sipMessage;
 }
-
 
 MessageFactoryImpl.prototype.createResponse =function(){
     if(logger!=undefined) logger.debug("MessageFactoryImpl:createResponse()");
@@ -540,7 +416,7 @@ MessageFactoryImpl.prototype.createReponsePrototype5 =function(statusCode,reques
 MessageFactoryImpl.prototype.createReponsePrototype6 =function(statusCode,request){
     if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype6():statusCode="+statusCode);
     if(logger!=undefined) logger.debug("MessageFactoryImpl:createReponsePrototype6():request="+request);
-    if (request == null || content == null || contentType == null)
+    if (request == null)
     {
         console.error("MessageFactoryImpl:createReponsePrototype6(): some parameters are missing, unable to create the response");
         throw "MessageFactoryImpl:createReponsePrototype6(): ome parameters are missing, unable to create the response";
@@ -716,44 +592,4 @@ MessageFactoryImpl.prototype.addHeader =function(sipmessage,header){
     if(logger!=undefined) logger.debug("MessageFactoryImpl:addHeader():sipmessage="+sipmessage+",header="+header);
     sipmessage.addHeader(header);
     return sipmessage;
-}
-
-MessageFactoryImpl.prototype.setNewViaHeader =function(sipmessage){
-    if(logger!=undefined) logger.debug("MessageFactoryImpl:setNewViaHeader():sipmessage="+sipmessage);
-    this.viaheader=this.listeningpoint.getViaHeader();
-    if(sipmessage instanceof SIPRequest)
-    {
-        var newmessage = new SIPRequest();
-        newmessage.setMethod(sipmessage.getMethod());
-        newmessage.setRequestURI(sipmessage.getRequestURI());
-    }
-    else
-    {
-        newmessage = new SIPResponse();
-    }
-    
-    var headerlist=sipmessage.getHeaders();
-    for(var i=0;i<headerlist.length;i++)
-    {
-        newmessage.addHeader(headerlist[i]);
-    }
-    
-    if(sipmessage.getCSeq()!=null && sipmessage.getCallId()!=null && sipmessage.getViaHeaders()!=null
-        && sipmessage.getFrom()!=null && sipmessage.getTo()!=null && sipmessage.getMaxForwards()!=null)
-        {
-        newmessage.setCSeq(sipmessage.getCSeq());
-        newmessage.setCallId(sipmessage.getCallId());
-        newmessage.setVia(this.viaheader);
-        newmessage.setFrom(sipmessage.getFrom());
-        newmessage.setTo(sipmessage.getTo());
-        newmessage.setMaxForwards(sipmessage.getMaxForwards());
-        if(sipmessage.getContent()!=null)
-        {
-            var content=sipmessage.getContent();
-            var contentType=sipmessage.getContentTypeHeader();
-            newmessage.setContent(content, contentType);
-        }
-    }
-    
-    return newmessage;
 }

@@ -27,47 +27,25 @@
  *  @version 1.0 
  *   
  */
-function WSMessageProcessor() {
+function WSMessageProcessor(sipStack, wsUrl) {
     if(logger!=undefined) logger.debug("WSMessageProcessor:WSMessageProcessor()");
-    this.classname="WSMessageProcessor"; 
-    this.nConnections=null;
-    this.isRunning=null;
-    this.wsMessageChannels=new Array(); 
-    this.incomingwsMessageChannels=null;
-    this.websocket=null;
-    this.useCount=0;
-    if(arguments.length!=0)
-    {
-        var sipStack=arguments[0];
-        this.sipStack = sipStack;
-        this.wsurl=this.sipStack.getUrlWs();
-    }
+    this.classname="WSMessageProcessor";
+    this.sipStack=sipStack;
+    this.wsMessageChannel=new WSMessageChannel(this, wsUrl);
     this.sentByHostPort=new HostPort();
     this.sentByHostPort.setHost(new Host(this.sipStack.getHostAddress()));
-    this.transport = "WS";
     this.sentBy=null;
     this.sentBySet=null;
 }
 
-WSMessageProcessor.prototype.start =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:start()");
-    return this.run();
-}
-
-WSMessageProcessor.prototype.run =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:run()");
-    this.incomingwsMessageChannels = new WSMessageChannel(this);
-    return this.incomingwsMessageChannels;
-}
-
 WSMessageProcessor.prototype.getTransport =function(){
     if(logger!=undefined) logger.debug("WSMessageProcessor:getTransport()");
-    return "WS";
+    return this.wsMessageChannel.getTransport();
 }
 
-WSMessageProcessor.prototype.getIncomingwsMessageChannels =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getIncomingwsMessageChannels()");
-    return this.incomingwsMessageChannels;
+WSMessageProcessor.prototype.getMessageChannel =function(){
+    if(logger!=undefined) logger.debug("WSMessageProcessor:getMessageChannel()");
+    return this.wsMessageChannel;
 }
 
 WSMessageProcessor.prototype.getSIPStack =function(){
@@ -75,26 +53,15 @@ WSMessageProcessor.prototype.getSIPStack =function(){
     return this.sipStack;
 }
 
-WSMessageProcessor.prototype.getURLWS =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getURLWS()");
-    return this.wsurl;
-}
-
 WSMessageProcessor.prototype.getInfoApp =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:getURLWS()");
+    if(logger!=undefined) logger.debug("WSMessageProcessor:getInfoApp()");
     return this.infoApp;
 }
 
 WSMessageProcessor.prototype.stop =function(){
     if(logger!=undefined) logger.debug("WSMessageProcessor:stop()");
     this.isRunning = false;
-    this.incomingwsMessageChannels.close();
-}
-
-WSMessageProcessor.prototype.createMessageChannel =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:createMessageChannel()");
-    this.incomingwsMessageChannels = new WSMessageChannel(this.sipStack,this);
-    return this.incomingwsMessageChannels;
+    this.wsMessageChannels.close();
 }
 
 WSMessageProcessor.prototype.getMaximumMessageSize =function(){
@@ -114,22 +81,8 @@ WSMessageProcessor.prototype.getViaHeader =function(){
         via.setHost(host);
         via.setTransport(this.getTransport());
     }
-    var random=new Date();
-    var viabranch="z9hG4bK"+new String(random.getTime());
-    via.setBranch(viabranch);
+    via.setBranch(Utils.prototype.generateBranchId());
     return via;
-}
-
-WSMessageProcessor.prototype.inUse =function(){
-    if(logger!=undefined) logger.debug("WSMessageProcessor:inUse()");
-    if(this.useCount != 0)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
 }
 
 WSMessageProcessor.prototype.getDefaultTargetPort =function(){

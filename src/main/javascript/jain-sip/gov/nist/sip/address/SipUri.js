@@ -30,7 +30,6 @@
 
 function SipUri() {
     if(logger!=undefined) logger.debug("SipUri");
-    this.serialVersionUID = "7749781076218987044L";
     this.classname="SipUri";
     this.authority=new Authority();
     this.uriParms=new NameValueList();
@@ -829,7 +828,8 @@ SipUri.prototype.setTransportParam=function(transport){
         || transport=="TLS" == 0
         || transport=="TCP" == 0
         || transport=="SCTP" == 0
-        || transport=="WS" == 0) {
+        || transport=="WS" == 0
+        || transport=="WSS" == 0) {
         var nv = new NameValue(this.TRANSPORT, transport.toLowerCase());
         this.uriParms.set_nv(nv);
     } 

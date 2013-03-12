@@ -56,7 +56,7 @@ ServerParser.prototype.parse =function(){
        console.error("ServerParser:parse(): empty header");
        throw "ServerParser:parse():  empty header";
     }
-    server.addProductToken(this.lexer.getRest().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '')); 
+    server.addProductToken(this.lexer.getRest().trim()); 
     return server;
 }
 

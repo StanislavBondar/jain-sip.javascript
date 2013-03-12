@@ -29,7 +29,6 @@
  */
 function ViaList() {
     if(logger!=undefined) logger.debug("ViaList:ViaList()");
-    this.serialVersionUID = "3899679374556152313L";
     this.classname="ViaList";
     this.headerName = this.NAME;
     this.myClass =  "Via";

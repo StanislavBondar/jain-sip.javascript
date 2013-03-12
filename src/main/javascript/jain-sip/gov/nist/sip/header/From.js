@@ -30,7 +30,6 @@
 
 function From(to) {
     if(logger!=undefined) logger.debug("From:From(): to="+to);
-    this.serialVersionUID = "-6312727234330643892L";
     this.classname="From";
     this.parameters=null;
     this.duplicates=null;

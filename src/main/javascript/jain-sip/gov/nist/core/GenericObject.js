@@ -29,17 +29,27 @@
  *   
  */
 
-function GenericObject() {
-    //if(logger!=undefined) logger.debug("GenericObject:GenericObject()");
-    this.classname="GenericObject"; 
-    this.indentation=0;
-    this.stringRepresentation="";
-    this.matchExpression=null;
-    this.immutableClassNames =["String", "Character",
-    "Boolean", "Byte", "Short", "Integer", "Long",
-    "Float", "Double"]
-    this.immutableClasses=new Array();
+     
+    Array.prototype.remove = function(from, to) {
+        var rest = this.slice((to || from) + 1 || this.length);
+        this.length = from < 0 ? this.length + from : from;
+        return this.push.apply(this, rest);
+    };
             
+    if(!String.prototype.trim) {
+        String.prototype.trim = function () {
+            return this.replace(/^\s+|\s+$/g,'');
+        };
+    }
+            
+    if(!String.prototype.endsWith) {
+        String.prototype.endsWith = function(suffix) {
+            return this.indexOf(suffix, this.length - suffix.length) !== -1;
+        };
+    }
+    
+function GenericObject() {
+    this.classname="GenericObject";
 }
 
 GenericObject.prototype.SEMICOLON = ";";
@@ -64,16 +74,6 @@ GenericObject.prototype.DOUBLE_QUOTE = "\"";
 GenericObject.prototype.QUOTE = "\'";
 GenericObject.prototype.HT = "\t";
 GenericObject.prototype.PERCENT = "%";
-
-GenericObject.prototype.setMatcher =function(matchExpression){
-    //if(logger!=undefined) logger.debug("GenericObject:setMatcher():matchExpression="+matchExpression);
-    this.matchExpression = matchExpression;
-}
-
-GenericObject.prototype.getMatcher =function(){
-    //if(logger!=undefined) logger.debug("GenericObject:getMatcher()");
-    return this.matchExpression;
-}
 
 GenericObject.prototype.getClassFromName =function(className){
     //if(logger!=undefined) logger.debug("GenericObject:getClassFromName():className="+className);
@@ -123,10 +123,6 @@ GenericObject.prototype.isMySubclass=function(other){
             
         }
     }
-}
-
-GenericObject.prototype.encode=function(){
-    //if(logger!=undefined) logger.debug("GenericObject:encode()");
 }
 
 GenericObject.prototype.encode=function(buffer){

@@ -59,7 +59,6 @@ function SIPTransactionStack() {
     this.clientTransactionTable=new Array();
     this.terminatedServerTransactionsPendingAck=new Array();
     this.forkedClientTransactionTable=new Array();
-    this.dialogCreatingMethods=new Array();
     this.dialogTable=new Array();
     this.earlyDialogTable=new Array();
     this.pendingTransactions=new Array();
@@ -70,7 +69,6 @@ function SIPTransactionStack() {
     this.clientTransactionTableHiwaterMark = 1000;
     this.clientTransactionTableLowaterMark = 800;
     this.rfc2543Supported=true;
-    this.timer=0;
     this.maxForkTime=0;
     this.toExit=false;
     this.isBackToBackUserAgent = false;
@@ -79,10 +77,6 @@ function SIPTransactionStack() {
     this.maxMessageSize=null;
     this.addressResolver = new DefaultAddressResolver();
     this.stackAddress =null;
-    this.dialogCreatingMethods.push("REFER");
-    this.dialogCreatingMethods.push("INVITE");
-    this.dialogCreatingMethods.push("SUBSCRIBE");
-    this.dialogCreatingMethods.push("REGISTER");
 }
 
 SIPTransactionStack.prototype.BASE_TIMER_INTERVAL=500;
@@ -90,6 +84,8 @@ SIPTransactionStack.prototype.CONNECTION_LINGER_TIME=8;
 SIPTransactionStack.prototype.BRANCH_MAGIC_COOKIE_LOWER_CASE="z9hg4bk";
 SIPTransactionStack.prototype.TRYING=100;
 SIPTransactionStack.prototype.RINGING=180;
+
+SIPTransactionStack.prototype.dialogCreatingMethods=new Array("REFER", "INVITE", "SUBSCRIBE", "REGISTER");
 
 SIPTransactionStack.prototype.reInit =function(){
     if(logger!=undefined) logger.debug("SIPTransactionStack:reInit()");
@@ -102,60 +98,28 @@ SIPTransactionStack.prototype.reInit =function(){
     this.earlyDialogTable = new Array();
     this.terminatedServerTransactionsPendingAck = new Array();
     this.forkedClientTransactionTable = new Array();
-    this.timer = null;
     this.activeClientTransactionCount=0;
 }
 
 SIPTransactionStack.prototype.addExtensionMethod =function(extensionMethod){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:addExtensionMethod():extensionMethod="+extensionMethod);
     if (extensionMethod!="NOTIFY") {
         var l=null;
-        for(var i=0;i<this.dialogCreatingMethods.length;i++)
+        for(var i=0;i<SIPTransactionStack.prototype.dialogCreatingMethods.length;i++)
         {
-            if(this.dialogCreatingMethods[i]==extensionMethod.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '').toUpperCase())
+            if(SIPTransactionStack.prototype.dialogCreatingMethods[i]==extensionMethod.trim().toUpperCase())
             {
                 l=i;
             }
         }
         if(l==null)
         {
-            this.dialogCreatingMethods.push(extensionMethod.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '').toUpperCase());
+            SIPTransactionStack.prototype.dialogCreatingMethods.push(extensionMethod.trim().toUpperCase());
         }
     }
 }
 
-SIPTransactionStack.prototype.removeDialog =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:removeDialog()");
-    if(typeof arguments[0]=="objet")
-    {
-        var dialog=arguments[0];
-        this.removeDialogobjet(dialog);
-    }
-    else if(typeof arguments[0]=="string")
-    {
-        var dialogId=arguments[0];
-        this.removeDialogstring(dialogId);
-    }
-}
-
-SIPTransactionStack.prototype.removeDialogstring =function(dialogId){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:removeDialogstring():dialogId="+dialogId);
-    var l=null;
-    for(var i=0;i<this.dialogTable.length;i++)
-    {
-        if(this.dialogTable[i][0]==dialogId)
-        {
-            l=i;
-        }
-    }
-    if(l!=null)
-    {
-        this.dialogTable.splice(l,1);
-    }    
-}
-
-SIPTransactionStack.prototype.removeDialogobjet =function(dialog){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:removeDialogobjet():dialog="+dialog);
+SIPTransactionStack.prototype.removeDialog =function(dialog){
+    console.log("SIPTransactionStack.prototype.removeDialog(): id="+dialog.getDialogId())
     var id = dialog.getDialogId();
     var earlyId = dialog.getEarlyDialogId();
     if (earlyId != null) {
@@ -341,11 +305,6 @@ SIPTransactionStack.prototype.isAlive =function(){
     }
 }
 
-SIPTransactionStack.prototype.getTimer =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getTimer()");
-    return this.timer;
-}
-
 SIPTransactionStack.prototype.findCancelTransaction =function(cancelRequest,isServer){
     if(logger!=undefined) logger.debug("SIPTransactionStack:findCancelTransaction():cancelRequest="+cancelRequest+",isServer="+isServer);
     if (isServer) {
@@ -393,23 +352,14 @@ SIPTransactionStack.prototype.getDialog =function(dialogId){
 }
 
 SIPTransactionStack.prototype.isDialogCreated =function(method){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:isDialogCreated():method="+method);
-    var l=null;
-    for(var i=0;i<this.dialogCreatingMethods.length;i++)
+    for(var i=0;i<SIPTransactionStack.prototype.dialogCreatingMethods.length;i++)
     {
-        if(this.dialogCreatingMethods[i]==method)
+        if(SIPTransactionStack.prototype.dialogCreatingMethods[i]==method)
         {
-            l=i;
+            return true
         }
     }
-    if(l!=null)
-    {
-        return true;
-    }
-    else
-    {
-        return false
-    }
+    return false
 }
 
 SIPTransactionStack.prototype.isRfc2543Supported =function(){
@@ -504,14 +454,14 @@ SIPTransactionStack.prototype.createDialogargu2 =function(transaction,sipRespons
 }
 
 SIPTransactionStack.prototype.createRawMessageChannel =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:createRawMessageChannel()");
     var newChannel = null;
     //var l=null;
-    for(var i=0;i<this.messageProcessors.length && newChannel == null;i++)
+    for(var i=0;i<this.messageProcessors.length;i++)
     {
         var processor = this.messageProcessors[i];
-        if (processor.getURLWS()==this.wsurl) {
+        if (processor.getTransport()==this.transport) {
             newChannel = processor.createMessageChannel();
+            break;
         }
     }
     return newChannel;
@@ -983,10 +933,6 @@ SIPTransactionStack.prototype.dialogErrorEvent =function(dialogErrorEvent){
 
 SIPTransactionStack.prototype.stopStack =function(){
     if(logger!=undefined) logger.debug("SIPTransactionStack:stopStack()");
-    if (this.timer != null) {
-        clearTimeout(this.timer)
-    }
-    this.timer = null;
     this.pendingTransactions=new Array();
     this.toExit = true;
     var processorList = this.getMessageProcessors();
@@ -1033,7 +979,7 @@ SIPTransactionStack.prototype.setStackName =function(stackName){
 SIPTransactionStack.prototype.setHostAddress =function(stackAddress){
     if(logger!=undefined) logger.debug("SIPTransactionStack:setHostAddress():stackAddress="+stackAddress);
     if (stackAddress.indexOf(':') != stackAddress.lastIndexOf(':')
-        && stackAddress.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '').charAt(0) != '[') {
+        && stackAddress.trim().charAt(0) != '[') {
         this.stackAddress = '[' + stackAddress + ']';
     } else {
         this.stackAddress = stackAddress;
@@ -1235,11 +1181,6 @@ SIPTransactionStack.prototype.getDialogsargu1 =function(state){
         }
     }
     return matchingDialogs;     
-}
-
-SIPTransactionStack.prototype.setTimer =function(timer){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:setTimer():timer="+timer);
-    this.timer = timer;
 }
 
 SIPTransactionStack.prototype.setDeliverDialogTerminatedEventForNullDialog =function(){

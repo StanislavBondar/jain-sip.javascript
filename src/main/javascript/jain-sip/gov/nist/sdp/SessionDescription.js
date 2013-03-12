@@ -52,24 +52,6 @@ function SessionDescription() {
             this.copy(arguments[0])
         } else throw new SdpException("SessionDescription.SessionDescription() requires SessionDescription object arguments");
     }
-	
-    Array.prototype.remove = function(from, to) {
-        var rest = this.slice((to || from) + 1 || this.length);
-        this.length = from < 0 ? this.length + from : from;
-        return this.push.apply(this, rest);
-    };
-            
-    if(!String.prototype.trim) {
-        String.prototype.trim = function () {
-            return this.replace(/^\s+|\s+$/g,'');
-        };
-    }
-            
-    if(!String.prototype.endsWith) {
-        String.prototype.endsWith = function(suffix) {
-            return this.indexOf(suffix, this.length - suffix.length) !== -1;
-        };
-    }
 }
 
 SessionDescription.prototype = new SDPObject();

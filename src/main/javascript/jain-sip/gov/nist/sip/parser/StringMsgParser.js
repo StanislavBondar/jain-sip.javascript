@@ -34,7 +34,7 @@ function StringMsgParser(exhandler) {
     this.readBody=true;
     this.parseExceptionListener=null;
     this.rawStringMessage=null;
-    this.strict=null;
+    this.strict=true;
     this.computeContentLengthFromMessage = false;
     this.viaCount=0;
     if(exhandler!=null)
@@ -136,8 +136,11 @@ StringMsgParser.prototype.parseSIPMessagestring =function(msgString){
         } 
         else if (!this.computeContentLengthFromMessage && message.getContentLength().getContentLength() == 0) {
             if (this.strict) {
-                console.error("StringMsgParser:parse(): extraneous characters at the end of the message",i);
-                throw "StringMsgParser:parse(): extraneous characters at the end of the message";
+                 var last4Chars = msgString.substring(msgString.length - 4, 4);
+                  if(!"\r\n\r\n" == last4Chars) {
+                     console.error("StringMsgParser:parse(): extraneous characters at the end of the message",i);
+                     throw "StringMsgParser:parse(): extraneous characters at the end of the message";
+                  }
             }
         }
     }

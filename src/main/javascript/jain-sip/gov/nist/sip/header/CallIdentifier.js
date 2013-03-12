@@ -29,7 +29,6 @@
  */
 function CallIdentifier() {
     if(logger!=undefined) logger.debug("CallIdentifier");
-    this.serialVersionUID = "7314773655675451377L";
     this.classname="CallIdentifier";
     this.localId=null;
     this.host=null;

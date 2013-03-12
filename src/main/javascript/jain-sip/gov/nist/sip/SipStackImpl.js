@@ -27,13 +27,12 @@
  *  @author Laurent STRULLU (laurent.strullu@orange.com)
  *  @version 1.0 
  */
-function SipStackImpl() {
+function SipStackImpl(sipUserAgent) {
     if(logger!=undefined) logger.debug("SipStackImpl:SipStackImpl()");
     this.classname="SipStackImpl"; 
     this.stackName=null;
     this.serverTransactionTable=new Array();
     this.clientTransactionTable=new Array();
-    this.dialogCreatingMethods=new Array();
     this.earlyDialogTable=new Array();
     this.isBackToBackUserAgent = false;
     this.eventScanner=new EventScanner(this);
@@ -44,23 +43,13 @@ function SipStackImpl() {
     this.isAutomaticDialogSupportEnabled = true;
     this.isAutomaticDialogErrorHandlingEnabled = true;
     this.messageChannel=null;
-    this.userAgentName=null;
+    this.userAgentName=sipUserAgent;
     this.lastTransaction=null;
     this.reEntrantListener=true;
-    
-    this.dialogCreatingMethods.push("REFER");
-    this.dialogCreatingMethods.push("INVITE");
-    this.dialogCreatingMethods.push("SUBSCRIBE");
-    
-    if(arguments.length!=0)
-    {
-        this.wsurl=arguments[0];
-        var utils=new Utils();
-        this.setHostAddress(utils.randomString(12)+".invalid");       
-        this.userAgentName=arguments[1];     
-        this.sipMessageFactory = new NistSipMessageFactoryImpl(this);      
-        this.defaultRouter = new DefaultRouter(this, this.stackAddress);
-    }
+   
+    this.setHostAddress(Utils.prototype.randomString(12)+".invalid");           
+    this.sipMessageFactory = new NistSipMessageFactoryImpl(this);      
+    this.defaultRouter = new DefaultRouter(this, this.stackAddress);
 }
 
 SipStackImpl.prototype = new SIPTransactionStack();
@@ -94,70 +83,53 @@ SipStackImpl.prototype.createSipProvider =function(listeningPoint){
         throw "SipProviderImpl:createSipProvider(): null listeningPoint argument";
     }
     
-    var listeningPointImpl = listeningPoint;
-    if (listeningPointImpl.sipProvider != null) {
+    if (listeningPoint.sipProvider != null) {
         console.error("SipProviderImpl:createSipProvider(): provider already attached!");
         throw "SipProviderImpl:createSipProvider(): provider already attached!";
     }
     
-    var provider = new SipProviderImpl(this);
-    provider.setListeningPoint(listeningPointImpl);
-    listeningPointImpl.sipProvider = provider;
-    var l=null;
-    for(var i=0;i<this.sipProviders.length;i++)
-    {
-        if(this.sipProviders[i]==provider)
-        {
-            l=i;
-        }
-    }
-    if(l==null)
-    {
-        this.sipProviders.push(provider);
-    }
-    return provider;
+    var sipProvider = new SipProviderImpl(this);
+    sipProvider.setListeningPoint(listeningPoint);
+    listeningPoint.setSipProvider(sipProvider);
+    this.sipProviders.push(sipProvider);
+    return sipProvider;
 }
 
-SipStackImpl.prototype.createListeningPoint =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:createListeningPoint()");
+SipStackImpl.prototype.createListeningPoint =function(wsUrl){
+    if(logger!=undefined) logger.debug("SipStackImpl:createListeningPoint(): wsUrl="+wsUrl);
     if (!this.isAlive()) {
         this.toExit = false;
         this.reInitialize();
     }
-    var transport="ws";
-    var lp=new ListeningPointImpl(this);
-    lp.host=this.stackAddress;
-    var key = lp.makeKey(this.stackAddress, transport);
-    var lip=null;
+    
+    var transport;
+    if(wsUrl.toLowerCase().indexOf("ws://")==0) transport="WS";
+    else if(wsUrl.toLowerCase().indexOf("wss://")==0) transport="WSS";
+    else 
+    {
+      throw "WSMessageChannel:createWebSocket(): bad Websocket Url";
+      console.warn("WSMessageChannel:createWebSocket(): bad Websocket Url");
+    }
+    
+    var key = ListeningPointImpl.prototype.makeKey(this.stackAddress, transport);
     for(var i=0;i<this.listeningPoints.length;i++)
     {
         if(this.listeningPoints[i]==key)
         {
-            lip=this.listeningPoints[i][1];
+            return this.listeningPoints[i][1];
         }
     }
-    if (lip != null) {
-        return lip;
-    }
-    else {
-        var messageProcessor = this.createMessageProcessor();
-        lip = new ListeningPointImpl(this);
-        lip.messageProcessor = messageProcessor;
-        messageProcessor.setListeningPoint(lip);
-        var array=new Array();
-        array[0]=key;
-        array[1]=lip;
-        this.listeningPoints.push(array);
-        this.messageChannel=messageProcessor.createMessageChannel();
-        return lip;
-    }
-}
-
-SipStackImpl.prototype.createMessageProcessor =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:createMessageProcessor()");
-    var wsMessageProcessor = new WSMessageProcessor(this);
-    this.addMessageProcessor(wsMessageProcessor);
-    return wsMessageProcessor;
+   
+    var messageProcessor = new WSMessageProcessor(this, wsUrl);
+    this.addMessageProcessor(messageProcessor);
+    var listeningPoint=new ListeningPointImpl(this, messageProcessor);
+    messageProcessor.setListeningPoint(listeningPoint);
+    var array=new Array();
+    array[0]=key;
+    array[1]=listeningPoint;
+    this.listeningPoints.push(array);
+    this.messageChannel=messageProcessor.getMessageChannel();
+    return listeningPoint;
 }
 
 SipStackImpl.prototype.reInitialize =function(){
@@ -169,16 +141,10 @@ SipStackImpl.prototype.reInitialize =function(){
     this.sipListener = null;
 }
 
-SipStackImpl.prototype.getUrlWs =function(){
-    if(logger!=undefined) logger.debug("SipStackImpl:getUrlWs()");
-    return this.wsurl;
-}
-
 SipStackImpl.prototype.getUserAgent =function(){
     if(logger!=undefined) logger.debug("SipStackImpl:getUserAgent()");
     return this.userAgentName;
 }
-
 
 SipStackImpl.prototype.deleteListeningPoint =function(listeningPoint){
     if(logger!=undefined) logger.debug("SipStackImpl:deleteListeningPoint():listeningPoint="+listeningPoint);
@@ -186,23 +152,17 @@ SipStackImpl.prototype.deleteListeningPoint =function(listeningPoint){
         console.error("SipProviderImpl:deleteListeningPoint(): null listeningPoint arg");
         throw "SipProviderImpl:deleteListeningPoint(): null listeningPoint arg";
     }
-    var lip = listeningPoint;
-    this.removeMessageProcessor(lip.messageProcessor);
-    var key = lip.getKey();
-    var l=null;
+    this.removeMessageProcessor(listeningPoint.messageProcessor);
+    var key = listeningPoint.getKey();
     for(var i=0;i<this.listeningPoints.length;i++)
     {
         if(this.listeningPoints[i][0]==key)
         {
-            l=i;
+            this.listeningPoints.splice(i,1);
+            break;
         }
     }
-    if(l!=null)
-    {
-        this.listeningPoints.splice(l,1);
-    }
 }
-
 
 SipStackImpl.prototype.deleteSipProvider =function(sipProvider){
     if(logger!=undefined) logger.debug("SipStackImpl:deleteSipProvider():sipProvider:"+sipProvider);
@@ -210,24 +170,19 @@ SipStackImpl.prototype.deleteSipProvider =function(sipProvider){
         console.error("SipProviderImpl:deleteSipProvider(): null provider arg");
         throw "SipProviderImpl:deleteSipProvider(): null provider arg";
     }
-    var sipProviderImpl = sipProvider;
-    if (sipProviderImpl.getSipListener() != null) {
+    if (sipProvider.getSipListener() != null) {
         console.error("SipProviderImpl:deleteSipProvider(): sipProvider still has an associated SipListener!");
         throw "SipProviderImpl:deleteSipProvider(): sipProvider still has an associated SipListener!";
     }
-    sipProviderImpl.removeListeningPoints();
-    sipProviderImpl.stop();
-    var l=null;
+    sipProvider.removeListeningPoints();
+    sipProvider.stop();
     for(var i=0;i<this.sipProviders.length;i++)
     {
         if(this.sipProviders[i]==sipProvider)
         {
-            l=i;
+             this.sipProviders.splice(i,1);
+             break;
         }
-    }
-    if(l!=null)
-    {
-        this.sipProviders.splice(l,1);
     }
     if (this.sipProviders.length==0) {
         this.stopStack();
@@ -241,14 +196,7 @@ SipStackImpl.prototype.getListeningPoints =function(){
 
 SipStackImpl.prototype.getSipProviders =function(){
     if(logger!=undefined) logger.debug("SipStackImpl:getSipProviders()");
-    if(this.sipProviders.length==1)
-    {
-        return this.sipProviders[0];
-    }
-    else
-    {
-        return this.sipProviders;
-    }
+    return this.sipProviders;
 }
 
 SipStackImpl.prototype.getStackName =function(){
@@ -372,7 +320,7 @@ SipStackImpl.prototype.newSIPServerRequest =function(requestReceived,requestMess
             requestReceived.setTransaction(currentTransaction);
             if(requestReceived.getMethod()!="ACK")
             {
-                currentTransaction=this.getSipProviders().getNewServerTransaction(requestReceived);
+               currentTransaction=requestMessageChannel.messageProcessor.listeningPoint.sipProvider.getNewServerTransaction(requestReceived);
             }
         }
     }

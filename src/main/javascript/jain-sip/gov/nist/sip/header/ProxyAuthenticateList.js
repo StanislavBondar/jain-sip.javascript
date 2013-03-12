@@ -29,7 +29,6 @@
  */
 function ProxyAuthenticateList() {
     if(logger!=undefined) logger.debug("ProxyAuthenticateList");
-    this.serialVersionUID = "1L";
     this.classname="ProxyAuthenticateList";
     this.headerName = this.NAME;
     this.myClass =  "ProxyAuthenticate";

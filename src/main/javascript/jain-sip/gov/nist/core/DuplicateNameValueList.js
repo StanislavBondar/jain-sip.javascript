@@ -30,7 +30,6 @@
  */
 function DuplicateNameValueList() {
     //if(logger!=undefined) logger.debug("DuplicateNameValueList:DuplicateNameValueList()");
-    this.serialVersionUID = "-5611332957903796952L";
     this.classname="DuplicateNameValueList";
     this.nameValueMap = new Array();
     this.separator=";";

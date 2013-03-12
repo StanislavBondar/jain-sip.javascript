@@ -29,7 +29,6 @@
  */
 function AuthorizationList() {
     if(logger!=undefined) logger.debug("AuthorizationList:AuthorizationList()");
-    this.serialVersionUID = "1L";
     this.classname="AuthorizationList";
     this.headerName = this.NAME;
     this.myClass =  "Authorization";

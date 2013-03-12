@@ -29,7 +29,6 @@
  */
 function ContentLength(length) {
     if(logger!=undefined) logger.debug("ContentLength:ContentLength(): length="+length);
-    this.serialVersionUID = "1187190542411037027L";
     this.classname="ContentLength";
     this.headerName=this.NAME;
     this.contentLength=null;

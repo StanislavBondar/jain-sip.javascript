@@ -29,7 +29,6 @@
  */
 function ReasonList() {
     if(logger!=undefined) logger.debug("ReasonList:ReasonList()");
-    this.serialVersionUID = "7459989997463160670L";
     this.classname="ReasonList";
     this.headerName = this.NAME;
     this.myClass = "Reason";

@@ -29,7 +29,6 @@
  */
 function Via() {
     if(logger!=undefined) logger.debug("Via:Via()");
-    this.serialVersionUID = "5281728373401351378L";
     this.classname="Via";
     this.sentProtocol=new Protocol();
     this.sentBy=new HostPort();

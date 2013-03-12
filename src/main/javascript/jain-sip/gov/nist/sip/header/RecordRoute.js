@@ -29,7 +29,6 @@
  */
 function RecordRoute(address) {
     if(logger!=undefined) logger.debug("RecordRoute:RecordRoute()");
-    this.serialVersionUID = "2388023364181727205L";
     this.classname="RecordRoute";
     if(address==null)
     {

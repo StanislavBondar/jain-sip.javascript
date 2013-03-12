@@ -41,11 +41,8 @@ function SIPClientTransaction(newSIPStack,newChannelToUse) {
     this.sipStack=newSIPStack;
     this.infoApp=newSIPStack.infoApp;
     this.addEventListener(newSIPStack);
-    this.originalRequest=null;
-    this.eventListeners = new Array();
-    
-    var utils=new Utils();
-    this.setBranch(utils.generateBranchId());
+    this.originalRequest=null; 
+    this.setBranch(Utils.prototype.generateBranchId());
     this.notifyOnRetransmit = false;
     this.timeoutIfStillInCallingState = false;
     this.setEncapsulatedChannel(newChannelToUse);
@@ -349,7 +346,7 @@ SIPClientTransaction.prototype.nonInviteClientTransaction =function(transactionR
             else {
                 this.setState(this.TERMINATED);
                 this.sipStack.removeTransaction(this);
-                clearTimeout(this.timer);
+                clearInterval(this.timer);
             }
             if (this.respondTo != null) {
                 this.respondTo.processResponse(transactionResponse, this, sipDialog);
@@ -394,7 +391,7 @@ SIPClientTransaction.prototype.inviteClientTransaction =function(transactionResp
             dialog.resendAck();
         }
         this.sipStack.removeTransaction(this);
-        clearTimeout(this.timer);
+        clearInterval(this.timer);
         return;
     }
     else if (this.CALLING == this.getState()) {
@@ -440,7 +437,7 @@ SIPClientTransaction.prototype.inviteClientTransaction =function(transactionResp
         {
             this.setState(this.TERMINATED);
             this.sipStack.removeTransaction(this);
-            clearTimeout(this.timer);
+            clearInterval(this.timer);
             if (this.respondTo != null) {
                 this.respondTo.processResponse(transactionResponse, this, dialog);
             } 
@@ -456,7 +453,7 @@ SIPClientTransaction.prototype.inviteClientTransaction =function(transactionResp
             {
                 this.setState(this.TERMINATED);
                 this.sipStack.removeTransaction(this);
-                clearTimeout(this.timer);
+                clearInterval(this.timer);
             }
             if (this.respondTo != null)
             {
@@ -467,7 +464,7 @@ SIPClientTransaction.prototype.inviteClientTransaction =function(transactionResp
     else if (this.COMPLETED == this.getState()) {
         this.setState(this.TERMINATED);
         this.sipStack.removeTransaction(this);
-        clearTimeout(this.timer);
+        clearInterval(this.timer);
         if (300 <= statusCode && statusCode <= 699) {
             this.sendMessage(this.createErrorAck());
         }
@@ -527,7 +524,7 @@ SIPClientTransaction.prototype.sendRequest =function(){
 
 SIPClientTransaction.prototype.fireTimeoutTimer =function(){
     if(logger!=undefined) logger.debug("SIPClientTransaction:fireTimeoutTimer()");
-    clearTimeout(this.timer);
+    clearInterval(this.timer);
     var dialog = this.getDialog();
     if (this.CALLING == this.getState()|| this.TRYING == this.getState()
         || this.PROCEEDING == this.getState()) {
@@ -724,17 +721,17 @@ SIPClientTransaction.prototype.startTransactionTimer =function(){
     if(logger!=undefined) logger.debug("SIPClientTransaction:startTransactionTimer()");
     if (this.transactionTimerStarted==false) {
         this.transactionTimerStarted=true;
-        if (this.sipStack.getTimer() != null ) {
-            var transaction=this;
+        if (this.timer == null ) {
+            var that=this;
             this.timer=setInterval(function(){
-                if(transaction.isTerminated())
+                if(that.isTerminated())
                 {
-                    var sipStack=transaction.getSIPStack();
-                    sipStack.removeTransaction(transaction);
+                    var sipStack=that.getSIPStack();
+                    sipStack.removeTransaction(that);
                 }
                 else
                 {
-                    transaction.fireTimer();
+                    that.fireTimer();
                 }
             },this.BASE_TIMER_INTERVAL);
         }

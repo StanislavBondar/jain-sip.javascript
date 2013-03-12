@@ -29,7 +29,6 @@
  */
 function ContentType(contentType,contentSubtype) {
     if(logger!=undefined) logger.debug("ContentType:ContentType()");
-    this.serialVersionUID = "8475682204373446610L";
     this.classname="ContentType";
     this.mediaRange=new MediaRange();
     this.headerName=this.NAME;

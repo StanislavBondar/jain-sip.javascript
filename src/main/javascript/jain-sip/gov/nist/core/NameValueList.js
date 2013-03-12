@@ -31,7 +31,6 @@
 function NameValueList(sync) {
     //if(logger!=undefined) logger.debug("NameValueList");
     this.classname="NameValueList"; 
-    this.serialVersionUID = "-6998271876574260243L";
     this.hmap = new Array();
     this.separator=";";
 

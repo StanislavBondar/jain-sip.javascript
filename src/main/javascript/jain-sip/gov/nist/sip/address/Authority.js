@@ -31,7 +31,6 @@
 function Authority() {
     if(logger!=undefined) logger.debug("Authority:Authority()");
     this.classname="Authority"; 
-    this.serialVersionUID = "-3570349777347017894L";
     this.userInfo =null;
     this.hostPort=new HostPort();
 }

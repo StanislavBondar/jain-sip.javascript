@@ -29,7 +29,6 @@
  */
 function Supported(option_tag) {
     if(logger!=undefined) logger.debug("Supported:Supported()");
-    this.serialVersionUID = "-7679667592702854542L";
     this.classname="Supported";
     this.optionTag=null;
     if(option_tag!=null)

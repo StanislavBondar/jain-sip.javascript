@@ -30,7 +30,6 @@
 
 function CallID() {
     if(logger!=undefined) logger.debug("CallID:CallID()");
-    this.serialVersionUID = "-6463630258703731156L;";
     this.classname="CallID";
     this.headerName=this.NAME;
     this.callIdentifier=new CallIdentifier();

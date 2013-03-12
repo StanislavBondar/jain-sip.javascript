@@ -30,7 +30,6 @@
 
 function AllowList() {
     if(logger!=undefined) logger.debug("AllowList:AllowList()");
-    this.serialVersionUID = "-4699795429662562358L";
     this.classname="AllowList";
     this.headerName = this.NAME;
     this.myClass =  "Allow";

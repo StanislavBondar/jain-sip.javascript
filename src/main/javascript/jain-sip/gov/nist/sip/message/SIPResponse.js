@@ -605,8 +605,7 @@ SIPResponse.prototype.setBranch =function(via, method){
             branch = this.getTopmostVia().getBranch();   // non-2xx ACK uses same branch
         } 
         else {
-            var utils=new Utils();
-            branch = utils.getInstance().generateBranchId();    // 2xx ACK gets new branch
+            branch = Utils.prototype.generateBranchId();    // 2xx ACK gets new branch
         }
     } 
     else if (method==this.CANCEL) {
@@ -697,10 +696,8 @@ SIPResponse.prototype.createRequest =function(requestURI, via, cseq, from, to){
         }
         newRequest.attachHeader(nextHeader, false);    
     }
-    // JvB: all requests need a Max-Forwards
-    var mfimpl=new MessageFactoryImpl();   
-    if (mfimpl.getDefaultUserAgentHeader() != null ) {
-        newRequest.setHeader(mfimpl.getDefaultUserAgentHeader());
+    if (MessageFactoryImpl.prototype.getDefaultUserAgentHeader() != null ) {
+        newRequest.setHeader(MessageFactoryImpl.prototype.getDefaultUserAgentHeader());
     }
     return newRequest;
 }

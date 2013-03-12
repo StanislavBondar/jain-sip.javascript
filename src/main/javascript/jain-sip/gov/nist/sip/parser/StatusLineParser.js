@@ -55,7 +55,7 @@ StatusLineParser.prototype.statusCode =function(){
 }
 StatusLineParser.prototype.reasonPhrase =function(){
     if(logger!=undefined) logger.debug("Parser:reasonPhrase()");
-    return this.lexer.getRest().replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
+    return this.lexer.getRest().trim();
 }
 StatusLineParser.prototype.parse =function(){
     if(logger!=undefined) logger.debug("Parser:parse()");

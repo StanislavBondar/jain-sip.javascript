@@ -29,7 +29,6 @@
  */
 function ProxyAuthorizationList() {
     if(logger!=undefined) logger.debug("ProxyAuthorizationList:ProxyAuthorizationList()");
-    this.serialVersionUID = "-1L";
     this.classname="ProxyAuthorizationList";
     this.headerName = this.NAME;
     this.myClass =  "ProxyAuthorization";

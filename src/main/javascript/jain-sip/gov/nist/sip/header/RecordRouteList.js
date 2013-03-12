@@ -29,7 +29,6 @@
  */
 function RecordRouteList() {
     if(logger!=undefined) logger.debug("RecordRouteList");
-    this.serialVersionUID = "1724940469426766691L";
     this.classname="RecordRouteList";
     this.headerName = this.NAME;
     this.myClass =  "RecordRoute";

@@ -31,7 +31,6 @@
 
 function Host(hn,addresstype) {
     if(logger!=undefined) logger.debug("Host:Host(): hn="+hn+" addresstype="+addresstype);
-    this.serialVersionUID = "-7233564517978323344L";
     this.stripAddressScopeZones = false;
     this.hostname = null;
     this.addressType=null;
@@ -153,7 +152,7 @@ Host.prototype.setHost =function(host,type){
         this.addressType = type;
     }
     if (host != null){
-        this.hostname=host.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
+        this.hostname=host.trim();
         if(this.addressType == this.HOSTNAME)
         {
             this.hostname = this.hostname.toLowerCase();

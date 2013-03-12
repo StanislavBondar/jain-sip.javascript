@@ -29,7 +29,6 @@
  */
 function Expires() {
     if(logger!=undefined) logger.debug("Expires:Expires()");
-    this.serialVersionUID = "3134344915465784267L";
     this.classname="Expires";
     this.headerName=this.NAME;
     this.expires=null;

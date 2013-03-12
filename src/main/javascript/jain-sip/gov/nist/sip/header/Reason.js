@@ -29,7 +29,6 @@
  */
 function Reason() {
     if(logger!=undefined) logger.debug("Reason:Reason()");
-    this.serialVersionUID = "-8903376965568297388L";
     this.classname="Reason";
     this.headerName=this.NAME;
     this.parameters = new NameValueList();
@@ -67,8 +66,7 @@ Reason.prototype.getProtocol =function(){
 Reason.prototype.setText =function(text){
     if(logger!=undefined) logger.debug("Reason:setText():text="+text);
     if ( text.charAt(0) != '"' ) {
-        var utils=new Utils();
-        text = utils.getQuotedString(text);
+        text = Utils.prototype.getQuotedString(text);
     }
     this.parameters.set_name_value("text", text);
 }

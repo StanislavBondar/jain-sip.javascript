@@ -29,7 +29,6 @@
  */
 function To(from) {
     if(logger!=undefined) logger.debug("To:To()");
-    this.serialVersionUID = "-4057413800584586316L";
     this.classname="To";
     if(from==null)
     {

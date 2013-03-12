@@ -31,7 +31,6 @@
 function HostPort() {
     //if(logger!=undefined) logger.debug("HostPort:HostPort()");
     this.classname="HostPort"; 
-    this.serialVersionUID = "-7103412227431884523L";
     this.port = -1;
     this.host=new Host();
 }

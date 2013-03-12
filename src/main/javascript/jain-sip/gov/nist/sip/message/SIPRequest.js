@@ -31,39 +31,14 @@
 function SIPRequest() {
     if(logger!=undefined) logger.debug("SIPRequest:SIPRequest()");
     this.classname="SIPRequest";
-    this.serialVersionUID = "3360720013577322927L";
     this.transactionPointer=null;
     this.requestLine = new RequestLine();
     this.messageChannel=null;
     this.inviteTransaction=null;
-    this.targetRefreshMethods = new Array();
-    this.nameTable = new Array();
     this.unrecognizedHeaders= new Array();
     this.headers=new Array();
+    this.nameTable = new Array();
     this.attachHeader(new ContentLength(0), false);
-    
-    this.targetRefreshMethods.push(this.INVITE);
-    this.targetRefreshMethods.push(this.UPDATE);
-    this.targetRefreshMethods.push(this.SUBSCRIBE);
-    this.targetRefreshMethods.push(this.NOTIFY);
-    this.targetRefreshMethods.push(this.REFER);
-    
-    this.putName(this.INVITE);
-    this.putName(this.BYE);
-    this.putName(this.CANCEL);
-    this.putName(this.ACK);
-    this.putName(this.PRACK);
-    this.putName(this.INFO);
-    this.putName(this.MESSAGE);
-    this.putName(this.NOTIFY);
-    this.putName(this.OPTIONS);
-    this.putName(this.PRACK);
-    this.putName(this.PUBLISH);
-    this.putName(this.REFER);
-    this.putName(this.REGISTER);
-    this.putName(this.SUBSCRIBE);
-    this.putName(this.UPDATE);
-    
 }
 
 SIPRequest.prototype = new SIPMessage();
@@ -93,60 +68,58 @@ SIPRequest.prototype.MaxForwardsHeader="Max-Forwards";
 SIPRequest.prototype.EventHeader="Event";
 SIPRequest.prototype.ContactHeader="Contact";
 SIPRequest.prototype.COLON=":";
-//SIPRequest.prototype.UPDATE="UPDATE";
 
-SIPRequest.prototype.putName =function(name){
-    if(logger!=undefined) logger.debug("SIPRequest:putName():name="+name);
-    var array=new Array();
-    array[0]=name;
-    array[1]=name;
-    this.nameTable.push(array);
-}
+SIPRequest.prototype.targetRefreshMethods = new Array(
+                     SIPRequest.prototype.INVITE, 
+                     SIPRequest.prototype.UPDATE,
+                     SIPRequest.prototype.SUBSCRIBE,
+                     SIPRequest.prototype.NOTIFY,
+                     SIPRequest.prototype.REFER);
+
+SIPRequest.prototype.canonicalRequestNameTable = new Array(
+                     SIPRequest.prototype.INVITE, 
+                     SIPRequest.prototype.BYE,
+                     SIPRequest.prototype.CANCEL,
+                     SIPRequest.prototype.ACK,
+                     SIPRequest.prototype.PRACK,
+                     SIPRequest.prototype.INFO,
+                     SIPRequest.prototype.MESSAGE,
+                     SIPRequest.prototype.NOTIFY,
+                     SIPRequest.prototype.OPTIONS, 
+                     SIPRequest.prototype.PRACK,
+                     SIPRequest.prototype.PUBLISH,
+                     SIPRequest.prototype.REFER,
+                     SIPRequest.prototype.REGISTER,
+                     SIPRequest.prototype.SUBSCRIBE,
+                     SIPRequest.prototype.UPDATE);
 
 SIPRequest.prototype.isTargetRefresh =function(ucaseMethod){
     if(logger!=undefined) logger.debug("SIPRequest:isTargetRefresh():ucaseMethod="+ucaseMethod);
-    var x=null;
-    for(var i=0;i<this.targetRefreshMethods;i++)
+    for(var i=0;i<SIPRequest.prototype.targetRefreshMethods;i++)
     {
-        if(this.targetRefreshMethods[i]==ucaseMethod)
+        if(SIPRequest.prototype.targetRefreshMethods[i]==ucaseMethod)
         {
-            x=1;
+            return true
         }
     }
-    if(x!=null)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return false;
 }
 
 SIPRequest.prototype.isDialogCreating =function(ucaseMethod){
     if(logger!=undefined) logger.debug("SIPRequest:isDialogCreating():ucaseMethod:"+ucaseMethod);
-    var siptranstack=new SIPTransactionStack();
-    return siptranstack.isDialogCreated(ucaseMethod);
+    return SIPTransactionStack.prototype.isDialogCreated(ucaseMethod);
 }
 
 SIPRequest.prototype.getCannonicalName =function(method){
     if(logger!=undefined) logger.debug("SIPRequest:getCannonicalName():method:"+method);
-    var x=null;
-    for(var i=0;i<this.nameTable;i++)
+    for(var i=0;i<this.canonicalRequestNameTable;i++)
     {
-        if(this.nameTable[i][0]==method)
+        if(this.canonicalRequestNameTable[i]==method)
         {
-            x=i;
+           return method 
         }
     }
-    if(x!=null)
-    {
-        return this.nameTable[x][1];
-    }
-    else
-    {
-        return method;
-    }
+    return method;
 }
 
 SIPRequest.prototype.getRequestLine =function(){
@@ -574,9 +547,9 @@ SIPRequest.prototype.createResponseargu2 =function(statusCode,reasonPhrase){
     {
         newResponse.setMessageContent(this.getMessageContent());
     }
-    var mfimpl=new MessageFactoryImpl();
-    if (mfimpl.getDefaultServerHeader() != null) {
-        newResponse.setHeader(mfimpl.getDefaultServerHeader());
+    
+    if (MessageFactoryImpl.prototype.getDefaultServerHeader() != null) {
+        newResponse.setHeader(MessageFactoryImpl.prototype.getDefaultServerHeader());
     }
     if (newResponse.getStatusCode() == 100) {
         newResponse.getTo().removeParameter("tag");
@@ -584,10 +557,6 @@ SIPRequest.prototype.createResponseargu2 =function(statusCode,reasonPhrase){
     if(newResponse.getStatusCode()==480&&newResponse.getHeaders("recordroute")!=null)
     {
         newResponse.removeHeader("record-route");
-    }
-    var server = mfimpl.getDefaultServerHeader();
-    if (server != null) {
-        newResponse.setHeader(server);
     }
     return newResponse;
 }
@@ -628,9 +597,8 @@ SIPRequest.prototype.createCancelRequest =function(){
     if (this.getRouteHeaders() != null) {
         cancel.setHeader(this.getRouteHeaders());
     }
-    var mfimpl=new MessageFactoryImpl();
-    if (mfimpl.getDefaultUserAgentHeader() != null) {
-        cancel.setHeader(mfimpl.getDefaultUserAgentHeader());
+    if (MessageFactoryImpl.prototype.getDefaultUserAgentHeader() != null) {
+        cancel.setHeader(MessageFactoryImpl.prototype.getDefaultUserAgentHeader());
     }
     return cancel;
 }
@@ -690,12 +658,12 @@ SIPRequest.prototype.createAckRequest_argu1 =function(responseToHeader){
         }
         newRequest.attachHeader(nextHeader, false);
     }
-    var mfimpl=new MessageFactoryImpl();
-    if (mfimpl.getDefaultUserAgentHeader() != null) {
-        newRequest.setHeader(mfimpl.getDefaultUserAgentHeader());
+    if (MessageFactoryImpl.prototype.getDefaultUserAgentHeader() != null) {
+        newRequest.setHeader(MessageFactoryImpl.prototype.getDefaultUserAgentHeader());
     }
     return newRequest;
 }
+
 SIPRequest.prototype.createErrorAck =function(responseToHeader){
     if(logger!=undefined) logger.debug("SIPRequest:createErrorAck():responseToHeader="+responseToHeader.classname);
     var newRequest = new SIPRequest();
@@ -716,9 +684,8 @@ SIPRequest.prototype.createErrorAck =function(responseToHeader){
     if (this.getRouteHeaders() != null) {
         newRequest.setHeader(this.getRouteHeaders());
     }
-    var mfimpl=new MessageFactoryImpl();
-    if (mfimpl.getDefaultUserAgentHeader() != null) {
-        newRequest.setHeader(mfimpl.getDefaultUserAgentHeader());
+    if (MessageFactoryImpl.prototype.getDefaultUserAgentHeader() != null) {
+        newRequest.setHeader(MessageFactoryImpl.prototype.getDefaultUserAgentHeader());
     }
     return newRequest;
 }
@@ -770,9 +737,8 @@ SIPRequest.prototype.createSIPRequest =function(requestLine, switchHeaders){
         }
         newRequest.attachHeader(nextHeader, false);
     }
-    var mfimpl=new MessageFactoryImpl();
-    if (mfimpl.getDefaultUserAgentHeader() != null) {
-        newRequest.setHeader(mfimpl.getDefaultUserAgentHeader());
+    if (MessageFactoryImpl.prototype.getDefaultUserAgentHeader() != null) {
+        newRequest.setHeader(MessageFactoryImpl.prototype.getDefaultUserAgentHeader());
     }
     return newRequest;
 }

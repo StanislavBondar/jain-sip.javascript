@@ -609,7 +609,7 @@ WebRtcCommCall.prototype.onPrivateCallConnectorCallRingingEvent=function(callerP
         var that=this;
         setTimeout(function(){
             try {
-                that.webRtcCommClient.eventListener.onWebRtcCommCallRingingEvent(that,that.callerPhoneNumber);
+                that.webRtcCommClient.eventListener.onWebRtcCommCallRingingEvent(that);
             }
             catch(exception)
             {

@@ -27,31 +27,21 @@
  *  @version 1.0 
  *   
  */
-function WSMessageChannel() {
+function WSMessageChannel(messageProcessor, wsUrl) {
     if(logger!=undefined) logger.debug("WSMessageChannel:WSMessageChannel()");
     this.classname="WSMessageChannel"; 
-    this.key=null;
-    this.isCached=null;
-    this.isRunning=null;
-    this.sipStack=null;
-    this.wsurl=null;
-    this.infoApp=null;
-    this.messageProcessor=null;
-    this.alive=true;
-    this.websocket=null;
-    this.requestsent=null;
-    if(arguments.length!=0)
+    this.wsurl=wsUrl;
+    if(this.wsurl.toLowerCase().indexOf("ws://")==0) this.transport="WS";
+    else if(this.wsurl.toLowerCase().indexOf("wss://")==0) this.transport="WSS";
+    else 
     {
-        var sipStack=arguments[0];
-        var msgProcessor=arguments[1];
-        this.sipStack = sipStack;
-        this.peerProtocol = "WS";
-        this.messageProcessor = msgProcessor;
-        this.myAddress = this.sipStack.getHostAddress();
-        this.wsurl=this.messageProcessor.getURLWS();
-        this.websocket=this.createWebSocket(this.wsurl);
+       throw "WSMessageChannel:createWebSocket(): bad Websocket Url";
+       console.warn("WSMessageChannel:createWebSocket(): bad Websocket Url");
     }
-    this.wsMsgParser=new WSMsgParser(this.sipStack);
+    this.messageProcessor=messageProcessor;
+    this.myAddress = this.messageProcessor.sipStack.getHostAddress();
+    this.websocket=this.createWebSocket();
+    this.wsMsgParser=new WSMsgParser(this);
 }
 
 WSMessageChannel.prototype.isReliable =function(){
@@ -59,29 +49,28 @@ WSMessageChannel.prototype.isReliable =function(){
     return true;
 }
 
-WSMessageChannel.prototype.createWebSocket =function(wsurl){
+WSMessageChannel.prototype.createWebSocket =function(){
     if(logger!=undefined) logger.debug("WSMessageChannel:createWebSocket():wsurl="+wsurl);
-    this.websocket=new WebSocket(wsurl,"sip");
+    this.websocket=new WebSocket(this.wsurl,"sip");
     this.websocket.binaryType='arraybuffer'
     var that=this;
     this.websocket.onclose=function()
     {
         console.warn("WSMessageChannel:createWebSocket(): the websocket is closed");
-        that.sipStack.sipListener.processDisconnected();
+        that.messageProcessor.sipStack.sipListener.processDisconnected();
         that.websocket=null;
-        this.alive=false;
     }
     
     this.websocket.onopen=function()
     {
         console.info("WSMessageChannel:createWebSocket(): the websocket is opened");
-        that.sipStack.sipListener.processConnected();
+        that.messageProcessor.sipStack.sipListener.processConnected();
     }
     
     this.websocket.onerror=function(error)
     {
         console.error("WSMessageChannel:createWebSocket(): websocket connection has failed:"+error);
-        that.sipStack.sipListener.processConnectionError(error);
+        that.messageProcessor.sipStack.sipListener.processConnectionError(error);
     }
     
     this.websocket.onmessage=function(event)
@@ -105,29 +94,18 @@ WSMessageChannel.prototype.createWebSocket =function(wsurl){
 
 WSMessageChannel.prototype.close =function(){
     if(logger!=undefined) logger.debug("WSMessageChannel:close()");
-    this.alive=false;
     this.websocket.close();
     this.websocket = null;
 }
 
 WSMessageChannel.prototype.getSIPStack =function(){
     if(logger!=undefined) logger.debug("WSMessageChannel:getSIPStack()");
-    return this.sipStack;
+    return this.messageProcessor.sipStack;
 }
 
 WSMessageChannel.prototype.getTransport =function(){
     if(logger!=undefined) logger.debug("WSMessageChannel:getTransport()");
-    return "WS";
-}
-
-WSMessageChannel.prototype.getURLWS =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getURLWS()");
-    return this.wsurl;
-}
-
-WSMessageChannel.prototype.getPeerProtocol =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getPeerProtocol()");
-    return this.peerProtocol;
+    return this.transport;
 }
 
 WSMessageChannel.prototype.sendMessage = function(sipMessage){
@@ -144,23 +122,6 @@ WSMessageChannel.prototype.sendMessage = function(sipMessage){
     }
     this.websocket.send(sipMessage);
     console.info("SIP message sent: "+sipMessage); 
-}
-
-WSMessageChannel.prototype.getKey =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getKey()");
-    if (this.key != null) {
-        return this.key;
-    } 
-    else {
-        var mc=new WSMessageChannel();
-        this.key = mc.getKey(this.wsurl, "WS");
-        return this.key;
-    }
-}
-
-WSMessageChannel.prototype.getViaHost =function(){
-    if(logger!=undefined) logger.debug("WSMessageChannel:getViaHost()");
-    return this.myAddress;
 }
 
 WSMessageChannel.prototype.getViaHeader =function(){
@@ -228,8 +189,7 @@ WSMessageChannel.prototype.createBadReqRes =function(badReq/*,pe*/){
     if (toStart != -1 && buf.indexOf("tag", toStart) == -1) {
         buf=buf+";tag=badreq"
     }
-    var mfi=new MessageFactoryImpl();
-    var s = mfi.getDefaultServerHeader();
+    var s = MessageFactoryImpl.prototype.getDefaultServerHeader();
     if ( s != null ) {
         buf=buf+"\r\n" + s.toString();
     }

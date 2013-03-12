@@ -27,12 +27,9 @@
  *  @version 1.0 
  *   
  */
-function WSMsgParser(sipstack) {
-    if(logger!=undefined) logger.debug("WSMsgParser:WSMsgParser()");
-    this.classname="WSMsgParser"; 
-    this.peerProtocol=null;
-    this.messageProcessor = null;
-    this.sipStack=sipstack;
+function WSMsgParser(messageChannel) {
+    this.classname="WSMsgParser";
+    this.messageChannel=messageChannel;
 }
 
 WSMsgParser.prototype.RPORT="rport";
@@ -64,15 +61,13 @@ WSMsgParser.prototype.processMessage =function(parsedSipMessage){
         || parsedSipMessage.getCSeq() == null || parsedSipMessage.getViaHeaders() == null) {
         return;
     }
-    var channel=this.getSIPStack().getChannel();
     if (parsedSipMessage instanceof SIPRequest) {
-        this.peerProtocol = "WS";
         var sipRequest =  parsedSipMessage;
-        var sipServerRequest = this.sipStack.newSIPServerRequest(sipRequest, channel);
+        var sipServerRequest = this.messageChannel.messageProcessor.sipStack.newSIPServerRequest(sipRequest, this.messageChannel);
         if (sipServerRequest != null) 
         {
-            sipServerRequest.processRequest(sipRequest,channel);
-        }//i delete all parts of logger 
+            sipServerRequest.processRequest(sipRequest,this.messageChannel);
+        }
     } 
     else {
         var sipResponse = parsedSipMessage;
@@ -82,20 +77,14 @@ WSMsgParser.prototype.processMessage =function(parsedSipMessage){
             console.error("WSMsgParser:processMessage(): catched exception:"+ex);
             return;
         }
-        var sipServerResponse = this.sipStack.newSIPServerResponse(sipResponse, channel);
+        var sipServerResponse = this.messageChannel.messageProcessor.sipStack.newSIPServerResponse(sipResponse, this.messageChannel);
         if (sipServerResponse != null) {
             if (sipServerResponse instanceof SIPClientTransaction
                 && !sipServerResponse.checkFromTag(sipResponse)) 
                 {
                 return;
             }
-            sipServerResponse.processResponse(sipResponse, channel);
+            sipServerResponse.processResponse(sipResponse, this.messageChannel);
         } 
     }
-}
-
-
-WSMsgParser.prototype.getSIPStack =function(){
-    if(logger!=undefined) logger.debug("WSMsgParser:getSIPStack()");
-    return this.sipStack;
 }

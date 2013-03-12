@@ -139,10 +139,9 @@ EventScanner.prototype.deliverEvent =function(eventWrapper){
             sipListener.processTimeout(sipEvent);//the application level will process the infomation
         }
     } else if (sipEvent instanceof DialogTimeoutEvent) {
-        if (sipListener != null && sipListener instanceof SipListenerExt) {
+        if (sipListener != null) {
             sipListener.processDialogTimeout(sipEvent);  //the application level will process the infomation                  
         }
-
     } else if (sipEvent instanceof TransactionTerminatedEvent) {
         if (sipListener != null)
         {

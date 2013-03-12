@@ -59,8 +59,7 @@ DialogFilter.prototype.processResponseargu2 =function(sipResponse,incomingChanne
     var dialogID = sipResponse.getDialogId(false);
     var sipDialog = this.sipStack.getDialog(dialogID);
     var method = sipResponse.getCSeq().getMethod();
-    var utils=new Utils();
-    if (this.sipStack.checkBranchId && !utils.responseBelongsToUs(sipResponse)) {
+    if (this.sipStack.checkBranchId && !Utils.prototype.responseBelongsToUs(sipResponse)) {
         return;
     }
     if (this.listeningPoint == null) {
@@ -149,8 +148,7 @@ DialogFilter.prototype.processResponseargu3 =function(response,incomingMessageCh
     if (this.listeningPoint == null) {
         return;
     }
-    var utils=new Utils();
-    if (this.sipStack.checkBranchId && !utils.responseBelongsToUs(response)) {
+    if (this.sipStack.checkBranchId && !Utils.prototype.responseBelongsToUs(response)) {
         return;
     }
     var sipProvider = this.listeningPoint.getProvider();
@@ -215,8 +213,7 @@ DialogFilter.prototype.sendBadRequestResponse =function(sipRequest,transaction,r
     {
         sipResponse.setReasonPhrase(reasonPhrase);
     }
-    var mfi=new MessageFactoryImpl();
-    var serverHeader = mfi.getDefaultServerHeader();
+    var serverHeader = MessageFactoryImpl.prototype.getDefaultServerHeader();
     if (serverHeader != null) {
         sipResponse.setHeader(serverHeader);
     }
@@ -231,8 +228,7 @@ DialogFilter.prototype.sendCallOrTransactionDoesNotExistResponse =function(sipRe
     if(logger!=undefined) logger.debug("DialogFilter:sendCallOrTransactionDoesNotExistResponse():sipRequest="+sipRequest);
     if(logger!=undefined) logger.debug("DialogFilter:sendCallOrTransactionDoesNotExistResponse(): transaction="+transaction);
     var sipResponse = sipRequest.createResponse(481);
-    var mfi=new MessageFactoryImpl();
-    var serverHeader = mfi.getDefaultServerHeader();
+    var serverHeader = MessageFactoryImpl.prototype.getDefaultServerHeader();
     if (serverHeader != null) {
         sipResponse.setHeader(serverHeader);
     }
@@ -246,8 +242,7 @@ DialogFilter.prototype.sendLoopDetectedResponse =function(sipRequest,transaction
     if(logger!=undefined) logger.debug("DialogFilter:sendLoopDetectedResponse():sipRequest="+sipRequest);
     if(logger!=undefined) logger.debug("DialogFilter:sendLoopDetectedResponse(): transaction="+transaction);
     var sipResponse = sipRequest.createResponse(482);
-    var mfi=new MessageFactoryImpl();
-    var serverHeader = mfi.getDefaultServerHeader();
+    var serverHeader = MessageFactoryImpl.prototype.getDefaultServerHeader();
     if (serverHeader != null) {
         sipResponse.setHeader(serverHeader);
     }

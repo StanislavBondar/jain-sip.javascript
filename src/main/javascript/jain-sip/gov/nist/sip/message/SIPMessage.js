@@ -525,8 +525,7 @@ SIPMessage.prototype.getTransactionId =function(){
         if (this.getCSeq().getMethod()==this.CANCEL) {
             retval=retval+this.CANCEL;
         }
-        var utils=new Utils();
-        retval=retval.toString().toLowerCase().replace(":", "-").replace("@", "-")+utils.getSignature();
+        retval=retval.toString().toLowerCase().replace(":", "-").replace("@", "-")+Utils.prototype.getSignature();
         return retval;
     }
 }
@@ -1016,7 +1015,7 @@ SIPMessage.prototype.addHeader =function(){
     if(typeof arguments[0]!="object")
     {
         var sipHeader=arguments[0];
-        var hdrString = sipHeader.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '') + "\n";
+        var hdrString = sipHeader.trim() + "\n";
         try {
             var pf=new ParserFactory();
             var parser = pf.createParser(sipHeader);

@@ -29,7 +29,6 @@
  */
 function MaxForwards(m) {
     if(logger!=undefined) logger.debug("MaxForwards:MaxForwards()");
-    this.serialVersionUID = "-3096874323347175943L";
     this.classname="MaxForwards";
     this.headerName=this.NAME;
     this.maxForwards=null;

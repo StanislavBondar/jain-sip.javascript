@@ -136,7 +136,7 @@ Lexer.prototype.getHeaderName =function(line){
         headerName = null;
         if (begin >= 1)
         {
-            headerName = line.substring(0, begin).replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
+            headerName = line.substring(0, begin).trim();
         }
     } catch (ex) {
         console.error("Lexer:getHeaderName(): catched exception:"+ex);

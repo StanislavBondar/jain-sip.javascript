@@ -53,7 +53,7 @@ SubjectParser.prototype.parse =function(){
     this.headerName(TokenTypes.prototype.SUBJECT);
     this.lexer.SPorHT();
     var s = this.lexer.getRest();
-    subject.setSubject(s.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, ''));
+    subject.setSubject(s.trim());
     return subject;
 }
 

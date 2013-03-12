@@ -29,7 +29,6 @@
  */
 function ContentDisposition (m) {
     if(logger!=undefined) logger.debug("ContentDisposition:ContentDisposition(): m="+m);
-    this.serialVersionUID = "835596496276127003L";
     this.classname="ContentDisposition"; 
     this.dispositionType=null;
     this.headerName=this.NAME;

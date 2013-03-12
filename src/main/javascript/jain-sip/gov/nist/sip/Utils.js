@@ -29,30 +29,21 @@
  */
 function Utils() {
     if(logger!=undefined) logger.debug("Utils:Utils()");
-    this.classname="Utils";
-    //this.digester=null; 
-    //there is no class MessageDigest, so i use the function digeste(MP5) to replace this object. 
-    this.rand=Math.random();
-    this.counter = 0;
-    this.callIDCounter=null;
-    this.toHex = ["0", "1", "2", "3", "4", "5", "6","7", "8", "9", "a", "b", "c", "d", "e", "f" ];
-    this.signature= this.toHexString(this.getBytes(Math.round(this.rand*1000).toString()));
-    this.instance = "Utils";
+    this.classname="Utils"; 
 }
 
 Utils.prototype.BRANCH_MAGIC_COOKIE="z9hG4bK";
-
-Utils.prototype.getInstance =function(){
-    if(logger!=undefined) logger.debug("Utils:getInstance()");
-    return new Function('return new ' + this.instance)();
-}
+Utils.prototype.callIDCounter=0;
+Utils.prototype.counter=0;
+Utils.prototype.toHex = ["0", "1", "2", "3", "4", "5", "6","7", "8", "9", "a", "b", "c", "d", "e", "f" ];
+Utils.prototype.rand=Math.random();
 
 Utils.prototype.toHexString =function(b){
     if(logger!=undefined) logger.debug("Utils:toHexString():b="+b);
     var c = "";
     for (var i = 0; i < b.length; i++) {
-        c=c+this.toHex[(b[i] >> 4) & 0x0F];
-        c=c+this.toHex[b[i] & 0x0f];
+        c=c+Utils.prototype.toHex[(b[i] >> 4) & 0x0F];
+        c=c+Utils.prototype.toHex[b[i] & 0x0f];
     }
     return c;
 }
@@ -62,47 +53,30 @@ Utils.prototype.getQuotedString =function(str){
     return '"' + str.replace( "\"", "\\\"" ) + '"';
 }
 
-Utils.prototype.reduceString =function(input){
-    if(logger!=undefined) logger.debug("Utils:reduceString():input="+input);
-    var newString = input.toLowerCase();
-    var len = newString.length();
-    var retval = "";
-    for (var i = 0; i < len; i++) {
-        if (newString.charAt(i) == ' ' || newString.charAt(i) == '\t')
-        {
-            continue;
-        }
-        else
-        {
-            retval = retval+newString.charAt(i);
-        }
-    }
-    return retval;
-}
-
 Utils.prototype.generateCallIdentifier =function(address){
     if(logger!=undefined) logger.debug("Utils:generateCallIdentifier():address="+address);
-    var date = new Date().getTime() + this.callIDCounter+Math.round(this.rand*100000000000000000000);
-    var x=new String(this.getBytes(date.toString()))
-    var cid = this.digest(x);
+    var date = new Date().getTime() + Utils.prototype.callIDCounter+Math.round(Utils.prototype.rand*100000000000000000000);
+    Utils.prototype.callIDCounter++;
+    var x=new String(Utils.prototype.getBytes(date.toString()))
+    var cid = Utils.prototype.digest(x);
     var cidString = cid;
     return cidString + "@" + address;
 }
 
 Utils.prototype.generateTag =function(){
     if(logger!=undefined) logger.debug("Utils:generateTag()");
-    var x=Math.round(this.rand*10000000000);
+    var x=Math.round(Utils.prototype.rand*10000000000);
     return x.toString(16);
 }
 
 Utils.prototype.generateBranchId =function(){
     if(logger!=undefined) logger.debug("Utils:generateBranchId()");
     var date=new Date().getTime();
-    var num = Math.round(this.rand*100000000000000000000)+ this.counter+date;
-    var x = new String(this.getBytes(num.toString()));
-    var bid= this.digest(x);
-    // prepend with a magic cookie to indicate we are bis09 compatible.
-    return this.BRANCH_MAGIC_COOKIE + bid + this.signature;
+    var num = Math.round(Utils.prototype.rand*100000000000000000000)+ Utils.prototype.counter+date;
+    Utils.prototype.counter++;
+    var x = new String(Utils.prototype.getBytes(num.toString()));
+    var bid= Utils.prototype.digest(x);
+    return Utils.prototype.BRANCH_MAGIC_COOKIE + "-"+ Utils.prototype.signature +"-"+ bid;
 }
 
 Utils.prototype.responseBelongsToUs =function(response){
@@ -111,15 +85,15 @@ Utils.prototype.responseBelongsToUs =function(response){
     var branch = topmostVia.getBranch();
     var x=branch.length-1;
     var j=0;
-    for(var i=this.signature.length-1;i>=0;i--)
+    for(var i=Utils.prototype.signature.length-1;i>=0;i--)
     {
-        if(this.signature[i]==branch[x])
+        if(Utils.prototype.signature[i]==branch[x])
         {
             j=j+1;
             x=x-1;
         }
     }
-    if(branch != null && j==this.signature.length)
+    if(branch != null && j==Utils.prototype.signature.length)
     {
         return true;
     }
@@ -132,17 +106,17 @@ Utils.prototype.responseBelongsToUs =function(response){
 
 Utils.prototype.getSignature =function(){
     if(logger!=undefined) logger.debug("Utils:getSignature()");
-    return this.signature;
+    return Utils.prototype.signature;
 }
 
 Utils.prototype.randomString= function(stringLength) {
-	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-	var randomString = '';
-	for (var i=0; i<stringLength; i++) {
-		var rnum = Math.floor(Math.random() * chars.length);
-		randomString += chars.substring(rnum,rnum+1);
-	}
-	return randomString;
+        var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+        var randomString = '';
+        for (var i=0; i<stringLength; i++) {
+                var rnum = Math.floor(Math.random() * chars.length);
+                randomString += chars.substring(rnum,rnum+1);
+        }
+        return randomString;
 }
 
 Utils.prototype.getBytes =function(str){
@@ -156,9 +130,11 @@ Utils.prototype.getBytes =function(str){
     return array;
 }
 
+Utils.prototype.signature= Utils.prototype.toHexString(Utils.prototype.getBytes(Math.round(Utils.prototype.rand*1000).toString()));
+
+
 Utils.prototype.digest =function(string){
     if(logger!=undefined) logger.debug("Utils:digest()");
-    
     function RotateLeft(lValue, iShiftBits) {
         return (lValue<<iShiftBits) | (lValue>>>(32-iShiftBits));
     }

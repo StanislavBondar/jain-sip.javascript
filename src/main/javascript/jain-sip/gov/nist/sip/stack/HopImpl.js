@@ -36,7 +36,6 @@ function HopImpl() {
     this.transport="WS";
     this.defaultRoute=null; // This is generated from the proxy addr
     this.uriRoute=null;
-    this.wsurl=null;
     if(arguments.length==1)
     {
         var hop=arguments[0];
@@ -74,8 +73,8 @@ function HopImpl() {
             console.error("HopImpl:HopImpl(): no host!");
             throw "HopImpl:HopImpl(): no host!";
         }
-        this.host = this.host.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
-        this.transport = this.transport.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, '');
+        this.host = this.host.trim();
+        this.transport = this.transport.trim();
         if ((brack>0) && this.host.charAt(0)!='[') {
             console.error("HopImpl:HopImpl(): bad IPv6 reference spec");
             throw "HopImpl:HopImpl(): bad IPv6 reference spec";
@@ -126,11 +125,6 @@ HopImpl.prototype.getTransport =function(){
     return this.transport;
 }
 
-HopImpl.prototype.getURLWS =function(){
-    if(logger!=undefined) logger.debug("HopImpl:getURLWS()");
-    return this.wsurl;
-}
-
 HopImpl.prototype.isURIRoute =function(){
     if(logger!=undefined) logger.debug("HopImpl:isURIRoute()");
     return this.uriRoute;
@@ -141,7 +135,3 @@ HopImpl.prototype.setURIRouteFlag =function(){
     this.uriRoute=true;
 }
 
-HopImpl.prototype.setURLWS =function(wsurl){
-    if(logger!=undefined) logger.debug("HopImpl:setURLWS():wsurl="+wsurl);
-    this.wsurl=wsurl;
-}

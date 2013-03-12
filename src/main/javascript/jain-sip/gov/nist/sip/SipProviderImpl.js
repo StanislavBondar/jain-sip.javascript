@@ -27,7 +27,7 @@
  *  @author Laurent STRULLU (laurent.strullu@orange.com)
  *  @version 1.0 
  */
-function SipProviderImpl() {
+function SipProviderImpl(sipStack) {
     if(logger!=undefined) logger.debug("SipProviderImpl:SipProviderImpl()");
     this.classname="SipProviderImpl"; 
     this.sipListener=null;
@@ -38,28 +38,21 @@ function SipProviderImpl() {
     this.port=null;
     this.automaticDialogSupportEnabled=null; 
     this.dialogErrorsAutomaticallyHandled = true;
-    if(arguments.length!=0)
-    {
-        var sipStack=arguments[0];
-        this.sipStack=sipStack;
-        this.eventScanner = sipStack.getEventScanner(); // for quick access.
-        this.eventScanner.incrementRefcount();
-        this.listeningPoints = new Array();
-        this.automaticDialogSupportEnabled = this.sipStack.isAutomaticDialogSupportEnabledFunction();
-        this.dialogErrorsAutomaticallyHandled = this.sipStack.isAutomaticDialogErrorHandlingEnabledFunction();
-    }
+    this.sipStack=sipStack;
+    this.eventScanner = sipStack.getEventScanner(); // for quick access.
+    this.eventScanner.incrementRefcount();
+    this.listeningPoints = new Array();
+    this.automaticDialogSupportEnabled = this.sipStack.isAutomaticDialogSupportEnabledFunction();
+    this.dialogErrorsAutomaticallyHandled = this.sipStack.isAutomaticDialogErrorHandlingEnabledFunction();
 }
 
-SipProviderImpl.prototype.getListeningPoint =function(){
+SipProviderImpl.prototype.getListeningPoint =function(transport){
     if(logger!=undefined) logger.debug("SipProviderImpl:getListeningPoint()");
-    if (this.listeningPoints.length > 0)
+    for(var i=0; i<this.listeningPoints.length;i++)
     {
-        return this.listeningPoints[0][1];
+        if(this.listeningPoints[i][0]==transport) return this.listeningPoints[i][1];
     }
-    else
-    {
-        return null;
-    }
+    return null;
 }
 
 SipProviderImpl.prototype.isAutomaticDialogSupportEnabled =function(){
@@ -128,8 +121,7 @@ SipProviderImpl.prototype.stop =function(){
 
 SipProviderImpl.prototype.getNewCallId =function(){
     if(logger!=undefined) logger.debug("SipProviderImpl:getNewCallId()");
-    var utils=new Utils();
-    var callId = utils.generateCallIdentifier(this.getListeningPoint().getHostAddress());
+    var callId = Utils.prototype.generateCallIdentifier(this.getListeningPoint().getHostAddress());
     var callid = new CallID();
     callid.setCallId(callId);
     return callid;
@@ -147,29 +139,45 @@ SipProviderImpl.prototype.getNewClientTransaction =function(request){
         console.error("SipProviderImpl:getNewClientTransaction(): stack is stopped");
         throw "SipProviderImpl:getNewClientTransaction(): stack is stopped";
     }
-    var sipRequest = request;
-    if (sipRequest.getTransaction() != null)
+    
+    if (request.getTransaction() != null)
     {
         console.error("SipProviderImpl:getNewClientTransaction(): transaction already assigned to request");
         throw "SipProviderImpl:getNewClientTransaction(): transaction already assigned to request";
     }
-    if (sipRequest.getMethod()=="ACK") {
+    
+    if (request.getMethod()=="ACK") {
         console.error("SipProviderImpl:getNewClientTransaction(): cannot create client transaction for  ACK");
         throw "SipProviderImpl:getNewClientTransaction(): cannot create client transaction for  ACK";
     }
-    if (sipRequest.getTopmostVia() == null) {
-        var lp = this.getListeningPoint();//i ust tcp for the test. in the end we should change it to ws
-        var via = lp.getViaHeader();
-        request.setHeader(via);
+    
+    var hop = null;
+    hop = this.sipStack.getNextHop(request);
+    if (hop == null)
+    {
+        console.error("SipProviderImpl:getNewClientTransaction(): cannot resolve next hop -- transaction unavailable");
+        throw "SipProviderImpl:getNewClientTransaction(): cannot resolve next hop -- transaction unavailable";
     }
+    
+    var transport = hop.getTransport();
+    if(transport == null) transport = "WS";
+    if (request.getTopmostVia() == null) {
+        var listeningPoint = this.getListeningPoint(transport);
+        if(listeningPoint == null) {
+          // last resort, instead of failing try to route anywhere
+          listeningPoint = this.getListeningPoints()[0];
+        }
+        request.setHeader( listeningPoint.getViaHeader());
+    }
+
     try {
-        sipRequest.checkHeaders();
+        request.checkHeaders();
     } catch (ex) {
         console.error("SipProviderImpl:getNewClientTransaction(): catched exception: "+ ex);
         throw "SipProviderImpl:getNewClientTransaction(): catched exception: "+ ex;
     }
     var bool=null;
-    if(sipRequest.getTopmostVia().getBranch().substring(0, 7)=="z9hG4bK")
+    if(request.getTopmostVia().getBranch().substring(0, 7)=="z9hG4bK")
     {
         bool=true;
     }
@@ -177,7 +185,7 @@ SipProviderImpl.prototype.getNewClientTransaction =function(request){
     {
         bool=false;
     }
-    if (sipRequest.getTopmostVia().getBranch() != null
+    if (request.getTopmostVia().getBranch() != null
         && bool && this.sipStack.findTransaction(request, false) != null) {
         console.error("SipProviderImpl:getNewClientTransaction(): transaction already exists!");
         throw "SipProviderImpl:getNewClientTransaction(): transaction already exists!";
@@ -189,28 +197,20 @@ SipProviderImpl.prototype.getNewClientTransaction =function(request){
             retval.addEventListener(this);
             this.sipStack.addTransaction(retval);
             if (ct.getDialog() != null) {
-                retval.setDialog(ct.getDialog(), sipRequest.getDialogId(false));
+                retval.setDialog(ct.getDialog(), request.getDialogId(false));
             }
             return retval;
         }
     }
-    var hop = null;
-    hop = this.sipStack.getNextHop(request);
-    if (hop == null)
-    {
-        console.error("SipProviderImpl:getNewClientTransaction(): cannot resolve next hop -- transaction unavailable");
-        throw "SipProviderImpl:getNewClientTransaction(): cannot resolve next hop -- transaction unavailable";
-    }
-    var transport = hop.getTransport();
-    //var listeningPoint = this.getListeningPoint();
-    var dialogId = sipRequest.getDialogId(false);
+
+    var dialogId = request.getDialogId(false);
     var dialog = this.sipStack.getDialog(dialogId);
     if (dialog != null && dialog.getState() == "TERMINATED") {
         this.sipStack.removeDialog(dialog);
     }
     var branchId = null;
     bool=null;
-    if(sipRequest.getTopmostVia().getBranch().substring(0, 7)!="z9hG4bK")
+    if(request.getTopmostVia().getBranch().substring(0, 7)!="z9hG4bK")
     {
         bool=true;
     }
@@ -218,40 +218,39 @@ SipProviderImpl.prototype.getNewClientTransaction =function(request){
     {
         bool=false;
     }
-    if (sipRequest.getTopmostVia().getBranch() == null
+    if (request.getTopmostVia().getBranch() == null
         || bool || this.sipStack.checkBranchIdFunction() ) {
-        var utils=new Utils();
-        branchId = utils.generateBranchId();
-        sipRequest.getTopmostVia().setBranch(branchId);
+        branchId = Utils.prototype.generateBranchId();
+        request.getTopmostVia().setBranch(branchId);
     }
-    var topmostVia = sipRequest.getTopmostVia();
+    var topmostVia = request.getTopmostVia();
     if(topmostVia.getTransport() == null)
     {
         topmostVia.setTransport(transport);
     }
-    branchId = sipRequest.getTopmostVia().getBranch();
-    ct = this.sipStack.createTransaction(sipRequest,this.sipStack.getChannel(),hop);
+    branchId = request.getTopmostVia().getBranch();
+    ct = this.sipStack.createTransaction(request,this.sipStack.getChannel(),hop);
     if (ct == null)
     {
         console.error("SipProviderImpl:getNewClientTransaction(): cannot create transaction");
         throw "SipProviderImpl:getNewClientTransaction(): cannot create transaction";
     }
     ct.setNextHop(hop);
-    ct.setOriginalRequest(sipRequest);
+    ct.setOriginalRequest(request);
     ct.setBranch(branchId);
     if (this.sipStack.isDialogCreated(request.getMethod())) {
         if (dialog != null)
         {
-            ct.setDialog(dialog, sipRequest.getDialogId(false));
+            ct.setDialog(dialog, request.getDialogId(false));
         }
         else if (this.isAutomaticDialogSupportEnabled()) {
             var sipDialog = this.sipStack.createDialog(ct);
-            ct.setDialog(sipDialog, sipRequest.getDialogId(false));
+            ct.setDialog(sipDialog, request.getDialogId(false));
         }
     } 
     else {
         if (dialog != null) {
-            ct.setDialog(dialog, sipRequest.getDialogId(false));
+            ct.setDialog(dialog, request.getDialogId(false));
         }
     }
     ct.addEventListener(this);

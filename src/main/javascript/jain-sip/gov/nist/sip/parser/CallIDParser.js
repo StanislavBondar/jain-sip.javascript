@@ -56,7 +56,7 @@ CallIDParser.prototype.parse =function(){
     var callID = new CallID();
     this.lexer.SPorHT();
     var rest = this.lexer.getRest();
-    callID.setCallId(rest.replace(/^(\s|\xA0)+|(\s|\xA0)+$/g, ''));
+    callID.setCallId(rest.trim());
     return callID;
 }
 

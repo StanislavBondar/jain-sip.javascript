@@ -29,7 +29,6 @@
  */
 function UserInfo() {
     if(logger!=undefined) logger.debug("UserInfo:UserInfo()");
-    this.serialVersionUID = "7268593273924256144L";
     this.user =null;
     this.password=null;
     this.userType = null;

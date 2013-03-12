@@ -29,7 +29,6 @@
  */
 function UserAgent() {
     if(logger!=undefined) logger.debug("UserAgent:UserAgent()");
-    this.serialVersionUID = "4561239179796364295L";
     this.classname="UserAgent";
     this.productTokens=new Array();
     this.headerName=this.NAME;
