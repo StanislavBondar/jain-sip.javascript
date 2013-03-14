@@ -27921,8 +27921,10 @@ SIPDialog.prototype.setState =function(state){
     if(logger!=undefined) logger.debug("SIPDialog:setState():state="+state);
     this.dialogState = state;
     if (state == this.TERMINATED_STATE) {
-            var that = this;
-            this.timer=setTimeout(function() { that.lingerTimeout();} , this.DIALOG_LINGER_TIME * 1000);
+        var that = this;
+        this.timer=setTimeout(function() {
+            that.lingerTimeout();
+        } , this.DIALOG_LINGER_TIME * 1000);
     }
 }
 
@@ -28553,12 +28555,10 @@ SIPDialog.prototype.isRequestConsumable =function(dialogRequest){
 
 SIPDialog.prototype.doDeferredDelete =function(){
     if(logger!=undefined) logger.debug("SIPDialog:doDeferredDelete()");
-    if (this.timer == null) {
-        this.setState(this.TERMINATED_STATE);
-    } else {
-        var that = this;
-        this.timer=setTimeout(function(){ that.deferredDeleteTimeout();},this.TIMER_H * this.BASE_TIMER_INTERVAL);
-    }
+    var that = this;
+    this.timer=setTimeout(function(){
+        that.deferredDeleteTimeout();
+    },this.TIMER_H * this.BASE_TIMER_INTERVAL);
 }
 
 SIPDialog.prototype.isAckSent =function(cseqNo){
@@ -28815,7 +28815,7 @@ SIPDialog.prototype.sendRequest =function(clientTransactionId){
     
     if (dialogRequest.getMethod()=="ACK" || dialogRequest.getMethod()=="CANCEL") {
         console.error("SIPDialog:sendRequest(): bad request method. " + dialogRequest.getMethod());
-       throw "SIPDialog:sendRequest(): bad request method. " + dialogRequest.getMethod();
+        throw "SIPDialog:sendRequest(): bad request method. " + dialogRequest.getMethod();
     }
     
     if (this.byeSent && this.isTerminatedOnBye() && dialogRequest.getMethod()!="BYE") {
@@ -28890,7 +28890,7 @@ SIPDialog.prototype.sendRequest =function(clientTransactionId){
 }
 
 SIPDialog.prototype.startTimer =function(transaction){
-   if(logger!=undefined) logger.debug("SIPDialog:startTimer():transaction="+transaction);
+    if(logger!=undefined) logger.debug("SIPDialog:startTimer():transaction="+transaction);
     if (this.dialogTransactionTimeout  == transaction) {
         return;
     }
@@ -28900,7 +28900,9 @@ SIPDialog.prototype.startTimer =function(transaction){
     } else {
         this.dialogTransactionTimeout=transaction;
         var that =this;
-        this.timer=that.timer=setInterval(function(){that.dialogTimeout();}, that.BASE_TIMER_INTERVAL);
+        this.timer=that.timer=setInterval(function(){
+            that.dialogTimeout();
+        }, that.BASE_TIMER_INTERVAL);
         console.error("SIPDialog:startTimer(): that.timer=setInterval()="+this.timer);
     } 
 }
@@ -28938,11 +28940,11 @@ SIPDialog.prototype.createAck =function(cseqno){
     }
     if (this.remoteTarget == null) {
         console.error("SIPDialog:createAck(): cannot create ACK - no remote Target!");
-         throw "SIPDialog:createAck(): cannot create ACK - no remote Target!";
+        throw "SIPDialog:createAck(): cannot create ACK - no remote Target!";
     }
     if (this.lastInviteOkReceived < cseqno) {
         console.error("SIPDialog:createAck(): dialog not yet established -- no OK response!");
-         throw "SIPDialog:createAck(): dialog not yet established -- no OK response!";
+        throw "SIPDialog:createAck(): dialog not yet established -- no OK response!";
     }
     
     try {
@@ -29160,13 +29162,12 @@ SIPDialog.prototype.isBackToBackUserAgent =function(){
 }
 
 SIPDialog.prototype.doDeferredDeleteIfNoAckSent =function(seqno){
-   if(logger!=undefined) logger.debug("SIPDialog:doDeferredDeleteIfNoAckSent():seqno:"+seqno);
-    if (this.timer == null) {
-        this.setState(this.TERMINATED_STATE);
-    } 
-    else if (this.dialogDeleteIfNoAckSentTimer == null) {
+    if(logger!=undefined) logger.debug("SIPDialog:doDeferredDeleteIfNoAckSent():seqno:"+seqno);
+    if(this.dialogDeleteIfNoAckSentTimer == null) {
         var that=this;
-        this.dialogDeleteIfNoAckSentTimer=setTimeout( function(){that.deleteIfNoAckSentTimeout(seqno);},this.TIMER_J* this.BASE_TIMER_INTERVAL);
+        this.dialogDeleteIfNoAckSentTimer=setTimeout( function(){
+            that.deleteIfNoAckSentTimeout(seqno);
+        },this.TIMER_J* this.BASE_TIMER_INTERVAL);
     }
 }
 
@@ -29177,7 +29178,7 @@ SIPDialog.prototype.setBackToBackUserAgent =function(){
 
 SIPDialog.prototype.getEventHeader =function(){
     if(logger!=undefined) logger.debug("SIPDialog:getEventHeader()");
-    return eventHeader;
+    return this.eventHeader;
 }
 
 SIPDialog.prototype.setEventHeader =function(eventHeader){
