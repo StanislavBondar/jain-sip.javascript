@@ -3,6 +3,8 @@
  * @public 
  */ 
 
+navigator.getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+window.URL = window.URL || window.webkitURL;
 /**
  * Constructor 
  */ 
@@ -20,7 +22,7 @@ function WebRtcCommTestWebAppController(view) {
 WebRtcCommTestWebAppController.prototype.constructor=WebRtcCommTestWebAppController;
 
 // Default SIP profile to use
-WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.193.13.222:5082";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.194.70.190:9080/sip";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT="WebRtcCommTestWebApp/0.0.1" 
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT_CAPABILITIES=undefined // +g.oma.sip-im
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DOMAIN="sip.test.com";
@@ -33,7 +35,7 @@ WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_REGISTER_MODE=true;
 WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER=undefined; // stun.l.google.com:19302
 WebRtcCommTestWebAppController.prototype.DEFAULT_AUDIO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
 WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
-
+WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"
 /**
  * on load event handler
  */ 
@@ -120,7 +122,7 @@ WebRtcCommTestWebAppController.prototype.onUnloadViewEventHandler=function()
         }
         catch(exception)
         {
-             console.error("WebRtcCommTestWebAppController:onUnloadViewEventHandler(): catched exception:"+exception);  
+            console.error("WebRtcCommTestWebAppController:onUnloadViewEventHandler(): catched exception:"+exception);  
         }
     }    
 }
@@ -153,40 +155,12 @@ WebRtcCommTestWebAppController.prototype.initView=function(){
     this.view.setSipContactTextInputValue(this.sipContact);
     this.view.setAudioCodecsFilterTextInputValue(WebRtcCommTestWebAppController.prototype.DEFAULT_AUDIO_CODECS_FILTER);
     this.view.setVideoCodecsFilterTextInputValue(WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER);
+    this.view.setLocalVideoFormatTextInputValue(WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT)
     
     // Get local user media
     try
     {
-        var that = this;
-        if(navigator.webkitGetUserMedia)
-        {
-            // Google Chrome user agent
-            navigator.webkitGetUserMedia({
-                audio:true, 
-                video:true
-            }, function(localMediaStream) {
-                that.onGetUserMediaSuccessEventHandler(localMediaStream);
-            }, function(error) {
-                that.onGetUserMediaErrorEventHandler(error);
-            });
-        }
-        else if(navigator.mozGetUserMedia)
-        {
-            // Mozilla firefox  user agent
-            navigator.mozGetUserMedia({
-                audio:true,
-                video:true
-            },function(localMediaStream) {
-                that.onGetUserMediaSuccessEventHandler(localMediaStream);
-            },function(error) {
-                that.onGetUserMediaErrorEventHandler(error);
-            });
-        }
-        else
-        {
-            console.error("WebRtcCommTestWebAppController:onLoadEventHandler(): navigator doesn't implemement getUserMedia API")
-            alert("WebRtcCommTestWebAppController:onLoadEventHandler(): navigator doesn't implemement getUserMedia API")     
-        }
+        this.getLocalUserMedia(WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT)
     }
     catch(exception)
     {
@@ -194,7 +168,31 @@ WebRtcCommTestWebAppController.prototype.initView=function(){
         alert("WebRtcCommTestWebAppController:onLoadEventHandler(): catched exception: "+exception);
     }   
 }
-   
+  
+WebRtcCommTestWebAppController.prototype.getLocalUserMedia=function(videoContraints){
+    console.debug ("WebRtcCommTestWebAppController:getLocalUserMedia():videoContraints="+JSON.stringify(videoContraints));  
+    var that = this;
+    this.view.stopLocalVideo();
+    if(this.localAudioVideoMediaStream) this.localAudioVideoMediaStream.stop();
+    if(navigator.getUserMedia)
+    {
+        // Google Chrome user agent
+        navigator.getUserMedia({
+            audio:true, 
+            video: JSON.parse(videoContraints)
+        }, function(localMediaStream) {
+            that.onGetUserMediaSuccessEventHandler(localMediaStream);
+        }, function(error) {
+            that.onGetUserMediaErrorEventHandler(error);
+        });
+    }
+    else
+    {
+        console.error("WebRtcCommTestWebAppController:onLoadEventHandler(): navigator doesn't implemement getUserMedia API")
+        alert("WebRtcCommTestWebAppController:onLoadEventHandler(): navigator doesn't implemement getUserMedia API")     
+    }
+}  
+    
 /**
  * get user media success event handler (Google Chrome User agent)
  * @param localAudioVideoMediaStream object
@@ -203,8 +201,73 @@ WebRtcCommTestWebAppController.prototype.onGetUserMediaSuccessEventHandler=funct
 {
     try
     {
-        console.debug("WebRtcCommTestWebAppController:onWebkitGetUserMediaSuccessEventHandler(): localAudioVideoMediaStream.id="+localAudioVideoMediaStream.id);
+        console.debug("WebRtcCommTestWebAppController:onWebkitGetUserMediaSuccessEventHandler(): localAudioVideoMediaStream="+JSON.stringify(localAudioVideoMediaStream));
         this.localAudioVideoMediaStream=localAudioVideoMediaStream;
+        this.localAudioVideoMediaStream.onended = function() {
+            alert("this.localAudioVideoMediaStream.onended")
+        }
+        var audioTracks = undefined;
+        if(this.localAudioVideoMediaStream.audioTracks) audioTracks=this.localAudioVideoMediaStream.audioTracks;
+        else if(this.localAudioVideoMediaStream.getAudioTracks) audioTracks=this.localAudioVideoMediaStream.getAudioTracks();
+        if(audioTracks)
+        {
+            console.debug("WebRtcCommTestWebAppController:onWebkitGetUserMediaSuccessEventHandler(): audioTracks="+JSON.stringify(audioTracks));
+            for(var i=0; i<audioTracks.length;i++)
+            {
+                audioTracks[i].onmute = function() {
+                    alert("videoTracks[i].onmute")
+                };
+                audioTracks[i].onunmute = function() {
+                    alert("audioTracks[i].onunmute")
+                }
+                audioTracks[i].onended = function() {
+                    alert("audioTracks[i].onended")
+                }
+            }             
+            audioTracks.onmute = function() {
+                alert("audioTracks.onmute")
+            };
+            audioTracks.onunmute = function() {
+                alert("audioTracks.onunmute")
+            }
+            audioTracks.onended = function() {
+                alert("audioTracks.onended")
+            } 
+        }
+        else
+        {
+            alert("MediaStream Track  API not supported");
+        }
+        
+        var videoTracks = undefined;
+        if(this.localAudioVideoMediaStream.videoTracks) audioTracks=this.localAudioVideoMediaStream.videoTracks;
+        else if(this.localAudioVideoMediaStream.getVideoTracks) audioTracks=this.localAudioVideoMediaStream.getVideoTracks();
+        if(videoTracks)
+        {
+            console.debug("WebRtcCommTestWebAppController:onWebkitGetUserMediaSuccessEventHandler(): videoTracks="+JSON.stringify(videoTracks));
+            for(var i=0; i<videoTracks.length;i++)
+            {
+                videoTracks[i].onmute = function() {
+                    alert("videoTracks[i].onmute")
+                };
+                videoTracks[i].onunmute = function() {
+                    alert("videoTracks[i].onunmute")
+                }
+                videoTracks[i].onended = function() {
+                    alert("videoTracks[i].onended")
+                }
+            }
+            videoTracks.onmute = function() {
+                alert("videoTracks.onmute")
+            };
+            videoTracks.onunmute = function() {
+                alert("videoTracks.onunmute")
+            }
+            videoTracks.onended = function() {
+                alert("videoTracks.onended")
+            }
+        }
+        
         this.view.playLocalVideo(this.localAudioVideoMediaStream);
         this.view.showLocalVideo();
         this.view.enableConnectButton();          
@@ -221,6 +284,23 @@ WebRtcCommTestWebAppController.prototype.onGetUserMediaErrorEventHandler=functio
     alert("Failed to get local user media: error="+error);
 }	
   
+/**
+ * on connect event handler
+ */ 
+WebRtcCommTestWebAppController.prototype.onChangeLocalVideoFormatViewEventHandler=function()
+{
+    console.debug ("WebRtcCommTestWebAppController:onChangeLocalVideoFormatViewEventHandler()");  
+      // Get local user media
+    try
+    {
+        this.getLocalUserMedia(this.view.getLocalVideoFormatTextInputValue());
+    }
+    catch(exception)
+    {
+        console.error("WebRtcCommTestWebAppController:onChangeLocalVideoFormatViewEventHandler(): catched exception: "+exception);
+        alert("WebRtcCommTestWebAppController:onChangeLocalVideoFormatViewEventHandler(): catched exception: "+exception);
+    }   
+} 
 /**
  * on connect event handler
  */ 
@@ -325,7 +405,7 @@ WebRtcCommTestWebAppController.prototype.onClickCancelCallButtonViewEventHandler
         {
             this.webRtcCommCall.close();
             this.view.disableCancelCallButton();
-             this.view.stopRinging();
+            this.view.stopRinging();
         }
         catch(exception)
         {
@@ -423,6 +503,41 @@ WebRtcCommTestWebAppController.prototype.onClickRejectCallButtonViewEventHandler
     }
 }
 
+/**
+ * on audio mute event handler
+ */ 
+WebRtcCommTestWebAppController.prototype.onClickMuteAudioCallButtonViewEventHandler=function()
+{
+    var audioTracks = undefined;
+    if(this.localAudioVideoMediaStream.audioTracks) audioTracks=this.localAudioVideoMediaStream.audioTracks;
+    else if(this.localAudioVideoMediaStream.getAudioTracks) audioTracks=this.localAudioVideoMediaStream.getAudioTracks();
+    if(audioTracks)
+    {
+        audioTracks.enabled= !audioTracks.enabled;
+        for(var i=0; i<audioTracks.length;i++)
+        {
+            audioTracks[i].enabled=!audioTracks[i].enabled;
+        }                  
+    }  
+}
+
+/**
+ * on video mute event handler
+ */ 
+WebRtcCommTestWebAppController.prototype.onClickMuteVideoCallButtonViewEventHandler=function()
+{
+    var videoTracks = undefined;
+    if(this.localAudioVideoMediaStream.videoTracks) videoTracks=this.localAudioVideoMediaStream.videoTracks;
+    else if(this.localAudioVideoMediaStream.getVideoTracks) videoTracks=this.localAudioVideoMediaStream.getVideoTracks();
+    if(videoTracks)
+    {
+        videoTracks.enabled= !videoTracks.enabled;
+        for(var i=0; i<videoTracks.length;i++)
+        {
+            videoTracks[i].enabled=!videoTracks[i].enabled;
+        }        
+    }
+}
 
 
 /**
@@ -482,6 +597,7 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommCallClosedEvent=function(we
     console.debug ("WebRtcCommTestWebAppController:onWebRtcCommCallClosedEvent(): webRtcCommCall.getId()="+webRtcCommCall.getId()); 
 
     //Enabled button DISCONECT, CALL
+    this.view.stopRinging();
     this.view.enableCallButton();
     this.view.enableDisconnectButton();
     this.view.disableRejectCallButton();
@@ -605,7 +721,10 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommCallHangupEvent=function(we
     this.view.stopRemoteVideo();
     this.view.stopRinging();
     this.webRtcCommCall=undefined;
-    alert("Communication from "+webRtcCommCall.getCallerPhoneNumber() + " closed");  
+    if(webRtcCommCall.getCallerPhoneNumber())
+        alert("Communication closed by "+webRtcCommCall.getCallerPhoneNumber());
+    else 
+        alert("Communication close by "+webRtcCommCall.getCalleePhoneNumber());
 }
 
 

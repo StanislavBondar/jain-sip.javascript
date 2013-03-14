@@ -31,6 +31,8 @@
             function  enableCallButton() 
             {
                 document.getElementById("callButton").disabled=false;
+                document.getElementById("audioMuteCkeckBox").checked=false;
+                document.getElementById("videoMuteCkeckBox").checked=false;
             }
     
             function disableCallButton() 
@@ -100,11 +102,11 @@
 
             function playLocalVideo(localMediaStream) 
             {
-                if(typeof navigator.webkitGetUserMedia != undefined)
+                if(typeof navigator.webkitGetUserMedia != 'undefined')
                 {     
                     document.getElementById("localVideo").src=webkitURL.createObjectURL(localMediaStream);
                 }
-                else if(typeof navigator.mozGetUserMedia != undefined)
+                else if(typeof navigator.mozGetUserMedia != 'undefined')
                 {
                     document.getElementById("localVideo").mozSrcObject=localMediaStream;
                 }
@@ -115,11 +117,11 @@
             function stopLocalVideo() 
             {
                 document.getElementById("localVideo").pause();
-                if(typeof navigator.webkitGetUserMedia != undefined)
+                if(typeof navigator.webkitGetUserMedia != 'undefined')
                 {     
                     document.getElementById("localVideo").src=null;
                 }
-                else if(typeof navigator.mozGetUserMedia != undefined)
+                else if(typeof navigator.mozGetUserMedia != 'undefined')
                 {
                     document.getElementById("localVideo").mozSrcObject=null;
                 }
@@ -127,11 +129,11 @@
 
             function playRemoteVideo(remoteMediaStream) 
             {
-                if(typeof navigator.webkitGetUserMedia != undefined)
+                if(typeof navigator.webkitGetUserMedia != 'undefined')
                 {     
                     document.getElementById("remoteVideo").src=webkitURL.createObjectURL(remoteMediaStream);
                 }
-                else if(typeof navigator.mozGetUserMedia != undefined)
+                else if(typeof navigator.mozGetUserMedia != 'undefined')
                 {
                     document.getElementById("remoteVideo").mozSrcObject=remoteMediaStream;
                 }
@@ -142,11 +144,11 @@
             function stopRemoteVideo() 
             {
                 document.getElementById("remoteVideo").pause();
-                if(typeof navigator.webkitGetUserMedia != undefined)
+                if(typeof navigator.webkitGetUserMedia != 'undefined')
                 {     
                     document.getElementById("remoteVideo").src=undefined;
                 }
-                else if(typeof navigator.mozGetUserMedia != undefined)
+                else if(typeof navigator.mozGetUserMedia != 'undefined')
                 {
                     document.getElementById("remoteVideo").mozSrcObject=undefined;
                 }
@@ -268,6 +270,11 @@
                 document.getElementById("videoCodecsFilter").value=value;
             }
             
+            function setLocalVideoFormatTextInputValue(value) 
+            {
+                document.getElementById("localVideoFormat").value=value;
+            }
+            
             function getTextInputValue(elementId) 
             {
                 var value = document.getElementById(elementId).value;
@@ -352,6 +359,11 @@
                 return getTextInputValue("videoCodecsFilter")
             }
             
+            function getLocalVideoFormatTextInputValue() 
+            {
+                return getTextInputValue("localVideoFormat")
+            }
+            
         </script>
 
     </head>
@@ -405,14 +417,17 @@
             <div id='audioMediaDiv'>
                 <label>Audio media:</label>
                 <input  id='audioMediaCkeckBox' type="checkbox" checked>
+                <label style="color:red">NOT SUPPORTED</label>
             </div>
             <div id='videoMediaDiv'>
                 <label>Video media:</label>
                 <input  id='videoMediaCkeckBox' type="checkbox" checked >
+                <label style="color:red">NOT SUPPORTED</label>
             </div>
             <div id='dataMediaDiv'>
                 <label>Data media:</label>
-                <input  id='dataMediaCkeckBox' type="checkbox" checked>
+                <input  id='dataMediaCkeckBox' type="checkbox">
+                <label style="color:red">NOT SUPPORTED</label>
             </div>
             <div id='audioCodecsFilterDiv'>
                 <label>Audio codecs filter (ordered by priority e.g. PCMU,PCMA,OPUS):</label>
@@ -422,26 +437,28 @@
                 <label>Video codecs filter (ordered by priority e.g. VP8, H264):</label>
                 <input id='videoCodecsFilter' type="text" size="30" >
             </div>
+             <div id='localVideoFormatDiv'>
+                <label>Local video format:</label>
+                <input id='localVideoFormat' type="text" size="200" onchange = "webRtcCommTestWebAppController.onChangeLocalVideoFormatViewEventHandler();">
+            </div>
             <audio id="ringing" loop src="audio/ringing.wav" />
             <audio id="ringingBack" loop src="audio/ringing.wav" />
         </div>
         <div id='input'>
-            <div>
-                <input id='connectButton'  type='submit' name='connectButton' disabled value='Connect' onclick = "webRtcCommTestWebAppController.onClickConnectButtonViewEventHandler();"/>
-                <input id='disconnectButton'  type='submit' name='disconnectButton'  value='Disconnect' disabled onclick = "webRtcCommTestWebAppController.onClickDisconnectButtonViewEventHandler();"/>
-                <input id='callButton'  type='submit' name='callButton' value='Call' disabled onclick = "webRtcCommTestWebAppController.onClickCallButtonViewEventHandler(getSipContactTextInputValue());"/>
-                <input id='cancelCallButton'  type='submit' name='cancelCallButton' value='Cancel Call' disabled onclick = "webRtcCommTestWebAppController.onClickCancelCallButtonViewEventHandler();"/>
-                <input id='acceptCallButton'  type='submit' name='acceptCallButton' value='Accept Call' disabled onclick = "webRtcCommTestWebAppController.onClickAcceptCallButtonViewEventHandler();"/>
-                <input id='rejectCallButton'  type='submit' name='rejectCallButton' value='Reject Call' disabled onclick = "webRtcCommTestWebAppController.onClickRejectCallButtonViewEventHandler();"/>
-                <input id='endCallButton'  type='submit' name='endCallButton' value='End Call' disabled onclick = "webRtcCommTestWebAppController.onClickEndCallButtonViewEventHandler();"/>
-            </div>
+                <input id='connectButton'  type='button' disabled value='Connect' onclick = "webRtcCommTestWebAppController.onClickConnectButtonViewEventHandler();"/>
+                <input id='disconnectButton'  type='button' value='Disconnect' disabled onclick = "webRtcCommTestWebAppController.onClickDisconnectButtonViewEventHandler();"/>
+                <input id='callButton'  type='button' value='Call' disabled onclick = "webRtcCommTestWebAppController.onClickCallButtonViewEventHandler(getSipContactTextInputValue());"/>
+                <input id='cancelCallButton'  type='button'  value='Cancel Call' disabled onclick = "webRtcCommTestWebAppController.onClickCancelCallButtonViewEventHandler();"/>
+                <input id='acceptCallButton'  type='button' value='Accept Call' disabled onclick = "webRtcCommTestWebAppController.onClickAcceptCallButtonViewEventHandler();"/>
+                <input id='rejectCallButton'  type='button' value='Reject Call' disabled onclick = "webRtcCommTestWebAppController.onClickRejectCallButtonViewEventHandler();"/>
+                <input id='endCallButton'  type='button' value='End Call' disabled onclick = "webRtcCommTestWebAppController.onClickEndCallButtonViewEventHandler();"/>
+                <label>Mute Audio:</label><input id='audioMuteCkeckBox' type="checkbox" onclick = "webRtcCommTestWebAppController.onClickMuteAudioCallButtonViewEventHandler();"/>
+                <label>Mute Video:</label><input id='videoMuteCkeckBox' type="checkbox"  onclick = "webRtcCommTestWebAppController.onClickMuteVideoCallButtonViewEventHandler();"/>
         </div>
         <div id='media'>
             <div>
-                <video id="localVideo" style="height:100px; width:100px"></video>  
-            </div>
-            <div>
-                <video id="remoteVideo" style="height:100px; width:100px"></video>  
+                <video id="localVideo" style="height: auto; width: auto"></video>  
+                <video id="remoteVideo" style="height: auto; width: auto"></video>  
             </div>
         </div>
     </body>
