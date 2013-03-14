@@ -77,7 +77,7 @@ WebRtcCommClient.prototype.getConfiguration=function(){
  * @throw {String} Exception [internal error]
  */
 WebRtcCommClient.prototype.open=function(configuration){
-    console.debug("WebRtcCommClient:open()");
+    console.debug("WebRtcCommClient:open(): configuration="+ JSON.stringify(configuration));
     if(typeof(configuration) == 'object')
     {
         if(this.isOpened()==false)
@@ -170,7 +170,7 @@ WebRtcCommClient.prototype.close=function(){
  */ 
 WebRtcCommClient.prototype.call=function(calleePhoneNumber, callConfiguration){
     console.debug("WebRtcCommClient:call():calleePhoneNumber="+calleePhoneNumber);
-    console.debug("WebRtcCommClient:call():callConfiguration="+callConfiguration);
+    console.debug("WebRtcCommClient:call():callConfiguration="+ JSON.stringify(callConfiguration));
     try
     {
         if(typeof(calleePhoneNumber) == 'string' && typeof(callConfiguration) == 'object')
@@ -227,20 +227,19 @@ WebRtcCommClient.prototype.call=function(calleePhoneNumber, callConfiguration){
  * @returns {boolean} true valid false unvalid
  */ 
 WebRtcCommClient.prototype.checkConfiguration=function(configuration){
-    console.debug("WebRtcCommClient:checkConfiguration()");
+    
+    console.debug("WebRtcCommClient:checkConfiguration(): configuration="+JSON.stringify(configuration));
     var check=true;
     if(configuration.communicationMode!=undefined)
     {
         if(configuration.communicationMode==WebRtcCommClient.prototype.SIP) 
         {
-            console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.communicationMode:"+configuration.communicationMode);
         } 
         else  
         {
             check=false;
             console.error("WebRtcCommClient:checkConfiguration(): unsupported communicationMode");  
         } 
-        console.debug("PrivateJainSipClientConnector:checkConfiguration(): configuration.RTCPeerConnection.stunServer:"+configuration.RTCPeerConnection.stunServer);
     }
     else
     {
