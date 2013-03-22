@@ -240,8 +240,8 @@ WebRtcCommTestWebAppController.prototype.onGetUserMediaSuccessEventHandler=funct
         }
         
         var videoTracks = undefined;
-        if(this.localAudioVideoMediaStream.videoTracks) audioTracks=this.localAudioVideoMediaStream.videoTracks;
-        else if(this.localAudioVideoMediaStream.getVideoTracks) audioTracks=this.localAudioVideoMediaStream.getVideoTracks();
+        if(this.localAudioVideoMediaStream.videoTracks) videoTracks=this.localAudioVideoMediaStream.videoTracks;
+        else if(this.localAudioVideoMediaStream.getVideoTracks) videoTracks=this.localAudioVideoMediaStream.getVideoTracks();
         if(videoTracks)
         {
             console.debug("WebRtcCommTestWebAppController:onWebkitGetUserMediaSuccessEventHandler(): videoTracks="+JSON.stringify(videoTracks));
@@ -290,7 +290,7 @@ WebRtcCommTestWebAppController.prototype.onGetUserMediaErrorEventHandler=functio
 WebRtcCommTestWebAppController.prototype.onChangeLocalVideoFormatViewEventHandler=function()
 {
     console.debug ("WebRtcCommTestWebAppController:onChangeLocalVideoFormatViewEventHandler()");  
-      // Get local user media
+    // Get local user media
     try
     {
         this.getLocalUserMedia(this.view.getLocalVideoFormatTextInputValue());
@@ -325,7 +325,7 @@ WebRtcCommTestWebAppController.prototype.onClickConnectButtonViewEventHandler=fu
         }
         catch(exception)
         {
-            alert("Connection has failed, reason:"+exception)  
+            console.error("WebRtcCommTestWebAppController:onClickConnectButtonViewEventHandler(): catched exception:"+exception)  
         }
     }
     else
@@ -349,7 +349,7 @@ WebRtcCommTestWebAppController.prototype.onClickDisconnectButtonViewEventHandler
         }
         catch(exception)
         {
-            alert("Disconnection has failed, reason:"+exception)  
+            console.error("WebRtcCommTestWebAppController:onClickDisconnectButtonViewEventHandler(): catched exception:"+exception)  
         }
     }
     else
@@ -364,7 +364,7 @@ WebRtcCommTestWebAppController.prototype.onClickDisconnectButtonViewEventHandler
 WebRtcCommTestWebAppController.prototype.onClickCallButtonViewEventHandler=function(calleePhoneNumber)
 {
     console.debug ("WebRtcCommTestWebAppController:onClickCallButtonViewEventHandler()"); 
-    if(this.webRtcCommClient != undefined)
+    if(this.webRtcCommCall == undefined)
     {
         try
         {
@@ -384,7 +384,7 @@ WebRtcCommTestWebAppController.prototype.onClickCallButtonViewEventHandler=funct
         }
         catch(exception)
         {
-            alert("Call has failed, reason:"+exception)  
+            console.error("WebRtcCommTestWebAppController:onClickCallButtonViewEventHandler(): catched exception:"+exception)  
         }
     }
     else
@@ -399,7 +399,7 @@ WebRtcCommTestWebAppController.prototype.onClickCallButtonViewEventHandler=funct
 WebRtcCommTestWebAppController.prototype.onClickCancelCallButtonViewEventHandler=function()
 {
     console.debug ("WebRtcCommTestWebAppController:onClickCancelCallButtonViewEventHandler()"); 
-    if(this.webRtcCommClient != undefined)
+    if(this.webRtcCommCall != undefined)
     {
         try
         {
@@ -409,7 +409,7 @@ WebRtcCommTestWebAppController.prototype.onClickCancelCallButtonViewEventHandler
         }
         catch(exception)
         {
-            alert("Cancel has failed, reason:"+exception)  
+            console.error("WebRtcCommTestWebAppController:onClickCancelCallButtonViewEventHandler(): catched exception:"+exception)  
         }
     }
     else
@@ -424,7 +424,7 @@ WebRtcCommTestWebAppController.prototype.onClickCancelCallButtonViewEventHandler
 WebRtcCommTestWebAppController.prototype.onClickEndCallButtonViewEventHandler=function()
 {
     console.debug ("WebRtcCommTestWebAppController:onClickEndCallButtonViewEventHandler()"); 
-    if(this.webRtcCommClient != undefined)
+    if(this.webRtcCommCall)
     {
         try
         {
@@ -432,7 +432,7 @@ WebRtcCommTestWebAppController.prototype.onClickEndCallButtonViewEventHandler=fu
         }
         catch(exception)
         {
-            alert("End has failed, reason:"+exception)  
+            console.error("WebRtcCommTestWebAppController:onClickEndCallButtonViewEventHandler(): catched exception:"+exception);
         }
     }
     else
@@ -447,7 +447,7 @@ WebRtcCommTestWebAppController.prototype.onClickEndCallButtonViewEventHandler=fu
 WebRtcCommTestWebAppController.prototype.onClickAcceptCallButtonViewEventHandler=function()
 {
     console.debug ("WebRtcCommTestWebAppController:onClickAcceptCallButtonViewEventHandler()"); 
-    if(this.webRtcCommClient != undefined)
+    if(this.webRtcCommCall)
     {
         try
         {
@@ -466,7 +466,7 @@ WebRtcCommTestWebAppController.prototype.onClickAcceptCallButtonViewEventHandler
         }
         catch(exception)
         {
-            alert("End has failed, reason:"+exception)  
+            console.error("WebRtcCommTestWebAppController:onClickAcceptCallButtonViewEventHandler(): catched exception:"+exception);
         }
     }
     else
@@ -481,7 +481,7 @@ WebRtcCommTestWebAppController.prototype.onClickAcceptCallButtonViewEventHandler
 WebRtcCommTestWebAppController.prototype.onClickRejectCallButtonViewEventHandler=function()
 {
     console.debug ("WebRtcCommTestWebAppController:onClickRejectCallButtonViewEventHandler()"); 
-    if(this.webRtcCommClient != undefined)
+    if(this.webRtcCommCall)
     {
         try
         {
@@ -494,7 +494,7 @@ WebRtcCommTestWebAppController.prototype.onClickRejectCallButtonViewEventHandler
         }
         catch(exception)
         {
-            alert("End has failed, reason:"+exception)  
+            console.error("WebRtcCommTestWebAppController:onClickRejectCallButtonViewEventHandler(): catched exception:"+exception);  
         }
     }
     else
@@ -504,41 +504,143 @@ WebRtcCommTestWebAppController.prototype.onClickRejectCallButtonViewEventHandler
 }
 
 /**
- * on audio mute event handler
+ * on local audio mute event handler
  */ 
-WebRtcCommTestWebAppController.prototype.onClickMuteAudioCallButtonViewEventHandler=function()
+WebRtcCommTestWebAppController.prototype.onClickMuteLocalAudioButtonViewEventHandler=function(checked)
 {
-    var audioTracks = undefined;
-    if(this.localAudioVideoMediaStream.audioTracks) audioTracks=this.localAudioVideoMediaStream.audioTracks;
-    else if(this.localAudioVideoMediaStream.getAudioTracks) audioTracks=this.localAudioVideoMediaStream.getAudioTracks();
-    if(audioTracks)
+    console.debug ("WebRtcCommTestWebAppController:onClickMuteLocalAudioButtonViewEventHandler():checked="+checked);
+    if(this.webRtcCommCall)
     {
-        audioTracks.enabled= !audioTracks.enabled;
-        for(var i=0; i<audioTracks.length;i++)
+        try
         {
-            audioTracks[i].enabled=!audioTracks[i].enabled;
-        }                  
-    }  
+            if(checked) this.webRtcCommCall.muteLocalAudioMediaStream();
+            else this.webRtcCommCall.unmuteLocalAudioMediaStream();
+        }
+        catch(exception)
+        {
+            console.error("WebRtcCommTestWebAppController:onClickMuteLocalAudioButtonViewEventHandler(): catched exception:"+exception)  
+        }
+    }
+    else
+    {
+        console.error("WebRtcCommTestWebAppController:onClickMuteLocalAudioButtonViewEventHandler(): internal error");      
+    } 
 }
 
 /**
- * on video mute event handler
+ * on local video hide event handler
  */ 
-WebRtcCommTestWebAppController.prototype.onClickMuteVideoCallButtonViewEventHandler=function()
+WebRtcCommTestWebAppController.prototype.onClickHideLocalVideoButtonViewEventHandler=function(checked)
 {
-    var videoTracks = undefined;
-    if(this.localAudioVideoMediaStream.videoTracks) videoTracks=this.localAudioVideoMediaStream.videoTracks;
-    else if(this.localAudioVideoMediaStream.getVideoTracks) videoTracks=this.localAudioVideoMediaStream.getVideoTracks();
-    if(videoTracks)
+    console.debug ("WebRtcCommTestWebAppController:onClickHideLocalVideoButtonViewEventHandler():checked="+checked);
+    if(this.webRtcCommCall)
     {
-        videoTracks.enabled= !videoTracks.enabled;
-        for(var i=0; i<videoTracks.length;i++)
+        try
         {
-            videoTracks[i].enabled=!videoTracks[i].enabled;
-        }        
+            if(checked) this.webRtcCommCall.hideLocalVideoMediaStream();
+            else this.webRtcCommCall.showLocalVideoMediaStream();
+        }
+        catch(exception)
+        {
+            console.error("WebRtcCommTestWebAppController:onClickHideLocalVideoButtonViewEventHandler(): catched exception:"+exception)  
+        }
     }
+    else
+    {
+        console.error("WebRtcCommTestWebAppController:onClickHideLocalVideoButtonViewEventHandler(): internal error");      
+    }   
 }
 
+/**
+ * on remote audio mute event handler
+ */ 
+WebRtcCommTestWebAppController.prototype.onClickMuteRemoteAudioButtonViewEventHandler=function(checked)
+{
+    console.debug ("WebRtcCommTestWebAppController:onClickMuteRemoteAudioButtonViewEventHandler():checked="+checked);
+    if(this.webRtcCommCall)
+    {
+        try
+        {
+            if(checked) this.webRtcCommCall.muteRemoteAudioMediaStream();
+            else this.webRtcCommCall.unmuteRemoteAudioMediaStream();
+        }
+        catch(exception)
+        {
+            console.error("WebRtcCommTestWebAppController:onClickMuteRemoteAudioButtonViewEventHandler(): catched exception:"+exception)  
+        }
+    }
+    else
+    {
+        console.error("WebRtcCommTestWebAppController:onClickMuteRemoteAudioButtonViewEventHandler(): internal error");      
+    } 
+}
+
+/**
+ * on remote video mute event handler
+ */ 
+WebRtcCommTestWebAppController.prototype.onClickHideRemoteVideoButtonViewEventHandler=function(checked)
+{
+    console.debug ("WebRtcCommTestWebAppController:onClickHideRemoteVideoButtonViewEventHandler():checked="+checked);
+    if(this.webRtcCommCall)
+    {
+        try
+        {
+            if(checked) this.webRtcCommCall.hideRemoteVideoMediaStream();
+            else this.webRtcCommCall.showRemoteVideoMediaStream();
+        }
+        catch(exception)
+        {
+            console.error("WebRtcCommTestWebAppController:onClickHideRemoteVideoButtonViewEventHandler(): catched exception:"+exception)  
+        }
+    }
+    else
+    {
+        console.error("WebRtcCommTestWebAppController:onClickHideRemoteVideoButtonViewEventHandler(): internal error");      
+    }   
+}
+
+/**
+ * on remote video mute event handler
+ */ 
+WebRtcCommTestWebAppController.prototype.onClickStopVideoStreamButtonViewEventHandler=function(checked)
+{
+    console.debug ("WebRtcCommTestWebAppController:onClickStopVideoStreamButtonViewEventHandler():checked="+checked);
+    var videoTracks = undefined;
+            if(this.localAudioVideoMediaStream.videoTracks) videoTracks=this.localAudioVideoMediaStream.videoTracks;
+            else if(this.localAudioVideoMediaStream.getVideoTracks) videoTracks=this.localAudioVideoMediaStream.getVideoTracks();
+            if(videoTracks)
+            {
+                for(var i=0; i<videoTracks.length;i++)
+                {
+                    this.localAudioVideoMediaStream.removeTrack(videoTracks[i]);
+                }                  
+            }  
+    if(this.webRtcCommCall)
+    {
+        try
+        {
+            //this.webRtcCommCall.stopVideoMediaStream();
+            var videoTracks = undefined;
+            if(this.localAudioVideoMediaStream.videoTracks) videoTracks=this.localAudioVideoMediaStream.videoTracks;
+            else if(this.localAudioVideoMediaStream.getVideoTracks) videoTracks=this.localAudioVideoMediaStream.getVideoTracks();
+            if(videoTracks)
+            {
+                for(var i=0; i<videoTracks.length;i++)
+                {
+                    this.localAudioVideoMediaStream.removeTrack(videoTracks[i]);
+                }                  
+            }  
+        }
+        catch(exception)
+        {
+            console.error("WebRtcCommTestWebAppController:onClickStopVideoStreamButtonViewEventHandler(): catched exception:"+exception)  
+        }
+    }
+    else
+    {
+        console.error("WebRtcCommTestWebAppController:onClickStopVideoStreamButtonViewEventHandler(): internal error");      
+    }   
+}
 
 /**
   * Implementation of the WebRtcCommClient listener interface

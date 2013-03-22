@@ -207,5 +207,7 @@ cat ./src/main/javascript/WebRtcComm/PrivateJainSipCallConnector.js > ./build/We
 cat ./src/main/javascript/WebRtcComm/PrivateJainSipClientConnector.js  >> ./build/WebRtcComm.debug.js
 cat ./src/main/javascript/WebRtcComm/WebRtcCommCall.js  >> ./build/WebRtcComm.debug.js
 cat ./src/main/javascript/WebRtcComm/WebRtcCommClient.js  >> ./build/WebRtcComm.debug.js
+cat ./src/main/javascript/WebRtcComm/WebRtcCommClientEventListenerInterface.js  >> ./build/WebRtcComm.debug.js
+cat ./src/main/javascript/WebRtcComm/WebRtcCommCallEventListenerInterface.js  >> ./build/WebRtcComm.debug.js
 grep -v "logger.debug" ./build/WebRtcComm.debug.js  >  ./build/WebRtcComm.js
 java -jar yuicompressor-2.4.7.jar  ./build/WebRtcComm.js -o ./build/WebRtcComm.min.js

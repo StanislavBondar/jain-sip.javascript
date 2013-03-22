@@ -164,6 +164,7 @@ WebRtcCommClient.prototype.close=function(){
  * <span style="margin-left: 30px">videoCodecsFilter:VP8,H264,<br></span>
  * }<br>
  * </p>
+ * @returns {WebRtcCommCall} new created WebRtcCommCall object
  * @throw {String} Exception "bad argument, check API documentation"
  * @throw {String} Exception "bad configuration, missing parameter"
  * @throw {String} Exception "bad state, unauthorized action"
