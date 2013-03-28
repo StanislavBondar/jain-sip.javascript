@@ -50,7 +50,7 @@ SipProviderImpl.prototype.getListeningPoint =function(transport){
     if(logger!=undefined) logger.debug("SipProviderImpl:getListeningPoint()");
     for(var i=0; i<this.listeningPoints.length;i++)
     {
-        if(this.listeningPoints[i][0]==transport) return this.listeningPoints[i][1];
+        if(this.listeningPoints[i][0]==transport.toUpperCase()) return this.listeningPoints[i][1];
     }
     return null;
 }

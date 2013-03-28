@@ -31151,7 +31151,7 @@ function SipProviderImpl(sipStack) {
 SipProviderImpl.prototype.getListeningPoint =function(transport){
     for(var i=0; i<this.listeningPoints.length;i++)
     {
-        if(this.listeningPoints[i][0]==transport) return this.listeningPoints[i][1];
+        if(this.listeningPoints[i][0]==transport.toUpperCase()) return this.listeningPoints[i][1];
     }
     return null;
 }
