@@ -1062,6 +1062,51 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIceCandidateEvent=function(rtcIceCan
             console.debug("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
             console.debug("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): this.peerConnection.iceConnectionState="+this.peerConnection.iceConnectionState); 
             console.debug("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): this.peerConnectionState="+this.peerConnectionState);
+             if(this.peerConnection.signalingState != 'closed')
+            {
+                if(this.peerConnection.iceGatheringState=="complete")
+                {
+                    if(window.webkitRTCPeerConnection)
+                    {
+                        if(this.peerConnectionState == 'preparing-offer') 
+                        {
+                            this.connector.invite(this.peerConnection.localDescription.sdp)
+                            this.peerConnectionState = 'offer-sent';
+                        } 
+                        else if (this.peerConnectionState == 'preparing-answer') 
+                        {
+                            this.connector.accept(this.peerConnection.localDescription.sdp)
+                            this.peerConnectionState = 'established';
+                            // Notify opened event to listener
+                            if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent) 
+                            {
+                                var that=this;
+                                setTimeout(function(){
+                                    try {
+                                        that.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(that);
+                                    }
+                                    catch(exception)
+                                    {
+                                        console.error("WebRtcCommCall:processInvitingSipRequest(): catched exception in listener:"+exception);    
+                                    }
+                                },1); 
+                            }
+                        }
+                        else if (this.peerConnectionState == 'established') 
+                        {
+                        // Why this last ice candidate event?
+                        } 
+                        else
+                        {
+                            console.error("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): RTCPeerConnection bad state!");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                console.error("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): RTCPeerConnection closed!");
+            }
         }
         else
         {
@@ -1532,7 +1577,7 @@ WebRtcCommCall.prototype.onRtcPeerConnectionGatheringChangeEvent=function(event)
                                     }
                                     catch(exception)
                                     {
-                                        console.error("WebRtcCommCall:processInvitingSipRequest(): catched exception in listener:"+exception);    
+                                        console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): catched exception in listener:"+exception);    
                                     }
                                 },1); 
                             }
@@ -1543,14 +1588,14 @@ WebRtcCommCall.prototype.onRtcPeerConnectionGatheringChangeEvent=function(event)
                         } 
                         else
                         {
-                            console.error("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): RTCPeerConnection bad state!");
+                            console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): RTCPeerConnection bad state!");
                         }
                     }
                 }
             }
             else
             {
-                console.error("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): RTCPeerConnection closed!");
+                console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): RTCPeerConnection closed!");
             }
     }
     else
@@ -1696,7 +1741,7 @@ WebRtcCommCall.prototype.getOfferedCodecsInMediaDescription=function(mediaDescri
         {
             var attributField = attributFields[k];
             console.debug("WebRtcCommCall:getOfferedCodecsInMediaDescription(): attributField.getName()="+attributField.getName()); 
-            if(attributField.getName()=="rtpmap" || attributField.getName()=="fmtp")
+            if(attributField.getName()=="rtpmap")
             {
                 try
                 {
