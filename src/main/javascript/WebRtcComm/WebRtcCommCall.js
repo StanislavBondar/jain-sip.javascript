@@ -1696,7 +1696,7 @@ WebRtcCommCall.prototype.getOfferedCodecsInMediaDescription=function(mediaDescri
         {
             var attributField = attributFields[k];
             console.debug("WebRtcCommCall:getOfferedCodecsInMediaDescription(): attributField.getName()="+attributField.getName()); 
-            if(attributField.getName()=="rtpmap")
+            if(attributField.getName()=="rtpmap" || attributField.getName()=="fmtp")
             {
                 try
                 {
@@ -1712,7 +1712,7 @@ WebRtcCommCall.prototype.getOfferedCodecsInMediaDescription=function(mediaDescri
                 }
                 catch(exception)
                 {
-                    console.error("WebRtcCommCall:getOfferedCodecsInMediaDescription(): rtpmap format not supported");  
+                    console.error("WebRtcCommCall:getOfferedCodecsInMediaDescription(): rtpmap/fmtp format not supported");  
                 }
             }
         }
@@ -1784,7 +1784,7 @@ WebRtcCommCall.prototype.updateMediaDescription=function(mediaDescription, filte
         {
             var attributField = attributFields[k];
             console.debug("WebRtcCommCall:updateMediaDescription(): attributField.getName()="+attributField.getName()); 
-            if(attributField.getName()=="rtpmap")
+            if(attributField.getName()=="rtpmap" || attributField.getName()=="fmtp")
             {
                 try
                 {
@@ -1796,7 +1796,7 @@ WebRtcCommCall.prototype.updateMediaDescription=function(mediaDescription, filte
                 }
                 catch(exception)
                 {
-                    console.error("WebRtcCommCall:updateMediaDescription(): rtpmap format not supported");  
+                    console.error("WebRtcCommCall:updateMediaDescription(): rtpmap/fmtp format not supported");  
                 }
             }
             else newAttributeFieldArray.push(attributField);
