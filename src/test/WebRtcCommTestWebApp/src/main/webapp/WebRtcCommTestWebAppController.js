@@ -22,6 +22,21 @@ function WebRtcCommTestWebAppController(view) {
 WebRtcCommTestWebAppController.prototype.constructor=WebRtcCommTestWebAppController;
 
 // Default SIP profile to use
+/*WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.194.124.24:80";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT="WebRtcCommTestWebApp/0.0.1" 
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT_CAPABILITIES=undefined // +g.oma.sip-im
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DOMAIN="webrtc.orange.com";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DISPLAY_NAME="alice";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_NAME="alice";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_LOGIN=undefined;
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_PASSWORD=undefined;
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_CONTACT="bob";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_REGISTER_MODE=true;
+WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER="10.194.124.24:3478"; // stun.l.google.com:19302
+WebRtcCommTestWebAppController.prototype.DEFAULT_AUDIO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
+WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
+WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"*/
+
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.194.70.190:9080/sip";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT="WebRtcCommTestWebApp/0.0.1" 
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT_CAPABILITIES=undefined // +g.oma.sip-im

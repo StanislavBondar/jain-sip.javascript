@@ -57,7 +57,7 @@
             function disableEndCallButton() 
             {
                 document.getElementById("endCallButton").disabled=true;
-               // document.getElementById("stopVideoStreamButton").disabled=true;
+                // document.getElementById("stopVideoStreamButton").disabled=true;
                 
                 document.getElementById("muteLocalAudioCheckBox").disabled=true;
                 document.getElementById("hideLocalVideoCheckBox").disabled=true;
@@ -398,82 +398,88 @@
 
     </head>
     <body onload='webRtcCommTestWebAppController.onLoadViewEventHandler();' onunload='webRtcCommTestWebAppController.onUnloadViewEventHandler();'>
-        <div style=" color: red">With Firefox, don't forget to set your about:config preferences! </div>
         <a href="http://localhost:8080/WebRtcCommTestWebApp/?sipDomain=sip.test&sipLogin=&sipPassword=&sipUserName=alice&sipDisplayName=alice&sipContactUserName=bob">
             http://localhost:8080/WebRtcCommTestWebApp/?sipDomain=sip.test&sipLogin=&sipPassword=&sipUserName=alice&sipDisplayName=alice&sipContactUserName=bob
         </a>
-        <div style=" color: red">Google public STUN server:stun.l.google.com:19302</div>
         <div id="webRtcCommClientConfigurationDiv" >
-            <div id='stunServerDiv'>
-                <label>STUN server:</label>
-                <input  id="stunServer"  type="text" size="40" > 
-            </div>
-            <div id='sipWsUrlDiv'>
-                <label>SIP outbound proxy WS URL:</label>
-                <input  id="sipOutboundProxy"  type="text" size="40"> 
-            </div>
-            <div id='sipUserAgentCapabilitiesDiv'>
-                <label>SIP User Agent Capabilities:</label>
-                <input id="sipUserAgentCapabilities"  type="text" size="30"> 
+            <br/>
+            <label style="color:black; font-weight: bold">SIP Profile settings</label>
+            <div style="border:black solid thin; width:700px " id="webRtcCommClientSipProfileConfigurationDiv"> 
+                <div id='sipDisplayNameDiv'>
+                    <label>SIP Display Name:</label>
+                    <input id="sipDisplayName"  type="text" size="30" > 
+                </div>
+                <div id='sipUserNameDiv'>
+                    <label>SIP User Name:</label>
+                    <input id="sipUserName"  type="text" size="30"> 
+                </div>
+                <div id='sipLoginDiv'>
+                    <label>SIP Login:</label>
+                    <input id="sipLogin"   type="text" size="30"> 
+                </div>
+                <div id='sipPasswordDiv'>
+                    <label>SIP Password:</label>
+                    <input id="sipPassword"   type="text" size="30"> 
+                </div>
+                <div id='stunServerDiv'>
+                    <label>STUN server:</label>
+                    <input  id="stunServer"  type="text" size="40" >
+                    <label style="color:red">Google public STUN server:stun.l.google.com:19302</label>
+                </div>
+                <div id='sipWsUrlDiv'>
+                    <label>SIP outbound proxy WS URL:</label>
+                    <input  id="sipOutboundProxy"  type="text" size="40"> 
+                </div>
+                <div id='sipUserAgentCapabilitiesDiv'>
+                    <label>SIP User Agent Capabilities:</label>
+                    <input id="sipUserAgentCapabilities"  type="text" size="30"> 
+                </div> 
+                <div id='sipDomainDiv'>
+                    <label>SIP Domain:</label>
+                    <input id="sipDomain"  type="text" size="30"> 
+                </div>   
             </div> 
-            <div id='sipDomainDiv'>
-                <label>SIP Domain:</label>
-                <input id="sipDomain"  type="text" size="30"> 
-            </div>           
-            <div id='sipDisplayNameDiv'>
-                <label>SIP Display Name:</label>
-                <input id="sipDisplayName"  type="text" size="30" > 
-            </div>
-            <div id='sipUserNameDiv'>
-                <label>SIP User Name:</label>
-                <input id="sipUserName"  type="text" size="30"> 
-            </div>
-            <div id='sipLoginDiv'>
-                <label>SIP Login:</label>
-                <input id="sipLogin"   type="text" size="30"> 
-            </div>
-            <div id='sipPasswordDiv'>
-                <label>SIP Password:</label>
-                <input id="sipPassword"   type="text" size="30"> 
-            </div>
-            <div id='sipContactPhoneNumberDiv'>
-                <label>SIP Contact phone number:</label>
-                <input id="sipContact"  type="text" size="30" > 
-            </div>
-            <div id='sipRegisterModeDiv'>
-                <label>SIP REGISTER required:</label>
-                <input  id='sipRegistrationCkeckBox' type="checkbox" checked name="sipRegistrationCkeckBox">
-            </div>
-            <div id='audioMediaDiv'>
-                <label>Audio media:</label>
-                <input  id='audioMediaCkeckBox' type="checkbox" checked>
-                <label style="color:red">NOT SUPPORTED</label>
-            </div>
-            <div id='videoMediaDiv'>
-                <label>Video media:</label>
-                <input  id='videoMediaCkeckBox' type="checkbox" checked >
-                <label style="color:red">NOT SUPPORTED</label>
-            </div>
-            <div id='dataMediaDiv'>
-                <label>Data media:</label>
-                <input  id='dataMediaCkeckBox' type="checkbox">
-                <label style="color:red">NOT SUPPORTED</label>
-            </div>
-            <div id='audioCodecsFilterDiv'>
-                <label>Audio codecs filter (ordered by priority e.g. PCMU,PCMA,OPUS):</label>
-                <input id='audioCodecsFilter' type="text" size="30" >
-            </div>
-            <div id='videoCodecsFilterDiv'>
-                <label>Video codecs filter (ordered by priority e.g. VP8, H264):</label>
-                <input id='videoCodecsFilter' type="text" size="30" >
-            </div>
-            <div id='localVideoFormatDiv'>
-                <label>Local video format:</label>
-                <input id='localVideoFormat' type="text" size="200" onchange = "webRtcCommTestWebAppController.onChangeLocalVideoFormatViewEventHandler();">
-            </div>
+            <br/>
+            <label style="color:black; font-weight:bold; ">Communication settings</label>
+            <div style="border:black solid thin; width:1000px" id="webRtcCommClientSipCallConfigurationDiv" title="Call settings"  >
+                <div id='sipContactPhoneNumberDiv'>
+                    <label>SIP Contact phone number:</label>
+                    <input id="sipContact"  type="text" size="30" > 
+                </div>
+                <div id='sipRegisterModeDiv'>
+                    <label>SIP REGISTER required:</label>
+                    <input  id='sipRegistrationCkeckBox' type="checkbox" checked name="sipRegistrationCkeckBox">
+                </div>
+                <div id='audioMediaDiv'>
+                    <label>Audio media:</label>
+                    <input  id='audioMediaCkeckBox' type="checkbox" checked>
+                </div>
+                <div id='videoMediaDiv'>
+                    <label>Video media:</label>
+                    <input  id='videoMediaCkeckBox' type="checkbox" checked >
+                </div>
+                <div id='dataMediaDiv'>
+                    <label>Data media:</label>
+                    <input  id='dataMediaCkeckBox' type="checkbox">
+                    <label style="color:red">DATA CHANNEL NOT YET SUPPORTED</label>
+                </div>
+                <div id='audioCodecsFilterDiv'>
+                    <label>Audio codecs filter (ordered by priority e.g. PCMU,PCMA,OPUS):</label>
+                    <input id='audioCodecsFilter' type="text" size="30" >
+                </div>
+                <div id='videoCodecsFilterDiv'>
+                    <label>Video codecs filter (ordered by priority e.g. VP8, H264):</label>
+                    <input id='videoCodecsFilter' type="text" size="30" >
+                </div>
+                <div id='localVideoFormatDiv'>
+                    <label>Local video format:</label>
+                    <input id='localVideoFormat' type="text" size="100" onchange = "webRtcCommTestWebAppController.onChangeLocalVideoFormatViewEventHandler();">
+                </div>
+            </div> 
             <audio id="ringing" loop src="audio/ringing.wav" />
             <audio id="ringingBack" loop src="audio/ringing.wav" />
         </div>
+        <br/>
         <div id='input'>
             <input id='connectButton'  type='button' disabled value='Connect' onclick = "webRtcCommTestWebAppController.onClickConnectButtonViewEventHandler();"/>
             <input id='disconnectButton'  type='button' value='Disconnect' disabled onclick = "webRtcCommTestWebAppController.onClickDisconnectButtonViewEventHandler();"/>
@@ -488,6 +494,7 @@
             <label>Hide Remote Video:</label><input id='hideRemoteVideoCheckBox' type="checkbox"  onclick = "webRtcCommTestWebAppController.onClickHideRemoteVideoButtonViewEventHandler(this.checked);"/>
             <input id='stopVideoStreamButton'  type='button' value='Stop video stream'  onclick = "webRtcCommTestWebAppController.onClickStopVideoStreamButtonViewEventHandler();"/>
         </div>
+        <br/>
         <div id='media'>
             <div>
                 <video id="localVideo" style="height: auto; width: auto"></video>  
