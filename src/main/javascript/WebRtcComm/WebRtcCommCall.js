@@ -22,6 +22,7 @@ WebRtcCommCall = function(webRtcCommClient)
         this.peerConnectionState = undefined;
         this.remoteMediaStream=undefined; 
         this.remoteSdpOffer=undefined;
+        this.dataChannel=undefined;
     }
     else 
     {
@@ -147,6 +148,22 @@ WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
                                 'OfferToReceiveVideo':this.configuration.videoMediaFlag
                             }
                         };
+                        
+                        if(this.configuration.dataMediaFlag)
+                        {
+                            if(this.peerConnection.createDataChannel) 
+                            {
+                                try
+                                {
+                                this.dataChannel = this.peerConnection.createDataChannel("dataChannel",{}); 
+                                }
+                                catch(exception)
+                                {
+                                   alert("Data Channel not supported") 
+                                }
+                            }
+                        }
+                        
                         if(window.webkitRTCPeerConnection)
                         {
                             
@@ -158,7 +175,6 @@ WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
                         }
                         else if(window.mozRTCPeerConnection)
                         {
-                            mediaContraints.mandatory.MozDontOfferDataChannel = true;
                             this.peerConnection.createOffer(function(offer) {
                                 that.processRtcPeerConnectionCreateOfferSuccess(offer);
                             }, function(error) {
@@ -169,8 +185,18 @@ WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
                     }
                     catch(exception){
                         console.error("WebRtcCommCall:open(): catched exception:"+exception);
+                        setTimeout(function(){
+                            try {
+                                that.webRtcCommClient.eventListener.onWebRtcCommCallOpenErrorEvent(that,exception);
+                            }
+                            catch(exception)
+                            {
+                                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenErrorEvent(): catched exception in listener:"+exception);    
+                            }
+                        },1);
                         // Close properly the communication
                         try {
+                            
                             this.close();
                         } catch(e) {} 
                         throw exception;  
@@ -1062,7 +1088,7 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIceCandidateEvent=function(rtcIceCan
             console.debug("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
             console.debug("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): this.peerConnection.iceConnectionState="+this.peerConnection.iceConnectionState); 
             console.debug("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): this.peerConnectionState="+this.peerConnectionState);
-             if(this.peerConnection.signalingState != 'closed')
+            if(this.peerConnection.signalingState != 'closed')
             {
                 if(this.peerConnection.iceGatheringState=="complete")
                 {
@@ -1553,50 +1579,50 @@ WebRtcCommCall.prototype.onRtcPeerConnectionGatheringChangeEvent=function(event)
         console.debug("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): this.peerConnectionState="+this.peerConnectionState);
     
         if(this.peerConnection.signalingState != 'closed')
+        {
+            if(this.peerConnection.iceGatheringState=="complete")
             {
-                if(this.peerConnection.iceGatheringState=="complete")
+                if(window.webkitRTCPeerConnection)
                 {
-                    if(window.webkitRTCPeerConnection)
+                    if(this.peerConnectionState == 'preparing-offer') 
                     {
-                        if(this.peerConnectionState == 'preparing-offer') 
+                        this.connector.invite(this.peerConnection.localDescription.sdp)
+                        this.peerConnectionState = 'offer-sent';
+                    } 
+                    else if (this.peerConnectionState == 'preparing-answer') 
+                    {
+                        this.connector.accept(this.peerConnection.localDescription.sdp)
+                        this.peerConnectionState = 'established';
+                        // Notify opened event to listener
+                        if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent) 
                         {
-                            this.connector.invite(this.peerConnection.localDescription.sdp)
-                            this.peerConnectionState = 'offer-sent';
-                        } 
-                        else if (this.peerConnectionState == 'preparing-answer') 
-                        {
-                            this.connector.accept(this.peerConnection.localDescription.sdp)
-                            this.peerConnectionState = 'established';
-                            // Notify opened event to listener
-                            if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent) 
-                            {
-                                var that=this;
-                                setTimeout(function(){
-                                    try {
-                                        that.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(that);
-                                    }
-                                    catch(exception)
-                                    {
-                                        console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): catched exception in listener:"+exception);    
-                                    }
-                                },1); 
-                            }
+                            var that=this;
+                            setTimeout(function(){
+                                try {
+                                    that.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(that);
+                                }
+                                catch(exception)
+                                {
+                                    console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): catched exception in listener:"+exception);    
+                                }
+                            },1); 
                         }
-                        else if (this.peerConnectionState == 'established') 
-                        {
-                        // Why this last ice candidate event?
-                        } 
-                        else
-                        {
-                            console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): RTCPeerConnection bad state!");
-                        }
+                    }
+                    else if (this.peerConnectionState == 'established') 
+                    {
+                    // Why this last ice candidate event?
+                    } 
+                    else
+                    {
+                        console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): RTCPeerConnection bad state!");
                     }
                 }
             }
-            else
-            {
-                console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): RTCPeerConnection closed!");
-            }
+        }
+        else
+        {
+            console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): RTCPeerConnection closed!");
+        }
     }
     else
     {

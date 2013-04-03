@@ -997,7 +997,7 @@ PrivateJainSipClientConnector.prototype.close=function(){
                         // Cancel SIP REGISTER refresh timer
                         clearTimeout(this.sipRegisterRefreshTimer);
                     }
-                    this.sendSipRegisterRequest(0);
+                    this.sendNewSipRegisterRequest(0);
                 }
                 else
                 {
@@ -1112,7 +1112,6 @@ PrivateJainSipClientConnector.prototype.resetSipRegisterContext=function(){
     this.jainSipRegisterTransaction=undefined;
     this.jainSipRegisterDialog=undefined;
     this.sipUnregisterPendingFlag=false;
-    this.jainSipAuthorizationHeader=undefined;
 }
 
 /**
@@ -1217,7 +1216,7 @@ PrivateJainSipClientConnector.prototype.processConnected=function(){
             {
                 this.resetSipRegisterContext();
                 // Send SIP REGISTER request
-                this.sendSipRegisterRequest(this.SIP_SESSION_EXPIRATION_TIMER);
+                this.sendNewSipRegisterRequest(this.SIP_SESSION_EXPIRATION_TIMER);
                 this.sipRegisterState=this.SIP_REGISTERING_STATE;
                 return;
             }
@@ -1248,8 +1247,8 @@ PrivateJainSipClientConnector.prototype.processConnected=function(){
  * Send SIP REGISTER request 
  * @private
  */ 
-PrivateJainSipClientConnector.prototype.sendSipRegisterRequest=function(expiration){
-    console.debug("PrivateJainSipClientConnector:sendSipRegisterRequest()");
+PrivateJainSipClientConnector.prototype.sendNewSipRegisterRequest=function(expiration){
+    console.debug("PrivateJainSipClientConnector:sendNewSipRegisterRequest()");
     var fromSipUriString=this.configuration.sipUserName+"@"+this.configuration.sipDomain;            
     var jainSipCseqHeader=this.jainSipHeaderFactory.createCSeqHeader(1,"REGISTER");
     var jainSipCallIdHeader=this.jainSipHeaderFactory.createCallIdHeader(new String(new Date().getTime()));
@@ -1268,14 +1267,42 @@ PrivateJainSipClientConnector.prototype.sendSipRegisterRequest=function(expirati
     this.jainSipMessageFactory.addHeader(this.jainSipRegisterRequest, jainSipExpiresHeader);
     this.jainSipMessageFactory.addHeader(this.jainSipRegisterRequest, jainSipAllowListHeader);
     this.jainSipMessageFactory.addHeader(this.jainSipRegisterRequest, this.jainSipContactHeader);
-    if(this.jainSipAuthorizationHeader)
-    {
-        this.jainSipMessageFactory.addHeader(this.jainSipRegisterRequest, this.jainSipAuthorizationHeader); 
-    }  
+    
     this.jainSipRegisterTransaction = this.jainSipProvider.getNewClientTransaction(this.jainSipRegisterRequest);
     this.jainSipRegisterDialog=this.jainSipRegisterTransaction.getDialog();
     this.jainSipRegisterRequest.setTransaction(this.jainSipRegisterTransaction);
     this.jainSipRegisterTransaction.sendRequest();
+}
+
+/**
+ * Send Authentitated SIP REGISTER request 
+ * @private
+ */ 
+PrivateJainSipClientConnector.prototype.sendAuthenticatedSipRegisterRequest=function(jainSipAuthorizationHeader){
+    console.debug("PrivateJainSipClientConnector:sendAuthenticatedSipRegisterRequest()");
+    this.jainSipRegisterRequest.removeHeader("Authorization");  
+    var newJainSipRegisterRequest = new SIPRequest();
+    newJainSipRegisterRequest.setMethod(this.jainSipRegisterRequest.getMethod());
+    newJainSipRegisterRequest.setRequestURI(this.jainSipRegisterRequest.getRequestURI());
+    var headerList=this.jainSipRegisterRequest.getHeaders();
+    for(var i=0;i<headerList.length;i++)
+    {
+        newJainSipRegisterRequest.addHeader(headerList[i]);
+    }
+    
+    var num=new Number(this.jainSipRegisterRequest.getCSeq().getSeqNumber());
+    newJainSipRegisterRequest.getCSeq().setSeqNumber(num+1);
+    newJainSipRegisterRequest.setCallId(this.jainSipRegisterRequest.getCallId());
+    newJainSipRegisterRequest.setVia(this.jainSipListeningPoint.getViaHeader());
+    newJainSipRegisterRequest.setFrom(this.jainSipRegisterRequest.getFrom());
+    newJainSipRegisterRequest.setTo(this.jainSipRegisterRequest.getTo());
+    newJainSipRegisterRequest.setMaxForwards(this.jainSipRegisterRequest.getMaxForwards());
+
+    this.jainSipRegisterRequest=newJainSipRegisterRequest;
+    this.jainSipMessageFactory.addHeader(this.jainSipRegisterRequest, jainSipAuthorizationHeader); 
+    this.jainSipClientTransaction = this.jainSipProvider.getNewClientTransaction(this.jainSipRegisterRequest);
+    this.jainSipRegisterRequest.setTransaction(this.jainSipClientTransaction);
+    this.jainSipClientTransaction.sendRequest();
 }
 
 /**
@@ -1464,7 +1491,7 @@ PrivateJainSipClientConnector.prototype.onSipRegisterTimeout=function(){
             this.sipRegisterRefreshTimer=undefined;
             this.sipRegisterState=this.SIP_REGISTER_REFRESHING_STATE;
             // Send SIP REGISTER request
-            this.sendSipRegisterRequest(this.SIP_SESSION_EXPIRATION_TIMER);
+            this.sendNewSipRegisterRequest(this.SIP_SESSION_EXPIRATION_TIMER);
         }
         else
         {
@@ -1502,9 +1529,9 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
             if(this.configuration.sipPassword!=undefined && this.configuration.sipLogin!=undefined)
             {
                 this.sipRegisterState=this.SIP_REGISTERING_401_STATE;
-                this.jainSipAuthorizationHeader=this.jainSipHeaderFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterRequest,this.configuration.sipPassword,this.configuration.sipLogin);           
-                // Send SIP REGISTER request
-                this.sendSipRegisterRequest(this.SIP_SESSION_EXPIRATION_TIMER);
+                var jainSipAuthorizationHeader=this.jainSipHeaderFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterRequest,this.configuration.sipPassword,this.configuration.sipLogin);             
+                // Send authenticated SIP REGISTER request
+                this.sendAuthenticatedSipRegisterRequest(jainSipAuthorizationHeader);
             }
             else
             {
@@ -1531,7 +1558,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
                     // Cancel SIP REGISTER refresh timer
                     clearTimeout(this.sipRegisterRefreshTimer);
                 }
-                this.sendSipRegisterRequest(0);
+                this.sendNewSipRegisterRequest(0);
             }
             else
             {
@@ -1574,7 +1601,7 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
                     // Cancel SIP REGISTER refresh timer
                     clearTimeout(this.sipRegisterRefreshTimer);
                 }
-                this.sendSipRegisterRequest(0);
+                this.sendNewSipRegisterRequest(0);
             }
             else
             {
@@ -1606,9 +1633,8 @@ PrivateJainSipClientConnector.prototype.processSipRegisterResponse=function(resp
         else if(statusCode==401)
         {
             this.sipRegisterState=this.SIP_UNREGISTERING_401_STATE;
-            this.jainSipRegisterRequest.removeHeader("Authorization");
-            this.jainSipAuthorizationHeader=this.jainSipHeaderFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterRequest,this.configuration.sipPassword,this.configuration.sipLogin); 
-            this.sendSipRegisterRequest(0);
+            jainSipAuthorizationHeader=this.jainSipHeaderFactory.createAuthorizationHeader(jainSipResponse,this.jainSipRegisterRequest,this.configuration.sipPassword,this.configuration.sipLogin);
+            this.sendAuthenticatedSipRegisterRequest(jainSipAuthorizationHeader); 
         }
         else if(statusCode==200)
         {
@@ -1691,6 +1717,7 @@ WebRtcCommCall = function(webRtcCommClient)
         this.peerConnectionState = undefined;
         this.remoteMediaStream=undefined; 
         this.remoteSdpOffer=undefined;
+        this.dataChannel=undefined;
     }
     else 
     {
@@ -1816,6 +1843,22 @@ WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
                                 'OfferToReceiveVideo':this.configuration.videoMediaFlag
                             }
                         };
+                        
+                        if(this.configuration.dataMediaFlag)
+                        {
+                            if(this.peerConnection.createDataChannel) 
+                            {
+                                try
+                                {
+                                this.dataChannel = this.peerConnection.createDataChannel("dataChannel",{}); 
+                                }
+                                catch(exception)
+                                {
+                                   alert("Data Channel not supported") 
+                                }
+                            }
+                        }
+                        
                         if(window.webkitRTCPeerConnection)
                         {
                             
@@ -1827,7 +1870,6 @@ WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
                         }
                         else if(window.mozRTCPeerConnection)
                         {
-                            mediaContraints.mandatory.MozDontOfferDataChannel = true;
                             this.peerConnection.createOffer(function(offer) {
                                 that.processRtcPeerConnectionCreateOfferSuccess(offer);
                             }, function(error) {
@@ -1838,8 +1880,18 @@ WebRtcCommCall.prototype.open=function(calleePhoneNumber, configuration){
                     }
                     catch(exception){
                         console.error("WebRtcCommCall:open(): catched exception:"+exception);
+                        setTimeout(function(){
+                            try {
+                                that.webRtcCommClient.eventListener.onWebRtcCommCallOpenErrorEvent(that,exception);
+                            }
+                            catch(exception)
+                            {
+                                console.error("WebRtcCommCall:onPrivateCallConnectorCallOpenErrorEvent(): catched exception in listener:"+exception);    
+                            }
+                        },1);
                         // Close properly the communication
                         try {
+                            
                             this.close();
                         } catch(e) {} 
                         throw exception;  
@@ -2731,7 +2783,7 @@ WebRtcCommCall.prototype.onRtcPeerConnectionIceCandidateEvent=function(rtcIceCan
             console.debug("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): this.peerConnection.iceGatheringState="+this.peerConnection.iceGatheringState);
             console.debug("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): this.peerConnection.iceConnectionState="+this.peerConnection.iceConnectionState); 
             console.debug("WebRtcCommCall:processRtcPeerConnectionIceCandidate(): this.peerConnectionState="+this.peerConnectionState);
-             if(this.peerConnection.signalingState != 'closed')
+            if(this.peerConnection.signalingState != 'closed')
             {
                 if(this.peerConnection.iceGatheringState=="complete")
                 {
@@ -3222,50 +3274,50 @@ WebRtcCommCall.prototype.onRtcPeerConnectionGatheringChangeEvent=function(event)
         console.debug("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): this.peerConnectionState="+this.peerConnectionState);
     
         if(this.peerConnection.signalingState != 'closed')
+        {
+            if(this.peerConnection.iceGatheringState=="complete")
             {
-                if(this.peerConnection.iceGatheringState=="complete")
+                if(window.webkitRTCPeerConnection)
                 {
-                    if(window.webkitRTCPeerConnection)
+                    if(this.peerConnectionState == 'preparing-offer') 
                     {
-                        if(this.peerConnectionState == 'preparing-offer') 
+                        this.connector.invite(this.peerConnection.localDescription.sdp)
+                        this.peerConnectionState = 'offer-sent';
+                    } 
+                    else if (this.peerConnectionState == 'preparing-answer') 
+                    {
+                        this.connector.accept(this.peerConnection.localDescription.sdp)
+                        this.peerConnectionState = 'established';
+                        // Notify opened event to listener
+                        if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent) 
                         {
-                            this.connector.invite(this.peerConnection.localDescription.sdp)
-                            this.peerConnectionState = 'offer-sent';
-                        } 
-                        else if (this.peerConnectionState == 'preparing-answer') 
-                        {
-                            this.connector.accept(this.peerConnection.localDescription.sdp)
-                            this.peerConnectionState = 'established';
-                            // Notify opened event to listener
-                            if(this.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent) 
-                            {
-                                var that=this;
-                                setTimeout(function(){
-                                    try {
-                                        that.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(that);
-                                    }
-                                    catch(exception)
-                                    {
-                                        console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): catched exception in listener:"+exception);    
-                                    }
-                                },1); 
-                            }
+                            var that=this;
+                            setTimeout(function(){
+                                try {
+                                    that.webRtcCommClient.eventListener.onWebRtcCommCallOpenedEvent(that);
+                                }
+                                catch(exception)
+                                {
+                                    console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): catched exception in listener:"+exception);    
+                                }
+                            },1); 
                         }
-                        else if (this.peerConnectionState == 'established') 
-                        {
-                        // Why this last ice candidate event?
-                        } 
-                        else
-                        {
-                            console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): RTCPeerConnection bad state!");
-                        }
+                    }
+                    else if (this.peerConnectionState == 'established') 
+                    {
+                    // Why this last ice candidate event?
+                    } 
+                    else
+                    {
+                        console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): RTCPeerConnection bad state!");
                     }
                 }
             }
-            else
-            {
-                console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): RTCPeerConnection closed!");
-            }
+        }
+        else
+        {
+            console.error("WebRtcCommCall:processRtcPeerConnectionGatheringChange(): RTCPeerConnection closed!");
+        }
     }
     else
     {
