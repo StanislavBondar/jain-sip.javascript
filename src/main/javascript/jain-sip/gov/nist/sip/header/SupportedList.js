@@ -32,6 +32,7 @@ function SupportedList() {
     this.classname="SupportedList";
     this.headerName = this.NAME;
     this.myClass =  "Supported";
+    this.hlist=new Array();
 }
 
 SupportedList.prototype = new SIPHeaderList();
