@@ -35,9 +35,10 @@ WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_REGISTER_MODE=true;
 WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER="10.194.124.24:3478"; // stun.l.google.com:19302
 WebRtcCommTestWebAppController.prototype.DEFAULT_AUDIO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
 WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
-WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"*/
+WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"
+*/
 
-WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.194.70.190:9080/sip";
+/*WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.194.70.190:9080/sip";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT="WebRtcCommTestWebApp/0.0.1" 
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT_CAPABILITIES=undefined // +g.oma.sip-im
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DOMAIN="sip.test.com";
@@ -47,10 +48,26 @@ WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_LOGIN=undefined;
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_PASSWORD=undefined;
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_CONTACT="bob";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_REGISTER_MODE=true;
-WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER=undefined; // stun.l.google.com:19302
+WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER=10.194.124.24:3478; // stun.l.google.com:19302
+WebRtcCommTestWebAppController.prototype.DEFAULT_AUDIO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
+WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
+WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"*/
+
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.193.192.136:9080/sip";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT="CloudTelAsterisk" 
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT_CAPABILITIES="expires=200;click2call=no;+g.oma.sip-im;+audio;language=\"en,fr\"" // +g.oma.sip-im
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DOMAIN="10.192.135.188";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DISPLAY_NAME="7003";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_NAME="7003";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_LOGIN="7003";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_PASSWORD="7003";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_CONTACT="bob";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_REGISTER_MODE=true;
+WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER="10.194.124.24:3478"; // stun.l.google.com:19302
 WebRtcCommTestWebAppController.prototype.DEFAULT_AUDIO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
 WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
 WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"
+
 /**
  * on load event handler
  */ 
@@ -161,6 +178,7 @@ WebRtcCommTestWebAppController.prototype.initView=function(){
     this.view.hideRemoteVideo();
     this.view.setStunServerTextInputValue(this.webRtcCommClientConfiguration.RTCPeerConnection.stunServer);
     this.view.setSipOutboundProxyTextInputValue(this.webRtcCommClientConfiguration.sip.sipOutboundProxy);
+    this.view.setSipUserAgentTextInputValue(this.DEFAULT_SIP_USER_AGENT);
     this.view.setSipUserAgentCapabilitiesTextInputValue(this.webRtcCommClientConfiguration.sip.sipUserAgentCapabilities);
     this.view.setSipDomainTextInputValue(this.webRtcCommClientConfiguration.sip.sipDomain);
     this.view.setSipDisplayNameTextInputValue(this.webRtcCommClientConfiguration.sip.sipDisplayName);
@@ -328,6 +346,7 @@ WebRtcCommTestWebAppController.prototype.onClickConnectButtonViewEventHandler=fu
         {
             this.webRtcCommClientConfiguration.RTCPeerConnection.stunServer= this.view.getStunServerTextInputValue();
             this.webRtcCommClientConfiguration.sip.sipOutboundProxy = this.view.getSipOutboundProxyTextInputValue();
+            this.webRtcCommClientConfiguration.sip.sipUserAgent = this.view.getSipUserAgentTextInputValue();       
             this.webRtcCommClientConfiguration.sip.sipUserAgentCapabilities = this.view.getSipUserAgentCapabilitiesTextInputValue();
             this.webRtcCommClientConfiguration.sip.sipDomain = this.view.getSipDomainTextInputValue();
             this.webRtcCommClientConfiguration.sip.sipDisplayName= this.view.getSipDisplayNameTextInputValue();

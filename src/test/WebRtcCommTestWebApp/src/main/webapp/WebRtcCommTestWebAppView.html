@@ -244,7 +244,6 @@
                 document.getElementById("dataMediaCkeckBox").checked=true;
             }
             
-
             function setStunServerTextInputValue(value) 
             {
                 document.getElementById("stunServer").value=value;
@@ -265,6 +264,11 @@
                 document.getElementById("sipDomain").value=value;
             }
 
+            function setSipUserAgentTextInputValue(value) 
+            {
+                document.getElementById("sipUserAgent").value=value;
+            }
+            
             function setSipDisplayNameTextInputValue(value) 
             {
                 document.getElementById("sipDisplayName").value=value;
@@ -333,6 +337,11 @@
                 return getTextInputValue("sipDomain");
             }
 
+            function getSipUserAgentTextInputValue() 
+            {
+                return getTextInputValue("sipUserAgent");
+            }
+            
             function getSipDisplayNameTextInputValue() 
             {
                 return getTextInputValue("sipDisplayName");
@@ -398,9 +407,6 @@
 
     </head>
     <body onload='webRtcCommTestWebAppController.onLoadViewEventHandler();' onunload='webRtcCommTestWebAppController.onUnloadViewEventHandler();'>
-        <a href="http://localhost:8080/WebRtcCommTestWebApp/?sipDomain=sip.test&sipLogin=&sipPassword=&sipUserName=alice&sipDisplayName=alice&sipContactUserName=bob">
-            http://localhost:8080/WebRtcCommTestWebApp/?sipDomain=sip.test&sipLogin=&sipPassword=&sipUserName=alice&sipDisplayName=alice&sipContactUserName=bob
-        </a>
         <div id="webRtcCommClientConfigurationDiv" >
             <br/>
             <label style="color:black; font-weight: bold">SIP Profile settings</label>
@@ -430,13 +436,17 @@
                     <label>SIP outbound proxy WS URL:</label>
                     <input  id="sipOutboundProxy"  type="text" size="40"> 
                 </div>
+                <div id='sipDomainDiv'>
+                    <label>SIP Domain:</label>
+                    <input id="sipDomain"  type="text" size="30"> 
+                </div>   
                 <div id='sipUserAgentCapabilitiesDiv'>
                     <label>SIP User Agent Capabilities:</label>
                     <input id="sipUserAgentCapabilities"  type="text" size="30"> 
                 </div> 
-                <div id='sipDomainDiv'>
-                    <label>SIP Domain:</label>
-                    <input id="sipDomain"  type="text" size="30"> 
+                 <div id='sipUserAgentDiv'>
+                    <label>SIP User agent:</label>
+                    <input id="sipUserAgent"  type="text" size="30"> 
                 </div>   
             </div> 
             <br/>
@@ -461,7 +471,6 @@
                 <div id='dataMediaDiv'>
                     <label>Data media:</label>
                     <input  id='dataMediaCkeckBox' type="checkbox">
-                    <label style="color:red">DATA CHANNEL NOT YET SUPPORTED</label>
                 </div>
                 <div id='audioCodecsFilterDiv'>
                     <label>Audio codecs filter (ordered by priority e.g. PCMU,PCMA,OPUS):</label>
