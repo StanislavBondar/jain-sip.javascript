@@ -559,22 +559,27 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         realm=response.getProxyAuthenticate().getRealm();
         scheme=response.getProxyAuthenticate().getScheme();
         nonce=response.getProxyAuthenticate().getNonce(); 
-		qop=response.getProxyAuthenticate().getQop();
+        qop=response.getProxyAuthenticate().getQop();
         var proxyauthorization=new ProxyAuthorization();
     }
     var mda=new MessageDigestAlgorithm();
     var method=response.getCSeq().getMethod();
-    var cnonce=Math.floor(Math.random()*16777215).toString(16);
-    var nc="00000001"; 
-    var resp=mda.calculateResponse(sipLogin,realm,sipPassword,nonce,nc,cnonce, method,request.getRequestURI(),null,qop);
+    var cnonce=null;
+    var nc=null;
+    if(qop!=null)
+    {
+        var cnonce=Math.floor(Math.random()*16777215).toString(16);
+        var nc="00000001"; 
+    }
+    var resp=mda.calculateResponse(sipLogin,realm,sipPassword,nonce,nc,cnonce,method,request.getRequestURI().toString(),null,qop);
     
     if(response.hasHeader("www-authenticate"))
     {
         authorization.setUsername(sipLogin);
         authorization.setRealm(realm);
         authorization.setNonce(nonce);
-        authorization.setCNonce(cnonce);
-        authorization.setNonceCount(nc);
+        if(cnonce!=null)  authorization.setCNonce(cnonce);
+        if(nc!=null)  authorization.setNonceCount(nc);
         authorization.setScheme(scheme);
         authorization.setResponse(resp);
         authorization.setURI(request.getRequestURI());
@@ -587,13 +592,13 @@ HeaderFactoryImpl.prototype.createAuthorizationHeaderargu2 =function(response,re
         proxyauthorization.setUsername(sipLogin);
         proxyauthorization.setRealm(realm);
         proxyauthorization.setNonce(nonce);
-        proxyauthorization.setCNonce(cnonce);
-        proxyauthorization.setNonceCount(nc);
+        if(cnonce!=null) proxyauthorization.setCNonce(cnonce);
+        if(nc!=null) proxyauthorization.setNonceCount(nc);
         proxyauthorization.setScheme(scheme);
         proxyauthorization.setResponse(resp);
         proxyauthorization.setURI(request.getRequestURI());
         proxyauthorization.setAlgorithm("MD5");
-		if(qop!=null)  proxyauthorization.setQop(qop);
+        if(qop!=null)  proxyauthorization.setQop(qop);
         return proxyauthorization;
     }
 }

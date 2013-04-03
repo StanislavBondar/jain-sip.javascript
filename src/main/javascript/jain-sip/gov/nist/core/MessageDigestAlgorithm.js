@@ -55,12 +55,9 @@ MessageDigestAlgorithm.prototype.calculateResponse =function(username_value,real
         A2 = method + ":" + digest_uri_value + ":" + this.H(entity_body);
     }
     var request_digest = null;
-    if (cnonce_value != null && qop_value != null && nc_value != null
-        && (qop_value=="auth" || qop_value=="auth-int"))
+    if (cnonce_value != null && qop_value != null && nc_value != null && (qop_value=="auth" || qop_value=="auth-int"))
         {
-        request_digest = this.KD(this.H(A1), nonce_value + ":" + nc_value + ":" + cnonce_value + ":"
-            + qop_value + ":" + this.H(A2));
-
+        request_digest = this.KD(this.H(A1), nonce_value + ":" + nc_value + ":" + cnonce_value + ":"+ qop_value + ":" + this.H(A2));
     } 
     else {
         request_digest = this.KD(this.H(A1), nonce_value + ":" + this.H(A2));
