@@ -114,6 +114,8 @@ cat ./src/main/javascript/jain-sip/gov/nist/sip/header/ProxyAuthenticateList.js 
 cat ./src/main/javascript/jain-sip/gov/nist/sip/header/ProxyAuthorizationList.js >> ./build/jain-sip.debug.js
 cat ./src/main/javascript/jain-sip/gov/nist/sip/header/AuthorizationList.js >> ./build/jain-sip.debug.js
 cat ./src/main/javascript/jain-sip/gov/nist/sip/header/AllowList.js >> ./build/jain-sip.debug.js
+cat ./src/main/javascript/jain-sip/gov/nist/sip/header/AllowEvents.js >> ./build/jain-sip.debug.js
+cat ./src/main/javascript/jain-sip/gov/nist/sip/header/AllowEventsList.js >> ./build/jain-sip.debug.js
 cat ./src/main/javascript/jain-sip/gov/nist/sip/header/RecordRouteList.js >> ./build/jain-sip.debug.js
 cat ./src/main/javascript/jain-sip/gov/nist/sip/header//SupportedList.js >> ./build/jain-sip.debug.js
 cat ./src/main/javascript/jain-sip/gov/nist/sip/header/HeaderFactoryImpl.js >> ./build/jain-sip.debug.js
