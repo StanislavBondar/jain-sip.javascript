@@ -54,6 +54,7 @@ WebRtcCommCallEventListenerInterface.prototype.onWebRtcCommCallRingingEvent= fun
 WebRtcCommCallEventListenerInterface.prototype.onWebRtcCommCallRingingBackEvent= function(webRtcCommCall) {
     throw "WebRtcCommCallEventListenerInterface:onWebRtcCommCallRingingBackEvent(): not implemented;"; 
 } 
+
 /**
  * Open error  event
  * @public
@@ -61,4 +62,13 @@ WebRtcCommCallEventListenerInterface.prototype.onWebRtcCommCallRingingBackEvent=
  */
 WebRtcCommCallEventListenerInterface.prototype.onWebRtcCommCallHangupEvent= function(webRtcCommCall) {
     throw "WebRtcCommCallEventListenerInterface:onWebRtcCommCallHangupEvent(): not implemented;";   
+}
+
+/**
+ * Message event
+ * @public
+ * @param {WebRtcCommCall} webRtcCommCall source WebRtcCommCall object
+ */
+WebRtcCommCallEventListenerInterface.prototype.onWebRtcCommCallMessageEvent= function(webRtcCommCall, message) {
+    throw "WebRtcCommCallEventListenerInterface:onWebRtcCommCallMessageEvent(): not implemented;";   
 }
