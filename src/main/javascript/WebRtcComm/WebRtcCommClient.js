@@ -57,6 +57,7 @@ WebRtcCommClient.prototype.getConfiguration=function(){
  * { <br>
  * <span style="margin-left: 30px">communicationMode:WebRtcCommClient.prototype.SIP,<br></span>
  * <span style="margin-left: 30px">sip: {,<br></span>
+ * <span style="margin-left: 60px">sipUriContactParameters:undefined,<br></span>
  * <span style="margin-left: 60px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
  * <span style="margin-left: 60px">sipUserAgentCapabilities=undefined,<br></span>
  * <span style="margin-left: 60px">sipOutboundProxy:"ws://localhost:5082",<br></span>
@@ -211,6 +212,7 @@ WebRtcCommClient.prototype.call=function(calleePhoneNumber, callConfiguration){
  * { <br>
  * <span style="margin-left: 30px">communicationMode:WebRtcCommClient.prototype.SIP,<br></span>
  * <span style="margin-left: 30px">sip: {,<br></span>
+ * <span style="margin-left: 60px">sipUriContactParameters:undefined,<br></span>
  * <span style="margin-left: 60px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
  * <span style="margin-left: 60px">sipUserAgentCapabilities=undefined,<br></span>
  * <span style="margin-left: 60px">sipOutboundProxy:"ws://localhost:5082",<br></span>

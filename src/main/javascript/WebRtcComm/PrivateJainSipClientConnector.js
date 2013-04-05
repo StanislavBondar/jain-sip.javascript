@@ -49,6 +49,7 @@ PrivateJainSipClientConnector.prototype.isOpened=function(){
  * @param {object} configuration   SIP client/user agent configuration <br>
  * <p> Client configuration sample: <br>
  * { <br>
+ * <span style="margin-left: 60px">sipUriContactParameters:undefined,<br></span>
  * <span style="margin-left: 30px">sipUserAgent:"WebRtcCommTestWebApp/0.0.1",<br></span>
  * <span style="margin-left: 30px">sipUserAgentCapabilities:"+g.oma.sip-im",<br></span>
  * <span style="margin-left: 30px">sipOutboundProxy:"ws://localhost:5082",<br></span>
@@ -88,8 +89,26 @@ PrivateJainSipClientConnector.prototype.open=function(configuration){
                     this.jainSipContactHeader = this.jainSipListeningPoint.createContactHeader(this.configuration.sipUserName);
                     if(this.configuration.sipUserAgentCapabilities)
                     {
-                        this.jainSipContactHeader.setParameter(this.configuration.sipUserAgentCapabilities,null);
+                        this.jainSipContactHeader.setParameter(this.configuration.sipUserAgentCapabilities,null); 
                     }
+                    if(this.configuration.sipUriContactParameters)
+                    {
+                        try
+                        {
+                        var sipUri = this.jainSipContactHeader.getAddress().getURI();
+                        var parameters = this.configuration.sipUriContactParameters.split(";");
+                        for(var i=0; i<parameters.length;i++ )
+                        {                                               
+                          var nameValue = parameters[i].split("=");
+                          sipUri.uriParms.set_nv(new NameValue(nameValue[0], nameValue[1]));
+                        }
+                        }
+                        catch(exception)
+                        {
+                          console.error("PrivateJainSipClientConnector:open(): catched exception:"+exception);   
+                        }
+                    }
+                    
                     this.jainSipMessageFactory.setDefaultUserAgentHeader(this.jainSipHeaderFactory.createUserAgentHeader(this.jainSipStack.getUserAgent()));
                     this.jainSipStack.start();
                 } 
@@ -521,6 +540,7 @@ PrivateJainSipClientConnector.prototype.processRequest=function(requestEvent){
                 {
                     // Incoming SIP Call
                     var newWebRtcCommCall = new WebRtcCommCall(this.webRtcCommClient);
+                    newWebRtcCommCall.incomingCallFlag = true;
                     newWebRtcCommCall.connector=this.createPrivateCallConnector(newWebRtcCommCall, sipCallId); 
                     newWebRtcCommCall.id=newWebRtcCommCall.connector.getId();
                     newWebRtcCommCall.connector.sipCallState=PrivateJainSipCallConnector.prototype.SIP_INVITED_INITIAL_STATE;
@@ -529,7 +549,7 @@ PrivateJainSipClientConnector.prototype.processRequest=function(requestEvent){
                 else
                 {
                     console.warn("PrivateJainSipClientConnector:processRequest(): SIP request ignored"); 
-                //@todo Should send SIP response 404 NOT FOUND or 501 NOT_IMPLEMENTED 
+                   //@todo Should send SIP response 404 NOT FOUND or 501 NOT_IMPLEMENTED 
                 }
             }
         }
