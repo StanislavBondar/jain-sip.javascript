@@ -68,6 +68,7 @@ WebRtcCommCallEventListenerInterface.prototype.onWebRtcCommCallHangupEvent= func
  * Message event
  * @public
  * @param {WebRtcCommCall} webRtcCommCall source WebRtcCommCall object
+ * @param {String} message received message
  */
 WebRtcCommCallEventListenerInterface.prototype.onWebRtcCommCallMessageEvent= function(webRtcCommCall, message) {
     throw "WebRtcCommCallEventListenerInterface:onWebRtcCommCallMessageEvent(): not implemented;";   

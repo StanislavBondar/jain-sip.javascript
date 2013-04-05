@@ -135,7 +135,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1679
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1725
     </li></ul></dd>
     
     
@@ -224,13 +224,18 @@
             
             <td class="type">
             
+                
+<span class="param-type">object</span>
+
+
+            
             </td>
             
             
             
             
             
-            <td class="description last">communication configuration JSON object<p> Communication configuration sample: <br>{ <br><span style="margin-left: 30px">displayName:alice,<br></span><span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span><span style="margin-left: 30px">audioMediaFlag:true,<br></span><span style="margin-left: 30px">videoMediaFlag:false,<br></span><span style="margin-left: 30px">dataMediaFlag:false,<br></span><span style="margin-left: 30px">audioCodecsFilter:PCMA,PCMU,OPUS,<br></span><span style="margin-left: 30px">videoCodecsFilter:VP8,H264,<br></span>}<br></p></td>
+            <td class="description last">communication configuration JSON object<p> Communication configuration sample: <br>{ <br><span style="margin-left: 30px">displayName:alice,<br></span><span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span><span style="margin-left: 30px">audioMediaFlag:true,<br></span><span style="margin-left: 30px">videoMediaFlag:false,<br></span><span style="margin-left: 30px">messageMediaFlag:false,<br></span><span style="margin-left: 30px">audioCodecsFilter:PCMA,PCMU,OPUS,<br></span><span style="margin-left: 30px">videoCodecsFilter:VP8,H264,<br></span>}<br></p></td>
         </tr>
 	
 	
@@ -261,7 +266,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1933
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2039
     </li></ul></dd>
     
     
@@ -326,7 +331,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1879
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1985
     </li></ul></dd>
     
     
@@ -350,7 +355,7 @@
         
             
 <dt>
-    <h4 class="name" id="getCalleePhoneNumber"><span class="type-signature"></span>getCalleePhoneNumber<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="getCalleePhoneNumber"><span class="type-signature"></span>getCalleePhoneNumber<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
     
     
 </dt>
@@ -391,7 +396,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1755
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1821
     </li></ul></dd>
     
     
@@ -412,10 +417,22 @@
     
             
 <div class="param-desc">
-    calleePhoneNumber string or undefined
+    calleePhoneNumber or undefined
 </div>
 
 
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">String</span>
+
+
+	</dd>
+</dl>
 
         
     
@@ -425,7 +442,7 @@
         
             
 <dt>
-    <h4 class="name" id="getCallerPhoneNumber"><span class="type-signature"></span>getCallerPhoneNumber<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="getCallerPhoneNumber"><span class="type-signature"></span>getCallerPhoneNumber<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
     
     
 </dt>
@@ -466,7 +483,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1736
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1802
     </li></ul></dd>
     
     
@@ -487,10 +504,22 @@
     
             
 <div class="param-desc">
-    callerPhoneNumber string
+    callerPhoneNumber or undefined
 </div>
 
 
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">String</span>
+
+
+	</dd>
+</dl>
 
         
     
@@ -541,7 +570,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1745
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1811
     </li></ul></dd>
     
     
@@ -562,7 +591,7 @@
     
             
 <div class="param-desc">
-    configuration property  or undefined
+    configuration or undefined
 </div>
 
 
@@ -587,7 +616,7 @@
         
             
 <dt>
-    <h4 class="name" id="getId"><span class="type-signature"></span>getId<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="getId"><span class="type-signature"></span>getId<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
     
     
 </dt>
@@ -628,7 +657,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1727
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1793
     </li></ul></dd>
     
     
@@ -649,10 +678,22 @@
     
             
 <div class="param-desc">
-    id  string
+    id
 </div>
 
 
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">String</span>
+
+
+	</dd>
+</dl>
 
         
     
@@ -703,7 +744,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1764
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1830
     </li></ul></dd>
     
     
@@ -778,7 +819,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2173
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2323
     </li></ul></dd>
     
     
@@ -843,7 +884,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2242
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2392
     </li></ul></dd>
     
     
@@ -860,6 +901,93 @@
     
     
     
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="isIncoming"><span class="type-signature"></span>isIncoming<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Get incoming call status
+    </div>
+    
+
+    
+    
+    
+    
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1774
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    <h5>Returns:</h5>
+    
+            
+<div class="param-desc">
+    true if incoming, false if outgoing
+</div>
+
+
+
+<dl>
+	<dt>
+		Type
+	</dt>
+	<dd>
+		
+<span class="param-type">boolean</span>
+
+
+	</dd>
+</dl>
+
+        
     
     
 </dd>
@@ -908,7 +1036,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1716
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1764
     </li></ul></dd>
     
     
@@ -995,7 +1123,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2043
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2193
     </li></ul></dd>
     
     
@@ -1060,7 +1188,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2107
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2257
     </li></ul></dd>
     
     
@@ -1131,6 +1259,11 @@
             
             <td class="type">
             
+                
+<span class="param-type">String</span>
+
+
+            
             </td>
             
             
@@ -1149,13 +1282,18 @@
             
             <td class="type">
             
+                
+<span class="param-type">object</span>
+
+
+            
             </td>
             
             
             
             
             
-            <td class="description last">communication configuration JSON object<p> Communication configuration sample: <br>{ <br><span style="margin-left: 30px">displayName:alice,<br></span><span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span><span style="margin-left: 30px">audioMediaFlag:true,<br></span><span style="margin-left: 30px">videoMediaFlag:false,<br></span><span style="margin-left: 30px">dataMediaFlag:false,<br></span><span style="margin-left: 30px">audioCodecsFilter:PCMA,PCMU,OPUS,<br></span><span style="margin-left: 30px">videoCodecsFilter:VP8,H264,<br></span>}<br></p></td>
+            <td class="description last">communication configuration JSON object<p> Communication configuration sample: <br>{ <br><span style="margin-left: 30px">displayName:alice,<br></span><span style="margin-left: 30px">localMediaStream: [LocalMediaStream],<br></span><span style="margin-left: 30px">audioMediaFlag:true,<br></span><span style="margin-left: 30px">videoMediaFlag:false,<br></span><span style="margin-left: 30px">messageMediaFlag:false,<br></span><span style="margin-left: 30px">audioCodecsFilter:PCMA,PCMU,OPUS,<br></span><span style="margin-left: 30px">videoCodecsFilter:VP8,H264,<br></span>}<br></p></td>
         </tr>
 	
 	
@@ -1186,7 +1324,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1789
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 1855
     </li></ul></dd>
     
     
@@ -1251,7 +1389,120 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2012
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2118
+    </li></ul></dd>
+    
+    
+    
+    
+    
+    
+    
+</dl>
+
+    
+    
+    
+    
+    
+    
+    
+    
+</dd>
+
+        
+            
+<dt>
+    <h4 class="name" id="sendMessage"><span class="type-signature"></span>sendMessage<span class="signature">(message)</span><span class="type-signature"></span></h4>
+    
+    
+</dt>
+<dd>
+    
+    
+    <div class="description">
+        Send Short message to WebRTC communication peer
+    </div>
+    
+
+    
+    
+    
+    
+    
+        <h5>Parameters:</h5>
+        
+
+<table class="params">
+    <thead>
+	<tr>
+		
+		<th>Name</th>
+		
+		
+		<th>Type</th>
+		
+		
+		
+		
+		
+		<th class="last">Description</th>
+	</tr>
+	</thead>
+	
+	<tbody>
+	
+	
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+            
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+            
+            
+            
+            
+            
+            <td class="description last">message to send</td>
+        </tr>
+	
+	
+	</tbody>
+</table>
+    
+    
+    
+<dl class="details">
+    
+        
+    
+    
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2150
     </li></ul></dd>
     
     
@@ -1316,7 +1567,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2207
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2357
     </li></ul></dd>
     
     
@@ -1381,7 +1632,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2276
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2426
     </li></ul></dd>
     
     
@@ -1446,7 +1697,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2074
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2224
     </li></ul></dd>
     
     
@@ -1511,7 +1762,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2140
+        <a href="WebRtcComm.js.html">WebRtcComm.js</a>, line 2290
     </li></ul></dd>
     
     
@@ -1554,7 +1805,7 @@
 <br clear="both">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Mar 22 2013 17:08:22 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Fri Apr 05 2013 17:23:02 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
