@@ -110,6 +110,18 @@
                 document.getElementById("stopVideoButton").disabled=false;
             }
             
+            function enableSendMessageButton() 
+            {
+                document.getElementById("sendMessageButton").disabled=false;
+                document.getElementById("messageTextArea").disabled=false;
+            }
+    
+            function disableSendMessageButton() 
+            {
+                document.getElementById("sendMessageButton").disabled=true;
+                document.getElementById("messageTextArea").disabled=true;
+            }
+            
             function showLocalVideo() 
             {
                 document.getElementById("localVideo").disabled=true;
@@ -140,6 +152,7 @@
                 {
                     document.getElementById("localVideo").mozSrcObject=localMediaStream;
                 }
+                document.getElementById("localVideo").muted=true;
                 document.getElementById("localVideo").play();
             }
 
@@ -234,14 +247,14 @@
                 document.getElementById("audioMediaCkeckBox").checked=true;
             }
 
-            function uncheckDataMediaFlag() 
+            function uncheckMessageMediaFlag() 
             {
-                document.getElementById("dataMediaCkeckBox").checked=false;
+                document.getElementById("messageMediaCkeckBox").checked=false;
             }
 
-            function checkDataMediaFlag() 
+            function checkMessageMediaFlag() 
             {
-                document.getElementById("dataMediaCkeckBox").checked=true;
+                document.getElementById("messageMediaCkeckBox").checked=true;
             }
             
             function setStunServerTextInputValue(value) 
@@ -257,6 +270,11 @@
             function setSipUserAgentCapabilitiesTextInputValue(value) 
             {
                 document.getElementById("sipUserAgentCapabilities").value=value;
+            }
+            
+            function setSipUriContactParametersTextInputValue(value) 
+            {
+                document.getElementById("sipUriContactParameters").value=value;
             }
             
             function setSipDomainTextInputValue(value) 
@@ -332,6 +350,11 @@
                 return getTextInputValue("sipUserAgentCapabilities");
             }
             
+            function getSipUriContactParametersTextInputValue() 
+            {
+                return getTextInputValue("sipUriContactParameters");
+            }  
+            
             function getSipDomainTextInputValue() 
             {
                 return getTextInputValue("sipDomain");
@@ -383,9 +406,9 @@
             }
             
              
-            function getDataMediaValue() 
+            function getMessageMediaValue() 
             {
-                return document.getElementById("dataMediaCkeckBox").checked;
+                return document.getElementById("messageMediaCkeckBox").checked;
             }
             
             function getAudioCodecsFilterTextInputValue() 
@@ -410,7 +433,7 @@
         <div id="webRtcCommClientConfigurationDiv" >
             <br/>
             <label style="color:black; font-weight: bold">SIP Profile settings</label>
-            <div style="border:black solid thin; width:700px " id="webRtcCommClientSipProfileConfigurationDiv"> 
+            <div style="border:black solid thin; width:800px " id="webRtcCommClientSipProfileConfigurationDiv"> 
                 <div id='sipDisplayNameDiv'>
                     <label>SIP Display Name:</label>
                     <input id="sipDisplayName"  type="text" size="30" > 
@@ -430,7 +453,7 @@
                 <div id='stunServerDiv'>
                     <label>STUN server:</label>
                     <input  id="stunServer"  type="text" size="40" >
-                    <label style="color:red">Google public STUN server:stun.l.google.com:19302</label>
+                    <label style="color:red">sample: Google public STUN server:stun.l.google.com:19302</label>
                 </div>
                 <div id='sipWsUrlDiv'>
                     <label>SIP outbound proxy WS URL:</label>
@@ -440,9 +463,15 @@
                     <label>SIP Domain:</label>
                     <input id="sipDomain"  type="text" size="30"> 
                 </div>   
+                <div id='sipUriContactParametersDiv'>
+                    <label>SIP URI Contact parameters:</label>
+                    <input id="sipUriContactParameters"  type="text" size="30"> 
+                     <label style="color:red">sample: rtcweb-breaker=yes;....</label>
+                </div> 
                 <div id='sipUserAgentCapabilitiesDiv'>
                     <label>SIP User Agent Capabilities:</label>
                     <input id="sipUserAgentCapabilities"  type="text" size="30"> 
+                     <label style="color:red">sample: +g.oma.sip-im;....</label>
                 </div> 
                  <div id='sipUserAgentDiv'>
                     <label>SIP User agent:</label>
@@ -468,9 +497,9 @@
                     <label>Video media:</label>
                     <input  id='videoMediaCkeckBox' type="checkbox" checked >
                 </div>
-                <div id='dataMediaDiv'>
-                    <label>Data media:</label>
-                    <input  id='dataMediaCkeckBox' type="checkbox">
+                <div id='messageMediaDiv'>
+                    <label>Message media:</label>
+                    <input  id='messageMediaCkeckBox' type="checkbox" checked>
                 </div>
                 <div id='audioCodecsFilterDiv'>
                     <label>Audio codecs filter (ordered by priority e.g. PCMU,PCMA,OPUS):</label>
@@ -505,6 +534,10 @@
         </div>
         <br/>
         <div id='media'>
+            <div style="position:relative;">
+             <textarea style="color: #444;font-family: 'Courier New', monospace;font-size: 1em;height: 50px; width:400px" id="messageTextArea" disabled placeholder="Enter some text, then press Send."></textarea>
+             <input  id='sendMessageButton'  style="" type='button' value='Send Message' disabled onclick = "webRtcCommTestWebAppController.onClickSendMessageButtonViewEventHandler();"/>
+            </div>
             <div>
                 <video id="localVideo" style="height: auto; width: auto"></video>  
                 <video id="remoteVideo" style="height: auto; width: auto"></video>  

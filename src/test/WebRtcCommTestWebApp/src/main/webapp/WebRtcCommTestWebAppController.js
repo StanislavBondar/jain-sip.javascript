@@ -22,7 +22,23 @@ function WebRtcCommTestWebAppController(view) {
 WebRtcCommTestWebAppController.prototype.constructor=WebRtcCommTestWebAppController;
 
 // Default SIP profile to use
-/*WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.194.124.24:80";
+/*WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.193.197.77:10060/sip";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT="WebRtcCommTestWebApp/0.0.1" 
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT_CAPABILITIES=undefined // +g.oma.sip-im
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DOMAIN="10.193.200.25";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DISPLAY_NAME="alice";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_NAME="alice";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_LOGIN="1234";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_PASSWORD="1234";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_CONTACT="818512341234";
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_REGISTER_MODE=false;
+WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER="10.194.124.24:3478"; // stun.l.google.com:19302
+WebRtcCommTestWebAppController.prototype.DEFAULT_AUDIO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
+WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
+WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"
+*/
+
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.194.124.24:80";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT="WebRtcCommTestWebApp/0.0.1" 
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT_CAPABILITIES=undefined // +g.oma.sip-im
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DOMAIN="webrtc.orange.com";
@@ -36,7 +52,7 @@ WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER="10.194.124.24:3478
 WebRtcCommTestWebAppController.prototype.DEFAULT_AUDIO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
 WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
 WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"
-*/
+WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_URI_CONTACT_PARAMETERS=undefined;
 
 /*WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.194.70.190:9080/sip";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT="WebRtcCommTestWebApp/0.0.1" 
@@ -48,12 +64,13 @@ WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_LOGIN=undefined;
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_PASSWORD=undefined;
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_CONTACT="bob";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_REGISTER_MODE=true;
-WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER=10.194.124.24:3478; // stun.l.google.com:19302
+WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER="10.194.124.24:3478"; // stun.l.google.com:19302
 WebRtcCommTestWebAppController.prototype.DEFAULT_AUDIO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
 WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
-WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"*/
+WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"
+*/
 
-WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.193.192.136:9080/sip";
+/*WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.193.192.136:9080/sip";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT="CloudTelAsterisk" 
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT_CAPABILITIES="expires=200;click2call=no;+g.oma.sip-im;+audio;language=\"en,fr\"" // +g.oma.sip-im
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DOMAIN="10.192.135.188";
@@ -67,6 +84,7 @@ WebRtcCommTestWebAppController.prototype.DEFAULT_STUN_SERVER="10.194.124.24:3478
 WebRtcCommTestWebAppController.prototype.DEFAULT_AUDIO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
 WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
 WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"
+*/
 
 /**
  * on load event handler
@@ -86,6 +104,7 @@ WebRtcCommTestWebAppController.prototype.onLoadViewEventHandler=function()
             sipUserName:this.DEFAULT_SIP_USER_NAME,
             sipLogin:this.DEFAULT_SIP_LOGIN,
             sipPassword:this.DEFAULT_SIP_PASSWORD,
+            sipUriContactParameters:this.DEFAULT_SIP_URI_CONTACT_PARAMETERS,
             sipUserAgentCapabilities:this.DEFAULT_SIP_USER_AGENT_CAPABILITIES,
             sipRegisterMode:this.DEFAULT_SIP_REGISTER_MODE
         },
@@ -169,6 +188,7 @@ WebRtcCommTestWebAppController.prototype.initView=function(){
     this.view.disableCancelCallButton();
     this.view.disableDisconnectButton();
     this.view.disableConnectButton();
+    this.view.disableSendMessageButton();
     this.view.checkSipRegisterMode();
     this.view.checkAudioMediaFlag();
     this.view.checkVideoMediaFlag();
@@ -179,6 +199,7 @@ WebRtcCommTestWebAppController.prototype.initView=function(){
     this.view.setStunServerTextInputValue(this.webRtcCommClientConfiguration.RTCPeerConnection.stunServer);
     this.view.setSipOutboundProxyTextInputValue(this.webRtcCommClientConfiguration.sip.sipOutboundProxy);
     this.view.setSipUserAgentTextInputValue(this.DEFAULT_SIP_USER_AGENT);
+    this.view.setSipUriContactParametersTextInputValue(this.webRtcCommClientConfiguration.sip.sipUriContactParameters);
     this.view.setSipUserAgentCapabilitiesTextInputValue(this.webRtcCommClientConfiguration.sip.sipUserAgentCapabilities);
     this.view.setSipDomainTextInputValue(this.webRtcCommClientConfiguration.sip.sipDomain);
     this.view.setSipDisplayNameTextInputValue(this.webRtcCommClientConfiguration.sip.sipDisplayName);
@@ -346,7 +367,8 @@ WebRtcCommTestWebAppController.prototype.onClickConnectButtonViewEventHandler=fu
         {
             this.webRtcCommClientConfiguration.RTCPeerConnection.stunServer= this.view.getStunServerTextInputValue();
             this.webRtcCommClientConfiguration.sip.sipOutboundProxy = this.view.getSipOutboundProxyTextInputValue();
-            this.webRtcCommClientConfiguration.sip.sipUserAgent = this.view.getSipUserAgentTextInputValue();       
+            this.webRtcCommClientConfiguration.sip.sipUserAgent = this.view.getSipUserAgentTextInputValue(); 
+            this.webRtcCommClientConfiguration.sip.sipUriContactParameters = this.view.getSipUriContactParametersTextInputValue();
             this.webRtcCommClientConfiguration.sip.sipUserAgentCapabilities = this.view.getSipUserAgentCapabilitiesTextInputValue();
             this.webRtcCommClientConfiguration.sip.sipDomain = this.view.getSipDomainTextInputValue();
             this.webRtcCommClientConfiguration.sip.sipDisplayName= this.view.getSipDisplayNameTextInputValue();
@@ -407,7 +429,7 @@ WebRtcCommTestWebAppController.prototype.onClickCallButtonViewEventHandler=funct
                 localMediaStream: this.localAudioVideoMediaStream,
                 audioMediaFlag:this.view.getAudioMediaValue(),
                 videoMediaFlag:this.view.getVideoMediaValue(),
-                dataMediaFlag:this.view.getDataMediaValue(),
+                messageMediaFlag:this.view.getMessageMediaValue(),
                 audioCodecsFilter:this.view.getAudioCodecsFilterTextInputValue(),
                 videoCodecsFilter:this.view.getVideoCodecsFilterTextInputValue()
             }
@@ -418,7 +440,8 @@ WebRtcCommTestWebAppController.prototype.onClickCallButtonViewEventHandler=funct
         }
         catch(exception)
         {
-            console.error("WebRtcCommTestWebAppController:onClickCallButtonViewEventHandler(): catched exception:"+exception)  
+            console.error("WebRtcCommTestWebAppController:onClickCallButtonViewEventHandler(): catched exception:"+exception);
+            alert("Call failed: "+exception);
         }
     }
     else
@@ -490,17 +513,19 @@ WebRtcCommTestWebAppController.prototype.onClickAcceptCallButtonViewEventHandler
                 localMediaStream: this.localAudioVideoMediaStream,
                 audioMediaFlag:this.view.getAudioMediaValue(),
                 videoMediaFlag:this.view.getVideoMediaValue(),
-                dataMediaFlag:false
+                messageMediaFlag:this.view.getVideoMediaValue()
             }
             this.webRtcCommCall.accept(callConfiguration);
             this.view.disableAcceptCallButton();
             this.view.disableRejectCallButton();
             this.view.enableEndCallButton();
+            this.view.enableSendMessageButton();
             this.view.stopRinging();
         }
         catch(exception)
         {
             console.error("WebRtcCommTestWebAppController:onClickAcceptCallButtonViewEventHandler(): catched exception:"+exception);
+            alert("Call failed: "+exception);
         }
     }
     else
@@ -536,6 +561,34 @@ WebRtcCommTestWebAppController.prototype.onClickRejectCallButtonViewEventHandler
         console.error("WebRtcCommTestWebAppController:onClickRejectCallButtonViewEventHandler(): internal error");      
     }
 }
+
+/**
+ * on accept event handler
+ */ 
+WebRtcCommTestWebAppController.prototype.onClickSendMessageButtonViewEventHandler=function()
+{
+    console.debug ("WebRtcCommTestWebAppController:onClickSendMessageButtonViewEventHandler()"); 
+    if(this.webRtcCommCall)
+    {
+        try
+        {
+            var message = document.getElementById("messageTextArea").value;
+            this.webRtcCommCall.sendMessage(message);
+            document.getElementById("messageTextArea").value="";
+        }
+        catch(exception)
+        {
+            console.error("WebRtcCommTestWebAppController:onClickRejectCallButtonViewEventHandler(): catched exception:"+exception); 
+            alert("Send message failed:"+exception)
+        }
+    }
+    else
+    {
+        console.error("WebRtcCommTestWebAppController:onClickRejectCallButtonViewEventHandler(): internal error");      
+    }
+}
+
+
 
 /**
  * on local audio mute event handler
@@ -640,15 +693,15 @@ WebRtcCommTestWebAppController.prototype.onClickStopVideoStreamButtonViewEventHa
 {
     console.debug ("WebRtcCommTestWebAppController:onClickStopVideoStreamButtonViewEventHandler():checked="+checked);
     var videoTracks = undefined;
-            if(this.localAudioVideoMediaStream.videoTracks) videoTracks=this.localAudioVideoMediaStream.videoTracks;
-            else if(this.localAudioVideoMediaStream.getVideoTracks) videoTracks=this.localAudioVideoMediaStream.getVideoTracks();
-            if(videoTracks)
-            {
-                for(var i=0; i<videoTracks.length;i++)
-                {
-                    this.localAudioVideoMediaStream.removeTrack(videoTracks[i]);
-                }                  
-            }  
+    if(this.localAudioVideoMediaStream.videoTracks) videoTracks=this.localAudioVideoMediaStream.videoTracks;
+    else if(this.localAudioVideoMediaStream.getVideoTracks) videoTracks=this.localAudioVideoMediaStream.getVideoTracks();
+    if(videoTracks)
+    {
+        for(var i=0; i<videoTracks.length;i++)
+        {
+            this.localAudioVideoMediaStream.removeTrack(videoTracks[i]);
+        }                  
+    }  
     if(this.webRtcCommCall)
     {
         try
@@ -690,6 +743,7 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommClientOpenedEvent=function(
     this.view.disableAcceptCallButton();
     this.view.disableEndCallButton();
     this.view.disableCancelCallButton();
+    this.view.disableSendMessageButton();
     alert("Online"); 
 }
     
@@ -703,6 +757,7 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommClientOpenErrorEvent=functi
     this.view.disableAcceptCallButton();
     this.view.disableEndCallButton();
     this.view.disableCancelCallButton();
+     this.view.disableSendMessageButton();
     this.webRtcCommCall=undefined;
     alert("Connection has failed, offline"); 
 } 
@@ -721,6 +776,7 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommClientClosedEvent=function(
     this.view.disableAcceptCallButton();
     this.view.disableEndCallButton();
     this.view.disableCancelCallButton();
+    this.view.disableSendMessageButton();
     this.webRtcCommCall=undefined;
     alert("Offline"); 
 }
@@ -741,6 +797,7 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommCallClosedEvent=function(we
     this.view.disableEndCallButton();
     this.view.disableCancelCallButton();
     this.view.disableConnectButton();
+    this.view.disableSendMessageButton();
     this.view.stopRemoteVideo();
     this.view.hideRemoteVideo();
     this.webRtcCommCall=undefined;  
@@ -765,8 +822,12 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommCallOpenedEvent=function(we
     this.view.disableCancelCallButton();
     this.view.disableDisconnectButton();
     this.view.disableConnectButton();
-    this.view.showRemoteVideo();
-    this.view.playRemoteVideo(webRtcCommCall.getRemoteMediaStream());
+    this.view.enableSendMessageButton();
+    if(webRtcCommCall.getRemoteMediaStream())
+    {
+        this.view.showRemoteVideo();
+        this.view.playRemoteVideo(webRtcCommCall.getRemoteMediaStream());
+    }
     
     alert("Communication opened"); 
 }
@@ -797,6 +858,7 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommCallOpenErrorEvent=function
     this.view.disableEndCallButton();
     this.view.disableCancelCallButton();
     this.view.disableConnectButton();
+    this.view.disableSendMessageButton();
     this.view.hideRemoteVideo();
     this.view.stopRemoteVideo();
     this.view.stopRinging();
@@ -817,6 +879,7 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommCallRingingEvent=function(w
     this.view.enableRejectCallButton();
     this.view.enableAcceptCallButton();
     this.view.disableEndCallButton();
+    this.view.disableSendMessageButton();
     this.view.disableCancelCallButton();
     this.view.disableConnectButton();
     alert("Communication from "+webRtcCommCall.getCallerPhoneNumber() + ", accept or reject"); 
@@ -835,6 +898,7 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommCallRingingBackEvent=functi
     this.view.disableRejectCallButton();
     this.view.disableAcceptCallButton();
     this.view.disableEndCallButton();
+    this.view.disableSendMessageButton();
     this.view.enableCancelCallButton();
     this.view.disableConnectButton();
 }
@@ -853,6 +917,7 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommCallHangupEvent=function(we
     this.view.disableEndCallButton();
     this.view.disableCancelCallButton();
     this.view.disableConnectButton();
+    this.view.disableSendMessageButton();
     this.view.hideRemoteVideo();
     this.view.stopRemoteVideo();
     this.view.stopRinging();
@@ -863,7 +928,25 @@ WebRtcCommTestWebAppController.prototype.onWebRtcCommCallHangupEvent=function(we
         alert("Communication close by "+webRtcCommCall.getCalleePhoneNumber());
 }
 
+/**
+ * Implementation of the WebRtcCommCall listener interface
+ */
+WebRtcCommTestWebAppController.prototype.onWebRtcCommCallMessageEvent=function(webRtcCommCall, message)
+{
+    console.debug ("WebRtcCommTestWebAppController:onWebRtcCommCallMessageEvent(): webRtcCommCall.getId()="+webRtcCommCall.getId()); 
+    if(webRtcCommCall.isIncoming()) alert("Message from "+webRtcCommCall.getCallerPhoneNumber()+":"+message);
+    else alert("Message from "+webRtcCommCall.getCalleePhoneNumber()+":"+message);
+}
 
+
+/**
+ * Message event
+ * @public
+ * @param {WebRtcCommCall} webRtcCommCall source WebRtcCommCall object
+ */
+WebRtcCommCallEventListenerInterface.prototype.onWebRtcCommCallMessageEvent= function(webRtcCommCall, message) {
+    throw "WebRtcCommCallEventListenerInterface:onWebRtcCommCallMessageEvent(): not implemented;";   
+}
 
 
 
