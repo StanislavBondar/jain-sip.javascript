@@ -31504,10 +31504,10 @@ Utils.prototype.generateTag =function(){
 Utils.prototype.generateBranchId =function(){
     if(logger!=undefined) logger.debug("Utils:generateBranchId()");
     var date=new Date().getTime();
-    var num = Math.round(Utils.prototype.rand*100000000000000000000)+ Utils.prototype.counter+date;
+    var roundValue = Math.round(Utils.prototype.rand*1000000000);
+    var num = roundValue+Utils.prototype.counter+date;
     Utils.prototype.counter++;
-    var x = new String(Utils.prototype.getBytes(num.toString()));
-    var bid= Utils.prototype.digest(x);
+    var bid= Utils.prototype.digest(new String(Utils.prototype.getBytes(num.toString())));
     return Utils.prototype.BRANCH_MAGIC_COOKIE + "-"+ Utils.prototype.signature +"-"+ bid;
 }
 
