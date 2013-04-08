@@ -1319,9 +1319,9 @@ PrivateJainSipClientConnector.prototype.sendAuthenticatedSipRegisterRequest=func
 
     this.jainSipRegisterRequest=newJainSipRegisterRequest;
     this.jainSipMessageFactory.addHeader(this.jainSipRegisterRequest, jainSipAuthorizationHeader); 
-    this.jainSipClientTransaction = this.jainSipProvider.getNewClientTransaction(this.jainSipRegisterRequest);
-    this.jainSipRegisterRequest.setTransaction(this.jainSipClientTransaction);
-    this.jainSipClientTransaction.sendRequest();
+    this.jainSipRegisterTransaction = this.jainSipProvider.getNewClientTransaction(this.jainSipRegisterRequest);
+    this.jainSipRegisterRequest.setTransaction(this.jainSipRegisterTransaction);
+    this.jainSipRegisterTransaction.sendRequest();
 }
 
 /**
