@@ -54,6 +54,7 @@ WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; 
 WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_URI_CONTACT_PARAMETERS=undefined;
 
+
 /*WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.194.70.190:9080/sip";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT="WebRtcCommTestWebApp/0.0.1" 
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT_CAPABILITIES=undefined // +g.oma.sip-im
@@ -70,7 +71,8 @@ WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; 
 WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"
 */
 
-/*WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.193.192.136:9080/sip";
+//WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.193.192.136:9080/sip";
+/*WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://10.192.135.192:10060";
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT="CloudTelAsterisk" 
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_USER_AGENT_CAPABILITIES="expires=200;click2call=no;+g.oma.sip-im;+audio;language=\"en,fr\"" // +g.oma.sip-im
 WebRtcCommTestWebAppController.prototype.DEFAULT_SIP_DOMAIN="10.192.135.188";
@@ -85,6 +87,7 @@ WebRtcCommTestWebAppController.prototype.DEFAULT_AUDIO_CODECS_FILTER=undefined; 
 WebRtcCommTestWebAppController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
 WebRtcCommTestWebAppController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"
 */
+
 
 /**
  * on load event handler
