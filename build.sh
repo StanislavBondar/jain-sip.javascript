@@ -205,11 +205,3 @@ cat ./src/main/javascript/jain-sip/gov/nist/sip/SipFactory.js >> ./build/jain-si
 grep -v "logger.debug" ./build/jain-sip.debug.js  >  ./build/jain-sip.js
 java -jar yuicompressor-2.4.7.jar  ./build/jain-sip.js -o ./build/jain-sip.min.js
 
-cat ./src/main/javascript/WebRtcComm/PrivateJainSipCallConnector.js > ./build/WebRtcComm.debug.js
-cat ./src/main/javascript/WebRtcComm/PrivateJainSipClientConnector.js  >> ./build/WebRtcComm.debug.js
-cat ./src/main/javascript/WebRtcComm/WebRtcCommCall.js  >> ./build/WebRtcComm.debug.js
-cat ./src/main/javascript/WebRtcComm/WebRtcCommClient.js  >> ./build/WebRtcComm.debug.js
-cat ./src/main/javascript/WebRtcComm/WebRtcCommClientEventListenerInterface.js  >> ./build/WebRtcComm.debug.js
-cat ./src/main/javascript/WebRtcComm/WebRtcCommCallEventListenerInterface.js  >> ./build/WebRtcComm.debug.js
-grep -v "logger.debug" ./build/WebRtcComm.debug.js  >  ./build/WebRtcComm.js
-java -jar yuicompressor-2.4.7.jar  ./build/WebRtcComm.js -o ./build/WebRtcComm.min.js

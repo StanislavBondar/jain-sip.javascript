@@ -203,12 +203,3 @@ copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\Si
 more .\build\jain-sip.debug.js | find /v "logger.debug"   >  .\build\jain-sip.js
 %JAVA_HOME%\bin\java -jar yuicompressor-2.4.7.jar  .\build\jain-sip.js -o .\build\jain-sip.min.js
 
-copy /b .\src\main\javascript\WebRtcComm\PrivateJainSipCallConnector.js .\build\WebRtcComm.debug.js
-copy /b .\build\WebRtcComm.debug.js+.\src\main\javascript\WebRtcComm\PrivateJainSipClientConnector.js   .\build\WebRtcComm.debug.js
-copy /b .\build\WebRtcComm.debug.js+.\src\main\javascript\WebRtcComm\WebRtcCommCall.js   .\build\WebRtcComm.debug.js
-copy /b .\build\WebRtcComm.debug.js+.\src\main\javascript\WebRtcComm\WebRtcCommClient.js   .\build\WebRtcComm.debug.js
-copy /b .\build\WebRtcComm.debug.js+.\src\main\javascript\WebRtcComm\WebRtcCommClientEventListenerInterface.js   .\build\WebRtcComm.debug.js
-copy /b .\build\WebRtcComm.debug.js+.\src\main\javascript\WebRtcComm\WebRtcCommCallEventListenerInterface.js   .\build\WebRtcComm.debug.js
-more .\build\WebRtcComm.debug.js | find /v "logger.debug"   >  .\build\WebRtcComm.js
-%JAVA_HOME%\bin\java -jar yuicompressor-2.4.7.jar  .\build\WebRtcComm.js -o .\build\WebRtcComm.min.js
-

@@ -1,1 +1,0 @@
-jsdoc -d ./WebRtcComm ../build/WebRtcComm.js
