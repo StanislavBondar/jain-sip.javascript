@@ -176,8 +176,10 @@ SIPRequest.prototype.checkHeaders =function(){
         }
     } else if (this.getMethod()==this.PUBLISH) {
         if (this.getHeader(this.EventHeader) == null)
+		{
             console.error("SIPRequest:checkHeaders(): "+prefix + this.EventHeader);
             throw "SIPRequest:checkHeaders(): "+prefix + this.EventHeader;
+		}
     }
     if (this.requestLine.getMethod()==this.INVITE
         || this.requestLine.getMethod()==this.SUBSCRIBE
