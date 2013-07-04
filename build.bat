@@ -9,7 +9,7 @@ copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\core\H
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\core\Host.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\core\Token.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\core\StringTokenizer.js .\build\jain-sip.debug.js
-copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\core\\LexerCore.js .\build\jain-sip.debug.js
+copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\core\LexerCore.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\core\ParserCore.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\core\HostNameParser.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\core\MessageDigestAlgorithm.js .\build\jain-sip.debug.js
@@ -30,10 +30,8 @@ copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sdp\fi
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sdp\fields\TimeField.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sdp\fields\ConnectionAddress.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sdp\fields\ConnectionField.js .\build\jain-sip.debug.js
-copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sdp\fields\ConnectionField.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sdp\fields\KeyField.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sdp\fields\MediaField.js .\build\jain-sip.debug.js
-copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sdp\fields\KeyField.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sdp\fields\AttributeField.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sdp\fields\BandwidthField.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sdp\fields\TypedTime.js .\build\jain-sip.debug.js
@@ -97,7 +95,6 @@ copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\he
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\header\MaxForwards.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\header\ContentType.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\header\TimeStamp.js .\build\jain-sip.debug.js
-copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\header\ContentLength.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\header\ContentDisposition.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\header\CallIdentifier.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\header\CallID.js .\build\jain-sip.debug.js
@@ -115,7 +112,7 @@ copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\he
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\header\AllowEvents.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\header\AllowEventsList.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\header\RecordRouteList.js .\build\jain-sip.debug.js
-copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\header\\SupportedList.js .\build\jain-sip.debug.js
+copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\header\SupportedList.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\header\HeaderFactoryImpl.js .\build\jain-sip.debug.js
 
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\Parser.js .\build\jain-sip.debug.js
@@ -123,7 +120,7 @@ copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\pa
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\HeaderParser.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\ParametersParser.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\TokenTypes.js .\build\jain-sip.debug.js
-copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\\TokenNames.js .\build\jain-sip.debug.js
+copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\TokenNames.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\StringMsgParser.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\AddressParametersParser.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\ChallengeParser.js .\build\jain-sip.debug.js
@@ -137,12 +134,12 @@ copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\pa
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\ContentTypeParser.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\ContentLengthParser.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\AuthorizationParser.js .\build\jain-sip.debug.js
-copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\\WWWAuthenticateParser.js .\build\jain-sip.debug.js
+copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\WWWAuthenticateParser.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\CallIDParser.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\RouteParser.js .\build\jain-sip.debug.js
-copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\\RecordRouteParser.js .\build\jain-sip.debug.js
-copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\\ProxyAuthenticateParser.js .\build\jain-sip.debug.js
-copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\\ProxyAuthorizationParser.js .\build\jain-sip.debug.js
+copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\RecordRouteParser.js .\build\jain-sip.debug.js
+copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\ProxyAuthenticateParser.js .\build\jain-sip.debug.js
+copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\ProxyAuthorizationParser.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\TimeStampParser.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\UserAgentParser.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\parser\SupportedParser.js .\build\jain-sip.debug.js
@@ -172,7 +169,7 @@ copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\st
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\stack\SIPTransactionErrorEvent.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\stack\DefaultRouter.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\stack\WSMessageChannel.js .\build\jain-sip.debug.js
-copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\stack\\WSMessageProcessor.js .\build\jain-sip.debug.js
+copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\stack\WSMessageProcessor.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\stack\SIPDialog.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\stack\SIPDialogErrorEvent.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\stack\SIPDialogEventListener.js .\build\jain-sip.debug.js
@@ -194,7 +191,7 @@ copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\Re
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\ResponseEventExt.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\DialogFilter.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\ListeningPointImpl.js .\build\jain-sip.debug.js
-copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\\NistSipMessageFactoryImpl.js .\build\jain-sip.debug.js
+copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\NistSipMessageFactoryImpl.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\SipProviderImpl.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\SipStackImpl.js .\build\jain-sip.debug.js
 copy /b .\build\jain-sip.debug.js+.\src\main\javascript\jain-sip\gov\nist\sip\SipListener.js .\build\jain-sip.debug.js
