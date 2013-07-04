@@ -170,7 +170,7 @@ SIPRequest.prototype.checkHeaders =function(){
         /*if (getHeader(SubscriptionStateHeader.NAME) == null){
             console.error(prefix + SubscriptionStateHeader.NAME, 0);
         }*/
-        if (getHeader(this.EventHeader) == null){
+        if (this.getHeader(this.EventHeader) == null){
             console.error("SIPRequest:checkHeaders(): "+prefix + this.EventHeader);
             throw "SIPRequest:checkHeaders(): "+prefix + this.EventHeader;
         }
