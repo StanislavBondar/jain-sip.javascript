@@ -21431,8 +21431,8 @@ SIPMessage.prototype.getHeader =function(headerName){
 SIPMessage.prototype.getHeaderLowerCase =function(lowerCaseHeaderName){
     if (lowerCaseHeaderName == null)
     {
-         console.error("MessageFactoryImpl:getHeaderLowerCase(): null lowerCaseHeaderName !");
-         throw "MessageFactoryImpl:getHeaderLowerCase(): null lowerCaseHeaderName!";
+        console.error("MessageFactoryImpl:getHeaderLowerCase(): null lowerCaseHeaderName !");
+        throw "MessageFactoryImpl:getHeaderLowerCase(): null lowerCaseHeaderName!";
     }
     var sipHeader = null;
     for(var i=0;i<this.nameTable.length;i++)
@@ -21635,8 +21635,8 @@ SIPMessage.prototype.setMessageContent =function(){
 SIPMessage.prototype.setContent =function(content, contentTypeHeader){
     if (content == null)
     {
-         console.error("MessageFactoryImpl:setContent(): null content !", 0);
-         throw "MessageFactoryImpl:setContent(): null content!";
+        console.error("MessageFactoryImpl:setContent(): null content !", 0);
+        throw "MessageFactoryImpl:setContent(): null content!";
     }
     this.setHeader(contentTypeHeader);
     this.messageContent = content;
@@ -21657,8 +21657,18 @@ SIPMessage.prototype.getContent =function(){
 SIPMessage.prototype.computeContentLength =function(content){
     var length = 0;
     if (content != null) {
-        if (content instanceof String) {
-            length = content.length;
+        if (content.constructor.name == "String") {
+            var cpt = 0;                                        
+            var codeChar;
+            for (var i = 0; i < content.length; ++i)
+            {
+                codeChar =content.charCodeAt(i);
+                if(codeChar<128) cpt=cpt+1;
+                else if (codeChar<2048) cpt=cpt+2;
+                else if (codeChar<65536) cpt=cpt+3;
+                else  cpt=cpt+4;
+            }
+            length = cpt;
         }
         else if (content.constructor==Array) {
             length = content.length;
