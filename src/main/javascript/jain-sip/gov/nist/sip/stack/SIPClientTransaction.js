@@ -25,6 +25,7 @@
  *  @see  gov/nist/javax/sip/stack/SIPClientTransaction.java 
  *  @author Yuemin Qin (yuemin.qin@orange.com)
  *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @author Jean Deruelle (jean.deruelle@telestax.com)
  *  @version 1.0 
  *   
  */
@@ -277,8 +278,8 @@ SIPClientTransaction.prototype.processResponseargu2 =function(sipResponse,incomi
                         this.setDialog(dialog, dialog.getDialogId());
                     } 
                 } else {
-                    console.error("SIPClientTransaction:processResponseargu2(): response without from-tag");
-                    throw "SIPClientTransaction:processResponseargu2(): response without from-tag";
+                    console.error("SIPClientTransaction:processResponseargu2(): response without from-tag " + sipResponse);
+                    throw "SIPClientTransaction:processResponseargu2(): response without from-tag " + sipResponse;
                 }
             } else {
                 if (this.sipStack.isAutomaticDialogSupportEnabled) {
@@ -747,11 +748,15 @@ SIPClientTransaction.prototype.checkFromTag =function(sipResponse){
     if(logger!=undefined) logger.debug("SIPClientTransaction:checkFromTag():sipResponse="+sipResponse);
     var originalFromTag = this.getRequest().getFromTag();
     if (this.defaultDialog != null) {
+	// Added for https://code.google.com/p/webrtcomm/issues/detail?id=19 as XOR below is not enough
+	if (originalFromTag == null && sipResponse.getFrom().getTag() == null) {
+    		return false;
+    	}
         if (originalFromTag == null ^ sipResponse.getFrom().getTag() == null) {
             return false;
         }
-        if (originalFromTag.toLowerCase()!=sipResponse.getFrom().getTag().toLowerCase()
-            && originalFromTag != null) {
+        if (originalFromTag != null && 
+		originalFromTag.toLowerCase()!=sipResponse.getFrom().getTag().toLowerCase()) {
             return false;
         }
     }
