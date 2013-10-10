@@ -331,6 +331,7 @@ SIPClientTransaction.prototype.nonInviteClientTransaction =function(transactionR
     if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():sipDialog="+sipDialog);
 
     var statusCode = transactionResponse.getStatusCode();
+    if(logger!=undefined) logger.debug("SIPClientTransaction.nonInviteClientTransaction state " + this.getState());
     if (this.TRYING == this.getState()) {
         if (100 <= statusCode && statusCode <= 199) {
             this.setState(this.PROCEEDING);
@@ -747,16 +748,17 @@ SIPClientTransaction.prototype.terminate =function(){
 SIPClientTransaction.prototype.checkFromTag =function(sipResponse){
     if(logger!=undefined) logger.debug("SIPClientTransaction:checkFromTag():sipResponse="+sipResponse);
     var originalFromTag = this.getRequest().getFromTag();
+    var sipResponseFromTag = sipResponse.getFrom().getTag();
     if (this.defaultDialog != null) {
-	// Added for https://code.google.com/p/webrtcomm/issues/detail?id=19 as XOR below is not enough
-	if (originalFromTag == null && sipResponse.getFrom().getTag() == null) {
+    	// Added for https://code.google.com/p/webrtcomm/issues/detail?id=19 as XOR below is not enough
+    	if (originalFromTag == null && sipResponseFromTag == null) {
     		return false;
     	}
-        if (originalFromTag == null ^ sipResponse.getFrom().getTag() == null) {
+        if (originalFromTag == null ^ sipResponseFromTag == null) {
             return false;
-        }
-        if (originalFromTag != null && 
-		originalFromTag.toLowerCase()!=sipResponse.getFrom().getTag().toLowerCase()) {
+        }        
+        if (originalFromTag != null && sipResponseFromTag != null && 
+        		originalFromTag.toLowerCase() != sipResponseFromTag.toLowerCase()) {
             return false;
         }
     }
