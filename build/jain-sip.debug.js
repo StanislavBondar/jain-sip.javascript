@@ -13247,7 +13247,8 @@ Via.prototype.encodeBodyBuffer =function(buffer){
     if (this.comment != null) {
         buffer=buffer+this.SP+this.LPAREN+this.comment+this.RPAREN;
     }
-    if (this.rPortFlag)
+    // https://code.google.com/p/jain-sip/issues/detail?id=130 rport is present 2 times on 407 Authentication Required
+    if (this.rPortFlag && this.getParameter(this.RPORT) == null)
     {
         buffer=buffer+";rport"
     }
