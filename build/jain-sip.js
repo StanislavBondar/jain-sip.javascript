@@ -28486,16 +28486,17 @@ SIPClientTransaction.prototype.terminate =function(){
 
 SIPClientTransaction.prototype.checkFromTag =function(sipResponse){
     var originalFromTag = this.getRequest().getFromTag();
+    var sipResponseFromTag = sipResponse.getFrom().getTag();
     if (this.defaultDialog != null) {
-	// Added for https://code.google.com/p/webrtcomm/issues/detail?id=19 as XOR below is not enough
-	if (originalFromTag == null && sipResponse.getFrom().getTag() == null) {
+    	// Added for https://code.google.com/p/webrtcomm/issues/detail?id=19 as XOR below is not enough
+    	if (originalFromTag == null && sipResponseFromTag == null) {
     		return false;
     	}
-        if (originalFromTag == null ^ sipResponse.getFrom().getTag() == null) {
+        if (originalFromTag == null ^ sipResponseFromTag == null) {
             return false;
-        }
-        if (originalFromTag != null && 
-		originalFromTag.toLowerCase()!=sipResponse.getFrom().getTag().toLowerCase()) {
+        }        
+        if (originalFromTag != null && sipResponseFromTag != null && 
+        		originalFromTag.toLowerCase() != sipResponseFromTag.toLowerCase()) {
             return false;
         }
     }
