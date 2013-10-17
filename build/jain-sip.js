@@ -2783,7 +2783,7 @@ ParserCore.prototype.nameValue =function(separator){
  */
 function HostNameParser() {
     this.classname="HostNameParser"; 
-    this.Lexer=null;
+    this.lexer=null;
     this.stripAddressScopeZones = false;
     if(typeof arguments[0]=="string")
     {
