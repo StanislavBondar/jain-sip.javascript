@@ -132,6 +132,11 @@ SIPTransactionStack.prototype.removeDialog =function(dialog){
             }
         }
         this.earlyDialogTable.splice(l,1);
+        // https://bitbucket.org/telestax/telscale-rtm/issue/35/ivnite-dialog-state-machine-is-broken-when
+	// When INVITE is sent out and 407 is received, a new challenge INVITE is sent but the Dialog gets TERMINATED from 407 
+	// after linger time so 8s, so when the callee try to send BYE it gets a 481 Dialog not found
+        // l was not nullified thus a random dialog could have been removed from the dialogTable which corresponds to the new INVITE Dialog
+        var l=null;
         for(i=0;i<this.dialogTable.length;i++)
         {
             if(this.dialogTable[i][0]==earlyId)
@@ -154,6 +159,7 @@ SIPTransactionStack.prototype.removeDialog =function(dialog){
             }
         }
         if (old == dialog) {
+        	var l=null;
             for(i=0;i<this.dialogTable.length;i++)
             {
                 if(this.dialogTable[i][0]==id)

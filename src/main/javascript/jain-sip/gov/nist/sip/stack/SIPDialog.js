@@ -394,7 +394,7 @@ SIPDialog.prototype.setLastResponse =function(transaction,sipResponse){
                         this.lastInviteOkReceived);
                 }
             } 
-            else if (statusCode >= 300&& statusCode <= 699
+            else if (statusCode >= 300 && statusCode <= 699
                 && (this.getState() == null || 
                     (cseqMethod==this.getMethod() && this.getState()== "EARLY"))) {
                 this.setState(this.TERMINATED_STATE);

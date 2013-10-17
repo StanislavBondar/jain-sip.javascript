@@ -25,6 +25,7 @@
  *  @see  gov/nist/javax/sip/stack/SIPClientTransaction.java 
  *  @author Yuemin Qin (yuemin.qin@orange.com)
  *  @author Laurent STRULLU (laurent.strullu@orange.com)
+ *  @author Jean Deruelle (jean.deruelle@telestax.com)
  *  @version 1.0 
  *   
  */
@@ -277,8 +278,8 @@ SIPClientTransaction.prototype.processResponseargu2 =function(sipResponse,incomi
                         this.setDialog(dialog, dialog.getDialogId());
                     } 
                 } else {
-                    console.error("SIPClientTransaction:processResponseargu2(): response without from-tag");
-                    throw "SIPClientTransaction:processResponseargu2(): response without from-tag";
+                    console.error("SIPClientTransaction:processResponseargu2(): response without from-tag " + sipResponse);
+                    throw "SIPClientTransaction:processResponseargu2(): response without from-tag " + sipResponse;
                 }
             } else {
                 if (this.sipStack.isAutomaticDialogSupportEnabled) {
@@ -330,6 +331,7 @@ SIPClientTransaction.prototype.nonInviteClientTransaction =function(transactionR
     if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():sipDialog="+sipDialog);
 
     var statusCode = transactionResponse.getStatusCode();
+    if(logger!=undefined) logger.debug("SIPClientTransaction.nonInviteClientTransaction state " + this.getState());
     if (this.TRYING == this.getState()) {
         if (100 <= statusCode && statusCode <= 199) {
             this.setState(this.PROCEEDING);
@@ -746,12 +748,17 @@ SIPClientTransaction.prototype.terminate =function(){
 SIPClientTransaction.prototype.checkFromTag =function(sipResponse){
     if(logger!=undefined) logger.debug("SIPClientTransaction:checkFromTag():sipResponse="+sipResponse);
     var originalFromTag = this.getRequest().getFromTag();
+    var sipResponseFromTag = sipResponse.getFrom().getTag();
     if (this.defaultDialog != null) {
-        if (originalFromTag == null ^ sipResponse.getFrom().getTag() == null) {
+    	// Added for https://code.google.com/p/webrtcomm/issues/detail?id=19 as XOR below is not enough
+    	if (originalFromTag == null && sipResponseFromTag == null) {
+    		return false;
+    	}
+        if (originalFromTag == null ^ sipResponseFromTag == null) {
             return false;
-        }
-        if (originalFromTag.toLowerCase()!=sipResponse.getFrom().getTag().toLowerCase()
-            && originalFromTag != null) {
+        }        
+        if (originalFromTag != null && sipResponseFromTag != null && 
+        		originalFromTag.toLowerCase() != sipResponseFromTag.toLowerCase()) {
             return false;
         }
     }
