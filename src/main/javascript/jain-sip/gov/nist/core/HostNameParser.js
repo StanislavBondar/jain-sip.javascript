@@ -31,7 +31,7 @@
 function HostNameParser() {
     //if(logger!=undefined) logger.debug("HostNameParser:HostNameParser()");
     this.classname="HostNameParser"; 
-    this.Lexer=null;
+    this.lexer=null;
     this.stripAddressScopeZones = false;
     if(typeof arguments[0]=="string")
     {

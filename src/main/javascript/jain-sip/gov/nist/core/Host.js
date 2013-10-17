@@ -168,7 +168,7 @@ Host.prototype.setHost =function(host,type){
 }
 
 Host.prototype.setAddress =function(address){
-    i//f(logger!=undefined) logger.debug("Host:setAddress():address="+address);
+    //if(logger!=undefined) logger.debug("Host:setAddress():address="+address);
     this.setHostAddress(address);
 }
 
@@ -227,7 +227,7 @@ Host.prototype.isIPv6Reference =function(address){
 }
 
 Host.prototype.hashCode =function(){
-    if(logger!=undefined) logger.debug("Host:hashCode()");
+    //if(logger!=undefined) logger.debug("Host:hashCode()");
     var hash = 0;
     var x=this.getHostname();
     if(!(x == null || x.value == ""))  
