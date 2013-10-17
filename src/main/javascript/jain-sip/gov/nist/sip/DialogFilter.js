@@ -387,8 +387,16 @@ DialogFilter.prototype.processRequest =function(sipRequest,incomingMessageChanne
     }
     else if (sipRequest.getMethod()=="INVITE") {
         var lastTransaction = dialog == null ? null : dialog.getInviteTransaction();
+        /*
+             * RFC 3261 Chapter 14. A UAS that receives a second INVITE before
+             * it sends the final response to a first INVITE with a lower CSeq
+             * sequence number on the same dialog MUST return a 500 (Server
+             * Internal Error) response to the second INVITE and MUST include a
+             * Retry-After header field with a randomly chosen value of between
+             * 0 and 10 seconds.
+             */
         if (dialog != null && transaction != null && lastTransaction != null
-            && sipRequest.getCSeq().getSeqNumber() > dialog.getRemoteSeqNumber()
+            && sipRequest.getCSeq().getSeqNumber() > lastTransaction.getCSeq()
             && lastTransaction instanceof SIPServerTransaction
             && sipProvider.isDialogErrorsAutomaticallyHandled()
             && dialog.isSequnceNumberValidation()
@@ -399,6 +407,7 @@ DialogFilter.prototype.processRequest =function(sipRequest,incomingMessageChanne
             this.sendServerInternalErrorResponse(sipRequest, transaction);
             return;
         }
+        
         lastTransaction = (dialog == null ? null : dialog.getLastTransaction());
         if (dialog != null
             && sipProvider.isDialogErrorsAutomaticallyHandled()
