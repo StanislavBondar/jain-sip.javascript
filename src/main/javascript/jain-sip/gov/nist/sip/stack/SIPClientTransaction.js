@@ -300,6 +300,7 @@ SIPClientTransaction.prototype.processResponseargu3 =function(transactionRespons
     if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():transactionResponse="+transactionResponse);
     if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():sourceChannel="+sourceChannel);
     if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():sipDialog="+dialog);
+    if(logger!=undefined) logger..debug("processResponse() ctx state: "+ this.getState()); 
 
     if (this.getState() == null)
     {
@@ -379,9 +380,13 @@ SIPClientTransaction.prototype.inviteClientTransaction =function(transactionResp
     if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():transactionResponse="+transactionResponse);
     if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():sourceChannel="+sourceChannel);
     if(logger!=undefined) logger.debug("SIPClientTransaction:inviteClientTransaction():dialog="+dialog);
+    if(logger!=undefined) logger.debug("inviteClientTransaction.processResponse() ctx state: "+ this.getState()); 
     var statusCode = transactionResponse.getStatusCode();
     if (this.TERMINATED == this.getState()) {
         var ackAlreadySent = false;
+	if(dialog != null) {
+		if(logger!=undefined) logger.debug("inviteClientTransaction.processResponse() dialog ackSeen : "+ dialog.isAckSeen() + "+ lastAckSent" + dialog.getLastAckSent()); 
+	} 
         if (dialog != null && dialog.isAckSeen() && dialog.getLastAckSent() != null) {
             if (dialog.getLastAckSent().getCSeq().getSeqNumber() == transactionResponse.getCSeq().getSeqNumber()
                 && transactionResponse.getFromTag()==dialog.getLastAckSent().getFromTag()) {
@@ -390,6 +395,7 @@ SIPClientTransaction.prototype.inviteClientTransaction =function(transactionResp
         }
         if (dialog!= null && !ackAlreadySent
             && transactionResponse.getCSeq().getMethod()==dialog.getMethod()) {
+	    if(logger!=undefined) logger.debug("inviteClientTransaction.processResponse() retransmission, resendingAck"); 
             dialog.resendAck();
         }
         this.sipStack.removeTransaction(this);

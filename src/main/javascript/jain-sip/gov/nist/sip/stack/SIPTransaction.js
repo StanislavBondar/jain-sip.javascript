@@ -213,6 +213,8 @@ SIPTransaction.prototype.setState =function(newState){
     {
         newState = this.currentState;
     }
+    currentState = newState;
+    if(logger!=undefined) logger.debug("SIPTransaction.setState() " + this.branch + " newState " + this.currentState);
 }
 
 SIPTransaction.prototype.getState =function(){

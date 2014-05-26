@@ -8822,138 +8822,6 @@ Authority.prototype.hashCode=function(){
  */
 
 /*
- *  Implementation of the JAIN-SIP  TelURLImpl.
- *  @author Yuemin Qin (yuemin.qin@orange.com)
- *  @author Laurent STRULLU (laurent.strullu@orange.com)
- *  @version 1.0 
- *  @see  gov/nist/javax/sip/address/TelURLImpl.java  
- */
-
-
-function TelURLImpl() {
-    this.classname="TelURLImpl";
-    this.telephoneNumber=new TelephoneNumber();
-    this.scheme = "tel";
-}
-
-TelURLImpl.prototype = new GenericURI();
-TelURLImpl.prototype.constructor=TelURLImpl;
-
-TelURLImpl.prototype.setTelephoneNumber =function(telephoneNumber){
-    this.telephoneNumber = telephoneNumber;
-}
-
-TelURLImpl.prototype.getIsdnSubAddress =function(){
-    return this.telephoneNumber.getIsdnSubaddress();
-}
-
-TelURLImpl.prototype.getPostDial =function(){
-    return this.telephoneNumber.getPostDial();
-}
-
-TelURLImpl.prototype.getScheme =function(){
-    return this.scheme;
-}
-
-TelURLImpl.prototype.isGlobal =function(){
-    return this.telephoneNumber.isGlobal();
-}
-
-TelURLImpl.prototype.isSipURI =function(){
-    return false;
-}
-
-TelURLImpl.prototype.setGlobal =function(global){
-    this.telephoneNumber.setGlobal(global);
-}
-
-TelURLImpl.prototype.setIsdnSubAddress =function(isdnSubAddress){
-    this.telephoneNumber.setIsdnSubaddress(isdnSubAddress);
-}
-
-TelURLImpl.prototype.setPostDial =function(postDial){
-    this.telephoneNumber.setPostDial(postDial);
-}
-
-TelURLImpl.prototype.setPhoneNumber =function(telephoneNumber){
-    this.telephoneNumber.setPhoneNumber(telephoneNumber);
-} 
-
-TelURLImpl.prototype.getPhoneNumber =function(){
-    return this.telephoneNumber.getPhoneNumber();
-}
-
-TelURLImpl.prototype.toString =function(){
-    return this.scheme + ":" + this.telephoneNumber.encode();
-}
-
-TelURLImpl.prototype.encode =function(){
-    return this.encodeBuffer("").toString();
-}
-
-TelURLImpl.prototype.encodeBuffer =function(buffer){
-    buffer=buffer+this.scheme+":";
-    buffer=this.telephoneNumber.encodeBuffer(buffer);
-    return buffer;
-}
-
-TelURLImpl.prototype.getParameter =function(parameterName){
-    return this.telephoneNumber.getParameter(parameterName);
-}
-
-TelURLImpl.prototype.setParameter =function(name, value){
-    this.telephoneNumber.setParameter(name, value);
-}
-
-TelURLImpl.prototype.getParameterNames =function(){
-    return this.telephoneNumber.getParameterNames();
-}
-
-TelURLImpl.prototype.getParameters =function(){
-    return this.telephoneNumber.getParameters();
-}
-
-TelURLImpl.prototype.removeParameter =function(name){
-    this.telephoneNumber.removeParameter(name);
-}
-
-TelURLImpl.prototype.setPhoneContext =function(phoneContext){
-    if (phoneContext==null) {
-        this.removeParameter("phone-context");
-    } 
-    else 
-    {
-        this.setParameter("phone-context",phoneContext);
-    }
-}
-
-TelURLImpl.prototype.getPhoneContext =function(){
-    return this.getParameter("phone-context");
-}
-
-/*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-
-/*
  *  Implementation of the JAIN-SIP  TelephoneNumber.
  *  @author Yuemin Qin (yuemin.qin@orange.com)
  *  @author Laurent STRULLU (laurent.strullu@orange.com)
@@ -16506,10 +16374,10 @@ Lexer.prototype.selectLexer =function(lexerName){
                     
             // added References header
             this.addKeyword(this.ReferencesHeader.toUpperCase(),TokenTypes.prototype.REFERENCES);
-                        
-                        // added Accept-Contact header
-                        this.addKeyword(this.AcceptContact.toUpperCase(),TokenTypes.prototype.ACCEPT_CONTACT);
-                        
+			
+			// added Accept-Contact header
+			this.addKeyword(this.AcceptContact.toUpperCase(),TokenTypes.prototype.ACCEPT_CONTACT);
+			
         } else if (lexerName=="status_lineLexer") {
             this.addKeyword(TokenNames.prototype.SIP.toUpperCase(), TokenTypes.prototype.SIP);
         } else if (lexerName=="request_lineLexer") {
@@ -20508,7 +20376,7 @@ ParserFactory.prototype.createParser =function(line){
         throw "ParserFactory:createParser(): the header name or value is null";
     }
     var parserClass = null;
-        var lowercaseHeadervalue=headerName.toLowerCase();
+	var lowercaseHeadervalue=headerName.toLowerCase();
     for(var i=0;i<this.parserTable.length;i++)
     {
         if(this.parserTable[i][0]==lowercaseHeadervalue)
@@ -21659,7 +21527,7 @@ SIPMessage.prototype.computeContentLength =function(content){
     var length = 0;
     if (content != null) {
         if (content.constructor.name == "String") {
-            var cpt = 0;                                        
+            var cpt = 0;					
             var codeChar;
             for (var i = 0; i < content.length; ++i)
             {
@@ -22715,10 +22583,10 @@ SIPRequest.prototype.checkHeaders =function(){
         }
     } else if (this.getMethod()==this.PUBLISH) {
         if (this.getHeader(this.EventHeader) == null)
-                {
+		{
             console.error("SIPRequest:checkHeaders(): "+prefix + this.EventHeader);
             throw "SIPRequest:checkHeaders(): "+prefix + this.EventHeader;
-                }
+		}
     }
     if (this.requestLine.getMethod()==this.INVITE
         || this.requestLine.getMethod()==this.SUBSCRIBE
@@ -24341,8 +24209,8 @@ SIPTransactionStack.prototype.removeDialog =function(dialog){
         }
         this.earlyDialogTable.splice(l,1);
         // https://bitbucket.org/telestax/telscale-rtm/issue/35/ivnite-dialog-state-machine-is-broken-when
-        // When INVITE is sent out and 407 is received, a new challenge INVITE is sent but the Dialog gets TERMINATED from 407 
-        // after linger time so 8s, so when the callee try to send BYE it gets a 481 Dialog not found
+	// When INVITE is sent out and 407 is received, a new challenge INVITE is sent but the Dialog gets TERMINATED from 407 
+	// after linger time so 8s, so when the callee try to send BYE it gets a 481 Dialog not found
         // l was not nullified thus a random dialog could have been removed from the dialogTable which corresponds to the new INVITE Dialog
         var l=null;
         for(i=0;i<this.dialogTable.length;i++)
@@ -24367,7 +24235,7 @@ SIPTransactionStack.prototype.removeDialog =function(dialog){
             }
         }
         if (old == dialog) {
-                var l=null;
+        	var l=null;
             for(i=0;i<this.dialogTable.length;i++)
             {
                 if(this.dialogTable[i][0]==id)
@@ -27633,6 +27501,7 @@ SIPTransaction.prototype.setState =function(newState){
     {
         newState = this.currentState;
     }
+    currentState = newState;
 }
 
 SIPTransaction.prototype.getState =function(){
@@ -27902,7 +27771,8 @@ SIPTransaction.prototype.startTransactionTimer =function(){
 
 SIPTransaction.prototype.isMessagePartOfTransaction =function(){
     
-}/*
+}
+/*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
@@ -28193,6 +28063,7 @@ SIPClientTransaction.prototype.processResponseargu2 =function(sipResponse,incomi
 }
 
 SIPClientTransaction.prototype.processResponseargu3 =function(transactionResponse,sourceChannel,dialog){
+    if(logger!=undefined) logger..debug("processResponse() ctx state: "+ this.getState()); 
 
     if (this.getState() == null)
     {
@@ -28268,6 +28139,8 @@ SIPClientTransaction.prototype.inviteClientTransaction =function(transactionResp
     var statusCode = transactionResponse.getStatusCode();
     if (this.TERMINATED == this.getState()) {
         var ackAlreadySent = false;
+	if(dialog != null) {
+	} 
         if (dialog != null && dialog.isAckSeen() && dialog.getLastAckSent() != null) {
             if (dialog.getLastAckSent().getCSeq().getSeqNumber() == transactionResponse.getCSeq().getSeqNumber()
                 && transactionResponse.getFromTag()==dialog.getLastAckSent().getFromTag()) {
@@ -28621,15 +28494,15 @@ SIPClientTransaction.prototype.checkFromTag =function(sipResponse){
     var originalFromTag = this.getRequest().getFromTag();
     var sipResponseFromTag = sipResponse.getFrom().getTag();
     if (this.defaultDialog != null) {
-        // Added for https://code.google.com/p/webrtcomm/issues/detail?id=19 as XOR below is not enough
-        if (originalFromTag == null && sipResponseFromTag == null) {
-                return false;
-        }
+    	// Added for https://code.google.com/p/webrtcomm/issues/detail?id=19 as XOR below is not enough
+    	if (originalFromTag == null && sipResponseFromTag == null) {
+    		return false;
+    	}
         if (originalFromTag == null ^ sipResponseFromTag == null) {
             return false;
         }        
         if (originalFromTag != null && sipResponseFromTag != null && 
-                        originalFromTag.toLowerCase() != sipResponseFromTag.toLowerCase()) {
+        		originalFromTag.toLowerCase() != sipResponseFromTag.toLowerCase()) {
             return false;
         }
     }
